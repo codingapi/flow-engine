@@ -1,0 +1,24 @@
+{
+  "name": "@flow-engine/root",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:flow-engine": "pnpm -F  @flow-engine/flow-design build",
+    "build": "build:flow-engine ",
+    "dev:app-pc": "pnpm -F  @flow-engine/app-pc dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.27.0",
+  "devDependencies": {
+    "@rsbuild/core": "^1.7.1",
+    "@rsbuild/plugin-react": "^1.4.2",
+    "@rslib/core": "^0.19.1",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "typescript": "^5.9.3",
+    "react": "^19.2.3"
+  }
+}

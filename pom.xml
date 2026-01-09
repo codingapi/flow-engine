@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.9</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>com.codingapi.flow</groupId>
+	<artifactId>flow-engine-parent</artifactId>
+	<version>0.0.1</version>
+    <packaging>pom</packaging>
+	<name>flow-engine-parent</name>
+	<description>FlowEngine project for Spring Boot</description>
+    <modules>
+        <module>flow-engine-starter</module>
+        <module>flow-engine-starter-infra</module>
+        <module>flow-engine-example</module>
+        <module>flow-engine-framework</module>
+    </modules>
+
+    <properties>
+        <!-- maven properties-->
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
+        <maven.compile.source>17</maven.compile.source>
+        <maven.compile.target>17</maven.compile.target>
+        <maven.source.plugin>3.0.1</maven.source.plugin>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+
+		<java.version>17</java.version>
+        <fastjson.version>2.0.53</fastjson.version>
+        <jsonwebtoken.jjwt.version>0.12.6</jsonwebtoken.jjwt.version>
+        <commons-io.version>2.17.0</commons-io.version>
+        <commons-lang3.version>3.17.0</commons-lang3.version>
+        <codingapi.framework.version>3.4.29</codingapi.framework.version>
+	</properties>
+
+	<dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.codingapi.springboot</groupId>
+            <artifactId>springboot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+	</dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <dependency>
+                <groupId>com.codingapi.flow</groupId>
+                <artifactId>flow-engine-framework</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.codingapi.flow</groupId>
+                <artifactId>flow-engine-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.codingapi.flow</groupId>
+                <artifactId>flow-engine-starter-infra</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.codingapi.springboot</groupId>
+                <artifactId>springboot-starter</artifactId>
+                <version>${codingapi.framework.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.codingapi.springboot</groupId>
+                <artifactId>springboot-starter-security</artifactId>
+                <version>${codingapi.framework.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.codingapi.springboot</groupId>
+                <artifactId>springboot-starter-data-fast</artifactId>
+                <version>${codingapi.framework.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${maven.compile.source}</source>
+                    <target>${maven.compile.target}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgument>-Xlint:deprecation</compilerArgument>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-plugin.version}</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Implementation-Title>${project.name}</Implementation-Title>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
