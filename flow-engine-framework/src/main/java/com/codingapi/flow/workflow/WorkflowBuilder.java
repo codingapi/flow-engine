@@ -14,7 +14,7 @@ public class WorkflowBuilder {
 
     private final static WorkflowBuilder instance = new WorkflowBuilder();
 
-    private final Workflow workflow = new Workflow();
+    private Workflow workflow = new Workflow();
 
     private WorkflowBuilder() {
     }
@@ -65,7 +65,9 @@ public class WorkflowBuilder {
     }
 
     public Workflow build() {
-        return workflow;
+        Workflow result = workflow;
+        workflow = new Workflow();
+        return result;
     }
 
 }

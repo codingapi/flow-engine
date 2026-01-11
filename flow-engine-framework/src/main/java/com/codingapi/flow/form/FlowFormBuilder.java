@@ -6,7 +6,7 @@ public class FlowFormBuilder {
 
     private final static FlowFormBuilder instance = new FlowFormBuilder();
 
-    private final FlowForm flowForm = new FlowForm();
+    private FlowForm flowForm = new FlowForm();
 
     private FlowFormBuilder() {
     }
@@ -52,6 +52,8 @@ public class FlowFormBuilder {
     }
 
     public FlowForm build() {
-        return flowForm;
+        FlowForm result = flowForm;
+        flowForm = new FlowForm();
+        return result;
     }
 }
