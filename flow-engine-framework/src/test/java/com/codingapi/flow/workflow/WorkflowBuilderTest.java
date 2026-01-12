@@ -1,5 +1,6 @@
 package com.codingapi.flow.workflow;
 
+import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.node.*;
@@ -23,13 +24,7 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
-        startNode.setName("开始");
-
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
-        endNode.setName("结束");
-
         Workflow workflow = WorkflowBuilder.builder()
                 .title("请假流程")
                 .code("leave")
@@ -61,16 +56,9 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
-        startNode.setName("开始");
-
-        ApprovalNode approvalNode = new ApprovalNode();
-        approvalNode.setId("approval_001");
-        approvalNode.setName("主管审批");
+        ApprovalNode approvalNode = new ApprovalNode("主管审批");
 
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
-        endNode.setName("结束");
 
         Workflow workflow = WorkflowBuilder.builder()
                 .title("审批流程")
@@ -97,14 +85,10 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
 
-        HandleNode handleNode = new HandleNode();
-        handleNode.setId("handle_001");
-        handleNode.setName("办理");
+        HandleNode handleNode = new HandleNode("办理");
 
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
 
         Workflow workflow = WorkflowBuilder.builder()
                 .title("办理流程")
@@ -114,6 +98,8 @@ class WorkflowBuilderTest {
                 .addNode(startNode)
                 .addNode(handleNode)
                 .addNode(endNode)
+                .addEdge(new FlowEdge(startNode.getId(), handleNode.getId()))
+                .addEdge(new FlowEdge(handleNode.getId(), endNode.getId()))
                 .build();
 
         assertNotNull(workflow);
@@ -133,22 +119,12 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
 
-        ConditionBranchNode conditionNode = new ConditionBranchNode();
-        conditionNode.setId("condition_001");
-        conditionNode.setName("金额判断");
-
-        ApprovalNode approvalNode1 = new ApprovalNode();
-        approvalNode1.setId("approval_001");
-        approvalNode1.setName("经理审批");
-
-        ApprovalNode approvalNode2 = new ApprovalNode();
-        approvalNode2.setId("approval_002");
-        approvalNode2.setName("总监审批");
+        ConditionBranchNode conditionNode = new ConditionBranchNode("金额判断");
+        ApprovalNode approvalNode1 = new ApprovalNode("经理审批");
+        ApprovalNode approvalNode2 = new ApprovalNode("总监审批");
 
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
 
         Workflow workflow = WorkflowBuilder.builder()
                 .title("条件分支流程")
@@ -177,22 +153,14 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
 
-        ParallelBranchNode parallelNode = new ParallelBranchNode();
-        parallelNode.setId("parallel_001");
-        parallelNode.setName("并行审批");
+        ParallelBranchNode parallelNode = new ParallelBranchNode("并行审批");
 
-        ApprovalNode approvalNode1 = new ApprovalNode();
-        approvalNode1.setId("approval_001");
-        approvalNode1.setName("财务审批");
+        ApprovalNode approvalNode1 = new ApprovalNode("财务审批");
 
-        ApprovalNode approvalNode2 = new ApprovalNode();
-        approvalNode2.setId("approval_002");
-        approvalNode2.setName("法务审批");
+        ApprovalNode approvalNode2 = new ApprovalNode("法务审批");
 
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
 
         Workflow workflow = WorkflowBuilder.builder()
                 .title("并行分支流程")
@@ -221,14 +189,10 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
 
-        NotifyNode notifyNode = new NotifyNode();
-        notifyNode.setId("notify_001");
-        notifyNode.setName("通知相关人员");
+        NotifyNode notifyNode = new NotifyNode("通知相关人员");
 
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
 
         Workflow workflow = WorkflowBuilder.builder()
                 .title("通知流程")
@@ -255,14 +219,10 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
 
-        DelayNode delayNode = new DelayNode();
-        delayNode.setId("delay_001");
-        delayNode.setName("延迟处理");
+        DelayNode delayNode = new DelayNode("延迟处理");
 
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
 
         Workflow workflow = WorkflowBuilder.builder()
                 .title("延迟流程")
@@ -289,14 +249,10 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
 
-        SubProcessNode subProcessNode = new SubProcessNode();
-        subProcessNode.setId("subprocess_001");
-        subProcessNode.setName("调用子流程");
+        SubProcessNode subProcessNode = new SubProcessNode("调用子流程");
 
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
 
         Workflow workflow = WorkflowBuilder.builder()
                 .title("子流程流程")
@@ -323,14 +279,10 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
 
-        TriggerNode triggerNode = new TriggerNode();
-        triggerNode.setId("trigger_001");
-        triggerNode.setName("触发器执行");
+        TriggerNode triggerNode = new TriggerNode("触发器执行");
 
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
 
         Workflow workflow = WorkflowBuilder.builder()
                 .title("触发器流程")
@@ -357,14 +309,10 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
 
-        RouterBranchNode routerNode = new RouterBranchNode();
-        routerNode.setId("router_001");
-        routerNode.setName("路由选择");
+        RouterBranchNode routerNode = new RouterBranchNode("路由选择");
 
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
 
         Workflow workflow = WorkflowBuilder.builder()
                 .title("路由分支流程")
@@ -391,14 +339,10 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
 
-        InclusiveBranchNode inclusiveNode = new InclusiveBranchNode();
-        inclusiveNode.setId("inclusive_001");
-        inclusiveNode.setName("包容分支");
+        InclusiveBranchNode inclusiveNode = new InclusiveBranchNode("包容分支");
 
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
 
         Workflow workflow = WorkflowBuilder.builder()
                 .title("包容分支流程")
@@ -428,44 +372,24 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
-        startNode.setName("开始");
 
-        NotifyNode notifyNode = new NotifyNode();
-        notifyNode.setId("notify_001");
-        notifyNode.setName("通知发起人");
+        NotifyNode notifyNode = new NotifyNode("通知发起人");
 
-        ConditionBranchNode conditionNode = new ConditionBranchNode();
-        conditionNode.setId("condition_001");
-        conditionNode.setName("金额判断");
+        ConditionBranchNode conditionNode = new ConditionBranchNode("金额判断");
 
-        ApprovalNode approvalNode1 = new ApprovalNode();
-        approvalNode1.setId("approval_001");
-        approvalNode1.setName("部门经理审批");
+        ApprovalNode approvalNode1 = new ApprovalNode("部门经理审批");
 
-        ApprovalNode approvalNode2 = new ApprovalNode();
-        approvalNode2.setId("approval_002");
-        approvalNode2.setName("总经理审批");
+        ApprovalNode approvalNode2 = new ApprovalNode("总经理审批");
 
-        ParallelBranchNode parallelNode = new ParallelBranchNode();
-        parallelNode.setId("parallel_001");
-        parallelNode.setName("并行审批");
+        ParallelBranchNode parallelNode = new ParallelBranchNode("并行审批");
 
-        ApprovalNode financeApproval = new ApprovalNode();
-        financeApproval.setId("approval_003");
-        financeApproval.setName("财务审批");
+        ApprovalNode financeApproval = new ApprovalNode("财务审批");
 
-        ApprovalNode legalApproval = new ApprovalNode();
-        legalApproval.setId("approval_004");
-        legalApproval.setName("法务审批");
+        ApprovalNode legalApproval = new ApprovalNode("法务审批");
 
-        DelayNode delayNode = new DelayNode();
-        delayNode.setId("delay_001");
-        delayNode.setName("延迟通知");
+        DelayNode delayNode = new DelayNode("延迟通知");
 
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
-        endNode.setName("结束");
 
         Workflow workflow = WorkflowBuilder.builder()
                 .title("复杂流程")
@@ -519,14 +443,10 @@ class WorkflowBuilderTest {
                 .build();
 
         StartNode startNode = new StartNode();
-        startNode.setId("start_001");
 
         ApprovalNode approvalNode = new ApprovalNode();
-        approvalNode.setId("approval_001");
-        approvalNode.setName("审批");
 
         EndNode endNode = new EndNode();
-        endNode.setId("end_001");
 
         Workflow workflow = WorkflowBuilder.builder()
                 .title("报销流程")

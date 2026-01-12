@@ -6,11 +6,6 @@ package com.codingapi.flow.edge;
 public interface IFlowEdge {
 
     /**
-     * 边id
-     */
-    String getId();
-
-    /**
      * 边源节点
      */
     String from();
