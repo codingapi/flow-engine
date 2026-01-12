@@ -20,6 +20,9 @@ public class OperatorMatchScript {
     }
 
 
+    /**
+     * 任意人
+     */
     public static OperatorMatchScript any() {
         return new OperatorMatchScript(SCRIPT_ANY);
     }

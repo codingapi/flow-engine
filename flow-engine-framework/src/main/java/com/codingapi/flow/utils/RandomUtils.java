@@ -19,7 +19,7 @@ public class RandomUtils {
     /**
      * 生成18位随机流程id
      */
-    public static String generateNodeId() {
+    public static String generateStringId() {
     	return random.nextAlphanumeric(18);
     }
 }

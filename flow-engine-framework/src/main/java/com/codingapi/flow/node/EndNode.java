@@ -1,5 +1,8 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.node.error.ErrorThrow;
+import com.codingapi.flow.session.FlowSession;
+
 /**
  * 结束节点
  */
@@ -19,5 +22,15 @@ public class EndNode extends BaseNode  {
 
     public EndNode(String name) {
         super(name);
+    }
+
+    @Override
+    public String generateTitle(FlowSession flowSession) {
+        return null;
+    }
+
+    @Override
+    public ErrorThrow errorTrigger(FlowSession flowSession) {
+        return null;
     }
 }

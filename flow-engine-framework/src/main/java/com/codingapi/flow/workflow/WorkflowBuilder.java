@@ -65,9 +65,8 @@ public class WorkflowBuilder {
     }
 
     public Workflow build() {
-        Workflow result = workflow;
-        workflow = new Workflow();
-        return result;
+        workflow.verify();
+        return workflow;
     }
 
 }
