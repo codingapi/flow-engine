@@ -1,7 +1,7 @@
 package com.codingapi.flow.workflow;
 
 import com.codingapi.flow.edge.IFlowEdge;
-import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.user.IFlowOperator;
 
@@ -33,7 +33,7 @@ public class WorkflowBuilder {
         return this;
     }
 
-    public WorkflowBuilder form(FlowForm form) {
+    public WorkflowBuilder form(FormMeta form) {
         workflow.setForm(form);
         return this;
     }

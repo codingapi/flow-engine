@@ -1,7 +1,7 @@
 package com.codingapi.flow.session;
 
 import com.codingapi.flow.form.FormData;
-import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.user.IFlowOperator;
 import com.codingapi.flow.workflow.Workflow;
@@ -22,7 +22,7 @@ public class FlowSession {
     /**
      * 当前流程表单
      */
-    private final FlowForm currentForm;
+    private final FormMeta formMeta;
     /**
      * 当前流程设计
      */
@@ -35,7 +35,14 @@ public class FlowSession {
     /**
      * 当前流程表单数据
      */
-    private final FormData currentData;
+    private final FormData formData;
 
+
+    /**
+     * 获取流程的创建者
+     */
+    public IFlowOperator getCreatedOperator() {
+        return workflow.getCreatedOperator();
+    }
 
 }

@@ -1,8 +1,8 @@
 package com.codingapi.flow.workflow;
 
 import com.codingapi.flow.edge.FlowEdge;
-import com.codingapi.flow.form.FlowForm;
-import com.codingapi.flow.form.FlowFormBuilder;
+import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.node.ApprovalNode;
@@ -20,7 +20,7 @@ class WorkflowBuilderTest {
     void buildBasicWorkflow() {
         User user = new User(1, "lorne");
 
-        FlowForm form = FlowFormBuilder.builder()
+        FormMeta form = FormMetaBuilder.builder()
                 .name("请假流程")
                 .code("leave")
                 .addField("请假人", "name", "string")

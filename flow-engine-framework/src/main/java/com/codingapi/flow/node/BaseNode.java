@@ -1,8 +1,10 @@
 package com.codingapi.flow.node;
 
-import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.node.error.ErrorThrow;
+import com.codingapi.flow.script.NodeTitleScript;
+import com.codingapi.flow.script.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.IFlowOperator;
 import com.codingapi.flow.utils.RandomUtils;
@@ -36,6 +38,16 @@ public abstract class BaseNode implements IFlowNode {
     @Getter
     private String view;
 
+    /**
+     * 审批人配置脚本
+     */
+    private OperatorLoadScript operatorScript;
+
+    /**
+     * 节点待办标题脚本
+     */
+    private NodeTitleScript nodeTitleScript;
+
     private final List<FormFieldPermission> formFieldsPermissions;
 
     public BaseNode(String name) {
@@ -53,23 +65,44 @@ public abstract class BaseNode implements IFlowNode {
         this.formFieldsPermissions = new ArrayList<>();
     }
 
+    /**
+     * 设置审批人配置脚本
+     * @param operatorScript 审批人配置脚本
+     */
+    public void setOperatorScript(String operatorScript) {
+        this.operatorScript = new OperatorLoadScript(operatorScript);
+    }
+
+    /**
+     * 设置节点待办标题脚本
+     * @param nodeTitleScript 节点待办标题脚本
+     */
+    public void setNodeTitleScript(String nodeTitleScript) {
+        this.nodeTitleScript = new NodeTitleScript(nodeTitleScript);
+    }
+
+    /**
+     * 设置表单字段权限
+     * @param builder 表单字段权限构建器
+     */
+    public void setFormFieldsPermissions(FormFieldPermission.Builder builder) {
+        formFieldsPermissions.addAll(builder.build());
+    }
+
+
     @Override
     public List<FormFieldPermission> formFieldsPermissions() {
         return formFieldsPermissions;
     }
 
     @Override
-    public List<IFlowOperator> operators() {
-        return List.of();
-    }
-
-    public void setFormFieldsPermissions(FormFieldPermission.Builder builder) {
-        formFieldsPermissions.addAll(builder.build());
+    public List<IFlowOperator> operators(FlowSession flowSession) {
+        return operatorScript.load(flowSession);
     }
 
     @Override
     public String generateTitle(FlowSession flowSession) {
-        return "";
+        return nodeTitleScript.load(flowSession);
     }
 
     @Override
@@ -78,7 +111,7 @@ public abstract class BaseNode implements IFlowNode {
     }
 
     @Override
-    public void verify(FlowForm form) {
+    public void verify(FormMeta form) {
         this.verifyFields();
         if (!(this instanceof EndNode)) {
             this.verifyPermissions(form);
@@ -97,8 +130,8 @@ public abstract class BaseNode implements IFlowNode {
         }
     }
 
-    private void verifyPermissions(FlowForm form) {
-        Map<String, String> fieldTypes = form.getFieldTypeMaps();
+    private void verifyPermissions(FormMeta form) {
+        Map<String, String> fieldTypes = form.getAllFieldTypeMaps();
         for (FormFieldPermission permission : formFieldsPermissions) {
             String key = permission.getFormCode() + "." + permission.getFieldName();
             if (!fieldTypes.containsKey(key)) {

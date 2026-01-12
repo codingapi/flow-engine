@@ -13,7 +13,7 @@ import java.util.Map;
  */
 @Setter
 @Getter
-public class FlowForm {
+public class FormMeta {
 
     /**
      * 表单名称
@@ -31,7 +31,7 @@ public class FlowForm {
     /**
      * 子表单
      */
-    private List<FlowForm> subForms;
+    private List<FormMeta> subForms;
 
     /**
      * 获取表单字段名称
@@ -49,7 +49,7 @@ public class FlowForm {
     	return fields.stream().filter(field -> field.getName().equals(fieldName)).findFirst().orElse(null);
     }
 
-    private void initFormFieldTypes(FlowForm form,Map<String,String> types) {
+    private void initFormFieldTypes(FormMeta form, Map<String,String> types) {
         for (FormFieldMeta field : form.getFields()) {
             String key = form.getCode() + "." + field.getCode();
             String type = field.getType();
@@ -61,14 +61,29 @@ public class FlowForm {
      * 获取表单字段类型
      * @return 表单字段类型
      */
-    public Map<String,String> getFieldTypeMaps(){
+    public Map<String,String> getAllFieldTypeMaps(){
         Map<String,String> types = new HashMap<>();
-        List<FlowForm> forms = this.getSubForms();
+        List<FormMeta> forms = this.getSubForms();
         if (forms == null) {
             forms = new ArrayList<>();
         }
         forms.add(this);
-        for (FlowForm subForm : forms) {
+        for (FormMeta subForm : forms) {
+            this.initFormFieldTypes(subForm, types);
+        }
+        return types;
+    }
+
+
+    /**
+     * 获取表单字段类型
+     * @return 表单字段类型
+     */
+    public Map<String,String> getMainFieldTypeMaps(){
+        Map<String,String> types = new HashMap<>();
+        List<FormMeta> forms = new ArrayList<>();
+        forms.add(this);
+        for (FormMeta subForm : forms) {
             this.initFormFieldTypes(subForm, types);
         }
         return types;

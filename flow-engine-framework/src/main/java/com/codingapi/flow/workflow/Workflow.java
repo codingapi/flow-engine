@@ -1,8 +1,7 @@
 package com.codingapi.flow.workflow;
 
 import com.codingapi.flow.edge.IFlowEdge;
-import com.codingapi.flow.form.FlowForm;
-import com.codingapi.flow.form.permission.FormFieldPermission;
+import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.EndNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.StartNode;
@@ -46,7 +45,7 @@ public class Workflow {
     /**
      * 流程表单
      */
-    private FlowForm form;
+    private FormMeta form;
 
     /**
      * 创建者脚本
@@ -82,12 +81,12 @@ public class Workflow {
      * 验证流程
      */
     public void verify() {
-        this.verifyWorkflow();
+        this.verifyFields();
         this.verifyNodes();
         this.verifyEdges();
     }
 
-    private void verifyWorkflow() {
+    private void verifyFields() {
         if (!StringUtils.hasText(id)) {
             throw new IllegalArgumentException("workflow id can not be null");
         }

@@ -1,6 +1,6 @@
 package com.codingapi.flow.node;
 
-import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.node.error.ErrorThrow;
 import com.codingapi.flow.session.FlowSession;
@@ -41,7 +41,7 @@ public interface IFlowNode {
     /**
      * 节点参与用户
      */
-    List<IFlowOperator> operators();
+    List<IFlowOperator> operators(FlowSession flowSession);
 
     /**
      * 构建待办标题
@@ -57,6 +57,6 @@ public interface IFlowNode {
     /**
      * 节点验证
      */
-    void verify(FlowForm form);
+    void verify(FormMeta form);
 
 }
