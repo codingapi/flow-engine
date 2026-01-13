@@ -12,15 +12,14 @@ import java.util.ArrayList;
  */
 public class WorkflowBuilder {
 
-    private final static WorkflowBuilder instance = new WorkflowBuilder();
-
-    private Workflow workflow = new Workflow();
+    private final Workflow workflow ;
 
     private WorkflowBuilder() {
+        this.workflow = new Workflow();
     }
 
     public static WorkflowBuilder builder() {
-        return instance;
+        return new WorkflowBuilder();
     }
 
     public WorkflowBuilder id(String id) {

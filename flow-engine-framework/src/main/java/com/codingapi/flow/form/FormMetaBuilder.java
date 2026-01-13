@@ -4,15 +4,13 @@ import java.util.ArrayList;
 
 public class FormMetaBuilder {
 
-    private final static FormMetaBuilder instance = new FormMetaBuilder();
-
     private FormMeta formMeta = new FormMeta();
 
     private FormMetaBuilder() {
     }
 
     public static FormMetaBuilder builder() {
-        return instance;
+        return new FormMetaBuilder();
     }
 
     public FormMetaBuilder name(String name) {
