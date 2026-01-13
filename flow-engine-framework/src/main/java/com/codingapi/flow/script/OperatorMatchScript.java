@@ -15,10 +15,9 @@ public class OperatorMatchScript {
     @Getter
     private final String script;
 
-    public boolean match(IFlowOperator current) {
+    public boolean execute(IFlowOperator current) {
         return ScriptRuntimeContext.getInstance().run(script, Boolean.class, current);
     }
-
 
     /**
      * 任意人

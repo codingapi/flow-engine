@@ -74,7 +74,7 @@ public class Workflow {
      * @return 是否匹配
      */
     public boolean matchCreatedOperator(IFlowOperator flowOperator) {
-        return operatorCreateScript.match(flowOperator);
+        return operatorCreateScript.execute(flowOperator);
     }
 
     /**
@@ -174,6 +174,15 @@ public class Workflow {
     public List<IFlowNode> next(IFlowNode node) {
         return edges.stream().filter(edge -> edge.from().equals(node.getId()))
                 .map(edge -> nodes.stream().filter(node1 -> node1.getId().equals(edge.to())).findFirst().get()).toList();
+    }
+
+
+    public IFlowNode getNode(String nodeId) {
+    	return nodes.stream().filter(node -> node.getId().equals(nodeId)).findFirst().orElse(null);
+    }
+
+    public IFlowNode getStartNode() {
+    	return nodes.stream().filter(node -> node instanceof StartNode).findFirst().orElse(null);
     }
 
 }

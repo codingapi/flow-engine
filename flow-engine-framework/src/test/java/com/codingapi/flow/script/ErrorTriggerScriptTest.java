@@ -1,4 +1,4 @@
-package com.codingapi.flow.workflow;
+package com.codingapi.flow.script;
 
 import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
@@ -8,16 +8,21 @@ import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.node.ApprovalNode;
 import com.codingapi.flow.node.EndNode;
 import com.codingapi.flow.node.StartNode;
+import com.codingapi.flow.error.ErrorThrow;
+import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.User;
+import com.codingapi.flow.workflow.Workflow;
+import com.codingapi.flow.workflow.WorkflowBuilder;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class WorkflowBuilderTest {
+class ErrorTriggerScriptTest {
 
     @Test
-    void buildBasicWorkflow() {
+    void execute() {
+
         User user = new User(1, "lorne");
 
         FormMeta form = FormMetaBuilder.builder()
@@ -58,15 +63,13 @@ class WorkflowBuilderTest {
                 .addEdge(new FlowEdge(approvalNode.getId(), endNode.getId()))
                 .build();
 
-        assertNotNull(workflow);
-        assertEquals("请假流程", workflow.getTitle());
-        assertEquals("leave", workflow.getCode());
-        assertNotNull(workflow.getCreatedOperator());
-        assertEquals(1, workflow.getCreatedOperator().getUserId());
-        assertNotNull(workflow.getForm());
-        assertEquals("请假流程", workflow.getForm().getName());
-        assertNotNull(workflow.getNodes());
-        assertEquals(3, workflow.getNodes().size());
-    }
+        ErrorTriggerScript errorTriggerScript = ErrorTriggerScript.defaultNodeScript();
 
+        FlowSession flowSession = new FlowSession(user, form, workflow, startNode, null);
+
+        ErrorThrow errorThrow =  errorTriggerScript.execute(flowSession);
+        assertTrue(errorThrow.isNode());
+        assertEquals(startNode.getId(), errorThrow.getNode().getId());
+
+    }
 }

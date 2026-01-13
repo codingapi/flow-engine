@@ -45,4 +45,8 @@ public class FlowSession {
         return workflow.getCreatedOperator();
     }
 
+    public IFlowNode getStartNode() {
+        return workflow.getStartNode();
+    }
+
 }

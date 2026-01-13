@@ -19,7 +19,7 @@ public class OperatorLoadScript {
     private final String script;
 
     @SuppressWarnings("unchecked")
-    public List<IFlowOperator> load(FlowSession request) {
+    public List<IFlowOperator> execute(FlowSession request) {
         return ScriptRuntimeContext.getInstance().run(script, List.class,request);
     }
 

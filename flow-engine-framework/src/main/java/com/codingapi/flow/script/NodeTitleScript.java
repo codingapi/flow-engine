@@ -15,7 +15,7 @@ public class NodeTitleScript {
     @Getter
     private final String script;
 
-    public String load(FlowSession request) {
+    public String execute(FlowSession request) {
         return ScriptRuntimeContext.getInstance().run(script, String.class, request);
     }
 

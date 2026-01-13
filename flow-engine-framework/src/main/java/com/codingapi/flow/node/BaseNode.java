@@ -2,7 +2,7 @@ package com.codingapi.flow.node;
 
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.node.error.ErrorThrow;
+import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.script.NodeTitleScript;
 import com.codingapi.flow.script.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
@@ -97,12 +97,12 @@ public abstract class BaseNode implements IFlowNode {
 
     @Override
     public List<IFlowOperator> operators(FlowSession flowSession) {
-        return operatorScript.load(flowSession);
+        return operatorScript.execute(flowSession);
     }
 
     @Override
     public String generateTitle(FlowSession flowSession) {
-        return nodeTitleScript.load(flowSession);
+        return nodeTitleScript.execute(flowSession);
     }
 
     @Override

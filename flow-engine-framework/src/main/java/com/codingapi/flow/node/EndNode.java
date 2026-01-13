@@ -1,6 +1,6 @@
 package com.codingapi.flow.node;
 
-import com.codingapi.flow.node.error.ErrorThrow;
+import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.session.FlowSession;
 
 /**

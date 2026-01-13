@@ -9,9 +9,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class OperatorMatchScriptTest {
 
     @Test
-    void match() {
+    void execute() {
         IFlowOperator flowOperator = new User(1,"lorne");
         OperatorMatchScript operatorMatchScript = OperatorMatchScript.any();
-        assertTrue(operatorMatchScript.match(flowOperator));
+        assertTrue(operatorMatchScript.execute(flowOperator));
     }
 }
