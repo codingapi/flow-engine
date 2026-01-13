@@ -2,12 +2,18 @@ package com.codingapi.flow.form;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class FormDataTest {
 
+    /**
+     * 表单数据测试
+     */
     @Test
-    void test() {
+    void dataTest() {
         FormMeta form = FormMetaBuilder.builder()
                 .name("请假流程")
                 .code("leave")
@@ -24,13 +30,23 @@ class FormDataTest {
                 .build();
         FormData data = new FormData(form);
         data.getDataBody().set("name","张三").set("days",10).set("reason","事由");
-        data.addSubData("record").set("approver","张三").set("result","通过").set("time","2020-01-01");
-        data.addSubData("record").set("approver","李四").set("result","通过").set("time","2020-01-02");
-
+        data.addSubDataBody("record").set("approver","张三").set("result","通过").set("time","2020-01-01");
+        data.addSubDataBody("record").set("approver","李四").set("result","通过").set("time","2020-01-02");
 
         assertEquals("张三", data.getDataBody().get("name"));
         assertEquals(10, data.getDataBody().get("days"));
         assertEquals("事由", data.getDataBody().get("reason"));
+
+        Map<String,Object> mainData = data.toMapData();
+        assertEquals("张三", mainData.get("name"));
+        assertEquals(10, mainData.get("days"));
+        assertEquals("事由", mainData.get("reason"));
+
+        data.getDataBody().set("name","张三-112233");
+        List<FormData.DataBody> subDataBody = data.getSubDataBody("record");
+        assertEquals(2, subDataBody.size());
+
+        assertEquals("张三-112233", data.getDataBody().get("name"));
 
         assertEquals(2, data.getSubDataBody().size());
         assertEquals("张三", data.getSubDataBody().get(0).get("approver"));
