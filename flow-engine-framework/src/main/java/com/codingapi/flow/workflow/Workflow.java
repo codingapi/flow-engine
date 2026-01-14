@@ -8,15 +8,18 @@ import com.codingapi.flow.node.StartNode;
 import com.codingapi.flow.script.OperatorMatchScript;
 import com.codingapi.flow.user.IFlowOperator;
 import com.codingapi.flow.utils.RandomUtils;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 流程对象
  */
-@Data
+@Getter
+@AllArgsConstructor
 public class Workflow {
 
     /**
@@ -63,8 +66,45 @@ public class Workflow {
     private List<IFlowEdge> edges;
 
 
-    public Workflow() {
+    protected Workflow() {
         this.id = RandomUtils.generateStringId();
+        this.code = RandomUtils.generateWorkflowCode();
+        this.createdTime = System.currentTimeMillis();
+        this.operatorCreateScript = OperatorMatchScript.any();
+        this.nodes = new ArrayList<>();
+        this.edges = new ArrayList<>();
+    }
+
+    protected void setId(String id) {
+        this.id = id;
+    }
+
+    protected void setCode(String code) {
+        this.code = code;
+    }
+
+    protected void setTitle(String title) {
+        this.title = title;
+    }
+
+    protected void setCreatedOperator(IFlowOperator createdOperator) {
+        this.createdOperator = createdOperator;
+    }
+
+    protected void setForm(FormMeta form) {
+        this.form = form;
+    }
+
+    protected void setOperatorCreateScript(OperatorMatchScript operatorCreateScript) {
+        this.operatorCreateScript = operatorCreateScript;
+    }
+
+    protected void setNodes(List<IFlowNode> nodes) {
+        this.nodes = nodes;
+    }
+
+    protected void setEdges(List<IFlowEdge> edges) {
+        this.edges = edges;
     }
 
     /**
@@ -95,6 +135,9 @@ public class Workflow {
         }
         if (!StringUtils.hasText(title)) {
             throw new IllegalArgumentException("workflow title can not be null");
+        }
+        if (createdTime <= 0) {
+            throw new IllegalArgumentException("workflow createdTime can not be null");
         }
         if (form == null) {
             throw new IllegalArgumentException("workflow form can not be null");
@@ -178,11 +221,11 @@ public class Workflow {
 
 
     public IFlowNode getNode(String nodeId) {
-    	return nodes.stream().filter(node -> node.getId().equals(nodeId)).findFirst().orElse(null);
+        return nodes.stream().filter(node -> node.getId().equals(nodeId)).findFirst().orElse(null);
     }
 
     public IFlowNode getStartNode() {
-    	return nodes.stream().filter(node -> node instanceof StartNode).findFirst().orElse(null);
+        return nodes.stream().filter(node -> node instanceof StartNode).findFirst().orElse(null);
     }
 
 }

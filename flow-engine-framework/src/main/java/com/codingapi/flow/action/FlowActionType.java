@@ -1,6 +1,6 @@
-package com.codingapi.flow.button;
+package com.codingapi.flow.action;
 
-public enum FlowButtonType {
+public enum FlowActionType {
     // 通过
     PASS,
     // 拒绝

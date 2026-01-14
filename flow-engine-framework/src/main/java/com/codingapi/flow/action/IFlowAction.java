@@ -1,15 +1,15 @@
-package com.codingapi.flow.button;
+package com.codingapi.flow.action;
 
 /**
  * 流程按钮配置
  */
-public interface IFlowButton {
+public interface IFlowAction {
 
     /**
      * 按钮名称
      */
     default String title() {
-        FlowButtonType currentType = this.type();
+        FlowActionType currentType = this.type();
         return switch (currentType) {
             case PASS -> "同意";
             case REJECT -> "拒绝";
@@ -23,6 +23,6 @@ public interface IFlowButton {
     /**
      * 按钮类型
      */
-    FlowButtonType type();
+    FlowActionType type();
 
 }

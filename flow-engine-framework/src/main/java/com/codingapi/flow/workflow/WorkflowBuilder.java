@@ -3,6 +3,7 @@ package com.codingapi.flow.workflow;
 import com.codingapi.flow.edge.IFlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.script.OperatorMatchScript;
 import com.codingapi.flow.user.IFlowOperator;
 
 import java.util.ArrayList;
@@ -44,6 +45,11 @@ public class WorkflowBuilder {
 
     public WorkflowBuilder createdOperator(IFlowOperator createdOperator) {
         workflow.setCreatedOperator(createdOperator);
+        return this;
+    }
+
+    public WorkflowBuilder operatorCreateScript(String operatorCreateScript) {
+        workflow.setOperatorCreateScript(new OperatorMatchScript(operatorCreateScript));
         return this;
     }
 

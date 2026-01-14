@@ -16,4 +16,9 @@ public class RandomUtils {
         // 1000亿的数据范围内重复的概率0.027%（约 1/3700）
     	return random.nextAlphanumeric(18);
     }
+
+
+    public static String generateWorkflowCode() {
+    	return random.nextAlphanumeric(10);
+    }
 }
