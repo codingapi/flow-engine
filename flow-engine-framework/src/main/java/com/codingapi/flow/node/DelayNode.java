@@ -1,9 +1,18 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.form.permission.FormFieldPermission;
+import com.codingapi.flow.script.ErrorTriggerScript;
+import com.codingapi.flow.script.NodeTitleScript;
+import com.codingapi.flow.script.OperatorLoadScript;
+import com.codingapi.flow.utils.RandomUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 延迟节点
  */
-public class DelayNode extends BaseNode{
+public class DelayNode extends BaseNode {
 
     public static final String NODE_TYPE = "delay";
     public static final String DEFAULT_NAME = "延迟节点";
@@ -13,11 +22,21 @@ public class DelayNode extends BaseNode{
         return NODE_TYPE;
     }
 
-    public DelayNode() {
-        super(DEFAULT_NAME);
+    public DelayNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions) {
+        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions);
     }
 
-    public DelayNode(String name) {
-        super(name);
+    private DelayNode() {
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>());
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder extends BaseBuilder<DelayNode> {
+        public Builder() {
+            super(new DelayNode());
+        }
     }
 }

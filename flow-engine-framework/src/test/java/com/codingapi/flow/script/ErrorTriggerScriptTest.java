@@ -1,15 +1,14 @@
 package com.codingapi.flow.script;
 
 import com.codingapi.flow.edge.FlowEdge;
+import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
-import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.node.ApprovalNode;
 import com.codingapi.flow.node.EndNode;
 import com.codingapi.flow.node.StartNode;
-import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
@@ -32,24 +31,25 @@ class ErrorTriggerScriptTest {
                 .addField("请假事由", "reason", "string")
                 .build();
 
-        StartNode startNode = new StartNode();
-        startNode.setFormFieldsPermissions(FormFieldPermission
-                .builder()
-                .field("leave", "name", PermissionType.WRITE)
-                .field("leave", "days", PermissionType.WRITE)
-                .field("leave", "reason", PermissionType.WRITE)
-        );
+        StartNode startNode = StartNode.builder()
+                .formFieldPermissionsBuilder()
+                .addPermission("leave", "name", PermissionType.WRITE)
+                .addPermission("leave", "days", PermissionType.WRITE)
+                .addPermission("leave", "reason", PermissionType.WRITE)
+                .build()
+                .build();
 
-        ApprovalNode approvalNode = new ApprovalNode("经理审批");
-        approvalNode.setOperatorScript("def run(request){return [request.getCreatedOperator()]}");
-        approvalNode.setFormFieldsPermissions(FormFieldPermission
-                .builder()
-                .field("leave", "name", PermissionType.READ)
-                .field("leave", "days", PermissionType.READ)
-                .field("leave", "reason", PermissionType.READ)
-        );
+        ApprovalNode approvalNode = ApprovalNode.builder()
+                .name("经理审批")
+                .operatorScript("def run(request){return [request.getCreatedOperator()]}")
+                .formFieldPermissionsBuilder()
+                .addPermission("leave", "name", PermissionType.READ)
+                .addPermission("leave", "days", PermissionType.READ)
+                .addPermission("leave", "reason", PermissionType.READ)
+                .build()
+                .build();
 
-        EndNode endNode = new EndNode();
+        EndNode endNode = EndNode.builder().build();
         Workflow workflow = WorkflowBuilder.builder()
                 .title("请假流程")
                 .code("leave")
@@ -63,17 +63,17 @@ class ErrorTriggerScriptTest {
                 .build();
 
         FormData data = new FormData(form);
-        data.getDataBody().set("name","张三").set("days",10).set("reason","事由");
+        data.getDataBody().set("name", "张三").set("days", 10).set("reason", "事由");
 
         FlowSession flowSession = new FlowSession(user, form, workflow, startNode, data);
 
         ErrorTriggerScript errorNodeTriggerScript = ErrorTriggerScript.defaultNodeScript();
-        ErrorThrow errorThrow =  errorNodeTriggerScript.execute(flowSession);
+        ErrorThrow errorThrow = errorNodeTriggerScript.execute(flowSession);
         assertTrue(errorThrow.isNode());
         assertEquals(startNode.getId(), errorThrow.getNode().getId());
 
         ErrorTriggerScript errorOperatorTriggerScript = ErrorTriggerScript.defaultOperatorScript();
-        errorThrow =  errorOperatorTriggerScript.execute(flowSession);
+        errorThrow = errorOperatorTriggerScript.execute(flowSession);
         assertFalse(errorThrow.isNode());
         assertEquals(user, errorThrow.getOperators().get(0));
     }

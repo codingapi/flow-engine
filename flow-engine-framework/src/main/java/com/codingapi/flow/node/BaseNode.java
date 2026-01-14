@@ -1,22 +1,21 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.script.ErrorTriggerScript;
 import com.codingapi.flow.script.NodeTitleScript;
 import com.codingapi.flow.script.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.IFlowOperator;
-import com.codingapi.flow.utils.RandomUtils;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@AllArgsConstructor
 public abstract class BaseNode implements IFlowNode {
 
     public static final String DEFAULT_VIEW = "default";
@@ -25,17 +24,15 @@ public abstract class BaseNode implements IFlowNode {
      * 节点id
      */
     @Getter
-    private final String id;
+    private String id;
     /**
      * 节点名称
      */
-    @Setter
     @Getter
     private String name;
     /**
      * 渲染视图
      */
-    @Setter
     @Getter
     private String view;
 
@@ -57,31 +54,26 @@ public abstract class BaseNode implements IFlowNode {
     /**
      * 表单字段权限
      */
-    private final List<FormFieldPermission> formFieldsPermissions;
+    private List<FormFieldPermission> formFieldPermissions;
 
 
-    public BaseNode(String name) {
-        this(RandomUtils.generateStringId(), name, DEFAULT_VIEW);
-    }
-
-    public BaseNode(String id, String name) {
-        this(id, name, DEFAULT_VIEW);
-    }
-
-    public BaseNode(String id, String name, String view) {
-        this.id = id;
-        this.name = name;
+    protected void setView(String view) {
         this.view = view;
-        this.formFieldsPermissions = new ArrayList<>();
-        this.operatorScript = OperatorLoadScript.creator();
-        this.nodeTitleScript = NodeTitleScript.defaultScript();
+    }
+
+    protected void setName(String name) {
+        this.name = name;
+    }
+
+    protected void setId(String id) {
+        this.id = id;
     }
 
     /**
      * 设置审批人配置脚本
      * @param operatorScript 审批人配置脚本
      */
-    public void setOperatorScript(String operatorScript) {
+    protected void setOperatorScript(String operatorScript) {
         this.operatorScript = new OperatorLoadScript(operatorScript);
     }
 
@@ -89,7 +81,7 @@ public abstract class BaseNode implements IFlowNode {
      * 设置节点待办标题脚本
      * @param nodeTitleScript 节点待办标题脚本
      */
-    public void setNodeTitleScript(String nodeTitleScript) {
+    protected void setNodeTitleScript(String nodeTitleScript) {
         this.nodeTitleScript = new NodeTitleScript(nodeTitleScript);
     }
 
@@ -97,22 +89,20 @@ public abstract class BaseNode implements IFlowNode {
      * 错误触发脚本
      * @param errorTriggerScript 错误触发脚本
      */
-    public void setErrorTriggerScript(String errorTriggerScript) {
+    protected void setErrorTriggerScript(String errorTriggerScript) {
         this.errorTriggerScript = new ErrorTriggerScript(errorTriggerScript);
     }
 
     /**
      * 设置表单字段权限
-     * @param builder 表单字段权限构建器
      */
-    public void setFormFieldsPermissions(FormFieldPermission.Builder builder) {
-        formFieldsPermissions.addAll(builder.build());
+    protected void setFormFieldPermissions(List<FormFieldPermission> permissions) {
+        this.formFieldPermissions = permissions;
     }
-
 
     @Override
     public List<FormFieldPermission> formFieldsPermissions() {
-        return formFieldsPermissions;
+        return formFieldPermissions;
     }
 
     @Override
@@ -159,7 +149,7 @@ public abstract class BaseNode implements IFlowNode {
 
     private void verifyPermissions(FormMeta form) {
         Map<String, String> fieldTypes = form.getAllFieldTypeMaps();
-        for (FormFieldPermission permission : formFieldsPermissions) {
+        for (FormFieldPermission permission : formFieldPermissions) {
             String key = permission.getFormCode() + "." + permission.getFieldName();
             if (!fieldTypes.containsKey(key)) {
                 throw new IllegalArgumentException("field " + key + " not found in form " + form.getName());
