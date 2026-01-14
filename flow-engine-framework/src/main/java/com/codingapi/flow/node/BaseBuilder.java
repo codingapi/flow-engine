@@ -6,7 +6,7 @@ import com.codingapi.flow.form.permission.PermissionType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BaseBuilder<N extends BaseNode> {
+public abstract class BaseBuilder<N extends BaseNode> {
 
     protected final N node;
 

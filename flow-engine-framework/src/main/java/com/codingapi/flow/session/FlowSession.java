@@ -45,6 +45,9 @@ public class FlowSession {
         return workflow.getCreatedOperator();
     }
 
+    /**
+     * 获取流程的开始节点
+     */
     public IFlowNode getStartNode() {
         return workflow.getStartNode();
     }
