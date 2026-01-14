@@ -3,6 +3,7 @@ package com.codingapi.flow.node;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.error.ErrorThrow;
+import com.codingapi.flow.script.ErrorTriggerScript;
 import com.codingapi.flow.script.NodeTitleScript;
 import com.codingapi.flow.script.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
@@ -48,7 +49,16 @@ public abstract class BaseNode implements IFlowNode {
      */
     private NodeTitleScript nodeTitleScript;
 
+    /**
+     * 异常触发脚本
+     */
+    private ErrorTriggerScript errorTriggerScript;
+
+    /**
+     * 表单字段权限
+     */
     private final List<FormFieldPermission> formFieldsPermissions;
+
 
     public BaseNode(String name) {
         this(RandomUtils.generateStringId(), name, DEFAULT_VIEW);
@@ -63,6 +73,8 @@ public abstract class BaseNode implements IFlowNode {
         this.name = name;
         this.view = view;
         this.formFieldsPermissions = new ArrayList<>();
+        this.operatorScript = OperatorLoadScript.creator();
+        this.nodeTitleScript = NodeTitleScript.defaultScript();
     }
 
     /**
@@ -79,6 +91,14 @@ public abstract class BaseNode implements IFlowNode {
      */
     public void setNodeTitleScript(String nodeTitleScript) {
         this.nodeTitleScript = new NodeTitleScript(nodeTitleScript);
+    }
+
+    /**
+     * 错误触发脚本
+     * @param errorTriggerScript 错误触发脚本
+     */
+    public void setErrorTriggerScript(String errorTriggerScript) {
+        this.errorTriggerScript = new ErrorTriggerScript(errorTriggerScript);
     }
 
     /**
@@ -107,7 +127,7 @@ public abstract class BaseNode implements IFlowNode {
 
     @Override
     public ErrorThrow errorTrigger(FlowSession flowSession) {
-        return null;
+        return errorTriggerScript.execute(flowSession);
     }
 
     @Override
@@ -127,6 +147,13 @@ public abstract class BaseNode implements IFlowNode {
         }
         if (!StringUtils.hasText(id)) {
             throw new IllegalArgumentException("id can not be null");
+        }
+
+        if(operatorScript==null){
+            throw new IllegalArgumentException("operator can not be null");
+        }
+        if(nodeTitleScript==null){
+            throw new IllegalArgumentException("nodeTitle can not be null");
         }
     }
 
