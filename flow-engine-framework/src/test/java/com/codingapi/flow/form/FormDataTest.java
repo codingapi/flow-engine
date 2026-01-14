@@ -45,15 +45,15 @@ class FormDataTest {
         data.getDataBody().set("name","张三-112233");
         List<FormData.DataBody> subDataBody = data.getSubDataBody("record");
         assertEquals(2, subDataBody.size());
+        assertEquals(1, data.countSubDataBody());
 
         assertEquals("张三-112233", data.getDataBody().get("name"));
 
-        assertEquals(2, data.getSubDataBody().size());
-        assertEquals("张三", data.getSubDataBody().get(0).get("approver"));
-        assertEquals("通过", data.getSubDataBody().get(0).get("result"));
-        assertEquals("2020-01-01", data.getSubDataBody().get(0).get("time"));
-        assertEquals("李四", data.getSubDataBody().get(1).get("approver"));
-        assertEquals("通过", data.getSubDataBody().get(1).get("result"));
-        assertEquals("2020-01-02", data.getSubDataBody().get(1).get("time"));
+        assertEquals("张三", subDataBody.get(0).get("approver"));
+        assertEquals("通过", subDataBody.get(0).get("result"));
+        assertEquals("2020-01-01", subDataBody.get(0).get("time"));
+        assertEquals("李四", subDataBody.get(1).get("approver"));
+        assertEquals("通过", subDataBody.get(1).get("result"));
+        assertEquals("2020-01-02", subDataBody.get(1).get("time"));
     }
 }

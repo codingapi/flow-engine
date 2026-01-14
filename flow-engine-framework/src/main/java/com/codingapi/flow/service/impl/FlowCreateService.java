@@ -1,6 +1,6 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.pojo.FlowCreateRequest;
+import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.repository.WorkflowBackupRepository;
 import com.codingapi.flow.repository.WorkflowRepository;
@@ -15,6 +15,5 @@ public class FlowCreateService {
     private final WorkflowBackupRepository workflowBackupRepository;
 
     public void create() {
-
     }
 }

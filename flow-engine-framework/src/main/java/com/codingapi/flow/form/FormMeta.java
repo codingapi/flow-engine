@@ -89,4 +89,7 @@ public class FormMeta {
         return types;
     }
 
+    public FormMeta getSubForm(String formCode) {
+        return this.subForms.stream().filter(form -> form.getCode().equals(formCode)).findFirst().orElse(null);
+    }
 }

@@ -1,7 +1,7 @@
 package com.codingapi.flow.service;
 
-import com.codingapi.flow.pojo.FlowCreateRequest;
-import com.codingapi.flow.pojo.FlowSubmitRequest;
+import com.codingapi.flow.pojo.request.FlowCreateRequest;
+import com.codingapi.flow.pojo.request.FlowSubmitRequest;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.repository.WorkflowBackupRepository;
