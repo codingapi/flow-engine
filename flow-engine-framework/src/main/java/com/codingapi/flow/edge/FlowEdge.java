@@ -5,18 +5,10 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class FlowEdge implements IFlowEdge{
+public class FlowEdge {
 
     private String from;
     private String to;
 
-    @Override
-    public String from() {
-        return from;
-    }
 
-    @Override
-    public String to() {
-        return to;
-    }
 }

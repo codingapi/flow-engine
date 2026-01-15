@@ -8,6 +8,7 @@ import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 子流程
@@ -26,8 +27,12 @@ public class SubProcessNode extends BaseNode {
         super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions);
     }
 
-    private SubProcessNode() {
+    protected SubProcessNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>());
+    }
+
+    public static SubProcessNode formMap(Map<String, Object> map) {
+        return BaseNode.formMap(map, SubProcessNode.class);
     }
 
     public static Builder builder() {

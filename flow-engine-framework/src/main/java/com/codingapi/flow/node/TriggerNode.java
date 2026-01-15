@@ -8,6 +8,7 @@ import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 触发节点
@@ -26,8 +27,12 @@ public class TriggerNode extends BaseNode{
         super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions);
     }
 
-    private TriggerNode() {
+    protected TriggerNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>());
+    }
+
+    public static TriggerNode formMap(Map<String, Object> map) {
+        return BaseNode.formMap(map, TriggerNode.class);
     }
 
     public static Builder builder() {

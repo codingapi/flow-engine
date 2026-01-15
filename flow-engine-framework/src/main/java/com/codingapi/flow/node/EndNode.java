@@ -8,6 +8,7 @@ import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 结束节点
@@ -26,9 +27,12 @@ public class EndNode extends BaseNode  {
         super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions);
     }
 
-
-    private EndNode() {
+    protected EndNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>());
+    }
+
+    public static EndNode formMap(Map<String, Object> map) {
+        return BaseNode.formMap(map, EndNode.class);
     }
 
     public static Builder builder() {

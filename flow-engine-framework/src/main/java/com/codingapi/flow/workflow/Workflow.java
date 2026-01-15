@@ -1,9 +1,12 @@
 package com.codingapi.flow.workflow;
 
-import com.codingapi.flow.edge.IFlowEdge;
+import com.alibaba.fastjson.JSON;
+import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.EndNode;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.NodeFactory;
 import com.codingapi.flow.node.StartNode;
 import com.codingapi.flow.script.OperatorMatchScript;
 import com.codingapi.flow.user.IFlowOperator;
@@ -13,7 +16,9 @@ import lombok.Getter;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流程对象
@@ -63,7 +68,12 @@ public class Workflow {
     /**
      * 流程关系
      */
-    private List<IFlowEdge> edges;
+    private List<FlowEdge> edges;
+
+    /**
+     * 流程设计
+     */
+    private String schema;
 
 
     protected Workflow() {
@@ -103,8 +113,74 @@ public class Workflow {
         this.nodes = nodes;
     }
 
-    protected void setEdges(List<IFlowEdge> edges) {
+    protected void setEdges(List<FlowEdge> edges) {
         this.edges = edges;
+    }
+
+    protected void setSchema(String schema) {
+        this.schema = schema;
+    }
+
+    protected void setCreatedTime(long createdTime) {
+        this.createdTime = createdTime;
+    }
+
+
+    /**
+     * 转换为json
+     * @return json
+     */
+    public String toJson(boolean hasSchema){
+        Map<String,Object> map = new HashMap<>();
+        map.put("id", id);
+        map.put("code", code);
+        map.put("title", title);
+        map.put("createdOperator", String.valueOf(createdOperator.getUserId()));
+        map.put("form", form.toMap());
+        map.put("operatorCreateScript", operatorCreateScript.getScript());
+        map.put("nodes", nodes.stream().map(IFlowNode::toMap).toList());
+        map.put("edges", edges);
+        map.put("createdTime", String.valueOf(createdTime));
+        map.put("schema", hasSchema ? schema : null);
+        return JSON.toJSONString(map);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public static Workflow formJson(String json) {
+        Map<String, Object> data = JSON.parseObject(json);
+        long createOperator = Long.parseLong((String) data.get("createdOperator"));
+        List<Map<String, Object>> nodes = (List<Map<String, Object>>) data.get("nodes");
+        Workflow workflow = new Workflow();
+        workflow.setId((String) data.get("id"));
+        workflow.setCode((String) data.get("code"));
+        workflow.setTitle((String) data.get("title"));
+        workflow.setSchema((String) data.get("schema"));
+        workflow.setCreatedTime(Long.parseLong((String)data.get("createdTime")));
+        workflow.setCreatedOperator(RepositoryContext.getInstance().getFlowOperator(createOperator));
+        workflow.setForm(FormMeta.fromMap((Map<String, Object>) data.get("form")));
+        workflow.setOperatorCreateScript(new OperatorMatchScript((String) data.get("operatorCreateScript")));
+
+        if(nodes!=null){
+            List<IFlowNode> nodeList = new ArrayList<>();
+            for (Map<String, Object> node : nodes){
+                IFlowNode flowNode =  NodeFactory.getInstance().createNode( node);
+                nodeList.add(flowNode);
+            }
+            workflow.setNodes(nodeList);
+        }
+
+        List<Map<String, Object>> edges = (List<Map<String, Object>>) data.get("edges");
+        if(edges!=null) {
+            List<FlowEdge> edgeList = new ArrayList<>();
+            for (Map<String, Object> edge : edges) {
+                FlowEdge flowEdge = new FlowEdge((String) edge.get("from"), (String) edge.get("to"));
+                edgeList.add(flowEdge);
+            }
+            workflow.setEdges(edgeList);
+        }
+
+        return workflow;
     }
 
     /**
@@ -175,16 +251,16 @@ public class Workflow {
     }
 
     private void verifyEdges() {
-        for (IFlowEdge edge : edges) {
-            if (edge.from().equals(edge.to())) {
+        for (FlowEdge edge : edges) {
+            if (edge.getFrom().equals(edge.getTo())) {
                 throw new IllegalArgumentException("workflow edges can not have same from and to");
             }
         }
         IFlowNode startNode = this.nodes.stream().filter(node -> node instanceof StartNode).findFirst().get();
 
         int startCount = 0;
-        for (IFlowEdge edge : edges) {
-            if (edge.from().equals(startNode.getId())) {
+        for (FlowEdge edge : edges) {
+            if (edge.getFrom().equals(startNode.getId())) {
                 startCount++;
             }
         }
@@ -215,8 +291,8 @@ public class Workflow {
 
 
     public List<IFlowNode> next(IFlowNode node) {
-        return edges.stream().filter(edge -> edge.from().equals(node.getId()))
-                .map(edge -> nodes.stream().filter(node1 -> node1.getId().equals(edge.to())).findFirst().get()).toList();
+        return edges.stream().filter(edge -> edge.getFrom().equals(node.getId()))
+                .map(edge -> nodes.stream().filter(node1 -> node1.getId().equals(edge.getTo())).findFirst().get()).toList();
     }
 
 

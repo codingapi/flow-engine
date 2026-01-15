@@ -1,5 +1,6 @@
 package com.codingapi.flow.form;
 
+import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -33,23 +34,75 @@ public class FormMeta {
      */
     private List<FormMeta> subForms;
 
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof FormMeta form) {
+            String json = JSON.toJSONString(form.toMap());
+            return json.equals(JSON.toJSONString(this.toMap()));
+        }
+        return super.equals(obj);
+    }
+
+    /**
+     * 转换成map
+     */
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", name);
+        map.put("code", code);
+        map.put("fields", fields);
+        map.put("subForms", subForms != null ? subForms.stream().map(FormMeta::toMap).toList() : null);
+        return map;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static FormMeta fromMap(Map<String, Object> map) {
+        FormMeta form = new FormMeta();
+        List<Map<String, Object>> fields = (List<Map<String, Object>>) map.get("fields");
+        List<FormFieldMeta> fieldList = new ArrayList<>();
+        for (Map<String, Object> field : fields) {
+            FormFieldMeta fieldMeta = new FormFieldMeta();
+            fieldMeta.setName((String) field.get("name"));
+            fieldMeta.setCode((String) field.get("code"));
+            fieldMeta.setType((String) field.get("type"));
+            fieldMeta.setNullable(Boolean.TRUE.equals(field.get("nullable")));
+            fieldMeta.setDefaultValue((String) field.get("defaultValue"));
+            fieldList.add(fieldMeta);
+        }
+        form.setName((String) map.get("name"));
+        form.setCode((String) map.get("code"));
+        form.setFields(fieldList);
+
+        List<Map<String, Object>> subForms = (List<Map<String, Object>>) map.get("subForms");
+        if (subForms != null) {
+            List<FormMeta> subFormList = new ArrayList<>();
+            for (Map<String, Object> subForm : subForms) {
+                subFormList.add(fromMap(subForm));
+            }
+            form.setSubForms(subFormList);
+        }
+        return form;
+    }
+
     /**
      * 获取表单字段名称
      */
     public List<String> getFieldNames() {
-    	return fields.stream().map(FormFieldMeta::getName).toList();
+        return fields.stream().map(FormFieldMeta::getName).toList();
     }
 
     /**
      * 获取表单字段
+     *
      * @param fieldName 字段名称
      * @return 表单字段
      */
     public FormFieldMeta getField(String fieldName) {
-    	return fields.stream().filter(field -> field.getName().equals(fieldName)).findFirst().orElse(null);
+        return fields.stream().filter(field -> field.getName().equals(fieldName)).findFirst().orElse(null);
     }
 
-    private void initFormFieldTypes(FormMeta form, Map<String,String> types) {
+    private void initFormFieldTypes(FormMeta form, Map<String, String> types) {
         for (FormFieldMeta field : form.getFields()) {
             String key = form.getCode() + "." + field.getCode();
             String type = field.getType();
@@ -59,10 +112,11 @@ public class FormMeta {
 
     /**
      * 获取表单字段类型
+     *
      * @return 表单字段类型
      */
-    public Map<String,String> getAllFieldTypeMaps(){
-        Map<String,String> types = new HashMap<>();
+    public Map<String, String> getAllFieldTypeMaps() {
+        Map<String, String> types = new HashMap<>();
         List<FormMeta> forms = this.getSubForms();
         if (forms == null) {
             forms = new ArrayList<>();
@@ -77,10 +131,11 @@ public class FormMeta {
 
     /**
      * 获取表单字段类型
+     *
      * @return 表单字段类型
      */
-    public Map<String,String> getMainFieldTypeMaps(){
-        Map<String,String> types = new HashMap<>();
+    public Map<String, String> getMainFieldTypeMaps() {
+        Map<String, String> types = new HashMap<>();
         List<FormMeta> forms = new ArrayList<>();
         forms.add(this);
         for (FormMeta subForm : forms) {

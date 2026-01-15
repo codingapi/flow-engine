@@ -8,6 +8,7 @@ import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 分支节点
@@ -22,12 +23,16 @@ public class ConditionBranchNode extends BaseNode{
         return NODE_TYPE;
     }
 
-    private ConditionBranchNode() {
+    protected ConditionBranchNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>());
     }
 
     public ConditionBranchNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions) {
         super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions);
+    }
+
+    public static ConditionBranchNode formMap(Map<String, Object> map) {
+        return BaseNode.formMap(map, ConditionBranchNode.class);
     }
 
     public static Builder builder() {

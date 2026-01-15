@@ -3,6 +3,7 @@ package com.codingapi.flow.node;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
+import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.script.ErrorTriggerScript;
 import com.codingapi.flow.script.NodeTitleScript;
 import com.codingapi.flow.script.OperatorLoadScript;
@@ -10,8 +11,11 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.IFlowOperator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,6 +60,45 @@ public abstract class BaseNode implements IFlowNode {
      */
     private List<FormFieldPermission> formFieldPermissions;
 
+    @Override
+    public Map<String,Object> toMap(){
+        Map<String,Object> map = new HashMap<>();
+        map.put("view",view);
+        map.put("name",name);
+        map.put("id",id);
+        map.put("operatorScript",operatorScript.getScript());
+        map.put("nodeTitleScript",nodeTitleScript.getScript());
+        map.put("errorTriggerScript",errorTriggerScript.getScript());
+        map.put("formFieldPermissions",formFieldPermissions);
+        map.put("type",getType());
+        return map;
+    }
+
+
+    @SneakyThrows
+    @SuppressWarnings("unchecked")
+    public static <T extends BaseNode> T formMap(Map<String, Object> map, Class<T> clazz)  {
+        T node = clazz.getDeclaredConstructor().newInstance();
+        node.setId((String) map.get("id"));
+        node.setName((String) map.get("name"));
+        node.setView((String) map.get("view"));
+        node.setOperatorScript((String) map.get("operatorScript"));
+        node.setNodeTitleScript((String) map.get("nodeTitleScript"));
+        node.setErrorTriggerScript((String) map.get("errorTriggerScript"));
+        List<Map<String, Object>> permissions = (List<Map<String, Object>>) map.get("formFieldsPermissions");
+        if (permissions != null) {
+            List<FormFieldPermission> permissionList = new ArrayList<>();
+            for (Map<String, Object> item : permissions) {
+                FormFieldPermission permission = new FormFieldPermission();
+                permission.setFormCode((String) item.get("formCode"));
+                permission.setFieldName((String) item.get("fieldName"));
+                permission.setType(PermissionType.valueOf((String) item.get("type")));
+                permissionList.add(permission);
+            }
+            node.setFormFieldPermissions(permissionList);
+        }
+        return node;
+    }
 
     protected void setView(String view) {
         this.view = view;
@@ -156,4 +199,7 @@ public abstract class BaseNode implements IFlowNode {
             }
         }
     }
+
+
+
 }

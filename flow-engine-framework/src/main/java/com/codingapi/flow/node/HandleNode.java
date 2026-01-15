@@ -8,6 +8,7 @@ import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 办理节点
@@ -26,8 +27,12 @@ public class HandleNode extends BaseNode {
         super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions);
     }
 
-    private HandleNode() {
+    protected HandleNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>());
+    }
+
+    public static HandleNode formMap(Map<String, Object> map) {
+        return BaseNode.formMap(map, HandleNode.class);
     }
 
     public static Builder builder() {

@@ -7,6 +7,7 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.IFlowOperator;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流程节点
@@ -58,5 +59,11 @@ public interface IFlowNode {
      * 节点验证
      */
     void verify(FormMeta form);
+
+
+    /**
+     * 转为map
+     */
+    Map<String,Object> toMap();
 
 }
