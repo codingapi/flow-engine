@@ -38,6 +38,9 @@ class FormDataTest {
         assertEquals("事由", data.getDataBody().get("reason"));
 
         Map<String,Object> mainData = data.toMapData();
+
+        data.reset(mainData);
+
         assertEquals("张三", mainData.get("name"));
         assertEquals(10, mainData.get("days"));
         assertEquals("事由", mainData.get("reason"));

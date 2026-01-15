@@ -1,14 +1,13 @@
 package com.codingapi.flow.pojo.body;
 
 import com.alibaba.fastjson.JSONObject;
-import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FormDataBodyTest {
 
@@ -33,7 +32,8 @@ class FormDataBodyTest {
         request.put("workId","123123");
 
         FlowCreateRequest formDataBody = JSONObject.parseObject(request.toJSONString(), FlowCreateRequest.class);
-        System.out.println(formDataBody);
+        assertEquals("123123", formDataBody.getWorkId());
+        assertEquals("张三", formDataBody.getFormData().get("name"));
 
     }
 

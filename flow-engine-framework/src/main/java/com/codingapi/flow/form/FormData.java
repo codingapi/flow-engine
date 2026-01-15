@@ -2,10 +2,7 @@ package com.codingapi.flow.form;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 流程表单数据
@@ -66,13 +63,42 @@ public class FormData {
     }
 
     /**
+     * 重置表单数据
+     *
+     * @param data 表单数据
+     */
+    public void reset(Map<String, Object> data) {
+        this.dataBody.reset();
+        this.subDataBody.clear();
+
+        for (String key : data.keySet()) {
+            Object value = data.get(key);
+            if (value instanceof Collection<?>) {
+                Collection<Map<String, Object>> list = (Collection<Map<String, Object>>) value;
+                for (Map<String, Object> item : list) {
+                    DataBody body = this.addSubDataBody(key);
+                    for (String subKey : item.keySet()) {
+                        body.set(subKey, item.get(subKey));
+                    }
+                }
+            } else {
+                this.dataBody.set(key, value);
+            }
+        }
+    }
+
+    /**
      * 转换成Map数据
      *
      * @return Map数据
      */
     public Map<String, Object> toMapData() {
         Map<String, Object> map = dataBody.toMapData();
-        map.putAll(this.subDataBody);
+        for (String key : subDataBody.keySet()) {
+            List<DataBody> list = subDataBody.get(key);
+            List<Map<String, Object>> value = list.stream().map(DataBody::toMapData).toList();
+            map.put(key, value);
+        }
         return map;
     }
 
@@ -97,6 +123,14 @@ public class FormData {
             this.formMeta = formMeta;
             this.data = new HashMap<>();
             this.fieldTypes = formMeta.getMainFieldTypeMaps();
+        }
+
+
+        /**
+         * 重置表单数据
+         */
+        public void reset() {
+            this.data.clear();
         }
 
         /**
