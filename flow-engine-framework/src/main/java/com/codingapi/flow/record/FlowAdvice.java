@@ -1,18 +1,18 @@
 package com.codingapi.flow.record;
 
-import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.FlowAction;
 import com.codingapi.flow.user.IFlowOperator;
-import lombok.Getter;
+import lombok.Data;
 
 /**
  * 审批意见
  */
-@Getter
+@Data
 public class FlowAdvice {
     /**
      * 流程动作
      */
-    private IFlowAction action;
+    private FlowAction action;
     /**
      * 审批意见
      */
