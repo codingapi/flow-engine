@@ -1,0 +1,32 @@
+package com.codingapi.flow.repository;
+
+import com.codingapi.flow.record.FlowRecord;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class FlowRecordRepositoryImpl implements FlowRecordRepository{
+
+    private final Map<Long, FlowRecord> cache = new HashMap<>();
+
+    @Override
+    public FlowRecord get(long id) {
+        return cache.get(id);
+    }
+
+    @Override
+    public void save(FlowRecord flowRecord) {
+        if(flowRecord.getId()>0){
+            cache.put(flowRecord.getId(),flowRecord);
+        }else {
+            long id = cache.size()+1;
+            flowRecord.setId(id);
+            cache.put(id,flowRecord);
+        }
+    }
+
+    @Override
+    public void delete(FlowRecord flowRecord) {
+        cache.remove(flowRecord.getId());
+    }
+}

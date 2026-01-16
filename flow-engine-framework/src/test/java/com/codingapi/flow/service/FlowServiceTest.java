@@ -1,26 +1,35 @@
-package com.codingapi.flow.workflow;
+package com.codingapi.flow.service;
 
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
+import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.node.ApprovalNode;
 import com.codingapi.flow.node.EndNode;
 import com.codingapi.flow.node.StartNode;
-import com.codingapi.flow.gateway.impl.UserGateway;
+import com.codingapi.flow.pojo.body.FlowAdviceBody;
+import com.codingapi.flow.pojo.request.FlowCreateRequest;
+import com.codingapi.flow.repository.*;
 import com.codingapi.flow.user.User;
+import com.codingapi.flow.workflow.Workflow;
+import com.codingapi.flow.workflow.WorkflowBuilder;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.Map;
 
-class WorkflowBuilderTest {
+class FlowServiceTest {
 
+    private final FlowRecordRepository flowRecordRepository = new FlowRecordRepositoryImpl();
     private final UserGateway userGateway = new UserGateway();
+    private final WorkflowBackupRepository workflowBackupRepository = new WorkflowBackupRepositoryImpl();
+    private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
+    private final FlowService flowService = new FlowService(workflowRepository,userGateway,flowRecordRepository,workflowBackupRepository);
 
     @Test
-    void buildBasicWorkflow() {
+    void create() {
+
         User user = new User(1, "lorne");
         userGateway.save(user);
 
@@ -66,34 +75,17 @@ class WorkflowBuilderTest {
                 .addEdge(new FlowEdge(approvalNode.getId(), endNode.getId()))
                 .build();
 
-        assertNotNull(workflow);
-        assertEquals("请假流程", workflow.getTitle());
-        assertEquals("leave", workflow.getCode());
-        assertNotNull(workflow.getCreatedOperator());
-        assertEquals(1, workflow.getCreatedOperator().getUserId());
-        assertNotNull(workflow.getForm());
-        assertEquals("请假流程", workflow.getForm().getName());
-        assertNotNull(workflow.getNodes());
-        assertEquals(3, workflow.getNodes().size());
+        workflowRepository.save(workflow);
 
+        FlowCreateRequest request = new FlowCreateRequest();
+        request.setWorkId(workflow.getId());
+        request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
+        FlowAdviceBody advice = new FlowAdviceBody();
+        advice.setAdvice("同意");
+        advice.setAction("pass");
+        advice.setOperatorId(user.getUserId());
+        request.setAdvice(advice);
 
-        String json = workflow.toJson(true);
-        System.out.println(json);
-
-        Workflow workflowBck = Workflow.formJson(json);
-        assertNotNull(workflowBck);
-
-        assertEquals(workflow.getTitle(), workflowBck.getTitle());
-        assertEquals(workflow.getCode(), workflowBck.getCode());
-        assertEquals(workflow.getId(), workflowBck.getId());
-        assertEquals(workflow.getCreatedOperator().getUserId(), workflowBck.getCreatedOperator().getUserId());
-        assertEquals(workflow.getForm(), workflowBck.getForm());
-        assertEquals(workflow.getNodes().size(), workflowBck.getNodes().size());
-        assertEquals(workflow.getEdges().size(), workflowBck.getEdges().size());
-        assertEquals(workflow.getSchema(), workflowBck.getSchema());
-        assertEquals(workflow.getNodes().get(0).getId(), workflowBck.getNodes().get(0).getId());
-
+        flowService.create(request);
     }
-
-
 }

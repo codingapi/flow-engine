@@ -3,6 +3,7 @@ package com.codingapi.flow.record;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.user.IFlowOperator;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class FlowRecord {
@@ -20,6 +21,7 @@ public class FlowRecord {
     /**
      * 记录id
      */
+    @Setter
     private long id;
     /**
      * 工作id

@@ -1,12 +1,13 @@
-package com.codingapi.flow.repository;
+package com.codingapi.flow.gateway.impl;
 
+import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.user.IFlowOperator;
 import com.codingapi.flow.user.User;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserRepository implements FlowOperatorRepository {
+public class UserGateway implements FlowOperatorGateway {
 
     private final Map<Long, User> cache = new HashMap<>();
 

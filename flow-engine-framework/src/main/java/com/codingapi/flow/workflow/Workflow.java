@@ -1,7 +1,7 @@
 package com.codingapi.flow.workflow;
 
 import com.alibaba.fastjson.JSON;
-import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.EndNode;
@@ -157,7 +157,7 @@ public class Workflow {
         workflow.setTitle((String) data.get("title"));
         workflow.setSchema((String) data.get("schema"));
         workflow.setCreatedTime(Long.parseLong((String)data.get("createdTime")));
-        workflow.setCreatedOperator(RepositoryContext.getInstance().getFlowOperator(createOperator));
+        workflow.setCreatedOperator(GatewayContext.getInstance().getFlowOperator(createOperator));
         workflow.setForm(FormMeta.fromMap((Map<String, Object>) data.get("form")));
         workflow.setOperatorCreateScript(new OperatorMatchScript((String) data.get("operatorCreateScript")));
 
