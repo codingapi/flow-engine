@@ -41,6 +41,18 @@ public interface IFlowNode {
     List<FlowAction> actions();
 
     /**
+     * 获取节点动作
+     * @param id 动作id
+     */
+    FlowAction getActionById(String id);
+
+    /**
+     * 获取节点动作
+     * @param title 动作title
+     */
+    FlowAction getActionByTitle(String title);
+
+    /**
      * 表单字段权限设置
      */
     List<FormFieldPermission> formFieldsPermissions();
@@ -72,6 +84,14 @@ public interface IFlowNode {
      */
     Map<String,Object> toMap();
 
+    /**
+     * 超时到期时间(毫秒)
+     */
+    long timeoutTime();
+    /**
+     * 是否可合并
+     */
+    boolean isMergeable();
 
 
 }

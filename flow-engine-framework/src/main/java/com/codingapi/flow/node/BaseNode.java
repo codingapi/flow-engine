@@ -1,5 +1,6 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.FlowAction;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
@@ -66,6 +67,15 @@ public abstract class BaseNode implements IFlowNode {
      */
     private List<FlowAction> actions;
 
+    /**
+     * 超时到期时间
+     */
+    private long timeoutTime;
+    /**
+     * 是否可合并
+     */
+    private boolean mergeable;
+
     @Override
     public Map<String,Object> toMap(){
         Map<String,Object> map = new HashMap<>();
@@ -77,6 +87,9 @@ public abstract class BaseNode implements IFlowNode {
         map.put("errorTriggerScript",errorTriggerScript.getScript());
         map.put("formFieldPermissions",formFieldPermissions);
         map.put("type",getType());
+        map.put("actions",actions);
+        map.put("timeoutTime",String.valueOf(timeoutTime));
+        map.put("mergeable",mergeable);
         return map;
     }
 
@@ -88,6 +101,8 @@ public abstract class BaseNode implements IFlowNode {
         node.setId((String) map.get("id"));
         node.setName((String) map.get("name"));
         node.setView((String) map.get("view"));
+        node.setTimeoutTime(Long.parseLong((String) map.get("timeoutTime")));
+        node.setMergeable((boolean) map.get("mergeable"));
         node.setOperatorScript((String) map.get("operatorScript"));
         node.setNodeTitleScript((String) map.get("nodeTitleScript"));
         node.setErrorTriggerScript((String) map.get("errorTriggerScript"));
@@ -102,6 +117,24 @@ public abstract class BaseNode implements IFlowNode {
                 permissionList.add(permission);
             }
             node.setFormFieldPermissions(permissionList);
+        }
+
+        List<Map<String, Object>> actions = (List<Map<String, Object>>) map.get("actions");
+        if (actions != null) {
+            List<FlowAction> actionList = new ArrayList<>();
+            for (Map<String, Object> item : actions) {
+                FlowAction action = FlowAction.builder()
+                        .id((String) item.get("id"))
+                        .title((String) item.get("title"))
+                        .style((String) item.get("style"))
+                        .type(ActionType.valueOf((String) item.get("type")))
+                        .order((Integer) item.get("order"))
+                        .icon((String) item.get("icon"))
+                        .script((String) item.get("script"))
+                        .build();
+                actionList.add(action);
+            }
+            node.setActions(actionList);
         }
         return node;
     }
@@ -121,6 +154,16 @@ public abstract class BaseNode implements IFlowNode {
     protected void setActions(List<FlowAction> actions) {
         this.actions = actions;
     }
+
+    protected void setTimeoutTime(long timeoutTime) {
+        this.timeoutTime = timeoutTime;
+    }
+
+    protected void setMergeable(boolean mergeable) {
+        this.mergeable = mergeable;
+    }
+
+
 
     /**
      * 设置审批人配置脚本
@@ -164,6 +207,16 @@ public abstract class BaseNode implements IFlowNode {
     }
 
     @Override
+    public FlowAction getActionById(String id) {
+        return actions.stream().filter(item -> item.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    @Override
+    public FlowAction getActionByTitle(String title) {
+        return actions.stream().filter(item -> item.getTitle().equals(title)).findFirst().orElse(null);
+    }
+
+    @Override
     public NodeOperators operators(FlowSession flowSession) {
         return new NodeOperators(operatorScript.execute(flowSession));
     }
@@ -184,6 +237,16 @@ public abstract class BaseNode implements IFlowNode {
         if (!(this instanceof EndNode)) {
             this.verifyPermissions(form);
         }
+    }
+
+    @Override
+    public boolean isMergeable() {
+        return mergeable;
+    }
+
+    @Override
+    public long timeoutTime() {
+        return timeoutTime;
     }
 
     private void verifyFields() {

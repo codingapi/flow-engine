@@ -3,6 +3,7 @@ package com.codingapi.flow.repository;
 import com.codingapi.flow.record.FlowRecord;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FlowRecordRepositoryImpl implements FlowRecordRepository{
@@ -12,6 +13,11 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository{
     @Override
     public FlowRecord get(long id) {
         return cache.get(id);
+    }
+
+
+    public List<FlowRecord> findTodoByOperator(long operatorId) {
+        return cache.values().stream().filter(flowRecord -> flowRecord.getCreateOperator().getUserId()==operatorId && flowRecord.getRecordState()==FlowRecord.SATE_RECORD_TODO).toList();
     }
 
     @Override

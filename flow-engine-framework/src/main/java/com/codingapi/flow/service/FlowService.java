@@ -23,7 +23,7 @@ public class FlowService {
 
 
     public void create(FlowCreateRequest request){
-        FlowCreateService flowCreateService = new FlowCreateService(request, flowOperatorGateway,workflowRepository,workflowBackupRepository);
+        FlowCreateService flowCreateService = new FlowCreateService(request, flowOperatorGateway,flowRecordRepository,workflowRepository,workflowBackupRepository);
         flowCreateService.create();
     }
 

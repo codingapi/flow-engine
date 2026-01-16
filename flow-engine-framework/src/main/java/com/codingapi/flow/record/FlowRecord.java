@@ -2,8 +2,11 @@ package com.codingapi.flow.record;
 
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.util.StringUtils;
 
 @Getter
 public class FlowRecord {
@@ -60,10 +63,7 @@ public class FlowRecord {
      * 审批意见
      */
     private FlowAdvice flowAdvice;
-    /**
-     * 配置信息
-     */
-    private FlowConfigure flowConfigure;
+
     /**
      * 节点状态 | 待办、已办
      */
@@ -98,4 +98,68 @@ public class FlowRecord {
      */
     private String errMessage;
 
+    /**
+     * 超时到期时间
+     */
+    private long timeoutTime;
+    /**
+     * 是否可合并
+     */
+    private boolean mergeable;
+    /**
+     * 是否干预
+     */
+    private boolean isInterfere;
+    /**
+     * 被干预的用户
+     */
+    private IFlowOperator interferedOperator;
+
+    public FlowRecord(FlowSession flowSession,FlowAdvice flowAdvice,long backupId) {
+        this.workCode = flowSession.getWorkCode();
+        this.workBackupId = backupId;
+        this.nodeId = flowSession.getCurrentNodeId();
+        this.formData = flowSession.getFormData();
+        this.fromId = 0;
+        this.title = flowSession.getCurrentNode().generateTitle(flowSession);
+        this.processId = RandomUtils.generateStringId();
+        this.createOperator = flowSession.getCurrentOperator();
+        this.recordState = SATE_RECORD_TODO;
+        this.flowAdvice = flowAdvice;
+        this.flowState = SATE_FLOW_RUNNING;
+        this.createTime = System.currentTimeMillis();
+        this.timeoutTime = flowSession.getCurrentNode().timeoutTime();
+        this.mergeable = flowSession.getCurrentNode().isMergeable();
+        this.isInterfere = flowSession.getWorkflow().isInterfere();
+    }
+
+    public void verify() {
+        if(!StringUtils.hasText(workCode)){
+            throw new IllegalArgumentException("workCode is null");
+        }
+        if(!StringUtils.hasText(nodeId)){
+            throw new IllegalArgumentException("nodeId is null");
+        }
+        if(!StringUtils.hasText(title)){
+            throw new IllegalArgumentException("title is null");
+        }
+        if(!StringUtils.hasText(processId)){
+            throw new IllegalArgumentException("processId is null");
+        }
+        if(createTime <= 0){
+            throw new IllegalArgumentException("createTime is null");
+        }
+        if(fromId < 0){
+            throw new IllegalArgumentException("fromId is null");
+        }
+        if(formData == null){
+            throw new IllegalArgumentException("formData is null");
+        }
+        if(createOperator == null){
+            throw new IllegalArgumentException("createOperator is null");
+        }
+        if(flowAdvice == null){
+            throw new IllegalArgumentException("flowAdvice is null");
+        }
+    }
 }

@@ -52,4 +52,16 @@ public class FlowSession {
         return workflow.getStartNode();
     }
 
+    public String getWorkCode(){
+        return workflow.getCode();
+    }
+
+    public String getWorkTitle(){
+        return workflow.getTitle();
+    }
+
+    public String getCurrentNodeId(){
+        return currentNode.getId();
+    }
+
 }

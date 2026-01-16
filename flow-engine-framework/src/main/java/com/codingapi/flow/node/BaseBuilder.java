@@ -30,6 +30,22 @@ public abstract class BaseBuilder<N extends BaseNode> {
         return this;
     }
 
+    public BaseBuilder<N> view(String view) {
+        node.setView(view);
+        return this;
+    }
+
+    public BaseBuilder<N> timeoutTime(long timeoutTime) {
+        node.setTimeoutTime(timeoutTime);
+        return this;
+    }
+
+    public BaseBuilder<N> mergeable(boolean mergeable) {
+        node.setMergeable(mergeable);
+        return this;
+    }
+
+
     public BaseBuilder<N> operatorScript(String operatorScript) {
         node.setOperatorScript(operatorScript);
         return this;

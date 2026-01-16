@@ -75,6 +75,10 @@ public class Workflow {
      */
     private String schema;
 
+    /**
+     * 是否干预
+     */
+    private boolean isInterfere;
 
     protected Workflow() {
         this.id = RandomUtils.generateStringId();
@@ -83,6 +87,7 @@ public class Workflow {
         this.operatorCreateScript = OperatorMatchScript.any();
         this.nodes = new ArrayList<>();
         this.edges = new ArrayList<>();
+        this.isInterfere = false;
     }
 
     protected void setId(String id) {
@@ -125,6 +130,10 @@ public class Workflow {
         this.createdTime = createdTime;
     }
 
+    protected void setIsInterfere(boolean isInterfere) {
+        this.isInterfere = isInterfere;
+    }
+
 
     /**
      * 转换为json
@@ -142,6 +151,7 @@ public class Workflow {
         map.put("edges", edges);
         map.put("createdTime", String.valueOf(createdTime));
         map.put("schema", hasSchema ? schema : null);
+        map.put("isInterfere", isInterfere);
         return JSON.toJSONString(map);
     }
 
@@ -156,6 +166,7 @@ public class Workflow {
         workflow.setCode((String) data.get("code"));
         workflow.setTitle((String) data.get("title"));
         workflow.setSchema((String) data.get("schema"));
+        workflow.setIsInterfere((boolean) data.get("isInterfere"));
         workflow.setCreatedTime(Long.parseLong((String)data.get("createdTime")));
         workflow.setCreatedOperator(GatewayContext.getInstance().getFlowOperator(createOperator));
         workflow.setForm(FormMeta.fromMap((Map<String, Object>) data.get("form")));

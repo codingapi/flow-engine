@@ -11,21 +11,25 @@ import com.codingapi.flow.node.EndNode;
 import com.codingapi.flow.node.StartNode;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
+import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FlowServiceTest {
 
-    private final FlowRecordRepository flowRecordRepository = new FlowRecordRepositoryImpl();
+    private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
     private final UserGateway userGateway = new UserGateway();
     private final WorkflowBackupRepository workflowBackupRepository = new WorkflowBackupRepositoryImpl();
     private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
-    private final FlowService flowService = new FlowService(workflowRepository,userGateway,flowRecordRepository,workflowBackupRepository);
+    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository);
 
     @Test
     void create() {
@@ -81,11 +85,14 @@ class FlowServiceTest {
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
         FlowAdviceBody advice = new FlowAdviceBody();
+        advice.setAction(startNode.getActionByTitle("同意").getId());
         advice.setAdvice("同意");
-        advice.setAction("pass");
         advice.setOperatorId(user.getUserId());
         request.setAdvice(advice);
 
         flowService.create(request);
+
+        List<FlowRecord> recordList = flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(1, recordList.size());
     }
 }
