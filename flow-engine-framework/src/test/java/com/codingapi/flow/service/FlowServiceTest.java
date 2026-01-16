@@ -34,8 +34,10 @@ class FlowServiceTest {
     @Test
     void create() {
 
-        User user = new User(1, "lorne");
-        userGateway.save(user);
+        User test = new User(1, "test");
+        User lorne = new User(2, "lorne");
+        userGateway.save(test);
+        userGateway.save(lorne);
 
         GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
 
@@ -58,7 +60,7 @@ class FlowServiceTest {
 
         ApprovalNode approvalNode = ApprovalNode.builder()
                 .name("经理审批")
-                .operatorScript("def run(request){return [request.getCreatedOperator()]}")
+                .operatorScript("def run(request){return [$bind.getOperatorById(2)]}")
                 .formFieldPermissionsBuilder()
                 .addPermission("leave", "name", PermissionType.READ)
                 .addPermission("leave", "days", PermissionType.READ)
@@ -70,7 +72,7 @@ class FlowServiceTest {
         Workflow workflow = WorkflowBuilder.builder()
                 .title("请假流程")
                 .code("leave")
-                .createdOperator(user)
+                .createdOperator(test)
                 .form(form)
                 .addNode(startNode)
                 .addNode(approvalNode)
@@ -84,15 +86,11 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
-        FlowAdviceBody advice = new FlowAdviceBody();
-        advice.setAction(startNode.getActionByTitle("同意").getId());
-        advice.setAdvice("同意");
-        advice.setOperatorId(user.getUserId());
-        request.setAdvice(advice);
+        request.setAdvice(new FlowAdviceBody(startNode.getActionByTitle("同意").getId(), "同意", test.getUserId()));
 
         flowService.create(request);
 
-        List<FlowRecord> recordList = flowRecordRepository.findTodoByOperator(user.getUserId());
+        List<FlowRecord> recordList = flowRecordRepository.findTodoByOperator(test.getUserId());
         assertEquals(1, recordList.size());
     }
 }

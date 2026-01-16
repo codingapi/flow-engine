@@ -5,6 +5,8 @@ import com.codingapi.flow.operator.IFlowOperator;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 public class GatewayContext {
 
     @Getter
@@ -21,4 +23,11 @@ public class GatewayContext {
         return flowOperatorGateway.get(userId);
     }
 
+    public List<IFlowOperator> findByIds(List<Long> ids) {
+        return flowOperatorGateway.findByIds(ids);
+    }
+
+    public List<IFlowOperator> findByIds(long... ids) {
+        return flowOperatorGateway.findByIds(ids);
+    }
 }

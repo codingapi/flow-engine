@@ -1,4 +1,4 @@
-package com.codingapi.flow.script;
+package com.codingapi.flow.script.runtime;
 
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
@@ -20,6 +20,7 @@ public class ScriptRuntimeContext {
     @SuppressWarnings("unchecked")
     public <T> T execute(String method,String script, Class<T> returnType, Object... args){
         Script runtime = groovyShell.parse(script);
+        runtime.setProperty("$bind",FlowScriptContext.getInstance());
         return (T) runtime.invokeMethod(method, args);
     }
 }

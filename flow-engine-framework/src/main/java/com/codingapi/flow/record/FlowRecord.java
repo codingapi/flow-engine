@@ -1,12 +1,13 @@
 package com.codingapi.flow.record;
 
-import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
+
+import java.util.Map;
 
 @Getter
 public class FlowRecord {
@@ -45,7 +46,7 @@ public class FlowRecord {
     /**
      * 表单数据
      */
-    private FormData formData;
+    private Map<String,Object> formData;
     /**
      * 消息标题
      */
@@ -119,7 +120,7 @@ public class FlowRecord {
         this.workCode = flowSession.getWorkCode();
         this.workBackupId = backupId;
         this.nodeId = flowSession.getCurrentNodeId();
-        this.formData = flowSession.getFormData();
+        this.formData = flowSession.getFormData().toMapData();
         this.fromId = 0;
         this.title = flowSession.getCurrentNode().generateTitle(flowSession);
         this.processId = RandomUtils.generateStringId();
