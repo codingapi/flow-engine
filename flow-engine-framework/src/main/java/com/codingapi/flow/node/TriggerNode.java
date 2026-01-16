@@ -1,5 +1,7 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.action.FlowAction;
+import com.codingapi.flow.action.factory.FlowActionFactory;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.script.ErrorTriggerScript;
 import com.codingapi.flow.script.NodeTitleScript;
@@ -23,12 +25,18 @@ public class TriggerNode extends BaseNode{
         return NODE_TYPE;
     }
 
-    public TriggerNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions) {
-        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions);
+    public TriggerNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<FlowAction> actions) {
+        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions,actions);
     }
 
     protected TriggerNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>());
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(),defaultActions());
+    }
+
+    private static List<FlowAction> defaultActions() {
+        List<FlowAction> actions = new ArrayList<>();
+        actions.add(FlowActionFactory.getInstance().defaultAction());
+        return actions;
     }
 
     public static TriggerNode formMap(Map<String, Object> map) {

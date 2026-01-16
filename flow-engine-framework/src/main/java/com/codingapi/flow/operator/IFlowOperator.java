@@ -1,4 +1,4 @@
-package com.codingapi.flow.user;
+package com.codingapi.flow.operator;
 
 /**
  *  流程参与用户
@@ -32,8 +32,6 @@ public interface IFlowOperator {
      * 当委托操作者不为空时，当前操作者将由委托操作者执行
      */
     IFlowOperator entrustOperator();
-
-
 
 }
 

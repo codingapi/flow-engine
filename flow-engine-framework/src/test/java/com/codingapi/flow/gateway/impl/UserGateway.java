@@ -1,7 +1,7 @@
 package com.codingapi.flow.gateway.impl;
 
 import com.codingapi.flow.gateway.FlowOperatorGateway;
-import com.codingapi.flow.user.IFlowOperator;
+import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.user.User;
 
 import java.util.HashMap;

@@ -1,5 +1,8 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.action.ActionType;
+import com.codingapi.flow.action.FlowAction;
+import com.codingapi.flow.action.factory.FlowActionFactory;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.script.ErrorTriggerScript;
@@ -24,12 +27,22 @@ public class ApprovalNode extends BaseNode {
         return NODE_TYPE;
     }
 
-    public ApprovalNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions) {
-        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions);
+    public ApprovalNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<FlowAction> actions) {
+        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions,actions);
     }
 
-    public ApprovalNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>());
+    protected ApprovalNode() {
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(),defaultActions());
+    }
+
+    private static List<FlowAction> defaultActions() {
+        List<FlowAction> actions = new ArrayList<>();
+        actions.add(FlowActionFactory.getInstance().create(ActionType.PASS));
+        actions.add(FlowActionFactory.getInstance().create(ActionType.REJECT));
+        actions.add(FlowActionFactory.getInstance().create(ActionType.RETURN));
+        actions.add(FlowActionFactory.getInstance().create(ActionType.TRANSFER));
+        actions.add(FlowActionFactory.getInstance().create(ActionType.CANCEL));
+        return actions;
     }
 
 

@@ -1,6 +1,6 @@
 package com.codingapi.flow.gateway;
 
-import com.codingapi.flow.user.IFlowOperator;
+import com.codingapi.flow.operator.IFlowOperator;
 
 public interface FlowOperatorGateway {
 

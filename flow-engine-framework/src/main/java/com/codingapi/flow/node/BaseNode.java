@@ -1,14 +1,15 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.action.FlowAction;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
+import com.codingapi.flow.operator.NodeOperators;
 import com.codingapi.flow.script.ErrorTriggerScript;
 import com.codingapi.flow.script.NodeTitleScript;
 import com.codingapi.flow.script.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.user.IFlowOperator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -59,6 +60,11 @@ public abstract class BaseNode implements IFlowNode {
      * 表单字段权限
      */
     private List<FormFieldPermission> formFieldPermissions;
+
+    /**
+     * 节点操作
+     */
+    private List<FlowAction> actions;
 
     @Override
     public Map<String,Object> toMap(){
@@ -112,6 +118,10 @@ public abstract class BaseNode implements IFlowNode {
         this.id = id;
     }
 
+    protected void setActions(List<FlowAction> actions) {
+        this.actions = actions;
+    }
+
     /**
      * 设置审批人配置脚本
      * @param operatorScript 审批人配置脚本
@@ -149,8 +159,13 @@ public abstract class BaseNode implements IFlowNode {
     }
 
     @Override
-    public List<IFlowOperator> operators(FlowSession flowSession) {
-        return operatorScript.execute(flowSession);
+    public List<FlowAction> actions() {
+        return actions;
+    }
+
+    @Override
+    public NodeOperators operators(FlowSession flowSession) {
+        return new NodeOperators(operatorScript.execute(flowSession));
     }
 
     @Override
@@ -180,6 +195,9 @@ public abstract class BaseNode implements IFlowNode {
         }
         if (!StringUtils.hasText(id)) {
             throw new IllegalArgumentException("id can not be null");
+        }
+        if(actions==null || actions.isEmpty()){
+            throw new IllegalArgumentException("actions can not be null");
         }
 
         if(operatorScript==null){

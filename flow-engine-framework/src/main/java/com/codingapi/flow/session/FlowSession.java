@@ -3,7 +3,7 @@ package com.codingapi.flow.session;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.user.IFlowOperator;
+import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

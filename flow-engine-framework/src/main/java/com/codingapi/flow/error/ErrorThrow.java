@@ -1,7 +1,7 @@
 package com.codingapi.flow.error;
 
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.user.IFlowOperator;
+import com.codingapi.flow.operator.IFlowOperator;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,10 +1,11 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.action.FlowAction;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.error.ErrorThrow;
+import com.codingapi.flow.operator.NodeOperators;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.user.IFlowOperator;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,11 @@ public interface IFlowNode {
     String getType();
 
     /**
+     * 节点动作
+     */
+    List<FlowAction> actions();
+
+    /**
      * 表单字段权限设置
      */
     List<FormFieldPermission> formFieldsPermissions();
@@ -42,7 +48,7 @@ public interface IFlowNode {
     /**
      * 节点参与用户
      */
-    List<IFlowOperator> operators(FlowSession flowSession);
+    NodeOperators operators(FlowSession flowSession);
 
     /**
      * 构建待办标题

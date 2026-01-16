@@ -4,7 +4,7 @@ import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.script.OperatorMatchScript;
-import com.codingapi.flow.user.IFlowOperator;
+import com.codingapi.flow.operator.IFlowOperator;
 
 import java.util.ArrayList;
 import java.util.List;

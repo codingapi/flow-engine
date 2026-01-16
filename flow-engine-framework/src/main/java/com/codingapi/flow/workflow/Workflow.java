@@ -9,7 +9,7 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeFactory;
 import com.codingapi.flow.node.StartNode;
 import com.codingapi.flow.script.OperatorMatchScript;
-import com.codingapi.flow.user.IFlowOperator;
+import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

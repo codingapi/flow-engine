@@ -1,7 +1,7 @@
 package com.codingapi.flow.script;
 
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.user.IFlowOperator;
+import com.codingapi.flow.operator.IFlowOperator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

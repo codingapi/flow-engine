@@ -1,6 +1,6 @@
 package com.codingapi.flow.record;
 
-import com.codingapi.flow.user.IFlowOperator;
+import com.codingapi.flow.operator.IFlowOperator;
 import lombok.Getter;
 
 /**

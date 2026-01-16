@@ -1,5 +1,6 @@
 package com.codingapi.flow.action;
 
+import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
 
 /**
@@ -37,5 +38,58 @@ public class FlowAction {
      */
     private String script;
 
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private final FlowAction flowAction;
+
+        public Builder() {
+            flowAction = new FlowAction();
+            flowAction.order = 1;
+            flowAction.id = RandomUtils.generateStringId();
+        }
+
+        public Builder id(String id) {
+            flowAction.id = id;
+            return this;
+        }
+
+        public Builder title(String title) {
+            flowAction.title = title;
+            return this;
+        }
+
+        public Builder style(String style) {
+            flowAction.style = style;
+            return this;
+        }
+
+        public Builder type(ActionType type) {
+            flowAction.type = type;
+            return this;
+        }
+
+        public Builder order(int order) {
+            flowAction.order = order;
+            return this;
+        }
+
+        public Builder icon(String icon) {
+            flowAction.icon = icon;
+            return this;
+        }
+
+        public Builder script(String script) {
+            flowAction.script = script;
+            return this;
+        }
+
+        public FlowAction build() {
+            return flowAction;
+        }
+    }
 
 }
