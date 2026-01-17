@@ -41,7 +41,6 @@ public class ConditionBranchNode extends BaseNode{
         actions.add(FlowActionFactory.getInstance().create(ActionType.REJECT));
         actions.add(FlowActionFactory.getInstance().create(ActionType.RETURN));
         actions.add(FlowActionFactory.getInstance().create(ActionType.TRANSFER));
-        actions.add(FlowActionFactory.getInstance().create(ActionType.CANCEL));
         return actions;
     }
 

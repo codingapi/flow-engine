@@ -23,9 +23,9 @@ public class FlowActionFactory {
         this.typeTitles.put(ActionType.PASS, "同意");
         this.typeTitles.put(ActionType.REJECT, "拒绝");
         this.typeTitles.put(ActionType.RETURN, "退回");
-        this.typeTitles.put(ActionType.CANCEL, "撤销");
         this.typeTitles.put(ActionType.TRANSFER, "转办");
-        this.typeTitles.put(ActionType.CONFIRM, "确认");
+        this.typeTitles.put(ActionType.DELEGATE, "委派");
+        this.typeTitles.put(ActionType.ADD_SIGN, "加签");
     }
 
     public FlowAction create(ActionType type) {

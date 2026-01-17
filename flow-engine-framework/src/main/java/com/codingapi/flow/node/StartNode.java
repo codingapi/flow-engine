@@ -37,7 +37,6 @@ public class StartNode extends BaseNode {
     private static List<FlowAction> defaultActions() {
         List<FlowAction> actions = new ArrayList<>();
         actions.add(FlowActionFactory.getInstance().create(ActionType.PASS));
-        actions.add(FlowActionFactory.getInstance().create(ActionType.CANCEL));
         return actions;
     }
 
