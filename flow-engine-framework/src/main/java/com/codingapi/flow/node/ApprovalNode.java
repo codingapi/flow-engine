@@ -2,6 +2,8 @@ package com.codingapi.flow.node;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.PassAction;
+import com.codingapi.flow.action.RejectAction;
+import com.codingapi.flow.action.SaveAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.script.ErrorTriggerScript;
 import com.codingapi.flow.script.NodeTitleScript;
@@ -37,6 +39,8 @@ public class ApprovalNode extends BaseNode {
     private static List<IFlowAction> defaultActions() {
         List<IFlowAction> actions = new ArrayList<>();
         actions.add(new PassAction());
+        actions.add(new RejectAction());
+        actions.add(new SaveAction());
         return actions;
     }
 

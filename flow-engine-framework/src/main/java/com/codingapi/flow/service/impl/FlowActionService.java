@@ -68,7 +68,7 @@ public class FlowActionService {
         FlowSession session = new FlowSession(currentOperator, workflow.getForm(), workflow, currentNode, formData, workflowBackup.getId(), request.getAdvice().getAdvice());
 
         // 判断当前节点是否已经完成
-        boolean done = currentNode.isDone(session, currentRecords);
+        boolean done = currentNode.isDone(session,flowAction, currentRecords);
         if (done) {
             List<FlowRecord> records = flowAction.trigger(session, flowRecord);
             if (records == null || records.isEmpty()) {

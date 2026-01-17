@@ -10,7 +10,6 @@ public class RejectAction extends BaseAction{
         this.id = RandomUtils.generateStringId();
         this.title = "拒绝";
         this.type = ActionType.REJECT;
-        this.order = 1;
         this.display = new ActionDisplay(this.title);
     }
 

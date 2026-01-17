@@ -10,7 +10,6 @@ public class DefaultAction extends BaseAction {
         this.id = RandomUtils.generateStringId();
         this.title = "默认";
         this.type = ActionType.DELEGATE;
-        this.order = 1;
         this.display = new ActionDisplay(this.title);
     }
 

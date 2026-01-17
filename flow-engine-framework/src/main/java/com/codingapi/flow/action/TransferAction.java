@@ -10,7 +10,6 @@ public class TransferAction extends BaseAction{
         this.id = RandomUtils.generateStringId();
         this.title = "转办";
         this.type = ActionType.TRANSFER;
-        this.order = 1;
         this.display = new ActionDisplay(this.title);
     }
 

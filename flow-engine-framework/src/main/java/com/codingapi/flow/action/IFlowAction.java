@@ -33,11 +33,6 @@ public interface IFlowAction {
     ActionDisplay display();
 
     /**
-     * 排序
-     */
-    int order();
-
-    /**
      * 执行动作
      */
     List<FlowRecord> trigger(FlowSession flowSession,FlowRecord currentRecord);

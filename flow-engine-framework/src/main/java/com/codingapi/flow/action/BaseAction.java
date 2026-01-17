@@ -16,7 +16,6 @@ public abstract class BaseAction implements IFlowAction {
     protected ActionType type;
     protected String title;
     protected ActionDisplay display;
-    protected int order;
 
     @Override
     public ActionType type() {
@@ -38,10 +37,6 @@ public abstract class BaseAction implements IFlowAction {
         return display;
     }
 
-    @Override
-    public int order() {
-        return order;
-    }
 
     protected void setId(String id) {
         this.id = id;
@@ -59,10 +54,6 @@ public abstract class BaseAction implements IFlowAction {
         this.display = display;
     }
 
-    protected void setOrder(int order) {
-        this.order = order;
-    }
-
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
@@ -70,7 +61,6 @@ public abstract class BaseAction implements IFlowAction {
         map.put("type", type.name());
         map.put("title", title);
         map.put("display", display != null ? display.toMap() : null);
-        map.put("order", String.valueOf(order));
         return map;
     }
 
@@ -90,7 +80,6 @@ public abstract class BaseAction implements IFlowAction {
         if(display!=null) {
             action.setDisplay(ActionDisplay.fromMap(display));
         }
-        action.setOrder(Integer.parseInt(data.get("order").toString()));
         return action;
     }
 }

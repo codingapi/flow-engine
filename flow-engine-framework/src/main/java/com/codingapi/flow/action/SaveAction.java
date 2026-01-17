@@ -10,7 +10,6 @@ public class SaveAction extends BaseAction{
         this.id = RandomUtils.generateStringId();
         this.title = "保存";
         this.type = ActionType.SAVE;
-        this.order = 1;
         this.display = new ActionDisplay(this.title);
     }
 

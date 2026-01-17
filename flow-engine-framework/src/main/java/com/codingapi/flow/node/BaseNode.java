@@ -1,5 +1,6 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.factory.FlowActionFactory;
 import com.codingapi.flow.error.ErrorThrow;
@@ -240,7 +241,11 @@ public abstract class BaseNode implements IFlowNode {
     }
 
     @Override
-    public boolean isDone(FlowSession session, List<FlowRecord> currentRecords) {
+    public boolean isDone(FlowSession session,IFlowAction action, List<FlowRecord> currentRecords) {
+        // 如果流程节点是保存节点，则不判断是否完成
+        if(action.type()== ActionType.SAVE){
+            return false;
+        }
         return true;
     }
 

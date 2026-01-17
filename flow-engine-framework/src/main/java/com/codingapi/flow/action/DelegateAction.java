@@ -10,7 +10,6 @@ public class DelegateAction extends BaseAction{
         this.id = RandomUtils.generateStringId();
         this.title = "委派";
         this.type = ActionType.DELEGATE;
-        this.order = 1;
         this.display = new ActionDisplay(this.title);
     }
 

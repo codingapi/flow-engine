@@ -10,7 +10,6 @@ public class ReturnAction extends BaseAction{
         this.id = RandomUtils.generateStringId();
         this.title = "退回";
         this.type = ActionType.RETURN;
-        this.order = 1;
         this.display = new ActionDisplay(this.title);
     }
 

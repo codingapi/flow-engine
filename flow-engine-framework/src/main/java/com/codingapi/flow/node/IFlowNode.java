@@ -92,8 +92,9 @@ public interface IFlowNode {
     /**
      * 节点是否完成
      * @param session 会话对象
+     * @param action 节点动作
      * @param currentRecords 当前节点的记录
      * @return true:完成 false:未完成
      */
-    boolean isDone(FlowSession session, List<FlowRecord> currentRecords);
+    boolean isDone(FlowSession session,IFlowAction action, List<FlowRecord> currentRecords);
 }

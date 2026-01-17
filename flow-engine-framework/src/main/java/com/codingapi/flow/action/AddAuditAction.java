@@ -10,7 +10,6 @@ public class AddAuditAction extends BaseAction{
         this.id = RandomUtils.generateStringId();
         this.title = "加签";
         this.type = ActionType.ADD_AUDIT;
-        this.order = 1;
         this.display = new ActionDisplay(this.title);
     }
 
