@@ -14,6 +14,8 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.AllArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 public class FlowSubmitService {
 
@@ -27,7 +29,7 @@ public class FlowSubmitService {
         request.verify();
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getAdvice().getOperatorId());
-        if (currentOperator==null) {
+        if (currentOperator == null) {
             throw new IllegalArgumentException("currentOperator not exist");
         }
         FlowRecord flowRecord = flowRecordRepository.get(request.getRecordId());
@@ -63,7 +65,9 @@ public class FlowSubmitService {
         formData.reset(request.getFormData());
 
         FlowSession session = new FlowSession(currentOperator, workflow.getForm(), workflow, currentNode, formData);
-
-
+        List<FlowRecord> records = flowAction.execute(session);
+        if (records != null) {
+            flowRecordRepository.saveAll(records);
+        }
     }
 }

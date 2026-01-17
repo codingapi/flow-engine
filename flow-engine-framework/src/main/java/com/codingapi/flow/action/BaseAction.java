@@ -1,9 +1,12 @@
 package com.codingapi.flow.action;
 
+import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -71,6 +74,10 @@ public abstract class BaseAction implements IFlowAction {
         return map;
     }
 
+    @Override
+    public List<FlowRecord> execute(FlowSession flowSession) {
+        return null;
+    }
 
     @SneakyThrows
     @SuppressWarnings("unchecked")

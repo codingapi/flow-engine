@@ -32,6 +32,13 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository{
     }
 
     @Override
+    public void saveAll(List<FlowRecord> flowRecords) {
+        for (FlowRecord flowRecord : flowRecords){
+            this.save(flowRecord);
+        }
+    }
+
+    @Override
     public void delete(FlowRecord flowRecord) {
         cache.remove(flowRecord.getId());
     }

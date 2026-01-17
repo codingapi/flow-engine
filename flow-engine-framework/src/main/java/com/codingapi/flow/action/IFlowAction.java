@@ -1,8 +1,10 @@
 package com.codingapi.flow.action;
 
 
+import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,7 +40,7 @@ public interface IFlowAction {
     /**
      * 执行动作
      */
-    void execute(FlowSession flowSession);
+    List<FlowRecord> execute(FlowSession flowSession);
 
     /**
      * 转换为map
