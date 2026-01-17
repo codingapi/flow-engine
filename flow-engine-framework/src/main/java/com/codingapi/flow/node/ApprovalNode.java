@@ -1,10 +1,8 @@
 package com.codingapi.flow.node;
 
-import com.codingapi.flow.action.ActionType;
-import com.codingapi.flow.action.FlowAction;
-import com.codingapi.flow.action.factory.FlowActionFactory;
+import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.PassAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.script.ErrorTriggerScript;
 import com.codingapi.flow.script.NodeTitleScript;
 import com.codingapi.flow.script.OperatorLoadScript;
@@ -28,7 +26,7 @@ public class ApprovalNode extends BaseNode {
     }
 
 
-    public ApprovalNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<FlowAction> actions,long timeoutTime, boolean mergeable) {
+    public ApprovalNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, long timeoutTime, boolean mergeable) {
         super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions,actions,timeoutTime, mergeable);
     }
 
@@ -36,12 +34,9 @@ public class ApprovalNode extends BaseNode {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(),defaultActions(),0, false);
     }
 
-    private static List<FlowAction> defaultActions() {
-        List<FlowAction> actions = new ArrayList<>();
-        actions.add(FlowActionFactory.getInstance().create(ActionType.PASS));
-        actions.add(FlowActionFactory.getInstance().create(ActionType.REJECT));
-        actions.add(FlowActionFactory.getInstance().create(ActionType.RETURN));
-        actions.add(FlowActionFactory.getInstance().create(ActionType.TRANSFER));
+    private static List<IFlowAction> defaultActions() {
+        List<IFlowAction> actions = new ArrayList<>();
+        actions.add(new PassAction());
         return actions;
     }
 

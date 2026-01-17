@@ -1,6 +1,6 @@
 package com.codingapi.flow.record;
 
-import com.codingapi.flow.action.FlowAction;
+import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.operator.IFlowOperator;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ public class FlowAdvice {
     /**
      * 流程动作
      */
-    private FlowAction action;
+    private IFlowAction action;
     /**
      * 审批意见
      */
@@ -29,7 +29,7 @@ public class FlowAdvice {
     private long createTime;
 
 
-    public FlowAdvice(FlowAction action, String advice, IFlowOperator operator) {
+    public FlowAdvice(IFlowAction action, String advice, IFlowOperator operator) {
         this.action = action;
         this.advice = advice;
         this.operator = operator;

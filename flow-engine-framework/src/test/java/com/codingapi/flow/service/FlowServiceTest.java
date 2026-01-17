@@ -1,5 +1,6 @@
 package com.codingapi.flow.service;
 
+import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
@@ -87,7 +88,8 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
-        request.setAdvice(new FlowAdviceBody(startNode.getActionByTitle("同意").getId(), "同意", test.getUserId()));
+        List<IFlowAction> actions = startNode.actions();
+        request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", test.getUserId()));
 
         flowService.create(request);
 
@@ -153,7 +155,8 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
-        request.setAdvice(new FlowAdviceBody(startNode.getActionByTitle("同意").getId(), "同意", test.getUserId()));
+        List<IFlowAction> actions = startNode.actions();
+        request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", test.getUserId()));
 
         flowService.create(request);
 
@@ -163,7 +166,7 @@ class FlowServiceTest {
         FlowSubmitRequest submitRequest = new FlowSubmitRequest();
         submitRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
         submitRequest.setRecordId(recordList.get(0).getId());
-        submitRequest.setAdvice(new FlowAdviceBody(startNode.getActionByTitle("同意").getId(), "同意", test.getUserId()));
+        submitRequest.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", test.getUserId()));
         flowService.submit(submitRequest);
     }
 }

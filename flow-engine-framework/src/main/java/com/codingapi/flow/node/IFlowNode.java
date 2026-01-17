@@ -1,9 +1,9 @@
 package com.codingapi.flow.node;
 
-import com.codingapi.flow.action.FlowAction;
+import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.operator.NodeOperators;
 import com.codingapi.flow.session.FlowSession;
 
@@ -38,19 +38,13 @@ public interface IFlowNode {
     /**
      * 节点动作
      */
-    List<FlowAction> actions();
+    List<IFlowAction> actions();
 
     /**
      * 获取节点动作
      * @param id 动作id
      */
-    FlowAction getActionById(String id);
-
-    /**
-     * 获取节点动作
-     * @param title 动作title
-     */
-    FlowAction getActionByTitle(String title);
+    IFlowAction getActionById(String id);
 
     /**
      * 表单字段权限设置

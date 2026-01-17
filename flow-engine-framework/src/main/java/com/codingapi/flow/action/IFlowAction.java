@@ -1,0 +1,47 @@
+package com.codingapi.flow.action;
+
+
+import com.codingapi.flow.session.FlowSession;
+
+import java.util.Map;
+
+/**
+ * 节点动作
+ */
+public interface IFlowAction {
+
+    /**
+     * 流程类型
+     */
+    ActionType type();
+
+    /**
+     * 动作id
+     */
+    String id();
+
+    /**
+     * 动作名称
+     */
+    String title();
+
+    /**
+     * 显示名称
+     */
+    ActionDisplay display();
+
+    /**
+     * 排序
+     */
+    int order();
+
+    /**
+     * 执行动作
+     */
+    void execute(FlowSession flowSession);
+
+    /**
+     * 转换为map
+     */
+    Map<String,Object> toMap();
+}

@@ -1,6 +1,6 @@
 package com.codingapi.flow.node;
 
-import com.codingapi.flow.action.FlowAction;
+import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
 
@@ -20,7 +20,7 @@ public abstract class BaseBuilder<N extends BaseNode> {
         return this;
     }
 
-    public BaseBuilder<N> actions(List<FlowAction> actions) {
+    public BaseBuilder<N> actions(List<IFlowAction> actions) {
         node.setActions(actions);
         return this;
     }

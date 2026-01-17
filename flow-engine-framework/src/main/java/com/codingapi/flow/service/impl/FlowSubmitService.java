@@ -1,6 +1,6 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.action.FlowAction;
+import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.backup.WorkflowBackup;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
@@ -53,7 +53,7 @@ public class FlowSubmitService {
         if (currentNode == null) {
             throw new IllegalArgumentException("currentNode not exist");
         }
-        FlowAction flowAction = currentNode.getActionById(request.getAdvice().getActionId());
+        IFlowAction flowAction = currentNode.getActionById(request.getAdvice().getActionId());
         if (flowAction == null) {
             throw new IllegalArgumentException("action not exist");
         }

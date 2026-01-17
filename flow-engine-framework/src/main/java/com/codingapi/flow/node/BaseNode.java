@@ -1,7 +1,7 @@
 package com.codingapi.flow.node;
 
-import com.codingapi.flow.action.ActionType;
-import com.codingapi.flow.action.FlowAction;
+import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.factory.FlowActionFactory;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
@@ -65,7 +65,7 @@ public abstract class BaseNode implements IFlowNode {
     /**
      * 节点操作
      */
-    private List<FlowAction> actions;
+    private List<IFlowAction> actions;
 
     /**
      * 超时到期时间
@@ -77,26 +77,26 @@ public abstract class BaseNode implements IFlowNode {
     private boolean mergeable;
 
     @Override
-    public Map<String,Object> toMap(){
-        Map<String,Object> map = new HashMap<>();
-        map.put("view",view);
-        map.put("name",name);
-        map.put("id",id);
-        map.put("operatorScript",operatorScript.getScript());
-        map.put("nodeTitleScript",nodeTitleScript.getScript());
-        map.put("errorTriggerScript",errorTriggerScript.getScript());
-        map.put("formFieldPermissions",formFieldPermissions);
-        map.put("type",getType());
-        map.put("actions",actions);
-        map.put("timeoutTime",String.valueOf(timeoutTime));
-        map.put("mergeable",mergeable);
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("view", view);
+        map.put("name", name);
+        map.put("id", id);
+        map.put("operatorScript", operatorScript.getScript());
+        map.put("nodeTitleScript", nodeTitleScript.getScript());
+        map.put("errorTriggerScript", errorTriggerScript.getScript());
+        map.put("formFieldPermissions", formFieldPermissions);
+        map.put("type", getType());
+        map.put("actions", actions.stream().map(IFlowAction::toMap).toList());
+        map.put("timeoutTime", String.valueOf(timeoutTime));
+        map.put("mergeable", mergeable);
         return map;
     }
 
 
     @SneakyThrows
     @SuppressWarnings("unchecked")
-    public static <T extends BaseNode> T formMap(Map<String, Object> map, Class<T> clazz)  {
+    public static <T extends BaseNode> T formMap(Map<String, Object> map, Class<T> clazz) {
         T node = clazz.getDeclaredConstructor().newInstance();
         node.setId((String) map.get("id"));
         node.setName((String) map.get("name"));
@@ -121,17 +121,9 @@ public abstract class BaseNode implements IFlowNode {
 
         List<Map<String, Object>> actions = (List<Map<String, Object>>) map.get("actions");
         if (actions != null) {
-            List<FlowAction> actionList = new ArrayList<>();
+            List<IFlowAction> actionList = new ArrayList<>();
             for (Map<String, Object> item : actions) {
-                FlowAction action = FlowAction.builder()
-                        .id((String) item.get("id"))
-                        .title((String) item.get("title"))
-                        .style((String) item.get("style"))
-                        .type(ActionType.valueOf((String) item.get("type")))
-                        .order((Integer) item.get("order"))
-                        .icon((String) item.get("icon"))
-                        .script((String) item.get("script"))
-                        .build();
+                IFlowAction action = FlowActionFactory.getInstance().createAction(item);
                 actionList.add(action);
             }
             node.setActions(actionList);
@@ -151,7 +143,7 @@ public abstract class BaseNode implements IFlowNode {
         this.id = id;
     }
 
-    protected void setActions(List<FlowAction> actions) {
+    protected void setActions(List<IFlowAction> actions) {
         this.actions = actions;
     }
 
@@ -164,9 +156,9 @@ public abstract class BaseNode implements IFlowNode {
     }
 
 
-
     /**
      * 设置审批人配置脚本
+     *
      * @param operatorScript 审批人配置脚本
      */
     protected void setOperatorScript(String operatorScript) {
@@ -175,6 +167,7 @@ public abstract class BaseNode implements IFlowNode {
 
     /**
      * 设置节点待办标题脚本
+     *
      * @param nodeTitleScript 节点待办标题脚本
      */
     protected void setNodeTitleScript(String nodeTitleScript) {
@@ -183,6 +176,7 @@ public abstract class BaseNode implements IFlowNode {
 
     /**
      * 错误触发脚本
+     *
      * @param errorTriggerScript 错误触发脚本
      */
     protected void setErrorTriggerScript(String errorTriggerScript) {
@@ -202,18 +196,13 @@ public abstract class BaseNode implements IFlowNode {
     }
 
     @Override
-    public List<FlowAction> actions() {
+    public List<IFlowAction> actions() {
         return actions;
     }
 
     @Override
-    public FlowAction getActionById(String id) {
-        return actions.stream().filter(item -> item.getId().equals(id)).findFirst().orElse(null);
-    }
-
-    @Override
-    public FlowAction getActionByTitle(String title) {
-        return actions.stream().filter(item -> item.getTitle().equals(title)).findFirst().orElse(null);
+    public IFlowAction getActionById(String id) {
+        return actions.stream().filter(item -> item.id().equals(id)).findFirst().orElse(null);
     }
 
     @Override
@@ -259,14 +248,14 @@ public abstract class BaseNode implements IFlowNode {
         if (!StringUtils.hasText(id)) {
             throw new IllegalArgumentException("id can not be null");
         }
-        if(actions==null || actions.isEmpty()){
+        if (actions == null || actions.isEmpty()) {
             throw new IllegalArgumentException("actions can not be null");
         }
 
-        if(operatorScript==null){
+        if (operatorScript == null) {
             throw new IllegalArgumentException("operator can not be null");
         }
-        if(nodeTitleScript==null){
+        if (nodeTitleScript == null) {
             throw new IllegalArgumentException("nodeTitle can not be null");
         }
     }
@@ -280,7 +269,6 @@ public abstract class BaseNode implements IFlowNode {
             }
         }
     }
-
 
 
 }

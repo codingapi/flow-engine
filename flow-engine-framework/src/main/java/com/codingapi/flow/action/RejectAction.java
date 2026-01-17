@@ -1,0 +1,26 @@
+package com.codingapi.flow.action;
+
+import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.utils.RandomUtils;
+
+import java.util.Map;
+
+public class RejectAction extends BaseAction{
+
+    public RejectAction() {
+        this.id = RandomUtils.generateStringId();
+        this.title = "拒绝";
+        this.type = ActionType.REJECT;
+        this.order = 1;
+        this.display = new ActionDisplay(this.title);
+    }
+    
+    @Override
+    public void execute(FlowSession flowSession) {
+
+    }
+
+    public static RejectAction formMap(Map<String, Object> data) {
+        return BaseAction.formMap(data, RejectAction.class);
+    }
+}

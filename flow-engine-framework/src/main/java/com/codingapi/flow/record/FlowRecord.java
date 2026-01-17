@@ -1,6 +1,5 @@
 package com.codingapi.flow.record;
 
-import com.codingapi.flow.action.FlowAction;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
@@ -136,7 +135,7 @@ public class FlowRecord {
         this.processId = RandomUtils.generateStringId();
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
         this.recordState = SATE_RECORD_TODO;
-        this.actionId = flowAdvice.getAction().getId();
+        this.actionId = flowAdvice.getAction().id();
         this.currentOperatorId = flowAdvice.getOperator().getUserId();
         this.advice = flowAdvice.getAdvice();
         this.flowState = SATE_FLOW_RUNNING;

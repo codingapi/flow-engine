@@ -1,6 +1,6 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.action.FlowAction;
+import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.backup.WorkflowBackup;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
@@ -56,7 +56,7 @@ public class FlowCreateService {
             throw new IllegalArgumentException("node operator not match");
         }
 
-        FlowAction action = currentNode.getActionById(request.getAdvice().getActionId());
+        IFlowAction action = currentNode.getActionById(request.getAdvice().getActionId());
 
         FlowAdvice flowAdvice = new FlowAdvice(action, request.getAdvice().getAdvice(), currentOperator);
 

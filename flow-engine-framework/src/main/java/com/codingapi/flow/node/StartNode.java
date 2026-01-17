@@ -1,8 +1,7 @@
 package com.codingapi.flow.node;
 
-import com.codingapi.flow.action.ActionType;
-import com.codingapi.flow.action.FlowAction;
-import com.codingapi.flow.action.factory.FlowActionFactory;
+import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.PassAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.script.ErrorTriggerScript;
 import com.codingapi.flow.script.NodeTitleScript;
@@ -26,7 +25,7 @@ public class StartNode extends BaseNode {
         return NODE_TYPE;
     }
 
-    public StartNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<FlowAction> actions,long timeoutTime, boolean mergeable) {
+    public StartNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions,long timeoutTime, boolean mergeable) {
         super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions,actions,timeoutTime, mergeable);
     }
 
@@ -34,9 +33,9 @@ public class StartNode extends BaseNode {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(),defaultActions(),0, false);
     }
 
-    private static List<FlowAction> defaultActions() {
-        List<FlowAction> actions = new ArrayList<>();
-        actions.add(FlowActionFactory.getInstance().create(ActionType.PASS));
+    private static List<IFlowAction> defaultActions() {
+        List<IFlowAction> actions = new ArrayList<>();
+        actions.add(new PassAction());
         return actions;
     }
 
