@@ -56,7 +56,7 @@ public class FlowCreateService {
             throw new IllegalArgumentException("node operator not match");
         }
 
-        FlowAction action = currentNode.getActionById(request.getAdvice().getAction());
+        FlowAction action = currentNode.getActionById(request.getAdvice().getActionId());
 
         FlowAdvice flowAdvice = new FlowAdvice(action, request.getAdvice().getAdvice(), currentOperator);
 

@@ -1,5 +1,6 @@
 package com.codingapi.flow.record;
 
+import com.codingapi.flow.action.FlowAction;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
@@ -60,10 +61,19 @@ public class FlowRecord {
      *  每一次流程启动时生成，直到流程结束
      */
     private String processId;
+
+    /**
+     * 流程动作
+     */
+    private String actionId;
     /**
      * 审批意见
      */
-    private FlowAdvice flowAdvice;
+    private String advice;
+    /**
+     * 当前审批人
+     */
+    private long currentOperatorId;
 
     /**
      * 节点状态 | 待办、已办
@@ -93,7 +103,7 @@ public class FlowRecord {
     /**
      * 发起者id
      */
-    private IFlowOperator createOperator;
+    private long createOperatorId;
     /**
      * 异常信息
      */
@@ -124,9 +134,11 @@ public class FlowRecord {
         this.fromId = 0;
         this.title = flowSession.getCurrentNode().generateTitle(flowSession);
         this.processId = RandomUtils.generateStringId();
-        this.createOperator = flowSession.getCurrentOperator();
+        this.createOperatorId = flowSession.getCreatedOperator().getUserId();
         this.recordState = SATE_RECORD_TODO;
-        this.flowAdvice = flowAdvice;
+        this.actionId = flowAdvice.getAction().getId();
+        this.currentOperatorId = flowAdvice.getOperator().getUserId();
+        this.advice = flowAdvice.getAdvice();
         this.flowState = SATE_FLOW_RUNNING;
         this.createTime = System.currentTimeMillis();
         this.timeoutTime = flowSession.getCurrentNode().timeoutTime();
@@ -156,11 +168,18 @@ public class FlowRecord {
         if(formData == null){
             throw new IllegalArgumentException("formData is null");
         }
-        if(createOperator == null){
+        if(createOperatorId <= 0){
             throw new IllegalArgumentException("createOperator is null");
         }
-        if(flowAdvice == null){
-            throw new IllegalArgumentException("flowAdvice is null");
+        if(currentOperatorId <= 0){
+            throw new IllegalArgumentException("currentOperatorId is null");
         }
+        if(actionId == null){
+            throw new IllegalArgumentException("actionId is null");
+        }
+    }
+
+    public boolean isTodo() {
+        return recordState == SATE_RECORD_TODO && flowState == SATE_FLOW_RUNNING;
     }
 }

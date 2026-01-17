@@ -17,7 +17,7 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository{
 
 
     public List<FlowRecord> findTodoByOperator(long operatorId) {
-        return cache.values().stream().filter(flowRecord -> flowRecord.getCreateOperator().getUserId()==operatorId && flowRecord.getRecordState()==FlowRecord.SATE_RECORD_TODO).toList();
+        return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId()==operatorId && flowRecord.isTodo()).toList();
     }
 
     @Override

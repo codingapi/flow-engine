@@ -12,7 +12,7 @@ public class FlowAdviceBody {
     /**
      * 流程动作
      */
-    private String action;
+    private String actionId;
     /**
      * 审批意见
      */
@@ -24,7 +24,7 @@ public class FlowAdviceBody {
 
 
     public void verify(){
-        if(action==null||action.isEmpty()){
+        if(actionId ==null|| actionId.isEmpty()){
             throw new IllegalArgumentException("action can not be null");
         }
         if(operatorId<=0){

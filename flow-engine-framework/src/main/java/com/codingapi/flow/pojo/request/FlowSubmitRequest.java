@@ -24,4 +24,17 @@ public class FlowSubmitRequest {
      */
     private FlowAdviceBody advice;
 
+
+    public void verify() {
+        if (recordId <= 0) {
+            throw new IllegalArgumentException("recordId can not be null");
+        }
+        if (formData == null || formData.isEmpty()) {
+            throw new IllegalArgumentException("formData can not be null");
+        }
+        if (advice == null) {
+            throw new IllegalArgumentException("advice can not be null");
+        }
+        advice.verify();
+    }
 }
