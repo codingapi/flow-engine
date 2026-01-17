@@ -16,11 +16,12 @@ public class FlowRecord {
     public static int SATE_RECORD_TODO = 0;
     public static int SATE_RECORD_DONE = 1;
 
-    // 运行中、已完成、异常、删除
+    // 运行中、已完成、终止、异常、删除
     public static int SATE_FLOW_RUNNING = 0;
     public static int SATE_FLOW_DONE = 1;
-    public static int SATE_FLOW_ERROR = 2;
-    public static int SATE_FLOW_DELETE = 3;
+    public static int SATE_FLOW_FINISH = 2;
+    public static int SATE_FLOW_ERROR = 3;
+    public static int SATE_FLOW_DELETE = 4;
 
     /**
      * 记录id
@@ -40,13 +41,17 @@ public class FlowRecord {
      */
     private String nodeId;
     /**
+     * 节点类型
+     */
+    private String nodeType;
+    /**
      * 父节点id
      */
     private long fromId;
     /**
      * 表单数据
      */
-    private Map<String,Object> formData;
+    private Map<String, Object> formData;
     /**
      * 消息标题
      */
@@ -56,8 +61,8 @@ public class FlowRecord {
      */
     private long readTime;
     /**
-     *  流程id
-     *  每一次流程启动时生成，直到流程结束
+     * 流程id
+     * 每一次流程启动时生成，直到流程结束
      */
     private String processId;
 
@@ -69,6 +74,12 @@ public class FlowRecord {
      * 审批意见
      */
     private String advice;
+
+    /**
+     * 签名key
+     */
+    private String signKey;
+
     /**
      * 当前审批人
      */
@@ -125,19 +136,20 @@ public class FlowRecord {
      */
     private IFlowOperator interferedOperator;
 
-    public FlowRecord(FlowSession flowSession,FlowAdvice flowAdvice,long backupId) {
+    public FlowRecord(FlowSession flowSession, String actionId,String processId, long fromId) {
         this.workCode = flowSession.getWorkCode();
-        this.workBackupId = backupId;
+        this.workBackupId = flowSession.getBackupId();
         this.nodeId = flowSession.getCurrentNodeId();
+        this.nodeType = flowSession.getCurrentNodeType();
         this.formData = flowSession.getFormData().toMapData();
-        this.fromId = 0;
+        this.fromId = fromId;
         this.title = flowSession.getCurrentNode().generateTitle(flowSession);
-        this.processId = RandomUtils.generateStringId();
+        this.processId = processId;
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
         this.recordState = SATE_RECORD_TODO;
-        this.actionId = flowAdvice.getAction().id();
-        this.currentOperatorId = flowAdvice.getOperator().getUserId();
-        this.advice = flowAdvice.getAdvice();
+        this.actionId = actionId;
+        this.currentOperatorId = flowSession.getCurrentOperator().getUserId();
+        this.advice = flowSession.getAdvice();
         this.flowState = SATE_FLOW_RUNNING;
         this.createTime = System.currentTimeMillis();
         this.timeoutTime = flowSession.getCurrentNode().timeoutTime();
@@ -146,39 +158,86 @@ public class FlowRecord {
     }
 
     public void verify() {
-        if(!StringUtils.hasText(workCode)){
+        if (!StringUtils.hasText(workCode)) {
             throw new IllegalArgumentException("workCode is null");
         }
-        if(!StringUtils.hasText(nodeId)){
+        if (!StringUtils.hasText(nodeId)) {
             throw new IllegalArgumentException("nodeId is null");
         }
-        if(!StringUtils.hasText(title)){
+        if (!StringUtils.hasText(title)) {
             throw new IllegalArgumentException("title is null");
         }
-        if(!StringUtils.hasText(processId)){
+        if (!StringUtils.hasText(processId)) {
             throw new IllegalArgumentException("processId is null");
         }
-        if(createTime <= 0){
+        if (createTime <= 0) {
             throw new IllegalArgumentException("createTime is null");
         }
-        if(fromId < 0){
+        if (fromId < 0) {
             throw new IllegalArgumentException("fromId is null");
         }
-        if(formData == null){
+        if (formData == null) {
             throw new IllegalArgumentException("formData is null");
         }
-        if(createOperatorId <= 0){
+        if (createOperatorId <= 0) {
             throw new IllegalArgumentException("createOperator is null");
         }
-        if(currentOperatorId <= 0){
+        if (currentOperatorId <= 0) {
             throw new IllegalArgumentException("currentOperatorId is null");
         }
-        if(actionId == null){
+        if (actionId == null) {
             throw new IllegalArgumentException("actionId is null");
         }
     }
 
+    /**
+     * 判断是否待办
+     *
+     * @return true/false
+     */
     public boolean isTodo() {
         return recordState == SATE_RECORD_TODO && flowState == SATE_FLOW_RUNNING;
+    }
+
+
+    /**
+     * 判断是否已完成
+     */
+    public boolean isFinish(){
+        return flowState != SATE_FLOW_RUNNING;
+    }
+
+    /**
+     * 判断节点类型
+     *
+     * @param nodeType 节点类型
+     * @return true/false
+     */
+    public boolean isNodeType(String nodeType) {
+        return this.nodeType.equals(nodeType);
+    }
+
+    /**
+     * 更新记录
+     *
+     * @param formData 表单数据
+     * @param advice   审批意见
+     * @param signKey  签名key
+     * @param done     是否完成
+     */
+    public void update(Map<String, Object> formData, String advice, String signKey, boolean done) {
+        this.formData = formData;
+        this.advice = advice;
+        this.signKey = signKey;
+        this.readable = true;
+        this.readTime = System.currentTimeMillis();
+        this.updateTime = System.currentTimeMillis();
+        this.recordState = done ? SATE_RECORD_DONE : SATE_RECORD_TODO;
+    }
+
+
+    public void finish() {
+        this.flowState = SATE_FLOW_FINISH;
+        this.finishTime = System.currentTimeMillis();
     }
 }

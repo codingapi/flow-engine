@@ -9,7 +9,7 @@ import java.util.Map;
  * 流程发起请求
  */
 @Data
-public class FlowSubmitRequest {
+public class FlowActionRequest {
 
     /**
      * 记录id

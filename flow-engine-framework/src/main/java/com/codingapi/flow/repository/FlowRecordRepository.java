@@ -13,4 +13,8 @@ public interface FlowRecordRepository {
     void saveAll(List<FlowRecord> flowRecords);
 
     void delete(FlowRecord flowRecord);
+
+    List<FlowRecord> findRecordsByFromId(long fromId);
+
+    List<FlowRecord> findRecordsByProcessId(String processId);
 }

@@ -75,7 +75,7 @@ public abstract class BaseAction implements IFlowAction {
     }
 
     @Override
-    public List<FlowRecord> execute(FlowSession flowSession) {
+    public List<FlowRecord> trigger(FlowSession flowSession,FlowRecord currentRecord) {
         return null;
     }
 

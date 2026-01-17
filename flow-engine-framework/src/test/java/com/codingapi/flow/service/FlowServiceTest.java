@@ -12,7 +12,7 @@ import com.codingapi.flow.node.EndNode;
 import com.codingapi.flow.node.StartNode;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
-import com.codingapi.flow.pojo.request.FlowSubmitRequest;
+import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.user.User;
@@ -101,7 +101,7 @@ class FlowServiceTest {
 
 
     @Test
-    void submit() {
+    void action() {
 
         User test = new User(1, "test");
         User lorne = new User(2, "lorne");
@@ -163,10 +163,27 @@ class FlowServiceTest {
         List<FlowRecord> recordList = flowRecordRepository.findTodoByOperator(test.getUserId());
         assertEquals(1, recordList.size());
 
-        FlowSubmitRequest submitRequest = new FlowSubmitRequest();
+        FlowActionRequest submitRequest = new FlowActionRequest();
         submitRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
         submitRequest.setRecordId(recordList.get(0).getId());
         submitRequest.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", test.getUserId()));
-        flowService.submit(submitRequest);
+        flowService.action(submitRequest);
+
+        List<FlowRecord> lorneRecordList = flowRecordRepository.findTodoByOperator(lorne.getUserId());
+        assertEquals(1, lorneRecordList.size());
+
+
+        List<IFlowAction> lorneActions = approvalNode.actions();
+
+        FlowActionRequest lorneRequest = new FlowActionRequest();
+        lorneRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
+        lorneRequest.setRecordId(lorneRecordList.get(0).getId());
+        lorneRequest.setAdvice(new FlowAdviceBody(lorneActions.get(0).id(), "同意", lorne.getUserId()));
+        flowService.action(lorneRequest);
+
+        List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(lorneRecordList.get(0).getProcessId());
+        assertEquals(3, records.size());
+        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+
     }
 }

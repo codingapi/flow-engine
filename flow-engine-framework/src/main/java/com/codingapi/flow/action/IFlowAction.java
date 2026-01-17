@@ -40,7 +40,7 @@ public interface IFlowAction {
     /**
      * 执行动作
      */
-    List<FlowRecord> execute(FlowSession flowSession);
+    List<FlowRecord> trigger(FlowSession flowSession,FlowRecord currentRecord);
 
     /**
      * 转换为map

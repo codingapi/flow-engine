@@ -4,9 +4,10 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.backup.WorkflowBackup;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
+import com.codingapi.flow.node.EndNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.pojo.request.FlowSubmitRequest;
+import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.repository.WorkflowBackupRepository;
@@ -17,15 +18,14 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 
 @AllArgsConstructor
-public class FlowSubmitService {
+public class FlowActionService {
 
-    private final FlowSubmitRequest request;
+    private final FlowActionRequest request;
     private final FlowOperatorGateway flowOperatorGateway;
     private final FlowRecordRepository flowRecordRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
 
-
-    public void submit() {
+    public void action() {
         request.verify();
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getAdvice().getOperatorId());
@@ -64,10 +64,33 @@ public class FlowSubmitService {
         FormData formData = new FormData(workflow.getForm());
         formData.reset(request.getFormData());
 
-        FlowSession session = new FlowSession(currentOperator, workflow.getForm(), workflow, currentNode, formData);
-        List<FlowRecord> records = flowAction.execute(session);
-        if (records != null) {
+        List<FlowRecord> currentRecords = flowRecordRepository.findRecordsByFromId(flowRecord.getFromId());
+        FlowSession session = new FlowSession(currentOperator, workflow.getForm(), workflow, currentNode, formData, workflowBackup.getId(), request.getAdvice().getAdvice());
+
+        // 判断当前节点是否已经完成
+        boolean done = currentNode.isDone(session, currentRecords);
+        if (done) {
+            List<FlowRecord> records = flowAction.trigger(session, flowRecord);
+            if (records == null || records.isEmpty()) {
+                throw new IllegalArgumentException("action not return record");
+            }
+            flowRecord.update(formData.toMapData(), request.getAdvice().getAdvice(), request.getAdvice().getSignKey(), true);
+            if (records.size() == 1) {
+                FlowRecord record = records.get(0);
+                if (record.isNodeType(EndNode.NODE_TYPE)) {
+                    // 添加当前节点到记录中
+                    records.add(flowRecord);
+                    // 添加历史记录到记录中
+                    List<FlowRecord> historyRecords = flowRecordRepository.findRecordsByProcessId(flowRecord.getProcessId());
+                    records.addAll(historyRecords);
+                    // 设置状态为完成
+                    records.forEach(FlowRecord::finish);
+                }
+            }
             flowRecordRepository.saveAll(records);
+        } else {
+            flowRecord.update(formData.toMapData(), request.getAdvice().getAdvice(), request.getAdvice().getSignKey(), false);
+            flowRecordRepository.save(flowRecord);
         }
     }
 }

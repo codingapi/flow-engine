@@ -7,6 +7,7 @@ import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.operator.NodeOperators;
+import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.ErrorTriggerScript;
 import com.codingapi.flow.script.NodeTitleScript;
 import com.codingapi.flow.script.OperatorLoadScript;
@@ -236,6 +237,11 @@ public abstract class BaseNode implements IFlowNode {
     @Override
     public long timeoutTime() {
         return timeoutTime;
+    }
+
+    @Override
+    public boolean isDone(FlowSession session, List<FlowRecord> currentRecords) {
+        return true;
     }
 
     private void verifyFields() {

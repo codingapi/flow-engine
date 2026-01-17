@@ -28,6 +28,7 @@ public class FlowActionFactory {
         actionClasses.put(ActionType.RETURN.name(), ReturnAction.class);
         actionClasses.put(ActionType.DELEGATE.name(), DelegateAction.class);
         actionClasses.put(ActionType.CUSTOM.name(), CustomAction.class);
+        actionClasses.put(ActionType.SAVE.name(), SaveAction.class);
     }
 
 

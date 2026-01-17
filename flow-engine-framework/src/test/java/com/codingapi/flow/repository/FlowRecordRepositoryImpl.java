@@ -20,6 +20,7 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository{
         return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId()==operatorId && flowRecord.isTodo()).toList();
     }
 
+
     @Override
     public void save(FlowRecord flowRecord) {
         if(flowRecord.getId()>0){
@@ -41,5 +42,15 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository{
     @Override
     public void delete(FlowRecord flowRecord) {
         cache.remove(flowRecord.getId());
+    }
+
+    @Override
+    public List<FlowRecord> findRecordsByFromId(long fromId) {
+        return cache.values().stream().filter(flowRecord -> flowRecord.getFromId()==fromId).toList();
+    }
+
+    @Override
+    public List<FlowRecord> findRecordsByProcessId(String processId) {
+        return cache.values().stream().filter(flowRecord -> flowRecord.getProcessId().equals(processId)).toList();
     }
 }

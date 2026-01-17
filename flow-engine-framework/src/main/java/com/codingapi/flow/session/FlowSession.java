@@ -5,14 +5,14 @@ import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.workflow.Workflow;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.List;
 
 /**
  * 流程会话对象
  */
 @Getter
-@AllArgsConstructor
 public class FlowSession {
 
     /**
@@ -36,7 +36,30 @@ public class FlowSession {
      * 当前流程表单数据
      */
     private final FormData formData;
+    /**
+     * 流程备份id
+     */
+    private final long backupId;
 
+    /**
+     * 审批意见
+     */
+    private final String advice;
+
+
+    public FlowSession(IFlowOperator currentOperator, FormMeta formMeta, Workflow workflow, IFlowNode currentNode, FormData formData, long backupId) {
+        this(currentOperator, formMeta, workflow, currentNode, formData, backupId, null);
+    }
+
+    public FlowSession(IFlowOperator currentOperator, FormMeta formMeta, Workflow workflow, IFlowNode currentNode, FormData formData, long backupId, String advice) {
+        this.currentOperator = currentOperator;
+        this.formMeta = formMeta;
+        this.workflow = workflow;
+        this.currentNode = currentNode;
+        this.formData = formData;
+        this.backupId = backupId;
+        this.advice = advice;
+    }
 
     /**
      * 获取流程的创建者
@@ -52,16 +75,31 @@ public class FlowSession {
         return workflow.getStartNode();
     }
 
-    public String getWorkCode(){
+    public String getWorkCode() {
         return workflow.getCode();
     }
 
-    public String getWorkTitle(){
+    public String getWorkTitle() {
         return workflow.getTitle();
     }
 
-    public String getCurrentNodeId(){
+    public String getCurrentNodeId() {
         return currentNode.getId();
     }
 
+    public String getCurrentNodeType() {
+        return currentNode.getType();
+    }
+
+    public List<IFlowNode> nextNode() {
+        return workflow.next(currentNode);
+    }
+
+    public FlowSession updateSession(IFlowNode currentNode) {
+        return new FlowSession(currentOperator, formMeta, workflow, currentNode, formData, backupId, advice);
+    }
+
+    public FlowSession updateSession(IFlowOperator currentOperator) {
+        return new FlowSession(currentOperator, formMeta, workflow, currentNode, formData, backupId, advice);
+    }
 }

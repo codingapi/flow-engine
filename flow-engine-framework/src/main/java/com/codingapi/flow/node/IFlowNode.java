@@ -5,6 +5,7 @@ import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.operator.NodeOperators;
+import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 
 import java.util.List;
@@ -88,4 +89,11 @@ public interface IFlowNode {
     boolean isMergeable();
 
 
+    /**
+     * 节点是否完成
+     * @param session 会话对象
+     * @param currentRecords 当前节点的记录
+     * @return true:完成 false:未完成
+     */
+    boolean isDone(FlowSession session, List<FlowRecord> currentRecords);
 }

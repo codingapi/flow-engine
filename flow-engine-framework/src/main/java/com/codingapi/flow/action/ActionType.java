@@ -3,6 +3,8 @@ package com.codingapi.flow.action;
 public enum ActionType {
     // 默认，用于没有审批操作时配置
     DEFAULT,
+    // 保存
+    SAVE,
     // 通过，流程继续往下流转
     PASS,
     // 拒绝，拒绝时需要根据拒绝的配置流程来设置

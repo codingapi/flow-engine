@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class FlowAdviceBody {
 
@@ -17,11 +16,28 @@ public class FlowAdviceBody {
      * 审批意见
      */
     private String advice;
+
     /**
-     * 创建者
+     * 签名key
+     */
+    private String signKey;
+    /**
+     * 操作者
      */
     private long operatorId;
 
+    public FlowAdviceBody(String actionId, String advice, String signKey, long operatorId) {
+        this.actionId = actionId;
+        this.advice = advice;
+        this.signKey = signKey;
+        this.operatorId = operatorId;
+    }
+
+    public FlowAdviceBody(String actionId, String advice, long operatorId) {
+        this.actionId = actionId;
+        this.advice = advice;
+        this.operatorId = operatorId;
+    }
 
     public void verify(){
         if(actionId ==null|| actionId.isEmpty()){

@@ -65,7 +65,7 @@ class ErrorTriggerScriptTest {
         FormData data = new FormData(form);
         data.getDataBody().set("name", "张三").set("days", 10).set("reason", "事由");
 
-        FlowSession flowSession = new FlowSession(user, form, workflow, startNode, data);
+        FlowSession flowSession = new FlowSession(user, form, workflow, startNode, data,0);
 
         ErrorTriggerScript errorNodeTriggerScript = ErrorTriggerScript.defaultNodeScript();
         ErrorThrow errorThrow = errorNodeTriggerScript.execute(flowSession);

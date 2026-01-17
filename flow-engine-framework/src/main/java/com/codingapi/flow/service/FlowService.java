@@ -1,13 +1,13 @@
 package com.codingapi.flow.service;
 
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
-import com.codingapi.flow.pojo.request.FlowSubmitRequest;
+import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.repository.WorkflowBackupRepository;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.service.impl.FlowCreateService;
-import com.codingapi.flow.service.impl.FlowSubmitService;
+import com.codingapi.flow.service.impl.FlowActionService;
 import lombok.AllArgsConstructor;
 
 /**
@@ -27,8 +27,8 @@ public class FlowService {
         flowCreateService.create();
     }
 
-    public void submit(FlowSubmitRequest request){
-        FlowSubmitService flowSubmitService = new FlowSubmitService(request, flowOperatorGateway,flowRecordRepository,workflowBackupRepository);
-        flowSubmitService.submit();
+    public void action(FlowActionRequest request){
+        FlowActionService flowActionService = new FlowActionService(request, flowOperatorGateway,flowRecordRepository,workflowBackupRepository);
+        flowActionService.action();
     }
 }

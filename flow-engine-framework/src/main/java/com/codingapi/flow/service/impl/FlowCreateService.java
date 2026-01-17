@@ -8,12 +8,12 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.operator.NodeOperators;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
-import com.codingapi.flow.record.FlowAdvice;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.repository.WorkflowBackupRepository;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.AllArgsConstructor;
 
@@ -41,7 +41,7 @@ public class FlowCreateService {
         }
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getAdvice().getOperatorId());
-        if(!workflow.matchCreatedOperator(currentOperator)){
+        if (!workflow.matchCreatedOperator(currentOperator)) {
             throw new IllegalArgumentException("operator not match");
         }
         // 构建表单数据
@@ -49,7 +49,7 @@ public class FlowCreateService {
         formData.reset(request.getFormData());
 
         IFlowNode currentNode = workflow.getStartNode();
-        FlowSession session = new FlowSession(currentOperator, workflow.getForm(), workflow, currentNode, formData);
+        FlowSession session = new FlowSession(currentOperator, workflow.getForm(), workflow, currentNode, formData, workflowBackup.getId());
 
         NodeOperators currentOperators = currentNode.operators(session);
         if (!currentOperators.match(currentOperator)) {
@@ -58,9 +58,7 @@ public class FlowCreateService {
 
         IFlowAction action = currentNode.getActionById(request.getAdvice().getActionId());
 
-        FlowAdvice flowAdvice = new FlowAdvice(action, request.getAdvice().getAdvice(), currentOperator);
-
-        FlowRecord flowRecord = new FlowRecord(session,flowAdvice, workflowBackup.getId());
+        FlowRecord flowRecord = new FlowRecord(session, action.id(), RandomUtils.generateStringId(), 0);
         flowRecord.verify();
         flowRecordRepository.save(flowRecord);
     }
