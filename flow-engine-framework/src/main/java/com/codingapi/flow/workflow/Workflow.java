@@ -76,9 +76,14 @@ public class Workflow {
     private String schema;
 
     /**
-     * 是否干预
+     * 开启干预
      */
     private boolean isInterfere;
+
+    /**
+     * 开启撤销
+     */
+    private boolean isRevoke;
 
     protected Workflow() {
         this.id = RandomUtils.generateStringId();
@@ -134,6 +139,9 @@ public class Workflow {
         this.isInterfere = isInterfere;
     }
 
+    protected void setIsRevoke(boolean isRevoke) {
+        this.isRevoke = isRevoke;
+    }
 
     /**
      * 转换为json
@@ -153,6 +161,7 @@ public class Workflow {
         map.put("createdTime", String.valueOf(createdTime));
         map.put("schema", hasSchema ? schema : null);
         map.put("isInterfere", isInterfere);
+        map.put("isRevoke", isRevoke);
         return JSON.toJSONString(map);
     }
 
@@ -168,6 +177,7 @@ public class Workflow {
         workflow.setTitle((String) data.get("title"));
         workflow.setSchema((String) data.get("schema"));
         workflow.setIsInterfere((boolean) data.get("isInterfere"));
+        workflow.setIsRevoke((boolean) data.get("isRevoke"));
         workflow.setCreatedTime(Long.parseLong((String) data.get("createdTime")));
         workflow.setCreatedOperator(GatewayContext.getInstance().getFlowOperator(createOperator));
         workflow.setForm(FormMeta.fromMap((Map<String, Object>) data.get("form")));
@@ -194,6 +204,7 @@ public class Workflow {
 
         return workflow;
     }
+
 
     /**
      * 匹配创建者

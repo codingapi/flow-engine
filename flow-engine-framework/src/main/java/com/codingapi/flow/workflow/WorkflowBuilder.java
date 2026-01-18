@@ -44,6 +44,16 @@ public class WorkflowBuilder {
         return this;
     }
 
+    public WorkflowBuilder revoke(boolean revoke) {
+        workflow.setIsRevoke(revoke);
+        return this;
+    }
+
+    public WorkflowBuilder interfere(boolean interfere) {
+        workflow.setIsInterfere(interfere);
+        return this;
+    }
+
     public WorkflowBuilder createdOperator(IFlowOperator createdOperator) {
         workflow.setCreatedOperator(createdOperator);
         return this;
