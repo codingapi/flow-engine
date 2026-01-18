@@ -2,7 +2,6 @@ package com.codingapi.flow.record;
 
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
@@ -84,6 +83,12 @@ public class FlowRecord {
      * 当前审批人
      */
     private long currentOperatorId;
+
+    /**
+     * 有那个节点退回的
+     */
+    @Setter
+    private String returnNodeId;
 
     /**
      * 节点状态 | 待办、已办
@@ -236,8 +241,19 @@ public class FlowRecord {
     }
 
 
+    /**
+     * 流程结束
+     */
     public void finish() {
         this.flowState = SATE_FLOW_FINISH;
         this.finishTime = System.currentTimeMillis();
+    }
+
+
+    /**
+     * 判断是否退回
+     */
+    public boolean isReturnRecord() {
+        return StringUtils.hasText(returnNodeId);
     }
 }

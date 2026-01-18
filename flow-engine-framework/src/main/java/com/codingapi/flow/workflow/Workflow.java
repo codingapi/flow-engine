@@ -315,4 +315,7 @@ public class Workflow {
         return nodes.stream().filter(node -> node instanceof StartNode).findFirst().orElse(null);
     }
 
+    public IFlowNode getEndNode() {
+        return nodes.stream().filter(node -> node instanceof EndNode).findFirst().orElse(null);
+    }
 }

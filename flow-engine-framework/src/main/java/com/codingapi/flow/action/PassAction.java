@@ -26,6 +26,13 @@ public class PassAction extends BaseAction {
 
     @Override
     public List<FlowRecord> trigger(FlowSession flowSession,FlowRecord currentRecord) {
+        if(currentRecord.isReturnRecord()){
+            // 退回后的流程重新提交
+            IFlowNode currentNode = flowSession.getWorkflow().getNode(currentRecord.getReturnNodeId());
+            System.out.println(currentNode.getType());
+            //TODO 如果当前流程是退回的记录，则需要根据节点设置判断如何继续执行
+        }
+
         List<IFlowNode> nextNodes = flowSession.nextNode();
         List<FlowRecord> records = new ArrayList<>();
         for (IFlowNode node : nextNodes) {

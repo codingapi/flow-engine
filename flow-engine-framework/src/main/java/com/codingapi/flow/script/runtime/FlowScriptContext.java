@@ -1,6 +1,7 @@
 package com.codingapi.flow.script.runtime;
 
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.record.FlowRecord;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,22 +13,7 @@ public class FlowScriptContext {
     private static final FlowScriptContext instance = new FlowScriptContext();
 
     private FlowScriptContext() {
-        this.beanFactory = new IBeanFactory() {
-            @Override
-            public <T> T getBean(Class<T> clazz) {
-                return null;
-            }
-
-            @Override
-            public <T> T getBean(String name, Class<T> clazz) {
-                return null;
-            }
-
-            @Override
-            public <T> List<T> getBeans(Class<T> clazz) {
-                return List.of();
-            }
-        };
+        this.beanFactory = new IBeanFactory() {};
     }
 
     @Setter
@@ -45,16 +31,21 @@ public class FlowScriptContext {
         return beanFactory.getBeans(clazz);
     }
 
+
+    public FlowRecord getRecordById(long id) {
+        return beanFactory.getRecordById(id);
+    }
+
     public IFlowOperator getOperatorById(long userId) {
         return beanFactory.getOperatorById(userId);
     }
 
-    public List<IFlowOperator> findByIds(long ... ids){
-        return beanFactory.findByIds(ids);
+    public List<IFlowOperator> findOperatorsByIds(long ... ids){
+        return beanFactory.findOperatorsByIds(ids);
     }
 
-    public List<IFlowOperator> findByIds(List<Long> ids){
-        return beanFactory.findByIds(ids);
+    public List<IFlowOperator> findOperatorsByIds(List<Long> ids){
+        return beanFactory.findOperatorsByIds(ids);
     }
 
 }
