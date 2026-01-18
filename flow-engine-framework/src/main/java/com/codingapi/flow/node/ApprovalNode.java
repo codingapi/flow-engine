@@ -5,9 +5,9 @@ import com.codingapi.flow.action.PassAction;
 import com.codingapi.flow.action.RejectAction;
 import com.codingapi.flow.action.SaveAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.script.ErrorTriggerScript;
-import com.codingapi.flow.script.NodeTitleScript;
-import com.codingapi.flow.script.OperatorLoadScript;
+import com.codingapi.flow.script.node.ErrorTriggerScript;
+import com.codingapi.flow.script.node.NodeTitleScript;
+import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.strategy.*;
 import com.codingapi.flow.utils.RandomUtils;
 
@@ -65,7 +65,7 @@ public class ApprovalNode extends BaseNode {
         return new Builder();
     }
 
-    public static class Builder extends BaseBuilder<ApprovalNode> {
+    public static class Builder extends BaseBuilder<Builder,ApprovalNode> {
 
         public Builder() {
             super(new ApprovalNode());

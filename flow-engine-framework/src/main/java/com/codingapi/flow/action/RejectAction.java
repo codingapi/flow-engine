@@ -2,7 +2,7 @@ package com.codingapi.flow.action;
 
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.script.RejectActionScript;
+import com.codingapi.flow.script.action.RejectActionScript;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;

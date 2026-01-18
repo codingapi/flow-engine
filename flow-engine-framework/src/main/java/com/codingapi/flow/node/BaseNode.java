@@ -10,9 +10,9 @@ import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
-import com.codingapi.flow.script.ErrorTriggerScript;
-import com.codingapi.flow.script.NodeTitleScript;
-import com.codingapi.flow.script.OperatorLoadScript;
+import com.codingapi.flow.script.node.ErrorTriggerScript;
+import com.codingapi.flow.script.node.NodeTitleScript;
+import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.INodeStrategy;
@@ -77,7 +77,6 @@ public abstract class BaseNode implements IFlowNode {
      * 节点策略
      */
     private List<INodeStrategy> nodeStrategies;
-
 
     @Override
     public Map<String, Object> toMap() {
@@ -244,6 +243,11 @@ public abstract class BaseNode implements IFlowNode {
     }
 
     @Override
+    public boolean match(FlowSession flowSession) {
+        return true;
+    }
+
+    @Override
     public void verifyFlowAdvice(FlowAdvice flowAdvice) {
         StrategyManager strategyManager = this.strategies();
         IFlowAction flowAction = flowAdvice.getAction();
@@ -296,6 +300,7 @@ public abstract class BaseNode implements IFlowNode {
         if (!StringUtils.hasText(id)) {
             throw new IllegalArgumentException("id can not be null");
         }
+
         if (actions == null || actions.isEmpty()) {
             throw new IllegalArgumentException("actions can not be null");
         }

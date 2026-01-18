@@ -91,8 +91,12 @@ public class FlowSession {
         return currentNode.getType();
     }
 
-    public List<IFlowNode> nextNode() {
-        return workflow.next(currentNode);
+    public List<IFlowNode> nextNodes() {
+        return workflow.nextNodes(this);
+    }
+
+    public Object getFormData(String fieldName) {
+        return formData.getDataBody().get(fieldName);
     }
 
     public FlowSession updateSession(IFlowNode currentNode) {

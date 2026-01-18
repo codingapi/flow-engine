@@ -3,9 +3,9 @@ package com.codingapi.flow.node;
 import com.codingapi.flow.action.DefaultAction;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.script.ErrorTriggerScript;
-import com.codingapi.flow.script.NodeTitleScript;
-import com.codingapi.flow.script.OperatorLoadScript;
+import com.codingapi.flow.script.node.ErrorTriggerScript;
+import com.codingapi.flow.script.node.NodeTitleScript;
+import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.strategy.*;
 import com.codingapi.flow.utils.RandomUtils;
 
@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * 并行节点
  */
-public class ParallelBranchNode extends BaseNode {
+public class ParallelBranchNode extends BaseNode implements IConditionNode {
 
     public static final String NODE_TYPE = "parallel_branch";
     public static final String DEFAULT_NAME = "并行节点";
@@ -25,7 +25,6 @@ public class ParallelBranchNode extends BaseNode {
     public String getType() {
         return NODE_TYPE;
     }
-
 
     public ParallelBranchNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
         super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, actions, nodeStrategies);
@@ -60,7 +59,7 @@ public class ParallelBranchNode extends BaseNode {
         return new Builder();
     }
 
-    public static class Builder extends BaseBuilder<ParallelBranchNode> {
+    public static class Builder extends BaseBuilder<Builder,ParallelBranchNode> {
         public Builder() {
             super(new ParallelBranchNode());
         }

@@ -3,9 +3,9 @@ package com.codingapi.flow.node;
 import com.codingapi.flow.action.DefaultAction;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.script.ErrorTriggerScript;
-import com.codingapi.flow.script.NodeTitleScript;
-import com.codingapi.flow.script.OperatorLoadScript;
+import com.codingapi.flow.script.node.ErrorTriggerScript;
+import com.codingapi.flow.script.node.NodeTitleScript;
+import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.strategy.*;
 import com.codingapi.flow.utils.RandomUtils;
 
@@ -60,7 +60,7 @@ public class RouterBranchNode extends BaseNode {
         return new Builder();
     }
 
-    public static class Builder extends BaseBuilder<RouterBranchNode> {
+    public static class Builder extends BaseBuilder<Builder,RouterBranchNode> {
         public Builder() {
             super(new RouterBranchNode());
         }

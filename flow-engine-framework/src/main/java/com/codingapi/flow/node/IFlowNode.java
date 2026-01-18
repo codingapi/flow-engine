@@ -91,4 +91,12 @@ public interface IFlowNode {
      */
     void verifyFlowAdvice(FlowAdvice flowAdvice);
 
+    /**
+     * 匹配节点
+     * @param flowSession 流程会话
+     * @return 是否匹配
+     */
+    boolean match(FlowSession flowSession);
+
+
 }

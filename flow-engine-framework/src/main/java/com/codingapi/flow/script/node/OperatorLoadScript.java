@@ -1,4 +1,4 @@
-package com.codingapi.flow.script;
+package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;

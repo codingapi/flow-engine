@@ -8,7 +8,7 @@ import com.codingapi.flow.strategy.INodeStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseBuilder<N extends BaseNode> {
+public abstract class BaseBuilder<B extends BaseBuilder<B, N>, N extends BaseNode> {
 
     protected final N node;
 
@@ -16,78 +16,78 @@ public abstract class BaseBuilder<N extends BaseNode> {
         this.node = node;
     }
 
-    public BaseBuilder<N> id(String id) {
+    public B id(String id) {
         node.setId(id);
-        return this;
+        return (B)this;
     }
 
-    public BaseBuilder<N> actions(List<IFlowAction> actions) {
+    public B actions(List<IFlowAction> actions) {
         node.setActions(actions);
-        return this;
+        return (B)this;
     }
 
-    public BaseBuilder<N> addAction(IFlowAction action) {
+    public B addAction(IFlowAction action) {
         node.addAction(action);
-        return this;
+        return (B)this;
     }
 
-    public BaseBuilder<N> name(String name) {
+    public B name(String name) {
         node.setName(name);
-        return this;
+        return (B)this;
     }
 
-    public BaseBuilder<N> view(String view) {
+    public B view(String view) {
         node.setView(view);
-        return this;
+        return (B)this;
     }
 
-    public BaseBuilder<N> nodeStrategies(List<INodeStrategy> nodeStrategies) {
+    public B nodeStrategies(List<INodeStrategy> nodeStrategies) {
         node.setNodeStrategies(nodeStrategies);
-        return this;
+        return (B)this;
     }
 
 
-    public BaseBuilder<N> operatorScript(String operatorScript) {
+    public B operatorScript(String operatorScript) {
         node.setOperatorScript(operatorScript);
-        return this;
+        return (B)this;
     }
 
-    public BaseBuilder<N> nodeTitleScript(String nodeTitleScript) {
+    public B nodeTitleScript(String nodeTitleScript) {
         node.setNodeTitleScript(nodeTitleScript);
-        return this;
+        return (B)this;
     }
 
-    public BaseBuilder<N> errorTriggerScript(String errorTriggerScript) {
+    public B errorTriggerScript(String errorTriggerScript) {
         node.setErrorTriggerScript(errorTriggerScript);
-        return this;
+        return (B)this;
     }
 
-    public BaseBuilder<N> formFieldsPermissions(List<FormFieldPermission> permissions) {
+    public B formFieldsPermissions(List<FormFieldPermission> permissions) {
         node.setFormFieldPermissions(permissions);
-        return this;
+        return (B)this;
     }
 
-    public FormFieldPermissionsBuilder<N> formFieldPermissionsBuilder() {
-        return new FormFieldPermissionsBuilder<N>(this, node);
+    public FormFieldPermissionsBuilder<B,N> formFieldPermissionsBuilder() {
+        return new FormFieldPermissionsBuilder<>(this, node);
     }
 
     public N build() {
         return node;
     }
 
-    public static class FormFieldPermissionsBuilder<T extends BaseNode> {
+    public static class FormFieldPermissionsBuilder<B extends BaseBuilder<B, N>,N extends BaseNode> {
 
-        private final T node;
-        private final BaseBuilder<T> baseBuilder;
+        private final N node;
+        private final BaseBuilder<B,N> baseBuilder;
         private final List<FormFieldPermission> permissions;
 
-        public FormFieldPermissionsBuilder(BaseBuilder<T> baseBuilder, T node) {
+        public FormFieldPermissionsBuilder(BaseBuilder<B,N> baseBuilder, N node) {
             this.baseBuilder = baseBuilder;
             this.node = node;
             this.permissions = new ArrayList<>();
         }
 
-        public FormFieldPermissionsBuilder<T> addPermission(String form, String name, PermissionType type) {
+        public FormFieldPermissionsBuilder<B,N> addPermission(String form, String name, PermissionType type) {
             FormFieldPermission permission = new FormFieldPermission();
             permission.setFormCode(form);
             permission.setFieldName(name);
@@ -96,7 +96,7 @@ public abstract class BaseBuilder<N extends BaseNode> {
             return this;
         }
 
-        public BaseBuilder<T> build() {
+        public BaseBuilder<B,N> build() {
             node.setFormFieldPermissions(this.permissions);
             return baseBuilder;
         }

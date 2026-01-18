@@ -1,4 +1,4 @@
-package com.codingapi.flow.script;
+package com.codingapi.flow.script.action;
 
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
@@ -12,7 +12,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class RejectActionScript {
 
-    public static final String SCRIPT_DEFAULT = "def run(session){return new com.codingapi.flow.script.RejectActionScript.RejectResult('RETURN_PREV')}";
+    public static final String SCRIPT_DEFAULT = "def run(session){return new com.codingapi.flow.script.action.RejectActionScript.RejectResult('RETURN_PREV')}";
 
     @Getter
     private final String script;
@@ -67,6 +67,5 @@ public class RejectActionScript {
             }
         }
     }
-
 
 }

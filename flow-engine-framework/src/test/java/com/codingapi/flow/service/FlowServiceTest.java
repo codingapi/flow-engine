@@ -8,6 +8,7 @@ import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.node.ApprovalNode;
+import com.codingapi.flow.node.ConditionNodeBranchNode;
 import com.codingapi.flow.node.EndNode;
 import com.codingapi.flow.node.StartNode;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
@@ -182,6 +183,128 @@ class FlowServiceTest {
         lorneRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
         lorneRequest.setRecordId(lorneRecordList.get(0).getId());
         lorneRequest.setAdvice(new FlowAdviceBody(lorneActions.get(0).id(), "同意", lorne.getUserId()));
+        flowService.action(lorneRequest);
+
+        List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(lorneRecordList.get(0).getProcessId());
+        assertEquals(3, records.size());
+        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+
+    }
+
+
+    /**
+     * 条件分支测试
+     */
+    @Test
+    void condition() {
+
+        User user = new User(1, "user");
+        User depart = new User(2, "depart");
+        User boss = new User(3, "boss");
+        userGateway.save(user);
+        userGateway.save(depart);
+        userGateway.save(boss);
+
+        GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
+
+        FormMeta form = FormMetaBuilder.builder()
+                .name("请假流程")
+                .code("leave")
+                .addField("请假人", "name", "string")
+                .addField("请假天数", "days", "int")
+                .addField("请假事由", "reason", "string")
+                .build();
+
+        StartNode startNode = StartNode
+                .builder()
+                .formFieldPermissionsBuilder()
+                .addPermission("leave", "name", PermissionType.WRITE)
+                .addPermission("leave", "days", PermissionType.WRITE)
+                .addPermission("leave", "reason", PermissionType.WRITE)
+                .build()
+                .build();
+
+        ConditionNodeBranchNode departConditionNode = ConditionNodeBranchNode.builder()
+                .name("条件分支")
+                .conditionScript("def run(request){return request.getFormData('days') <= 3}")
+                .order(1)
+                .build();
+
+        ConditionNodeBranchNode bossConditionNode = ConditionNodeBranchNode.builder()
+                .name("条件分支")
+                .conditionScript("def run(request){return request.getFormData('days') > 3}")
+                .order(2)
+                .build();
+
+        ApprovalNode departApprovalNode = ApprovalNode.builder()
+                .name("经理审批")
+                .operatorScript("def run(request){return [$bind.getOperatorById(2)]}")
+                .formFieldPermissionsBuilder()
+                .addPermission("leave", "name", PermissionType.READ)
+                .addPermission("leave", "days", PermissionType.READ)
+                .addPermission("leave", "reason", PermissionType.READ)
+                .build()
+                .build();
+
+        ApprovalNode bossApprovalNode = ApprovalNode.builder()
+                .name("经理审批")
+                .operatorScript("def run(request){return [$bind.getOperatorById(3)]}")
+                .formFieldPermissionsBuilder()
+                .addPermission("leave", "name", PermissionType.READ)
+                .addPermission("leave", "days", PermissionType.READ)
+                .addPermission("leave", "reason", PermissionType.READ)
+                .build()
+                .build();
+
+        EndNode endNode = EndNode.builder().build();
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("请假流程")
+                .code("leave")
+                .createdOperator(user)
+                .form(form)
+                .addNode(startNode)
+                .addNode(departConditionNode)
+                .addNode(bossConditionNode)
+                .addNode(departApprovalNode)
+                .addNode(bossApprovalNode)
+                .addNode(endNode)
+                .addEdge(new FlowEdge(startNode.getId(), departConditionNode.getId()))
+                .addEdge(new FlowEdge(startNode.getId(), bossConditionNode.getId()))
+                .addEdge(new FlowEdge(departConditionNode.getId(), departApprovalNode.getId()))
+                .addEdge(new FlowEdge(bossConditionNode.getId(), bossApprovalNode.getId()))
+                .addEdge(new FlowEdge(departApprovalNode.getId(), endNode.getId()))
+                .addEdge(new FlowEdge(bossApprovalNode.getId(), endNode.getId()))
+                .build();
+
+        workflowRepository.save(workflow);
+
+        FlowCreateRequest request = new FlowCreateRequest();
+        request.setWorkId(workflow.getId());
+        request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
+        List<IFlowAction> actions = startNode.actions().getActions();
+        request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", user.getUserId()));
+
+        flowService.create(request);
+
+        List<FlowRecord> recordList = flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(1, recordList.size());
+
+        FlowActionRequest submitRequest = new FlowActionRequest();
+        submitRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
+        submitRequest.setRecordId(recordList.get(0).getId());
+        submitRequest.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", user.getUserId()));
+        flowService.action(submitRequest);
+
+        List<FlowRecord> lorneRecordList = flowRecordRepository.findTodoByOperator(depart.getUserId());
+        assertEquals(1, lorneRecordList.size());
+
+
+        List<IFlowAction> lorneActions = departApprovalNode.actions().getActions();
+
+        FlowActionRequest lorneRequest = new FlowActionRequest();
+        lorneRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
+        lorneRequest.setRecordId(lorneRecordList.get(0).getId());
+        lorneRequest.setAdvice(new FlowAdviceBody(lorneActions.get(0).id(), "同意", depart.getUserId()));
         flowService.action(lorneRequest);
 
         List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(lorneRecordList.get(0).getProcessId());

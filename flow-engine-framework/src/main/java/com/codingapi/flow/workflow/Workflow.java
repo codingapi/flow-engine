@@ -8,8 +8,9 @@ import com.codingapi.flow.node.EndNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeFactory;
 import com.codingapi.flow.node.StartNode;
-import com.codingapi.flow.script.OperatorMatchScript;
+import com.codingapi.flow.script.node.OperatorMatchScript;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -281,18 +282,7 @@ public class Workflow {
         }
         IFlowNode startNode = this.nodes.stream().filter(node -> node instanceof StartNode).findFirst().get();
 
-        int startCount = 0;
-        for (FlowEdge edge : edges) {
-            if (edge.getFrom().equals(startNode.getId())) {
-                startCount++;
-            }
-        }
-
-        if (startCount != 1) {
-            throw new IllegalArgumentException("workflow edges must have one start edge");
-        }
-
-        List<IFlowNode> nextNodes = next(startNode);
+        List<IFlowNode> nextNodes = edgeNext(startNode);
         for (IFlowNode nextNode : nextNodes) {
             this.verifyNextEdge(nextNode);
         }
@@ -302,7 +292,7 @@ public class Workflow {
         if (node instanceof EndNode) {
             return;
         } else {
-            List<IFlowNode> nextNodes = next(node);
+            List<IFlowNode> nextNodes = edgeNext(node);
             if (nextNodes.isEmpty()) {
                 throw new IllegalArgumentException("workflow edges must have one end edge");
             }
@@ -313,9 +303,14 @@ public class Workflow {
     }
 
 
-    public List<IFlowNode> next(IFlowNode node) {
+    public List<IFlowNode> edgeNext(IFlowNode node) {
         return edges.stream().filter(edge -> edge.getFrom().equals(node.getId()))
                 .map(edge -> nodes.stream().filter(node1 -> node1.getId().equals(edge.getTo())).findFirst().get()).toList();
+    }
+
+    public List<IFlowNode> nextNodes(FlowSession session) {
+        List<IFlowNode> nodeList = edgeNext(session.getCurrentNode());
+        return nodeList.stream().filter(node -> node.match(session)).toList();
     }
 
 

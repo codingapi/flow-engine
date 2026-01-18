@@ -1,4 +1,4 @@
-package com.codingapi.flow.script;
+package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
@@ -6,6 +6,9 @@ import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ *  异常触发脚本
+ */
 @AllArgsConstructor
 public class ErrorTriggerScript {
 

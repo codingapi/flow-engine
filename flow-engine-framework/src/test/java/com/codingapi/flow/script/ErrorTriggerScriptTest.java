@@ -9,6 +9,7 @@ import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.node.ApprovalNode;
 import com.codingapi.flow.node.EndNode;
 import com.codingapi.flow.node.StartNode;
+import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;

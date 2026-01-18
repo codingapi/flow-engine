@@ -71,8 +71,9 @@ public class PassAction extends BaseAction {
                 records.addAll(nextRecords);
             }
         } else {
-            List<IFlowNode> nextNodes = flowSession.nextNode();
+            List<IFlowNode> nextNodes = flowSession.nextNodes();
             for (IFlowNode node : nextNodes) {
+                //TODO 如果是条件节点，则自动完成当前记录，并构建下一个记录
                 List<FlowRecord> nextRecords = this.generateNextRecords(node, flowSession.updateSession(node), currentRecord);
                 records.addAll(nextRecords);
             }
