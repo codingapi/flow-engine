@@ -53,13 +53,16 @@ public class RejectAction extends BaseAction {
     public List<FlowRecord> trigger(FlowSession flowSession, FlowRecord currentRecord) {
         RejectActionScript.RejectResult rejectResult = script.execute(flowSession);
         IFlowNode currentNode = null;
+        // 返回指定节点
         if (rejectResult.isReturnNode()) {
             String nodeId = rejectResult.getNodeId();
             currentNode = flowSession.getWorkflow().getNode(nodeId);
         }
+        // 流程结束（非正常）
         if (rejectResult.isTerminate()) {
             currentNode = flowSession.getWorkflow().getEndNode();
         }
+        // 退回上级节点
         if (rejectResult.isReturnPrev()) {
             long fromId = currentRecord.getFromId();
             FlowRecord preRecord = FlowScriptContext.getInstance().getRecordById(fromId);
@@ -71,14 +74,8 @@ public class RejectAction extends BaseAction {
         if (currentNode == null) {
             throw new IllegalArgumentException("currentNode is null");
         }
-        List<FlowRecord> records = new ArrayList<>();
+
         FlowSession triggerSession = flowSession.updateSession(currentNode);
-        OperatorManager operatorManager = currentNode.operators(triggerSession);
-        for (IFlowOperator operator : operatorManager.getOperators()) {
-            FlowRecord flowRecord = new FlowRecord(triggerSession.updateSession(operator), this.id, currentRecord.getProcessId(), currentRecord.getId());
-            flowRecord.setReturnNodeId(currentRecord.getNodeId());
-            records.add(flowRecord);
-        }
-        return records;
+        return this.generateNextRecords(currentNode, triggerSession, currentRecord);
     }
 }

@@ -237,15 +237,6 @@ public abstract class BaseNode implements IFlowNode {
         return new StrategyManager(nodeStrategies);
     }
 
-    @Override
-    public boolean isDone(FlowSession session, IFlowAction action, List<FlowRecord> currentRecords) {
-        // 如果流程节点是保存节点，则不判断是否完成
-        if (action.type() == ActionType.SAVE) {
-            return false;
-        }
-        return true;
-    }
-
     private void verifyFields() {
         if (!StringUtils.hasText(view)) {
             throw new IllegalArgumentException("view can not be null");

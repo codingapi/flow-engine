@@ -1,8 +1,6 @@
 package com.codingapi.flow.node.manager;
 
-import com.codingapi.flow.strategy.INodeStrategy;
-import com.codingapi.flow.strategy.RecordMergeStrategy;
-import com.codingapi.flow.strategy.TimeoutStrategy;
+import com.codingapi.flow.strategy.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -38,5 +36,55 @@ public class StrategyManager {
             }
         }
         return false;
+    }
+
+
+    /**
+     * 是否恢复到退回节点
+     */
+    public boolean isResume() {
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof ResubmitStrategy) {
+                return ((ResubmitStrategy) strategy).isResume();
+            }
+        }
+        return false;
+    }
+
+
+    public MultiOperatorAuditStrategy.Type getMultiOperatorAuditStrategyType() {
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof MultiOperatorAuditStrategy) {
+                return ((MultiOperatorAuditStrategy) strategy).getType();
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * 是否是顺序审批
+     * @return true/false
+     */
+    public boolean isSequenceMultiOperator() {
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof MultiOperatorAuditStrategy) {
+                return ((MultiOperatorAuditStrategy) strategy).getType() == MultiOperatorAuditStrategy.Type.SEQUENCE;
+            }
+        }
+        return false;
+    }
+
+    public float getMultiOperatorAuditMergePercent() {
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof MultiOperatorAuditStrategy) {
+                return ((MultiOperatorAuditStrategy) strategy).getPercent();
+            }
+        }
+        return 0;
     }
 }

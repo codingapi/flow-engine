@@ -14,10 +14,14 @@ public class ResubmitStrategy implements INodeStrategy {
     private Type type;
 
     public enum Type {
-        // 提交到当前节点
-        CURRENT,
+        // 恢复到当前节点
+        RESUME,
         // 逐级提交
         CHAIN,
+    }
+
+    public boolean isResume() {
+        return type == Type.RESUME;
     }
 
     @Override
@@ -37,7 +41,7 @@ public class ResubmitStrategy implements INodeStrategy {
 
     public static ResubmitStrategy defaultStrategy() {
         ResubmitStrategy strategy = new ResubmitStrategy();
-        strategy.setType(Type.CURRENT);
+        strategy.setType(Type.RESUME);
         return strategy;
     }
 }

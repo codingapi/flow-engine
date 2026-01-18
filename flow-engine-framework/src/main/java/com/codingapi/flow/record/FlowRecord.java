@@ -90,6 +90,17 @@ public class FlowRecord {
     @Setter
     private String returnNodeId;
 
+
+    /**
+     * 当前节点下的排序
+     */
+    private int nodeOrder;
+
+    /**
+     * 是否隐藏记录（用于多人审批时）
+     */
+    private boolean hidden;
+
     /**
      * 节点状态 | 待办、已办
      */
@@ -141,13 +152,14 @@ public class FlowRecord {
      */
     private IFlowOperator interferedOperator;
 
-    public FlowRecord(FlowSession flowSession, String actionId, String processId, long fromId) {
+    public FlowRecord(FlowSession flowSession, String actionId, String processId, long fromId, int nodeOrder) {
         this.workCode = flowSession.getWorkCode();
         this.workBackupId = flowSession.getBackupId();
         this.nodeId = flowSession.getCurrentNodeId();
         this.nodeType = flowSession.getCurrentNodeType();
         this.formData = flowSession.getFormData().toMapData();
         this.fromId = fromId;
+        this.nodeOrder = nodeOrder;
         this.title = flowSession.getCurrentNode().generateTitle(flowSession);
         this.processId = processId;
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
@@ -160,6 +172,7 @@ public class FlowRecord {
         this.timeoutTime = flowSession.getCurrentNode().strategies().getTimeoutTime();
         this.mergeable = flowSession.getCurrentNode().strategies().isMergeable();
         this.isInterfere = flowSession.getWorkflow().isInterfere();
+        this.hidden = false;
     }
 
     public void verify() {
@@ -201,7 +214,7 @@ public class FlowRecord {
      * @return true/false
      */
     public boolean isTodo() {
-        return recordState == SATE_RECORD_TODO && flowState == SATE_FLOW_RUNNING;
+        return recordState == SATE_RECORD_TODO && flowState == SATE_FLOW_RUNNING && !hidden;
     }
 
 
@@ -244,9 +257,22 @@ public class FlowRecord {
     /**
      * 流程结束
      */
-    public void finish() {
-        this.flowState = SATE_FLOW_FINISH;
+    public void finish(boolean success) {
+        this.flowState = success ? SATE_FLOW_FINISH : SATE_FLOW_DONE;
         this.finishTime = System.currentTimeMillis();
+    }
+
+
+    public void hidden() {
+        this.hidden = true;
+    }
+
+    public void show() {
+        this.hidden = false;
+    }
+
+    public boolean isShow() {
+        return !hidden;
     }
 
 
@@ -255,5 +281,9 @@ public class FlowRecord {
      */
     public boolean isReturnRecord() {
         return StringUtils.hasText(returnNodeId);
+    }
+
+    public void resetNodeOrder(int nodeOrder) {
+        this.nodeOrder = nodeOrder;
     }
 }

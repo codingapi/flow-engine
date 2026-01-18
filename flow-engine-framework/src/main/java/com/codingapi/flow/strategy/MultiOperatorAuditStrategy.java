@@ -16,14 +16,14 @@ public class MultiOperatorAuditStrategy implements INodeStrategy{
     private float percent;
 
     public enum Type {
-        // 自动跳过
+        // 循序提交
         SEQUENCE,
         // 合并审核(并签)
         MERGE,
         // 任意审核(或签)
         ANY,
-        // 随机人员审批
-        RANDOM
+        // 随机一人员审批
+        RANDOM_ONE
     }
 
     @Override

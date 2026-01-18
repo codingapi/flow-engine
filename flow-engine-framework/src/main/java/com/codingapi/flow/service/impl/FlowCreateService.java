@@ -2,11 +2,14 @@ package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.backup.WorkflowBackup;
+import com.codingapi.flow.event.FlowRecordStartEvent;
+import com.codingapi.flow.event.FlowRecordTodoEvent;
+import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.node.manager.OperatorManager;
+import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
@@ -15,7 +18,11 @@ import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
+import com.codingapi.springboot.framework.event.EventPusher;
 import lombok.AllArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 public class FlowCreateService {
@@ -58,8 +65,17 @@ public class FlowCreateService {
 
         IFlowAction action = currentNode.actions().getActionById(request.getAdvice().getActionId());
 
-        FlowRecord flowRecord = new FlowRecord(session, action.id(), RandomUtils.generateStringId(), 0);
+        FlowRecord flowRecord = new FlowRecord(session, action.id(), RandomUtils.generateStringId(), 0, 0);
         flowRecord.verify();
         flowRecordRepository.save(flowRecord);
+
+        List<IFlowEvent> events = new ArrayList<>();
+        events.add(new FlowRecordStartEvent(flowRecord));
+        events.add(new FlowRecordTodoEvent(flowRecord));
+
+        // 推送事件
+        for (IFlowEvent event : events){
+            EventPusher.push(event);
+        }
     }
 }
