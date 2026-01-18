@@ -150,7 +150,7 @@ public class FlowRecord {
     /**
      * 被干预的用户
      */
-    private IFlowOperator interferedOperator;
+    private long interferedOperatorId;
 
     public FlowRecord(FlowSession flowSession, String actionId, String processId, long fromId, int nodeOrder) {
         this.workCode = flowSession.getWorkCode();
@@ -166,7 +166,9 @@ public class FlowRecord {
         this.recordState = SATE_RECORD_TODO;
         this.actionId = actionId;
         this.currentOperatorId = flowSession.getCurrentOperator().getUserId();
-        this.advice = flowSession.getAdvice();
+        this.interferedOperatorId = flowSession.getCurrentOperator().entrustOperator()!=null?flowSession.getCurrentOperator().entrustOperator().getUserId():0;
+        this.advice = flowSession.getAdvice().getAdvice();
+        this.signKey = flowSession.getAdvice().getSignKey();
         this.flowState = SATE_FLOW_RUNNING;
         this.createTime = System.currentTimeMillis();
         this.timeoutTime = flowSession.getCurrentNode().strategies().getTimeoutTime();

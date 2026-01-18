@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ *   通过
+ */
 public class PassAction extends BaseAction {
 
     public PassAction() {

@@ -1,8 +1,6 @@
 package com.codingapi.flow.action;
 
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.RejectActionScript;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
@@ -10,7 +8,6 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

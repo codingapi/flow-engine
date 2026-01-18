@@ -1,7 +1,12 @@
 package com.codingapi.flow.pojo.request;
 
+import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
+import com.codingapi.flow.session.FlowAdvice;
+import com.codingapi.flow.workflow.Workflow;
 import lombok.Data;
+import org.springframework.util.StringUtils;
 
 import java.util.Map;
 
@@ -24,6 +29,21 @@ public class FlowActionRequest {
      */
     private FlowAdviceBody advice;
 
+
+    public FlowAdvice toFlowAdvice(Workflow workflow, IFlowAction flowAction) {
+        FlowAdvice flowAdvice = new FlowAdvice();
+        flowAdvice.setAdvice(advice.getAdvice());
+        flowAdvice.setSignKey(advice.getSignKey());
+        flowAdvice.setAction(flowAction);
+        if (advice.getTransferOperatorIds() != null && !advice.getTransferOperatorIds().isEmpty()) {
+            flowAdvice.setTransferOperators(GatewayContext.getInstance().findByIds(advice.getTransferOperatorIds()));
+        }
+        if (StringUtils.hasText(advice.getBackNodeId())) {
+            flowAdvice.setBackNode(workflow.getNode(advice.getBackNodeId()));
+        }
+
+        return flowAdvice;
+    }
 
     public void verify() {
         if (recordId <= 0) {

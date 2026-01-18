@@ -4,6 +4,9 @@ import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.Map;
 
+/**
+ * 加签
+ */
 public class AddAuditAction extends BaseAction {
 
     public AddAuditAction() {

@@ -11,11 +11,13 @@ import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.node.EndNode;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.repository.WorkflowBackupRepository;
+import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.springboot.framework.event.EventPusher;
@@ -71,8 +73,16 @@ public class FlowActionService {
         FormData formData = new FormData(workflow.getForm());
         formData.reset(request.getFormData());
 
+        FlowAdvice flowAdvice = request.toFlowAdvice(workflow,flowAction);
+        // 数据验证
+        FieldPermissionManager fieldPermissionManager = currentNode.formFieldsPermissions();
+        fieldPermissionManager.verifyFormData(workflow.getForm(),flowRecord.getFormData(),request.getFormData());
+
+        // 节点验证
+        currentNode.verifyFlowAdvice(flowAdvice);
+
         List<FlowRecord> currentRecords = flowRecordRepository.findRecordsByFromId(flowRecord.getFromId());
-        FlowSession session = new FlowSession(currentOperator, workflow.getForm(), workflow, currentNode, formData, workflowBackup.getId(), request.getAdvice().getAdvice());
+        FlowSession session = new FlowSession(currentOperator, workflow.getForm(), workflow, currentNode, formData, workflowBackup.getId(),flowAdvice);
 
         List<IFlowEvent> flowEvents = new ArrayList<>();
 

@@ -1,5 +1,8 @@
 package com.codingapi.flow.action;
 
+/**
+ *  操作类型
+ */
 public enum ActionType {
     // 默认，用于没有审批操作时配置
     DEFAULT,

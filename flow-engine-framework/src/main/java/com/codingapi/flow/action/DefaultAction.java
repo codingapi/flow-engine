@@ -4,6 +4,9 @@ import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.Map;
 
+/**
+ *  默认动作，用于无需要操作的节点配置
+ */
 public class DefaultAction extends BaseAction {
 
     public DefaultAction() {

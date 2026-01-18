@@ -7,10 +7,9 @@ import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
-import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +36,11 @@ public interface IFlowNode {
      * 流程类型
      */
     String getType();
+
+    /**
+     * 添加节点动作
+     */
+    void addAction(IFlowAction action);
 
     /**
      * 节点动作
@@ -80,4 +84,11 @@ public interface IFlowNode {
      * 节点策略
      */
     StrategyManager strategies();
+
+    /**
+     * 校验提交参数
+     * @param flowAdvice 请求参数
+     */
+    void verifyFlowAdvice(FlowAdvice flowAdvice);
+
 }

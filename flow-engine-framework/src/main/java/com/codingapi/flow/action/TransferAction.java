@@ -4,6 +4,9 @@ import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.Map;
 
+/**
+ *  转办
+ */
 public class TransferAction extends BaseAction {
 
     public TransferAction() {
@@ -16,4 +19,5 @@ public class TransferAction extends BaseAction {
     public static TransferAction fromMap(Map<String, Object> data) {
         return BaseAction.fromMap(data, TransferAction.class);
     }
+
 }

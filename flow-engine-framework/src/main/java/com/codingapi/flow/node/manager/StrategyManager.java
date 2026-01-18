@@ -40,6 +40,33 @@ public class StrategyManager {
 
 
     /**
+     *  审批意见是否必须填写
+     */
+    public boolean isEnableAdvice(){
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof AdviceStrategy) {
+                return !((AdviceStrategy) strategy).isAdviceNullable();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 是否可签名
+     */
+    public boolean isEnableSignable() {
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof AdviceStrategy) {
+                return ((AdviceStrategy) strategy).isSignable();
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * 是否恢复到退回节点
      */
     public boolean isResume() {
@@ -53,6 +80,9 @@ public class StrategyManager {
     }
 
 
+    /**
+     * 多操作者审批类型
+     */
     public MultiOperatorAuditStrategy.Type getMultiOperatorAuditStrategyType() {
         List<INodeStrategy> strategies = this.strategies;
         for (INodeStrategy strategy : strategies) {
@@ -79,6 +109,9 @@ public class StrategyManager {
         return false;
     }
 
+    /**
+     * 多操作者审批并签比例
+     */
     public float getMultiOperatorAuditMergePercent() {
         List<INodeStrategy> strategies = this.strategies;
         for (INodeStrategy strategy : strategies) {

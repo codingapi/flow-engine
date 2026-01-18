@@ -26,6 +26,11 @@ public abstract class BaseBuilder<N extends BaseNode> {
         return this;
     }
 
+    public BaseBuilder<N> addAction(IFlowAction action) {
+        node.addAction(action);
+        return this;
+    }
+
     public BaseBuilder<N> name(String name) {
         node.setName(name);
         return this;

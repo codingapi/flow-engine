@@ -1,8 +1,9 @@
 package com.codingapi.flow.pojo.body;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -25,6 +26,16 @@ public class FlowAdviceBody {
      * 操作者
      */
     private long operatorId;
+
+    /**
+     * 退回节点
+     */
+    private String backNodeId;
+
+    /**
+     * 转办人员
+     */
+    private List<Long> transferOperatorIds;
 
     public FlowAdviceBody(String actionId, String advice, String signKey, long operatorId) {
         this.actionId = actionId;

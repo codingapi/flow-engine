@@ -4,6 +4,9 @@ import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.Map;
 
+/**
+ *  委派
+ */
 public class DelegateAction extends BaseAction {
 
     public DelegateAction() {

@@ -44,14 +44,14 @@ public class FlowSession {
     /**
      * 审批意见
      */
-    private final String advice;
+    private final FlowAdvice advice;
 
 
     public FlowSession(IFlowOperator currentOperator, FormMeta formMeta, Workflow workflow, IFlowNode currentNode, FormData formData, long backupId) {
-        this(currentOperator, formMeta, workflow, currentNode, formData, backupId, null);
+        this(currentOperator, formMeta, workflow, currentNode, formData, backupId, FlowAdvice.nullFlowAdvice());
     }
 
-    public FlowSession(IFlowOperator currentOperator, FormMeta formMeta, Workflow workflow, IFlowNode currentNode, FormData formData, long backupId, String advice) {
+    public FlowSession(IFlowOperator currentOperator, FormMeta formMeta, Workflow workflow, IFlowNode currentNode, FormData formData, long backupId, FlowAdvice advice) {
         this.currentOperator = currentOperator;
         this.formMeta = formMeta;
         this.workflow = workflow;

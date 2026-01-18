@@ -1,7 +1,6 @@
 package com.codingapi.flow.node;
 
-import com.codingapi.flow.action.ActionType;
-import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.*;
 import com.codingapi.flow.action.factory.FlowActionFactory;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
@@ -9,15 +8,15 @@ import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
-import com.codingapi.flow.node.manager.StrategyManager;
-import com.codingapi.flow.strategy.INodeStrategy;
-import com.codingapi.flow.strategy.NodeStrategyFactory;
 import com.codingapi.flow.node.manager.OperatorManager;
-import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.script.ErrorTriggerScript;
 import com.codingapi.flow.script.NodeTitleScript;
 import com.codingapi.flow.script.OperatorLoadScript;
+import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.strategy.INodeStrategy;
+import com.codingapi.flow.strategy.NodeStrategyFactory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -95,7 +94,6 @@ public abstract class BaseNode implements IFlowNode {
         map.put("nodeStrategies", nodeStrategies.stream().map(INodeStrategy::toMap).toList());
         return map;
     }
-
 
     @SneakyThrows
     @SuppressWarnings("unchecked")
@@ -224,6 +222,14 @@ public abstract class BaseNode implements IFlowNode {
     }
 
     @Override
+    public void addAction(IFlowAction action) {
+        if(this.actions == null){
+            this.actions = new ArrayList<>();
+        }
+        this.actions.add(action);
+    }
+
+    @Override
     public void verify(FormMeta form) {
         this.verifyFields();
         if (!(this instanceof EndNode)) {
@@ -235,6 +241,49 @@ public abstract class BaseNode implements IFlowNode {
     @Override
     public StrategyManager strategies() {
         return new StrategyManager(nodeStrategies);
+    }
+
+    @Override
+    public void verifyFlowAdvice(FlowAdvice flowAdvice) {
+        StrategyManager strategyManager = this.strategies();
+        IFlowAction flowAction = flowAdvice.getAction();
+
+        // 保存操作,不做检查
+        if(flowAction instanceof SaveAction){
+            return;
+        }
+
+        // 转办操作
+        if(flowAction instanceof TransferAction){
+            if(flowAdvice.getTransferOperators()==null || flowAdvice.getTransferOperators().isEmpty()){
+                throw new IllegalArgumentException("transferOperators can not be null");
+            }
+        }
+
+        // 退回操作
+        if(flowAction instanceof ReturnAction){
+            if(flowAdvice.getBackNode()==null ){
+                throw new IllegalArgumentException("backNode can not be null");
+            }
+        }
+
+        // 是否必须填写审批意见
+        if(strategyManager.isEnableAdvice()){
+            if(!StringUtils.hasText(flowAdvice.getAdvice())){
+                throw new IllegalArgumentException("advice can not be null");
+            }
+        }
+        //  通过操作
+        if(flowAction instanceof PassAction) {
+            // 是否必须签名
+            if (strategyManager.isEnableSignable()) {
+                if (!StringUtils.hasText(flowAdvice.getSignKey())) {
+                    throw new IllegalArgumentException("signKey can not be null");
+                }
+            }
+        }
+
+
     }
 
     private void verifyFields() {
@@ -258,5 +307,6 @@ public abstract class BaseNode implements IFlowNode {
             throw new IllegalArgumentException("nodeTitle can not be null");
         }
     }
+
 
 }
