@@ -6,6 +6,9 @@ import lombok.Getter;
 
 import java.util.List;
 
+/**
+ *  节点动作管理
+ */
 @AllArgsConstructor
 public class ActionManager {
 

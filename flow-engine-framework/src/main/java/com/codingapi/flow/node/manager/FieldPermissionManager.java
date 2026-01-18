@@ -9,6 +9,9 @@ import lombok.Getter;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *  表单字段权限管理
+ */
 @AllArgsConstructor
 public class FieldPermissionManager {
 

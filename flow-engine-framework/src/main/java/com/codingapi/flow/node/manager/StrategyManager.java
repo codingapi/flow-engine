@@ -6,6 +6,9 @@ import lombok.Getter;
 
 import java.util.List;
 
+/**
+ *  节点策略管理
+ */
 @AllArgsConstructor
 public class StrategyManager {
 

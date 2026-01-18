@@ -5,6 +5,9 @@ import lombok.Getter;
 
 import java.util.List;
 
+/**
+ *  节点操作者管理
+ */
 public class OperatorManager {
 
     @Getter
