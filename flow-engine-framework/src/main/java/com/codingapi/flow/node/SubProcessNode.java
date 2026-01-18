@@ -59,7 +59,7 @@ public class SubProcessNode extends BaseNode {
         return new Builder();
     }
 
-    public static class Builder extends BaseBuilder<SubProcessNode>{
+    public static class Builder extends BaseBuilder<SubProcessNode> {
         public Builder() {
             super(new SubProcessNode());
         }

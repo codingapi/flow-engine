@@ -59,7 +59,7 @@ public class EndNode extends BaseNode  {
         return new Builder();
     }
 
-    public static class Builder extends BaseBuilder<EndNode>{
+    public static class Builder extends BaseBuilder<EndNode> {
 
         public Builder() {
            super(new EndNode());

@@ -6,7 +6,7 @@ import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.operator.NodeOperators;
+import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
@@ -51,12 +51,12 @@ public class FlowCreateService {
         IFlowNode currentNode = workflow.getStartNode();
         FlowSession session = new FlowSession(currentOperator, workflow.getForm(), workflow, currentNode, formData, workflowBackup.getId());
 
-        NodeOperators currentOperators = currentNode.operators(session);
+        OperatorManager currentOperators = currentNode.operators(session);
         if (!currentOperators.match(currentOperator)) {
             throw new IllegalArgumentException("node operator not match");
         }
 
-        IFlowAction action = currentNode.getActionById(request.getAdvice().getActionId());
+        IFlowAction action = currentNode.actions().getActionById(request.getAdvice().getActionId());
 
         FlowRecord flowRecord = new FlowRecord(session, action.id(), RandomUtils.generateStringId(), 0);
         flowRecord.verify();

@@ -61,7 +61,7 @@ public class ConditionBranchNode extends BaseNode{
         return new Builder();
     }
 
-    public static class Builder extends BaseBuilder<ConditionBranchNode>{
+    public static class Builder extends BaseBuilder<ConditionBranchNode> {
         public Builder() {
             super(new ConditionBranchNode());
         }

@@ -7,9 +7,12 @@ import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
+import com.codingapi.flow.node.manager.ActionManager;
+import com.codingapi.flow.node.manager.FieldPermissionManager;
+import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.strategy.INodeStrategy;
 import com.codingapi.flow.strategy.NodeStrategyFactory;
-import com.codingapi.flow.operator.NodeOperators;
+import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.ErrorTriggerScript;
 import com.codingapi.flow.script.NodeTitleScript;
@@ -195,23 +198,19 @@ public abstract class BaseNode implements IFlowNode {
     }
 
     @Override
-    public List<FormFieldPermission> formFieldsPermissions() {
-        return formFieldPermissions;
+    public FieldPermissionManager formFieldsPermissions() {
+        return new FieldPermissionManager(formFieldPermissions);
     }
 
     @Override
-    public List<IFlowAction> actions() {
-        return actions;
+    public ActionManager actions() {
+        return new ActionManager(actions);
     }
 
-    @Override
-    public IFlowAction getActionById(String id) {
-        return actions.stream().filter(item -> item.id().equals(id)).findFirst().orElse(null);
-    }
 
     @Override
-    public NodeOperators operators(FlowSession flowSession) {
-        return new NodeOperators(operatorScript.execute(flowSession));
+    public OperatorManager operators(FlowSession flowSession) {
+        return new OperatorManager(operatorScript.execute(flowSession));
     }
 
     @Override
@@ -228,13 +227,14 @@ public abstract class BaseNode implements IFlowNode {
     public void verify(FormMeta form) {
         this.verifyFields();
         if (!(this instanceof EndNode)) {
-            this.verifyPermissions(form);
+            FieldPermissionManager fieldPermissionManager = this.formFieldsPermissions();
+            fieldPermissionManager.verifyPermissions(form);
         }
     }
 
     @Override
-    public List<INodeStrategy> strategies() {
-        return nodeStrategies;
+    public StrategyManager strategies() {
+        return new StrategyManager(nodeStrategies);
     }
 
     @Override
@@ -267,16 +267,5 @@ public abstract class BaseNode implements IFlowNode {
             throw new IllegalArgumentException("nodeTitle can not be null");
         }
     }
-
-    private void verifyPermissions(FormMeta form) {
-        Map<String, String> fieldTypes = form.getAllFieldTypeMaps();
-        for (FormFieldPermission permission : formFieldPermissions) {
-            String key = permission.getFormCode() + "." + permission.getFieldName();
-            if (!fieldTypes.containsKey(key)) {
-                throw new IllegalArgumentException("field " + key + " not found in form " + form.getName());
-            }
-        }
-    }
-
 
 }

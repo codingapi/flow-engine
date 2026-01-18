@@ -61,7 +61,7 @@ public class InclusiveBranchNode extends BaseNode{
         return new Builder();
     }
 
-    public static class Builder extends BaseBuilder<InclusiveBranchNode>{
+    public static class Builder extends BaseBuilder<InclusiveBranchNode> {
 
         public Builder() {
             super(new InclusiveBranchNode());

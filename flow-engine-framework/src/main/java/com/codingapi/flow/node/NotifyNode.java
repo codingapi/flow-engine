@@ -60,7 +60,7 @@ public class NotifyNode extends BaseNode {
         return new Builder();
     }
 
-    public static class Builder  extends BaseBuilder<NotifyNode>{
+    public static class Builder  extends BaseBuilder<NotifyNode> {
         public Builder() {
            super(new NotifyNode());
         }

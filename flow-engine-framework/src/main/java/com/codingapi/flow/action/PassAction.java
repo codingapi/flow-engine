@@ -2,7 +2,7 @@ package com.codingapi.flow.action;
 
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.operator.NodeOperators;
+import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
@@ -37,8 +37,8 @@ public class PassAction extends BaseAction {
         List<FlowRecord> records = new ArrayList<>();
         for (IFlowNode node : nextNodes) {
             FlowSession triggerSession = flowSession.updateSession(node);
-            NodeOperators nodeOperators = node.operators(triggerSession);
-            for(IFlowOperator operator : nodeOperators.getOperators()) {
+            OperatorManager operatorManager = node.operators(triggerSession);
+            for(IFlowOperator operator : operatorManager.getOperators()) {
                 FlowRecord flowRecord = new FlowRecord(triggerSession.updateSession(operator), this.id, currentRecord.getProcessId(), currentRecord.getId());
                 records.add(flowRecord);
             }

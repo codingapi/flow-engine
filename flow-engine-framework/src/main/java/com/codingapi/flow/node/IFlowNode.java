@@ -3,11 +3,10 @@ package com.codingapi.flow.node;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.strategy.INodeStrategy;
-import com.codingapi.flow.strategy.RecordMergeStrategy;
-import com.codingapi.flow.strategy.TimeoutStrategy;
-import com.codingapi.flow.operator.NodeOperators;
+import com.codingapi.flow.node.manager.ActionManager;
+import com.codingapi.flow.node.manager.FieldPermissionManager;
+import com.codingapi.flow.node.manager.OperatorManager;
+import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 
@@ -42,24 +41,17 @@ public interface IFlowNode {
     /**
      * 节点动作
      */
-    List<IFlowAction> actions();
-
-    /**
-     * 获取节点动作
-     *
-     * @param id 动作id
-     */
-    IFlowAction getActionById(String id);
+    ActionManager actions();
 
     /**
      * 表单字段权限设置
      */
-    List<FormFieldPermission> formFieldsPermissions();
+    FieldPermissionManager formFieldsPermissions();
 
     /**
      * 节点参与用户
      */
-    NodeOperators operators(FlowSession flowSession);
+    OperatorManager operators(FlowSession flowSession);
 
     /**
      * 构建待办标题
@@ -87,7 +79,7 @@ public interface IFlowNode {
     /**
      * 节点策略
      */
-    List<INodeStrategy> strategies();
+    StrategyManager strategies();
 
 
     /**
@@ -99,31 +91,5 @@ public interface IFlowNode {
      * @return true:完成 false:未完成
      */
     boolean isDone(FlowSession session, IFlowAction action, List<FlowRecord> currentRecords);
-
-    /**
-     * 获取超时时间
-     */
-    default long getTimeoutTime() {
-        List<INodeStrategy> strategies = this.strategies();
-        for (INodeStrategy strategy : strategies) {
-            if (strategy instanceof TimeoutStrategy) {
-                return System.currentTimeMillis() + ((TimeoutStrategy) strategy).getTimeoutTime();
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * 是否可合并
-     */
-    default boolean isMergeable() {
-        List<INodeStrategy> strategies = this.strategies();
-        for (INodeStrategy strategy : strategies) {
-            if (strategy instanceof RecordMergeStrategy) {
-                return ((RecordMergeStrategy) strategy).isMergeable();
-            }
-        }
-        return false;
-    }
 
 }

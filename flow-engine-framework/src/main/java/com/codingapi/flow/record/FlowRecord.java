@@ -157,8 +157,8 @@ public class FlowRecord {
         this.advice = flowSession.getAdvice();
         this.flowState = SATE_FLOW_RUNNING;
         this.createTime = System.currentTimeMillis();
-        this.timeoutTime = flowSession.getCurrentNode().getTimeoutTime();
-        this.mergeable = flowSession.getCurrentNode().isMergeable();
+        this.timeoutTime = flowSession.getCurrentNode().strategies().getTimeoutTime();
+        this.mergeable = flowSession.getCurrentNode().strategies().isMergeable();
         this.isInterfere = flowSession.getWorkflow().isInterfere();
     }
 

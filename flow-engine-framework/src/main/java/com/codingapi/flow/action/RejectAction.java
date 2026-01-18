@@ -2,7 +2,7 @@ package com.codingapi.flow.action;
 
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.operator.NodeOperators;
+import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.RejectActionScript;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
@@ -73,8 +73,8 @@ public class RejectAction extends BaseAction {
         }
         List<FlowRecord> records = new ArrayList<>();
         FlowSession triggerSession = flowSession.updateSession(currentNode);
-        NodeOperators nodeOperators = currentNode.operators(triggerSession);
-        for (IFlowOperator operator : nodeOperators.getOperators()) {
+        OperatorManager operatorManager = currentNode.operators(triggerSession);
+        for (IFlowOperator operator : operatorManager.getOperators()) {
             FlowRecord flowRecord = new FlowRecord(triggerSession.updateSession(operator), this.id, currentRecord.getProcessId(), currentRecord.getId());
             flowRecord.setReturnNodeId(currentRecord.getNodeId());
             records.add(flowRecord);

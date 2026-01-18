@@ -60,7 +60,7 @@ public class HandleNode extends BaseNode {
         return new Builder();
     }
 
-    public static class Builder extends BaseBuilder<HandleNode>{
+    public static class Builder extends BaseBuilder<HandleNode> {
         public Builder() {
             super(new HandleNode());
         }

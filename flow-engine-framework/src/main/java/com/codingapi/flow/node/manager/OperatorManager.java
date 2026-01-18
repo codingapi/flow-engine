@@ -1,16 +1,17 @@
-package com.codingapi.flow.operator;
+package com.codingapi.flow.node.manager;
 
+import com.codingapi.flow.operator.IFlowOperator;
 import lombok.Getter;
 
 import java.util.List;
 
-public class NodeOperators {
+public class OperatorManager {
 
     @Getter
     private final List<IFlowOperator> operators;
     private final List<Long> operatorIds;
 
-    public NodeOperators(List<IFlowOperator> operators) {
+    public OperatorManager(List<IFlowOperator> operators) {
         this.operators = operators;
         this.operatorIds = operators.stream().map(IFlowOperator::getUserId).toList();
     }

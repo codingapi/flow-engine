@@ -55,7 +55,7 @@ public class FlowActionService {
         if (currentNode == null) {
             throw new IllegalArgumentException("currentNode not exist");
         }
-        IFlowAction flowAction = currentNode.getActionById(request.getAdvice().getActionId());
+        IFlowAction flowAction = currentNode.actions().getActionById(request.getAdvice().getActionId());
         if (flowAction == null) {
             throw new IllegalArgumentException("action not exist");
         }

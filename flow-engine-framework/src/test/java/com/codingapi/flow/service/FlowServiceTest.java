@@ -90,7 +90,7 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
-        List<IFlowAction> actions = startNode.actions();
+        List<IFlowAction> actions = startNode.actions().getActions();
         request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", test.getUserId()));
 
         flowService.create(request);
@@ -158,7 +158,7 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
-        List<IFlowAction> actions = startNode.actions();
+        List<IFlowAction> actions = startNode.actions().getActions();
         request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", test.getUserId()));
 
         flowService.create(request);
@@ -176,7 +176,7 @@ class FlowServiceTest {
         assertEquals(1, lorneRecordList.size());
 
 
-        List<IFlowAction> lorneActions = approvalNode.actions();
+        List<IFlowAction> lorneActions = approvalNode.actions().getActions();
 
         FlowActionRequest lorneRequest = new FlowActionRequest();
         lorneRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
@@ -255,7 +255,7 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
-        List<IFlowAction> startActions = startNode.actions();
+        List<IFlowAction> startActions = startNode.actions().getActions();
         request.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", test.getUserId()));
 
         flowService.create(request);
@@ -273,7 +273,7 @@ class FlowServiceTest {
         assertEquals(1, lorneRecordList.size());
 
 
-        List<IFlowAction> lorneActions = approvalNode.actions();
+        List<IFlowAction> lorneActions = approvalNode.actions().getActions();
 
         FlowActionRequest lorneRequest = new FlowActionRequest();
         lorneRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
