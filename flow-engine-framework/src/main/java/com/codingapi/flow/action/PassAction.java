@@ -20,8 +20,8 @@ public class PassAction extends BaseAction {
         this.display = new ActionDisplay(this.title);
     }
 
-    public static PassAction formMap(Map<String, Object> data) {
-        return BaseAction.formMap(data, PassAction.class);
+    public static PassAction fromMap(Map<String, Object> data) {
+        return BaseAction.fromMap(data, PassAction.class);
     }
 
     @Override

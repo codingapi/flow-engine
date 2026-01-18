@@ -42,8 +42,8 @@ public class RejectAction extends BaseAction {
         return map;
     }
 
-    public static RejectAction formMap(Map<String, Object> data) {
-        RejectAction rejectAction = BaseAction.formMap(data, RejectAction.class);
+    public static RejectAction fromMap(Map<String, Object> data) {
+        RejectAction rejectAction = BaseAction.fromMap(data, RejectAction.class);
         String script = (String) data.get("script");
         rejectAction.setScript(script);
         return rejectAction;

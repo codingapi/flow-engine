@@ -13,7 +13,7 @@ public class DelegateAction extends BaseAction{
         this.display = new ActionDisplay(this.title);
     }
 
-    public static DelegateAction formMap(Map<String, Object> data) {
-        return BaseAction.formMap(data, DelegateAction.class);
+    public static DelegateAction fromMap(Map<String, Object> data) {
+        return BaseAction.fromMap(data, DelegateAction.class);
     }
 }

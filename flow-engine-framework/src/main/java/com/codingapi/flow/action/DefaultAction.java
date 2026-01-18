@@ -14,7 +14,7 @@ public class DefaultAction extends BaseAction {
     }
 
 
-    public static DefaultAction formMap(Map<String, Object> data) {
-        return BaseAction.formMap(data, DefaultAction.class);
+    public static DefaultAction fromMap(Map<String, Object> data) {
+        return BaseAction.fromMap(data, DefaultAction.class);
     }
 }

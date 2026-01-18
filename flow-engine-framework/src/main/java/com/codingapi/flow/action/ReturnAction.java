@@ -13,7 +13,7 @@ public class ReturnAction extends BaseAction{
         this.display = new ActionDisplay(this.title);
     }
 
-    public static ReturnAction formMap(Map<String, Object> data) {
-        return BaseAction.formMap(data, ReturnAction.class);
+    public static ReturnAction fromMap(Map<String, Object> data) {
+        return BaseAction.fromMap(data, ReturnAction.class);
     }
 }

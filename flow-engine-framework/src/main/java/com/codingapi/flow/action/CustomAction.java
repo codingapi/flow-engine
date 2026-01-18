@@ -13,7 +13,7 @@ public class CustomAction extends BaseAction{
         this.display = new ActionDisplay(this.title);
     }
 
-    public static CustomAction formMap(Map<String, Object> data) {
-        return BaseAction.formMap(data, CustomAction.class);
+    public static CustomAction fromMap(Map<String, Object> data) {
+        return BaseAction.fromMap(data, CustomAction.class);
     }
 }

@@ -7,6 +7,8 @@ import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
+import com.codingapi.flow.strategy.INodeStrategy;
+import com.codingapi.flow.strategy.NodeStrategyFactory;
 import com.codingapi.flow.operator.NodeOperators;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.ErrorTriggerScript;
@@ -70,13 +72,10 @@ public abstract class BaseNode implements IFlowNode {
     private List<IFlowAction> actions;
 
     /**
-     * 超时到期时间
+     * 节点策略
      */
-    private long timeoutTime;
-    /**
-     * 是否可合并
-     */
-    private boolean mergeable;
+    private List<INodeStrategy> nodeStrategies;
+
 
     @Override
     public Map<String, Object> toMap() {
@@ -90,8 +89,7 @@ public abstract class BaseNode implements IFlowNode {
         map.put("formFieldPermissions", formFieldPermissions);
         map.put("type", getType());
         map.put("actions", actions.stream().map(IFlowAction::toMap).toList());
-        map.put("timeoutTime", String.valueOf(timeoutTime));
-        map.put("mergeable", mergeable);
+        map.put("nodeStrategies", nodeStrategies.stream().map(INodeStrategy::toMap).toList());
         return map;
     }
 
@@ -103,8 +101,6 @@ public abstract class BaseNode implements IFlowNode {
         node.setId((String) map.get("id"));
         node.setName((String) map.get("name"));
         node.setView((String) map.get("view"));
-        node.setTimeoutTime(Long.parseLong((String) map.get("timeoutTime")));
-        node.setMergeable((boolean) map.get("mergeable"));
         node.setOperatorScript((String) map.get("operatorScript"));
         node.setNodeTitleScript((String) map.get("nodeTitleScript"));
         node.setErrorTriggerScript((String) map.get("errorTriggerScript"));
@@ -130,7 +126,22 @@ public abstract class BaseNode implements IFlowNode {
             }
             node.setActions(actionList);
         }
+
+        List<Map<String, Object>> nodeStrategies = (List<Map<String, Object>>) map.get("nodeStrategies");
+        if (nodeStrategies != null) {
+            List<INodeStrategy> strategyList = new ArrayList<>();
+            for (Map<String, Object> item : nodeStrategies) {
+                INodeStrategy strategy = NodeStrategyFactory.getInstance().createStrategy(item);
+                strategyList.add(strategy);
+            }
+            node.setNodeStrategies(strategyList);
+        }
+
         return node;
+    }
+
+    protected void setNodeStrategies(List<INodeStrategy> strategyList) {
+        this.nodeStrategies = strategyList;
     }
 
     protected void setView(String view) {
@@ -148,15 +159,6 @@ public abstract class BaseNode implements IFlowNode {
     protected void setActions(List<IFlowAction> actions) {
         this.actions = actions;
     }
-
-    protected void setTimeoutTime(long timeoutTime) {
-        this.timeoutTime = timeoutTime;
-    }
-
-    protected void setMergeable(boolean mergeable) {
-        this.mergeable = mergeable;
-    }
-
 
     /**
      * 设置审批人配置脚本
@@ -231,19 +233,14 @@ public abstract class BaseNode implements IFlowNode {
     }
 
     @Override
-    public boolean isMergeable() {
-        return mergeable;
+    public List<INodeStrategy> strategies() {
+        return nodeStrategies;
     }
 
     @Override
-    public long timeoutTime() {
-        return timeoutTime;
-    }
-
-    @Override
-    public boolean isDone(FlowSession session,IFlowAction action, List<FlowRecord> currentRecords) {
+    public boolean isDone(FlowSession session, IFlowAction action, List<FlowRecord> currentRecords) {
         // 如果流程节点是保存节点，则不判断是否完成
-        if(action.type()== ActionType.SAVE){
+        if (action.type() == ActionType.SAVE) {
             return false;
         }
         return true;

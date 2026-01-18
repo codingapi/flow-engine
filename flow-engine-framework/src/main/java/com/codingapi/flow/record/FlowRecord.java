@@ -141,7 +141,7 @@ public class FlowRecord {
      */
     private IFlowOperator interferedOperator;
 
-    public FlowRecord(FlowSession flowSession, String actionId,String processId, long fromId) {
+    public FlowRecord(FlowSession flowSession, String actionId, String processId, long fromId) {
         this.workCode = flowSession.getWorkCode();
         this.workBackupId = flowSession.getBackupId();
         this.nodeId = flowSession.getCurrentNodeId();
@@ -157,7 +157,7 @@ public class FlowRecord {
         this.advice = flowSession.getAdvice();
         this.flowState = SATE_FLOW_RUNNING;
         this.createTime = System.currentTimeMillis();
-        this.timeoutTime = flowSession.getCurrentNode().timeoutTime();
+        this.timeoutTime = flowSession.getCurrentNode().getTimeoutTime();
         this.mergeable = flowSession.getCurrentNode().isMergeable();
         this.isInterfere = flowSession.getWorkflow().isInterfere();
     }
@@ -208,7 +208,7 @@ public class FlowRecord {
     /**
      * 判断是否已完成
      */
-    public boolean isFinish(){
+    public boolean isFinish() {
         return flowState != SATE_FLOW_RUNNING;
     }
 

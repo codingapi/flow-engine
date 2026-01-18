@@ -3,6 +3,7 @@ package com.codingapi.flow.node;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
+import com.codingapi.flow.strategy.INodeStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,13 +36,8 @@ public abstract class BaseBuilder<N extends BaseNode> {
         return this;
     }
 
-    public BaseBuilder<N> timeoutTime(long timeoutTime) {
-        node.setTimeoutTime(timeoutTime);
-        return this;
-    }
-
-    public BaseBuilder<N> mergeable(boolean mergeable) {
-        node.setMergeable(mergeable);
+    public BaseBuilder<N> nodeStrategies(List<INodeStrategy> nodeStrategies) {
+        node.setNodeStrategies(nodeStrategies);
         return this;
     }
 

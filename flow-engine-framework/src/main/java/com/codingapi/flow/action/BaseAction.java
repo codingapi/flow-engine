@@ -71,7 +71,7 @@ public abstract class BaseAction implements IFlowAction {
 
     @SneakyThrows
     @SuppressWarnings("unchecked")
-    protected static <T extends BaseAction> T formMap(Map<String, Object> data, Class<T> clazz) {
+    protected static <T extends BaseAction> T fromMap(Map<String, Object> data, Class<T> clazz) {
         T action = clazz.getDeclaredConstructor().newInstance();
         action.setId((String) data.get("id"));
         action.setType(ActionType.valueOf((String) data.get("type")));

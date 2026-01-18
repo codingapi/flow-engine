@@ -13,7 +13,7 @@ public class AddAuditAction extends BaseAction{
         this.display = new ActionDisplay(this.title);
     }
 
-    public static AddAuditAction formMap(Map<String, Object> data) {
-        return BaseAction.formMap(data, AddAuditAction.class);
+    public static AddAuditAction fromMap(Map<String, Object> data) {
+        return BaseAction.fromMap(data, AddAuditAction.class);
     }
 }

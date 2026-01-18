@@ -4,6 +4,9 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
+import com.codingapi.flow.strategy.INodeStrategy;
+import com.codingapi.flow.strategy.RecordMergeStrategy;
+import com.codingapi.flow.strategy.TimeoutStrategy;
 import com.codingapi.flow.operator.NodeOperators;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -43,6 +46,7 @@ public interface IFlowNode {
 
     /**
      * 获取节点动作
+     *
      * @param id 动作id
      */
     IFlowAction getActionById(String id);
@@ -77,24 +81,49 @@ public interface IFlowNode {
     /**
      * 转为map
      */
-    Map<String,Object> toMap();
+    Map<String, Object> toMap();
+
 
     /**
-     * 超时到期时间(毫秒)
+     * 节点策略
      */
-    long timeoutTime();
-    /**
-     * 是否可合并
-     */
-    boolean isMergeable();
+    List<INodeStrategy> strategies();
 
 
     /**
      * 节点是否完成
-     * @param session 会话对象
-     * @param action 节点动作
+     *
+     * @param session        会话对象
+     * @param action         节点动作
      * @param currentRecords 当前节点的记录
      * @return true:完成 false:未完成
      */
-    boolean isDone(FlowSession session,IFlowAction action, List<FlowRecord> currentRecords);
+    boolean isDone(FlowSession session, IFlowAction action, List<FlowRecord> currentRecords);
+
+    /**
+     * 获取超时时间
+     */
+    default long getTimeoutTime() {
+        List<INodeStrategy> strategies = this.strategies();
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof TimeoutStrategy) {
+                return System.currentTimeMillis() + ((TimeoutStrategy) strategy).getTimeoutTime();
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * 是否可合并
+     */
+    default boolean isMergeable() {
+        List<INodeStrategy> strategies = this.strategies();
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof RecordMergeStrategy) {
+                return ((RecordMergeStrategy) strategy).isMergeable();
+            }
+        }
+        return false;
+    }
+
 }

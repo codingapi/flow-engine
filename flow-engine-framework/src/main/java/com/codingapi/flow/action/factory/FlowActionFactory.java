@@ -37,8 +37,8 @@ public class FlowActionFactory {
         String type = (String) map.get("type");
         Class<? extends IFlowAction> clazz = actionClasses.get(type);
         if (clazz != null) {
-            Method formMap = clazz.getMethod("formMap", Map.class);
-            return (IFlowAction) formMap.invoke(null, map);
+            Method fromMap = clazz.getMethod("fromMap", Map.class);
+            return (IFlowAction) fromMap.invoke(null, map);
         }
         return null;
     }

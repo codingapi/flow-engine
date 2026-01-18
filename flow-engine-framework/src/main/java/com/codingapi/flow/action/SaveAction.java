@@ -13,7 +13,7 @@ public class SaveAction extends BaseAction{
         this.display = new ActionDisplay(this.title);
     }
 
-    public static SaveAction formMap(Map<String, Object> data) {
-        return BaseAction.formMap(data, SaveAction.class);
+    public static SaveAction fromMap(Map<String, Object> data) {
+        return BaseAction.fromMap(data, SaveAction.class);
     }
 }

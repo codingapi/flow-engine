@@ -13,7 +13,7 @@ public class TransferAction extends BaseAction{
         this.display = new ActionDisplay(this.title);
     }
 
-    public static TransferAction formMap(Map<String, Object> data) {
-        return BaseAction.formMap(data, TransferAction.class);
+    public static TransferAction fromMap(Map<String, Object> data) {
+        return BaseAction.fromMap(data, TransferAction.class);
     }
 }
