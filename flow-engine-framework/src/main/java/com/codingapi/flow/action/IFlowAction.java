@@ -36,17 +36,18 @@ public interface IFlowAction {
     /**
      * 执行动作
      */
-    List<FlowRecord> trigger(FlowSession flowSession,FlowRecord currentRecord);
+    List<FlowRecord> trigger(FlowSession flowSession, FlowRecord currentRecord);
 
     /**
      * 转换为map
      */
-    Map<String,Object> toMap();
+    Map<String, Object> toMap();
 
     /**
      * 流程是否结束
-     * @param session  session
-     * @param currentRecord 当前审批记录
+     *
+     * @param session        session
+     * @param currentRecord  当前审批记录
      * @param currentRecords 当前节点所有人提交的记录
      * @return 是否结束
      */

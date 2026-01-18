@@ -24,7 +24,7 @@ public class ErrorThrow {
         return node != null;
     }
 
-    public static class Builder{
+    public static class Builder {
         private IFlowNode node;
         private List<IFlowOperator> operators;
 

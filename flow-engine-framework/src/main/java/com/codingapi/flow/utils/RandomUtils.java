@@ -17,12 +17,12 @@ public class RandomUtils {
      */
     public static String generateStringId() {
         // 1000亿的数据范围内重复的概率0.027%（约 1/3700）
-    	return randomString.nextAlphanumeric(18);
+        return randomString.nextAlphanumeric(18);
     }
 
 
     public static String generateWorkflowCode() {
-    	return randomString.nextAlphanumeric(10);
+        return randomString.nextAlphanumeric(10);
     }
 
     public static int randomInt(int size) {

@@ -28,11 +28,11 @@ public class NotifyNode extends BaseNode {
 
 
     public NotifyNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions,actions,nodeStrategies);
+        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, actions, nodeStrategies);
     }
 
     protected NotifyNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(),defaultActions(),defaultStrategies());
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(), defaultActions(), defaultStrategies());
     }
 
     private static List<INodeStrategy> defaultStrategies() {
@@ -60,9 +60,9 @@ public class NotifyNode extends BaseNode {
         return new Builder();
     }
 
-    public static class Builder  extends BaseBuilder<NotifyNode> {
+    public static class Builder extends BaseBuilder<NotifyNode> {
         public Builder() {
-           super(new NotifyNode());
+            super(new NotifyNode());
         }
     }
 }

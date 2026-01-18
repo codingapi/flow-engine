@@ -11,16 +11,17 @@ public class ScriptRuntimeContext {
     @Getter
     private final static ScriptRuntimeContext instance = new ScriptRuntimeContext();
 
-    private ScriptRuntimeContext(){}
+    private ScriptRuntimeContext() {
+    }
 
-    public <T> T run(String script, Class<T> returnType, Object... args){
-        return this.execute("run",script, returnType, args);
+    public <T> T run(String script, Class<T> returnType, Object... args) {
+        return this.execute("run", script, returnType, args);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T execute(String method,String script, Class<T> returnType, Object... args){
+    public <T> T execute(String method, String script, Class<T> returnType, Object... args) {
         Script runtime = groovyShell.parse(script);
-        runtime.setProperty("$bind",FlowScriptContext.getInstance());
+        runtime.setProperty("$bind", FlowScriptContext.getInstance());
         return (T) runtime.invokeMethod(method, args);
     }
 }

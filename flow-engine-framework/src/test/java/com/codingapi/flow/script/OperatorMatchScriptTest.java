@@ -10,7 +10,7 @@ class OperatorMatchScriptTest {
 
     @Test
     void execute() {
-        IFlowOperator flowOperator = new User(1,"lorne");
+        IFlowOperator flowOperator = new User(1, "lorne");
         OperatorMatchScript operatorMatchScript = OperatorMatchScript.any();
         assertTrue(operatorMatchScript.execute(flowOperator));
     }

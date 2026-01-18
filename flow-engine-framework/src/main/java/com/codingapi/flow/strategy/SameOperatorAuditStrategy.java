@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  提交人与审批人一致
+ * 提交人与审批人一致
  */
 @Data
 public class SameOperatorAuditStrategy implements INodeStrategy {

@@ -1,7 +1,7 @@
 package com.codingapi.flow.operator;
 
 /**
- *  流程参与用户
+ * 流程参与用户
  */
 public interface IFlowOperator {
 
@@ -15,6 +15,7 @@ public interface IFlowOperator {
 
     /**
      * 获取用户名称
+     *
      * @return 名称
      */
     String getName();

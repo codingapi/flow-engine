@@ -66,6 +66,7 @@ public class StrategyManager {
 
     /**
      * 是否是顺序审批
+     *
      * @return true/false
      */
     public boolean isSequenceMultiOperator() {

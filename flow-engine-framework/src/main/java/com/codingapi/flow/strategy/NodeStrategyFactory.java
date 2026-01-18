@@ -28,7 +28,7 @@ public class NodeStrategyFactory {
 
 
     @SneakyThrows
-    public INodeStrategy createStrategy(Map<String,Object> map) {
+    public INodeStrategy createStrategy(Map<String, Object> map) {
         if (map == null || map.isEmpty()) return null;
         String key = (String) map.get(INodeStrategy.TYPE_KEY);
         Class<? extends INodeStrategy> clazz = strategyClasses.get(key);

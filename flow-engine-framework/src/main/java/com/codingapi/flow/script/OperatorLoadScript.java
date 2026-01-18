@@ -21,7 +21,7 @@ public class OperatorLoadScript {
 
     @SuppressWarnings("unchecked")
     public List<IFlowOperator> execute(FlowSession request) {
-        return ScriptRuntimeContext.getInstance().run(script, List.class,request);
+        return ScriptRuntimeContext.getInstance().run(script, List.class, request);
     }
 
     /**

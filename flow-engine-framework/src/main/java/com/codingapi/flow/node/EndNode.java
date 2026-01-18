@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * 结束节点
  */
-public class EndNode extends BaseNode  {
+public class EndNode extends BaseNode {
 
     public static final String NODE_TYPE = "end";
     public static final String DEFAULT_NAME = "结束节点";
@@ -27,11 +27,11 @@ public class EndNode extends BaseNode  {
     }
 
     public EndNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions,actions,nodeStrategies);
+        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, actions, nodeStrategies);
     }
 
     protected EndNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(),defaultActions(),defaultStrategies());
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(), defaultActions(), defaultStrategies());
     }
 
     private static List<INodeStrategy> defaultStrategies() {
@@ -62,7 +62,7 @@ public class EndNode extends BaseNode  {
     public static class Builder extends BaseBuilder<EndNode> {
 
         public Builder() {
-           super(new EndNode());
+            super(new EndNode());
         }
     }
 }

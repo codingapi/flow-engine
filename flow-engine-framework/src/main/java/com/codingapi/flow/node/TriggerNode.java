@@ -27,11 +27,11 @@ public class TriggerNode extends BaseNode {
     }
 
     public TriggerNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions,actions,nodeStrategies);
+        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, actions, nodeStrategies);
     }
 
     protected TriggerNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(),defaultActions(),defaultStrategies());
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(), defaultActions(), defaultStrategies());
     }
 
     private static List<INodeStrategy> defaultStrategies() {
@@ -44,6 +44,7 @@ public class TriggerNode extends BaseNode {
         strategies.add(AdviceStrategy.defaultStrategy());
         return strategies;
     }
+
     private static List<IFlowAction> defaultActions() {
         List<IFlowAction> actions = new ArrayList<>();
         actions.add(new DefaultAction());

@@ -4,7 +4,7 @@ import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.Map;
 
-public class DelegateAction extends BaseAction{
+public class DelegateAction extends BaseAction {
 
     public DelegateAction() {
         this.id = RandomUtils.generateStringId();

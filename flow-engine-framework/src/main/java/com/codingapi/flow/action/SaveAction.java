@@ -7,7 +7,7 @@ import com.codingapi.flow.utils.RandomUtils;
 import java.util.List;
 import java.util.Map;
 
-public class SaveAction extends BaseAction{
+public class SaveAction extends BaseAction {
 
     public SaveAction() {
         this.id = RandomUtils.generateStringId();

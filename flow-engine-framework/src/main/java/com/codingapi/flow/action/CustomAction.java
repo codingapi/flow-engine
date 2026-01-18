@@ -4,7 +4,7 @@ import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.Map;
 
-public class CustomAction extends BaseAction{
+public class CustomAction extends BaseAction {
 
     public CustomAction() {
         this.id = RandomUtils.generateStringId();

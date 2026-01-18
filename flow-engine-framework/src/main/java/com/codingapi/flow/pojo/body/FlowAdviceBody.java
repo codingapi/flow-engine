@@ -39,11 +39,11 @@ public class FlowAdviceBody {
         this.operatorId = operatorId;
     }
 
-    public void verify(){
-        if(actionId ==null|| actionId.isEmpty()){
+    public void verify() {
+        if (actionId == null || actionId.isEmpty()) {
             throw new IllegalArgumentException("action can not be null");
         }
-        if(operatorId<=0){
+        if (operatorId <= 0) {
             throw new IllegalArgumentException("operatorId can not be null");
         }
     }

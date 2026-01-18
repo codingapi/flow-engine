@@ -9,7 +9,7 @@ import java.util.Map;
  * 记录合并策略
  */
 @Data
-public class RecordMergeStrategy implements INodeStrategy{
+public class RecordMergeStrategy implements INodeStrategy {
 
     private boolean mergeable;
 

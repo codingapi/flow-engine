@@ -4,7 +4,7 @@ import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.Map;
 
-public class TransferAction extends BaseAction{
+public class TransferAction extends BaseAction {
 
     public TransferAction() {
         this.id = RandomUtils.generateStringId();

@@ -9,7 +9,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public class FlowRecordFinishEvent implements IFlowEvent{
+public class FlowRecordFinishEvent implements IFlowEvent {
 
     private final FlowRecord flowRecord;
 

@@ -137,10 +137,11 @@ public class Workflow {
 
     /**
      * 转换为json
+     *
      * @return json
      */
-    public String toJson(boolean hasSchema){
-        Map<String,Object> map = new HashMap<>();
+    public String toJson(boolean hasSchema) {
+        Map<String, Object> map = new HashMap<>();
         map.put("id", id);
         map.put("code", code);
         map.put("title", title);
@@ -167,22 +168,22 @@ public class Workflow {
         workflow.setTitle((String) data.get("title"));
         workflow.setSchema((String) data.get("schema"));
         workflow.setIsInterfere((boolean) data.get("isInterfere"));
-        workflow.setCreatedTime(Long.parseLong((String)data.get("createdTime")));
+        workflow.setCreatedTime(Long.parseLong((String) data.get("createdTime")));
         workflow.setCreatedOperator(GatewayContext.getInstance().getFlowOperator(createOperator));
         workflow.setForm(FormMeta.fromMap((Map<String, Object>) data.get("form")));
         workflow.setOperatorCreateScript(new OperatorMatchScript((String) data.get("operatorCreateScript")));
 
-        if(nodes!=null){
+        if (nodes != null) {
             List<IFlowNode> nodeList = new ArrayList<>();
-            for (Map<String, Object> node : nodes){
-                IFlowNode flowNode =  NodeFactory.getInstance().createNode( node);
+            for (Map<String, Object> node : nodes) {
+                IFlowNode flowNode = NodeFactory.getInstance().createNode(node);
                 nodeList.add(flowNode);
             }
             workflow.setNodes(nodeList);
         }
 
         List<Map<String, Object>> edges = (List<Map<String, Object>>) data.get("edges");
-        if(edges!=null) {
+        if (edges != null) {
             List<FlowEdge> edgeList = new ArrayList<>();
             for (Map<String, Object> edge : edges) {
                 FlowEdge flowEdge = new FlowEdge((String) edge.get("from"), (String) edge.get("to"));

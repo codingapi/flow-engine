@@ -3,7 +3,7 @@ package com.codingapi.flow.form;
 import lombok.Data;
 
 /**
- *  表单字段元数据
+ * 表单字段元数据
  */
 @Data
 public class FormFieldMeta {

@@ -16,7 +16,7 @@ public class OperatorManager {
         this.operatorIds = operators.stream().map(IFlowOperator::getUserId).toList();
     }
 
-    public boolean match(IFlowOperator operator){
+    public boolean match(IFlowOperator operator) {
         return operatorIds.contains(operator.getUserId());
     }
 }

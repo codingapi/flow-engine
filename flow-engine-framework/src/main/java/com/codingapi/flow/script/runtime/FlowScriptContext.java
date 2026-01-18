@@ -13,7 +13,8 @@ public class FlowScriptContext {
     private static final FlowScriptContext instance = new FlowScriptContext();
 
     private FlowScriptContext() {
-        this.beanFactory = new IBeanFactory() {};
+        this.beanFactory = new IBeanFactory() {
+        };
     }
 
     @Setter
@@ -40,11 +41,11 @@ public class FlowScriptContext {
         return beanFactory.getOperatorById(userId);
     }
 
-    public List<IFlowOperator> findOperatorsByIds(long ... ids){
+    public List<IFlowOperator> findOperatorsByIds(long... ids) {
         return beanFactory.findOperatorsByIds(ids);
     }
 
-    public List<IFlowOperator> findOperatorsByIds(List<Long> ids){
+    public List<IFlowOperator> findOperatorsByIds(List<Long> ids) {
         return beanFactory.findOperatorsByIds(ids);
     }
 

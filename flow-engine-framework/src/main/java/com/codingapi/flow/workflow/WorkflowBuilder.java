@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class WorkflowBuilder {
 
-    private final Workflow workflow ;
+    private final Workflow workflow;
 
     private WorkflowBuilder() {
         this.workflow = new Workflow();
@@ -63,7 +63,7 @@ public class WorkflowBuilder {
     }
 
     public WorkflowBuilder nodes(List<IFlowNode> nodes) {
-        workflow.setNodes( nodes);
+        workflow.setNodes(nodes);
         return this;
     }
 

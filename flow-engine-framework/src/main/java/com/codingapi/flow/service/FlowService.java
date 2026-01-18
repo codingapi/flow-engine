@@ -22,13 +22,13 @@ public class FlowService {
     private final WorkflowBackupRepository workflowBackupRepository;
 
 
-    public void create(FlowCreateRequest request){
-        FlowCreateService flowCreateService = new FlowCreateService(request, flowOperatorGateway,flowRecordRepository,workflowRepository,workflowBackupRepository);
+    public void create(FlowCreateRequest request) {
+        FlowCreateService flowCreateService = new FlowCreateService(request, flowOperatorGateway, flowRecordRepository, workflowRepository, workflowBackupRepository);
         flowCreateService.create();
     }
 
-    public void action(FlowActionRequest request){
-        FlowActionService flowActionService = new FlowActionService(request, flowOperatorGateway,flowRecordRepository,workflowBackupRepository);
+    public void action(FlowActionRequest request) {
+        FlowActionService flowActionService = new FlowActionService(request, flowOperatorGateway, flowRecordRepository, workflowBackupRepository);
         flowActionService.action();
     }
 }

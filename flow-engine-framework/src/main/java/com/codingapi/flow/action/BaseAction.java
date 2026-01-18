@@ -72,7 +72,7 @@ public abstract class BaseAction implements IFlowAction {
     }
 
     @Override
-    public List<FlowRecord> trigger(FlowSession flowSession,FlowRecord currentRecord) {
+    public List<FlowRecord> trigger(FlowSession flowSession, FlowRecord currentRecord) {
         return null;
     }
 
@@ -88,8 +88,8 @@ public abstract class BaseAction implements IFlowAction {
         action.setId((String) data.get("id"));
         action.setType(ActionType.valueOf((String) data.get("type")));
         action.setTitle((String) data.get("title"));
-        Map<String,Object> display = (Map<String, Object>) data.get("display");
-        if(display!=null) {
+        Map<String, Object> display = (Map<String, Object>) data.get("display");
+        if (display != null) {
             action.setDisplay(ActionDisplay.fromMap(display));
         }
         return action;

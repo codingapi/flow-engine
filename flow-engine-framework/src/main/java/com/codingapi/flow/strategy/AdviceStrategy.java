@@ -9,7 +9,7 @@ import java.util.Map;
  * 节点审批意见策略
  */
 @Data
-public class AdviceStrategy implements INodeStrategy{
+public class AdviceStrategy implements INodeStrategy {
 
     /**
      * 是否可空

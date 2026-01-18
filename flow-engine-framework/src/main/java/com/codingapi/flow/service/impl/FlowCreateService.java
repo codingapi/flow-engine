@@ -74,7 +74,7 @@ public class FlowCreateService {
         events.add(new FlowRecordTodoEvent(flowRecord));
 
         // 推送事件
-        for (IFlowEvent event : events){
+        for (IFlowEvent event : events) {
             EventPusher.push(event);
         }
     }

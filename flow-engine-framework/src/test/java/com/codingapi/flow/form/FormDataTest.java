@@ -29,15 +29,15 @@ class FormDataTest {
                         .build())
                 .build();
         FormData data = new FormData(form);
-        data.getDataBody().set("name","张三").set("days",10).set("reason","事由");
-        data.addSubDataBody("record").set("approver","张三").set("result","通过").set("time","2020-01-01");
-        data.addSubDataBody("record").set("approver","李四").set("result","通过").set("time","2020-01-02");
+        data.getDataBody().set("name", "张三").set("days", 10).set("reason", "事由");
+        data.addSubDataBody("record").set("approver", "张三").set("result", "通过").set("time", "2020-01-01");
+        data.addSubDataBody("record").set("approver", "李四").set("result", "通过").set("time", "2020-01-02");
 
         assertEquals("张三", data.getDataBody().get("name"));
         assertEquals(10, data.getDataBody().get("days"));
         assertEquals("事由", data.getDataBody().get("reason"));
 
-        Map<String,Object> mainData = data.toMapData();
+        Map<String, Object> mainData = data.toMapData();
 
         data.reset(mainData);
 
@@ -45,7 +45,7 @@ class FormDataTest {
         assertEquals(10, mainData.get("days"));
         assertEquals("事由", mainData.get("reason"));
 
-        data.getDataBody().set("name","张三-112233");
+        data.getDataBody().set("name", "张三-112233");
         List<FormData.DataBody> subDataBody = data.getSubDataBody("record");
         assertEquals(2, subDataBody.size());
         assertEquals(1, data.countSubDataBody());

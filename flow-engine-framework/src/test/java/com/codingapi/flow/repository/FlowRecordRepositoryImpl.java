@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FlowRecordRepositoryImpl implements FlowRecordRepository{
+public class FlowRecordRepositoryImpl implements FlowRecordRepository {
 
     private final Map<Long, FlowRecord> cache = new HashMap<>();
 
@@ -17,24 +17,24 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository{
 
 
     public List<FlowRecord> findTodoByOperator(long operatorId) {
-        return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId()==operatorId && flowRecord.isTodo()).toList();
+        return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId && flowRecord.isTodo()).toList();
     }
 
 
     @Override
     public void save(FlowRecord flowRecord) {
-        if(flowRecord.getId()>0){
-            cache.put(flowRecord.getId(),flowRecord);
-        }else {
-            long id = cache.size()+1;
+        if (flowRecord.getId() > 0) {
+            cache.put(flowRecord.getId(), flowRecord);
+        } else {
+            long id = cache.size() + 1;
             flowRecord.setId(id);
-            cache.put(id,flowRecord);
+            cache.put(id, flowRecord);
         }
     }
 
     @Override
     public void saveAll(List<FlowRecord> flowRecords) {
-        for (FlowRecord flowRecord : flowRecords){
+        for (FlowRecord flowRecord : flowRecords) {
             this.save(flowRecord);
         }
     }
@@ -46,7 +46,7 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository{
 
     @Override
     public List<FlowRecord> findRecordsByFromId(long fromId) {
-        return cache.values().stream().filter(flowRecord -> flowRecord.getFromId()==fromId).toList();
+        return cache.values().stream().filter(flowRecord -> flowRecord.getFromId() == fromId).toList();
     }
 
     @Override

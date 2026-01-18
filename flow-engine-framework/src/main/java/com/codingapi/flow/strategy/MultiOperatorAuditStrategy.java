@@ -9,7 +9,7 @@ import java.util.Map;
  * 多人审批策略
  */
 @Data
-public class MultiOperatorAuditStrategy implements INodeStrategy{
+public class MultiOperatorAuditStrategy implements INodeStrategy {
 
     private Type type;
     // 并签比例(0~1)

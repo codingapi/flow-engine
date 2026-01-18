@@ -15,19 +15,19 @@ public class ActionDisplay {
         this.title = title;
     }
 
-    private ActionDisplay(){
+    private ActionDisplay() {
 
     }
 
-    public Map<String,Object> toMap() {
-        Map<String,Object> map = new HashMap<>();
-        map.put("title",title);
-        map.put("style",style);
-        map.put("icon",icon);
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("title", title);
+        map.put("style", style);
+        map.put("icon", icon);
         return map;
     }
 
-    public static ActionDisplay fromMap(Map<String,Object> map) {
+    public static ActionDisplay fromMap(Map<String, Object> map) {
         ActionDisplay display = new ActionDisplay();
         display.setTitle((String) map.get("title"));
         display.setStyle((String) map.get("style"));

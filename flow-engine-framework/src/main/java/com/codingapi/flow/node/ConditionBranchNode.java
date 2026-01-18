@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * 分支节点
  */
-public class ConditionBranchNode extends BaseNode{
+public class ConditionBranchNode extends BaseNode {
 
     public static final String NODE_TYPE = "condition_branch";
     public static final String DEFAULT_NAME = "分支节点";
@@ -27,13 +27,12 @@ public class ConditionBranchNode extends BaseNode{
     }
 
 
-
     public ConditionBranchNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions,actions,nodeStrategies);
+        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, actions, nodeStrategies);
     }
 
     protected ConditionBranchNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(),defaultActions(),defaultStrategies());
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(), defaultActions(), defaultStrategies());
     }
 
     private static List<INodeStrategy> defaultStrategies() {

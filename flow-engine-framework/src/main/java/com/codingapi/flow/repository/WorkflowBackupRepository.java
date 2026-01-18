@@ -8,7 +8,7 @@ public interface WorkflowBackupRepository {
 
     WorkflowBackup get(long id);
 
-    WorkflowBackup getByWorkId(String workId,long workVersion);
+    WorkflowBackup getByWorkId(String workId, long workVersion);
 
     void delete(WorkflowBackup backup);
 
