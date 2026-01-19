@@ -1,9 +1,11 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,4 +52,19 @@ public abstract class BaseBranchNode extends BaseFlowNode implements IBranchNode
     public int order() {
         return order;
     }
+
+    @Override
+    public void verify(FormMeta form) {
+        this.verifyFields();
+    }
+
+    private void verifyFields () {
+        if (!StringUtils.hasText(name)) {
+            throw new IllegalArgumentException("name can not be null");
+        }
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("id can not be null");
+        }
+    }
+
 }

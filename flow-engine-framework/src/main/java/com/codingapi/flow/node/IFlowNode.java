@@ -1,5 +1,7 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.form.FormMeta;
+
 import java.util.Map;
 
 /**
@@ -26,6 +28,11 @@ public interface IFlowNode {
      * 转化为map
      */
     Map<String, Object> toMap();
+
+    /**
+     * 节点验证
+     */
+    void verify(FormMeta form);
 
 
 

@@ -2,7 +2,6 @@ package com.codingapi.flow.node;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.error.ErrorThrow;
-import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.node.manager.OperatorManager;
@@ -52,12 +51,6 @@ public interface IAuditNode extends IFlowNode {
      * 错误异常处理
      */
     ErrorThrow errorTrigger(FlowSession flowSession);
-
-    /**
-     * 节点验证
-     */
-    void verify(FormMeta form);
-
 
     /**
      * 转为map

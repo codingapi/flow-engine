@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.node.*;
+import com.codingapi.flow.node.IAuditNode;
+import com.codingapi.flow.node.IBranchNode;
+import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.audit.EndNode;
 import com.codingapi.flow.node.audit.StartNode;
 import com.codingapi.flow.node.factory.NodeFactory;
@@ -270,9 +272,7 @@ public class Workflow {
         }
 
         for (IFlowNode node : nodes) {
-            if (node instanceof IAuditNode) {
-                ((IAuditNode) node).verify(form);
-            }
+            node.verify(form);
         }
     }
 
@@ -349,7 +349,7 @@ public class Workflow {
 
     public IAuditNode getEndNode() {
         return nodes.stream().filter(node -> node instanceof EndNode)
-                .map(node ->  (IAuditNode) node)
+                .map(node -> (IAuditNode) node)
                 .findFirst().orElse(null);
     }
 }
