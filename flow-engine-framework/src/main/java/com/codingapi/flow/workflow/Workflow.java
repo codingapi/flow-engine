@@ -307,7 +307,7 @@ public class Workflow {
 
     public List<IFlowNode> edgeNext(IFlowNode node) {
         return edges.stream().filter(edge -> edge.getFrom().equals(node.getId()))
-                .map(edge -> nodes.stream().filter(node1 -> node1.getId().equals(edge.getTo())).findFirst().get()).toList();
+                .map(edge -> nodes.stream().filter(item -> item.getId().equals(edge.getTo())).findFirst().get()).toList();
     }
 
     public List<IAuditNode> nextNodes(FlowSession session) {
@@ -322,8 +322,8 @@ public class Workflow {
             if (node instanceof IAuditNode) {
                 auditNodeList.add((IAuditNode) node);
             }
-            if (node instanceof IConditionNode) {
-                if (((IConditionNode) node).match(session)) {
+            if (node instanceof IBranchNode) {
+                if (((IBranchNode) node).match(session)) {
                     List<IFlowNode> nextNodes = this.edgeNext(node);
                     auditNodeList.addAll(this.loadNextAuditNodes(nextNodes, session));
                 }

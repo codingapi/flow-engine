@@ -8,7 +8,7 @@ import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.node.audit.ApprovalNode;
-import com.codingapi.flow.node.condition.ConditionNodeBranchNode;
+import com.codingapi.flow.node.branch.BranchNodeBranchNode;
 import com.codingapi.flow.node.audit.EndNode;
 import com.codingapi.flow.node.audit.StartNode;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
@@ -224,13 +224,13 @@ class FlowServiceTest {
                 .build()
                 .build();
 
-        ConditionNodeBranchNode departConditionNode = ConditionNodeBranchNode.builder()
+        BranchNodeBranchNode departConditionNode = BranchNodeBranchNode.builder()
                 .name("条件分支")
                 .conditionScript("def run(request){return request.getFormData('days') <= 3}")
                 .order(1)
                 .build();
 
-        ConditionNodeBranchNode bossConditionNode = ConditionNodeBranchNode.builder()
+        BranchNodeBranchNode bossConditionNode = BranchNodeBranchNode.builder()
                 .name("条件分支")
                 .conditionScript("def run(request){return request.getFormData('days') > 3}")
                 .order(2)
@@ -278,9 +278,11 @@ class FlowServiceTest {
 
         workflowRepository.save(workflow);
 
+        Map<String, Object> data = Map.of("name", "lorne", "days", 3, "reason", "leave");
+
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
-        request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
+        request.setFormData(data);
         List<IFlowAction> actions = startNode.actions().getActions();
         request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", user.getUserId()));
 
@@ -290,7 +292,7 @@ class FlowServiceTest {
         assertEquals(1, recordList.size());
 
         FlowActionRequest submitRequest = new FlowActionRequest();
-        submitRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
+        submitRequest.setFormData(data);
         submitRequest.setRecordId(recordList.get(0).getId());
         submitRequest.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", user.getUserId()));
         flowService.action(submitRequest);
@@ -302,7 +304,7 @@ class FlowServiceTest {
         List<IFlowAction> lorneActions = departApprovalNode.actions().getActions();
 
         FlowActionRequest lorneRequest = new FlowActionRequest();
-        lorneRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
+        lorneRequest.setFormData(data);
         lorneRequest.setRecordId(lorneRecordList.get(0).getId());
         lorneRequest.setAdvice(new FlowAdviceBody(lorneActions.get(0).id(), "同意", depart.getUserId()));
         flowService.action(lorneRequest);

@@ -2,9 +2,10 @@ package com.codingapi.flow.node.factory;
 
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.audit.*;
-import com.codingapi.flow.node.condition.ConditionNodeBranchNode;
-import com.codingapi.flow.node.condition.InclusiveBranchNode;
-import com.codingapi.flow.node.condition.ParallelBranchNode;
+import com.codingapi.flow.node.branch.BranchNodeBranchNode;
+import com.codingapi.flow.node.branch.InclusiveBranchNode;
+import com.codingapi.flow.node.branch.ParallelBranchNode;
+import com.codingapi.flow.node.branch.RouterBranchNode;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
@@ -25,7 +26,7 @@ public class NodeFactory {
 
     private void initNodes() {
         nodesClasses.put(ApprovalNode.NODE_TYPE, ApprovalNode.class);
-        nodesClasses.put(ConditionNodeBranchNode.NODE_TYPE, ConditionNodeBranchNode.class);
+        nodesClasses.put(BranchNodeBranchNode.NODE_TYPE, BranchNodeBranchNode.class);
         nodesClasses.put(DelayNode.NODE_TYPE, DelayNode.class);
         nodesClasses.put(EndNode.NODE_TYPE, EndNode.class);
         nodesClasses.put(HandleNode.NODE_TYPE, HandleNode.class);

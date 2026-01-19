@@ -5,7 +5,7 @@ import com.codingapi.flow.session.FlowSession;
 /**
  *  条件节点
  */
-public interface IConditionNode extends IFlowNode{
+public interface IBranchNode extends IFlowNode{
 
     /**
      * 匹配节点
@@ -13,5 +13,10 @@ public interface IConditionNode extends IFlowNode{
      * @return 是否匹配
      */
     boolean match(FlowSession flowSession);
+
+    /**
+     * 顺序
+     */
+    int order();
 
 }

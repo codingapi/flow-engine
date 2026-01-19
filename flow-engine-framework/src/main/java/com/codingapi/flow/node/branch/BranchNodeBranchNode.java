@@ -1,18 +1,17 @@
-package com.codingapi.flow.node.condition;
+package com.codingapi.flow.node.branch;
 
-import com.codingapi.flow.node.BaseConditionNode;
-import com.codingapi.flow.node.builder.ConditionNodeBuilder;
+import com.codingapi.flow.node.BaseBranchNode;
+import com.codingapi.flow.node.builder.BranchNodeBuilder;
 import com.codingapi.flow.script.node.ConditionScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
-import lombok.Getter;
 
 import java.util.Map;
 
 /**
  * 分支节点
  */
-public class ConditionNodeBranchNode extends BaseConditionNode {
+public class BranchNodeBranchNode extends BaseBranchNode {
 
     public static final String NODE_TYPE = "condition_branch";
     public static final String DEFAULT_NAME = "分支节点";
@@ -22,27 +21,19 @@ public class ConditionNodeBranchNode extends BaseConditionNode {
      */
     private ConditionScript conditionScript;
 
-    /**
-     * 条件顺序,越小则优先级越高
-     */
-    @Getter
-    private int order;
-
     @Override
     public String getType() {
         return NODE_TYPE;
     }
 
-    public ConditionNodeBranchNode(String id, String name) {
+    public BranchNodeBranchNode(String id, String name) {
         super(id, name);
-        this.order = 0;
         this.conditionScript = ConditionScript.defaultScript();
     }
 
-    public ConditionNodeBranchNode() {
+    public BranchNodeBranchNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME);
     }
-
 
     /**
      * 匹配条件
@@ -56,13 +47,11 @@ public class ConditionNodeBranchNode extends BaseConditionNode {
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
         map.put("script", conditionScript.getScript());
-        map.put("order", String.valueOf(order));
         return map;
     }
 
-    public static ConditionNodeBranchNode formMap(Map<String, Object> map) {
-        ConditionNodeBranchNode branchNode = BaseConditionNode.formMap(map, ConditionNodeBranchNode.class);
-        branchNode.order = Integer.parseInt((String) map.get("order"));
+    public static BranchNodeBranchNode formMap(Map<String, Object> map) {
+        BranchNodeBranchNode branchNode = BaseBranchNode.formMap(map, BranchNodeBranchNode.class);
         branchNode.conditionScript = new ConditionScript((String) map.get("script"));
         return branchNode;
     }
@@ -71,9 +60,9 @@ public class ConditionNodeBranchNode extends BaseConditionNode {
         return new Builder();
     }
 
-    public static class Builder extends ConditionNodeBuilder<Builder, ConditionNodeBranchNode> {
+    public static class Builder extends BranchNodeBuilder<Builder, BranchNodeBranchNode> {
         public Builder() {
-            super(new ConditionNodeBranchNode());
+            super(new BranchNodeBranchNode());
         }
 
         public Builder conditionScript(String script) {
@@ -81,9 +70,7 @@ public class ConditionNodeBranchNode extends BaseConditionNode {
             return this;
         }
 
-        public Builder order(int order) {
-            node.order = order;
-            return this;
-        }
+
+
     }
 }

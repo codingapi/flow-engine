@@ -1,12 +1,12 @@
 package com.codingapi.flow.node.builder;
 
-import com.codingapi.flow.node.BaseConditionNode;
+import com.codingapi.flow.node.BaseBranchNode;
 
-public abstract class ConditionNodeBuilder<B extends ConditionNodeBuilder<B, N>, N extends BaseConditionNode> {
+public abstract class BranchNodeBuilder<B extends BranchNodeBuilder<B, N>, N extends BaseBranchNode> {
 
     protected final N node;
 
-    public ConditionNodeBuilder(N node) {
+    public BranchNodeBuilder(N node) {
         this.node = node;
     }
 
@@ -20,6 +20,10 @@ public abstract class ConditionNodeBuilder<B extends ConditionNodeBuilder<B, N>,
         return (B)this;
     }
 
+    public B order(int order) {
+        node.setOrder(order);
+        return (B)this;
+    }
     public N build() {
         return node;
     }
