@@ -261,8 +261,6 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
                 }
             }
         }
-
-
     }
 
     private void verifyFields() {
@@ -275,11 +273,9 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
         if (!StringUtils.hasText(id)) {
             throw new IllegalArgumentException("id can not be null");
         }
-
         if (actions == null || actions.isEmpty()) {
             throw new IllegalArgumentException("actions can not be null");
         }
-
         if (operatorScript == null) {
             throw new IllegalArgumentException("operator can not be null");
         }
