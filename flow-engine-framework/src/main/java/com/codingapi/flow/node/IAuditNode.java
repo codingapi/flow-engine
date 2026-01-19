@@ -9,8 +9,6 @@ import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 
-import java.util.Map;
-
 /**
  *  审批节点
  */
@@ -46,17 +44,10 @@ public interface IAuditNode extends IFlowNode {
      */
     String generateTitle(FlowSession flowSession);
 
-
     /**
      * 错误异常处理
      */
     ErrorThrow errorTrigger(FlowSession flowSession);
-
-    /**
-     * 转为map
-     */
-    Map<String, Object> toMap();
-
 
     /**
      * 节点策略
