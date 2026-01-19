@@ -40,7 +40,7 @@ public interface IAuditNode extends IFlowNode {
     OperatorManager operators(FlowSession flowSession);
 
     /**
-     * 构建待办标题
+     * 构建待办标题z
      */
     String generateTitle(FlowSession flowSession);
 

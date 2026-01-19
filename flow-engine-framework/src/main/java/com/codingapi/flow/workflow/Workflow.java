@@ -6,9 +6,10 @@ import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IAuditNode;
 import com.codingapi.flow.node.IBranchNode;
+import com.codingapi.flow.node.IConfigNode;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.audit.EndNode;
 import com.codingapi.flow.node.audit.StartNode;
+import com.codingapi.flow.node.fixed.EndNode;
 import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.script.node.OperatorMatchScript;
@@ -319,12 +320,17 @@ public class Workflow {
     private List<IAuditNode> loadNextAuditNodes(List<IFlowNode> nodeList, FlowSession session) {
         List<IAuditNode> auditNodeList = new ArrayList<>();
         for (IFlowNode node : nodeList) {
+            // 审批节点
             if (node instanceof IAuditNode) {
                 auditNodeList.add((IAuditNode) node);
             }
+            // 配置节点
+            if (node instanceof IConfigNode) {
+                ((IConfigNode) node).execute(session);
+            }
             if (node instanceof IBranchNode) {
                 if (((IBranchNode) node).match(session)) {
-                    List<IFlowNode> nextNodes = this.edgeNext(node);
+                    List<IFlowNode> nextNodes = node.nextNodes(session);
                     auditNodeList.addAll(this.loadNextAuditNodes(nextNodes, session));
                 }
             }

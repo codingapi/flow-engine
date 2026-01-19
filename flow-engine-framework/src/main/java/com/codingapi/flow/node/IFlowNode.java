@@ -1,7 +1,9 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.session.FlowSession;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,5 +37,11 @@ public interface IFlowNode {
     void verify(FormMeta form);
 
 
+    /**
+     * 获取下一个节点列表
+     * @param session 会话
+     * @return 下一个节点列表
+     */
+    List<IFlowNode> nextNodes(FlowSession session);
 
 }

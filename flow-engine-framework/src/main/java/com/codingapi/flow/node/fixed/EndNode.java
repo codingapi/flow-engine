@@ -1,4 +1,4 @@
-package com.codingapi.flow.node.audit;
+package com.codingapi.flow.node.fixed;
 
 import com.codingapi.flow.action.DefaultAction;
 import com.codingapi.flow.action.IFlowAction;
@@ -16,23 +16,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 触发节点
+ * 结束节点
  */
-public class TriggerNode extends BaseAuditNode {
+public class EndNode extends BaseAuditNode {
 
-    public static final String NODE_TYPE = "trigger";
-    public static final String DEFAULT_NAME = "触发节点";
+    public static final String NODE_TYPE = "end";
+    public static final String DEFAULT_NAME = "结束节点";
 
     @Override
     public String getType() {
         return NODE_TYPE;
     }
 
-    public TriggerNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
+
+    public EndNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
         super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, actions, nodeStrategies);
     }
 
-    public TriggerNode() {
+    public EndNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(), defaultActions(), defaultStrategies());
     }
 
@@ -53,17 +54,18 @@ public class TriggerNode extends BaseAuditNode {
         return actions;
     }
 
-    public static TriggerNode formMap(Map<String, Object> map) {
-        return BaseAuditNode.formMap(map, TriggerNode.class);
+    public static EndNode formMap(Map<String, Object> map) {
+        return BaseAuditNode.formMap(map, EndNode.class);
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends AuditNodeBuilder<Builder,TriggerNode> {
+    public static class Builder extends AuditNodeBuilder<Builder,EndNode> {
+
         public Builder() {
-            super(new TriggerNode());
+            super(new EndNode());
         }
     }
 }

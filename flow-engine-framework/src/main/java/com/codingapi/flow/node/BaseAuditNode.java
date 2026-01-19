@@ -6,7 +6,7 @@ import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
-import com.codingapi.flow.node.audit.EndNode;
+import com.codingapi.flow.node.fixed.EndNode;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.node.manager.OperatorManager;

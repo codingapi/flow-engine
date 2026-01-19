@@ -1,9 +1,12 @@
 package com.codingapi.flow.node.branch;
 
 import com.codingapi.flow.node.BaseBranchNode;
+import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.builder.BranchNodeBuilder;
+import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,6 +29,11 @@ public class RouterBranchNode extends BaseBranchNode {
 
     public RouterBranchNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME);
+    }
+
+
+    public List<IFlowNode> matchRouters(FlowSession session){
+        return null;
     }
 
 

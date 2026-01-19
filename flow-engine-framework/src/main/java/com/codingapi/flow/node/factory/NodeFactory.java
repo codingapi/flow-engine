@@ -6,6 +6,10 @@ import com.codingapi.flow.node.branch.BranchNodeBranchNode;
 import com.codingapi.flow.node.branch.InclusiveBranchNode;
 import com.codingapi.flow.node.branch.ParallelBranchNode;
 import com.codingapi.flow.node.branch.RouterBranchNode;
+import com.codingapi.flow.node.config.DelayNode;
+import com.codingapi.flow.node.config.SubProcessNode;
+import com.codingapi.flow.node.config.TriggerNode;
+import com.codingapi.flow.node.fixed.EndNode;
 import lombok.Getter;
 import lombok.SneakyThrows;
 

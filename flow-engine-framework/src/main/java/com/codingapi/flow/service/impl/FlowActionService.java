@@ -9,7 +9,7 @@ import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
-import com.codingapi.flow.node.audit.EndNode;
+import com.codingapi.flow.node.fixed.EndNode;
 import com.codingapi.flow.node.IAuditNode;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -90,12 +90,11 @@ public class FlowActionService {
         boolean done = flowAction.isDone(session, flowRecord, currentRecords);
         if (done) {
             List<FlowRecord> records = flowAction.trigger(session, flowRecord);
-            if (records == null || records.isEmpty()) {
-                throw new IllegalArgumentException("action not return record");
-            }
-            for (FlowRecord record : records) {
-                if (record.isShow()) {
-                    flowEvents.add(new FlowRecordTodoEvent(record));
+            if (!records.isEmpty()) {
+                for (FlowRecord record : records) {
+                    if (record.isShow()) {
+                        flowEvents.add(new FlowRecordTodoEvent(record));
+                    }
                 }
             }
             flowRecord.update(formData.toMapData(), request.getAdvice().getAdvice(), request.getAdvice().getSignKey(), true);
