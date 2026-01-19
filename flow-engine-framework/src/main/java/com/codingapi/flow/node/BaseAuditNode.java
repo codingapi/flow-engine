@@ -6,6 +6,7 @@ import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
+import com.codingapi.flow.node.audit.EndNode;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.node.manager.OperatorManager;
@@ -17,8 +18,8 @@ import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.INodeStrategy;
 import com.codingapi.flow.strategy.NodeStrategyFactory;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;
 
@@ -27,25 +28,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@AllArgsConstructor
-public abstract class BaseNode implements IFlowNode {
+public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
 
     public static final String DEFAULT_VIEW = "default";
 
     /**
-     * 节点id
-     */
-    @Getter
-    private String id;
-    /**
-     * 节点名称
-     */
-    @Getter
-    private String name;
-    /**
      * 渲染视图
      */
     @Getter
+    @Setter
     private String view;
 
     /**
@@ -66,17 +57,32 @@ public abstract class BaseNode implements IFlowNode {
     /**
      * 表单字段权限
      */
+    @Setter
     private List<FormFieldPermission> formFieldPermissions;
 
     /**
      * 节点操作
      */
+    @Setter
     private List<IFlowAction> actions;
 
     /**
      * 节点策略
      */
+    @Setter
     private List<INodeStrategy> nodeStrategies;
+
+
+    public BaseAuditNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
+        super(id, name);
+        this.view = view;
+        this.operatorScript = operatorScript;
+        this.nodeTitleScript = nodeTitleScript;
+        this.errorTriggerScript = errorTriggerScript;
+        this.formFieldPermissions = formFieldPermissions;
+        this.actions = actions;
+        this.nodeStrategies = nodeStrategies;
+    }
 
     @Override
     public Map<String, Object> toMap() {
@@ -96,7 +102,7 @@ public abstract class BaseNode implements IFlowNode {
 
     @SneakyThrows
     @SuppressWarnings("unchecked")
-    public static <T extends BaseNode> T formMap(Map<String, Object> map, Class<T> clazz) {
+    public static <T extends BaseAuditNode> T formMap(Map<String, Object> map, Class<T> clazz) {
         T node = clazz.getDeclaredConstructor().newInstance();
         node.setId((String) map.get("id"));
         node.setName((String) map.get("name"));
@@ -140,32 +146,12 @@ public abstract class BaseNode implements IFlowNode {
         return node;
     }
 
-    protected void setNodeStrategies(List<INodeStrategy> strategyList) {
-        this.nodeStrategies = strategyList;
-    }
-
-    protected void setView(String view) {
-        this.view = view;
-    }
-
-    protected void setName(String name) {
-        this.name = name;
-    }
-
-    protected void setId(String id) {
-        this.id = id;
-    }
-
-    protected void setActions(List<IFlowAction> actions) {
-        this.actions = actions;
-    }
-
     /**
      * 设置审批人配置脚本
      *
      * @param operatorScript 审批人配置脚本
      */
-    protected void setOperatorScript(String operatorScript) {
+    public void setOperatorScript(String operatorScript) {
         this.operatorScript = new OperatorLoadScript(operatorScript);
     }
 
@@ -174,7 +160,7 @@ public abstract class BaseNode implements IFlowNode {
      *
      * @param nodeTitleScript 节点待办标题脚本
      */
-    protected void setNodeTitleScript(String nodeTitleScript) {
+    public void setNodeTitleScript(String nodeTitleScript) {
         this.nodeTitleScript = new NodeTitleScript(nodeTitleScript);
     }
 
@@ -183,16 +169,10 @@ public abstract class BaseNode implements IFlowNode {
      *
      * @param errorTriggerScript 错误触发脚本
      */
-    protected void setErrorTriggerScript(String errorTriggerScript) {
+    public void setErrorTriggerScript(String errorTriggerScript) {
         this.errorTriggerScript = new ErrorTriggerScript(errorTriggerScript);
     }
 
-    /**
-     * 设置表单字段权限
-     */
-    protected void setFormFieldPermissions(List<FormFieldPermission> permissions) {
-        this.formFieldPermissions = permissions;
-    }
 
     @Override
     public FieldPermissionManager formFieldsPermissions() {
@@ -240,11 +220,6 @@ public abstract class BaseNode implements IFlowNode {
     @Override
     public StrategyManager strategies() {
         return new StrategyManager(nodeStrategies);
-    }
-
-    @Override
-    public boolean match(FlowSession flowSession) {
-        return true;
     }
 
     @Override
@@ -312,6 +287,4 @@ public abstract class BaseNode implements IFlowNode {
             throw new IllegalArgumentException("nodeTitle can not be null");
         }
     }
-
-
 }

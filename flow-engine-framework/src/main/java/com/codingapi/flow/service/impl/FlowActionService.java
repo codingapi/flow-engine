@@ -9,8 +9,8 @@ import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
-import com.codingapi.flow.node.EndNode;
-import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.audit.EndNode;
+import com.codingapi.flow.node.IAuditNode;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
@@ -60,7 +60,7 @@ public class FlowActionService {
         }
 
         Workflow workflow = workflowBackup.toWorkflow();
-        IFlowNode currentNode = workflow.getNode(flowRecord.getNodeId());
+        IAuditNode currentNode = workflow.getAuditNode(flowRecord.getNodeId());
         if (currentNode == null) {
             throw new IllegalArgumentException("currentNode not exist");
         }

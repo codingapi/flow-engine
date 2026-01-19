@@ -1,6 +1,6 @@
 package com.codingapi.flow.action;
 
-import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.IAuditNode;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -104,7 +104,7 @@ public abstract class BaseAction implements IFlowAction {
      * @param currentRecord  当前记录
      * @return 下一节节点的记录
      */
-    protected List<FlowRecord> generateNextRecords(IFlowNode currentNode, FlowSession triggerSession, FlowRecord currentRecord) {
+    protected List<FlowRecord> generateNextRecords(IAuditNode currentNode, FlowSession triggerSession, FlowRecord currentRecord) {
         List<FlowRecord> records = new ArrayList<>();
         OperatorManager operatorManager = currentNode.operators(triggerSession);
         List<IFlowOperator> operators = operatorManager.getOperators();

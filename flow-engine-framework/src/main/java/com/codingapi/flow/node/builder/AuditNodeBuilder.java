@@ -1,18 +1,19 @@
-package com.codingapi.flow.node;
+package com.codingapi.flow.node.builder;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
+import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.strategy.INodeStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseBuilder<B extends BaseBuilder<B, N>, N extends BaseNode> {
+public abstract class AuditNodeBuilder<B extends AuditNodeBuilder<B, N>, N extends BaseAuditNode> {
 
-    protected final N node;
+    private final N node;
 
-    public BaseBuilder(N node) {
+    public AuditNodeBuilder(N node) {
         this.node = node;
     }
 
@@ -75,13 +76,13 @@ public abstract class BaseBuilder<B extends BaseBuilder<B, N>, N extends BaseNod
         return node;
     }
 
-    public static class FormFieldPermissionsBuilder<B extends BaseBuilder<B, N>,N extends BaseNode> {
+    public static class FormFieldPermissionsBuilder<B extends AuditNodeBuilder<B, N>,N extends BaseAuditNode> {
 
         private final N node;
-        private final BaseBuilder<B,N> baseBuilder;
+        private final AuditNodeBuilder<B,N> baseBuilder;
         private final List<FormFieldPermission> permissions;
 
-        public FormFieldPermissionsBuilder(BaseBuilder<B,N> baseBuilder, N node) {
+        public FormFieldPermissionsBuilder(AuditNodeBuilder<B,N> baseBuilder, N node) {
             this.baseBuilder = baseBuilder;
             this.node = node;
             this.permissions = new ArrayList<>();
@@ -96,7 +97,7 @@ public abstract class BaseBuilder<B extends BaseBuilder<B, N>, N extends BaseNod
             return this;
         }
 
-        public BaseBuilder<B,N> build() {
+        public AuditNodeBuilder<B,N> build() {
             node.setFormFieldPermissions(this.permissions);
             return baseBuilder;
         }

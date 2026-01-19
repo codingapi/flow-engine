@@ -4,12 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.node.EndNode;
-import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.NodeFactory;
-import com.codingapi.flow.node.StartNode;
-import com.codingapi.flow.script.node.OperatorMatchScript;
+import com.codingapi.flow.node.*;
+import com.codingapi.flow.node.audit.EndNode;
+import com.codingapi.flow.node.audit.StartNode;
+import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.script.node.OperatorMatchScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.AllArgsConstructor;
@@ -270,7 +270,9 @@ public class Workflow {
         }
 
         for (IFlowNode node : nodes) {
-            node.verify(form);
+            if (node instanceof IAuditNode) {
+                ((IAuditNode) node).verify(form);
+            }
         }
     }
 
@@ -308,21 +310,46 @@ public class Workflow {
                 .map(edge -> nodes.stream().filter(node1 -> node1.getId().equals(edge.getTo())).findFirst().get()).toList();
     }
 
-    public List<IFlowNode> nextNodes(FlowSession session) {
+    public List<IAuditNode> nextNodes(FlowSession session) {
         List<IFlowNode> nodeList = edgeNext(session.getCurrentNode());
-        return nodeList.stream().filter(node -> node.match(session)).toList();
+        return this.loadNextAuditNodes(nodeList, session);
     }
 
 
-    public IFlowNode getNode(String nodeId) {
-        return nodes.stream().filter(node -> node.getId().equals(nodeId)).findFirst().orElse(null);
+    private List<IAuditNode> loadNextAuditNodes(List<IFlowNode> nodeList, FlowSession session) {
+        List<IAuditNode> auditNodeList = new ArrayList<>();
+        for (IFlowNode node : nodeList) {
+            if (node instanceof IAuditNode) {
+                auditNodeList.add((IAuditNode) node);
+            }
+            if (node instanceof IConditionNode) {
+                if (((IConditionNode) node).match(session)) {
+                    List<IFlowNode> nextNodes = this.edgeNext(node);
+                    auditNodeList.addAll(this.loadNextAuditNodes(nextNodes, session));
+                }
+            }
+        }
+        return auditNodeList;
     }
 
-    public IFlowNode getStartNode() {
-        return nodes.stream().filter(node -> node instanceof StartNode).findFirst().orElse(null);
+
+    public IAuditNode getAuditNode(String nodeId) {
+        return nodes.stream()
+                .filter(node -> node instanceof IAuditNode)
+                .filter(node -> node.getId().equals(nodeId))
+                .map(node -> (IAuditNode) node)
+                .findFirst().orElse(null);
     }
 
-    public IFlowNode getEndNode() {
-        return nodes.stream().filter(node -> node instanceof EndNode).findFirst().orElse(null);
+    public IAuditNode getStartNode() {
+        return nodes.stream().filter(node -> node instanceof StartNode)
+                .map(node -> (IAuditNode) node)
+                .findFirst().orElse(null);
+    }
+
+    public IAuditNode getEndNode() {
+        return nodes.stream().filter(node -> node instanceof EndNode)
+                .map(node ->  (IAuditNode) node)
+                .findFirst().orElse(null);
     }
 }

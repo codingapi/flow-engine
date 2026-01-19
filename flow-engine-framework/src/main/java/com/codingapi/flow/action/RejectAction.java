@@ -1,5 +1,6 @@
 package com.codingapi.flow.action;
 
+import com.codingapi.flow.node.IAuditNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.action.RejectActionScript;
@@ -49,11 +50,11 @@ public class RejectAction extends BaseAction {
     @Override
     public List<FlowRecord> trigger(FlowSession flowSession, FlowRecord currentRecord) {
         RejectActionScript.RejectResult rejectResult = script.execute(flowSession);
-        IFlowNode currentNode = null;
+        IAuditNode currentNode = null;
         // 返回指定节点
         if (rejectResult.isReturnNode()) {
             String nodeId = rejectResult.getNodeId();
-            currentNode = flowSession.getWorkflow().getNode(nodeId);
+            currentNode = flowSession.getWorkflow().getAuditNode(nodeId);
         }
         // 流程结束（非正常）
         if (rejectResult.isTerminate()) {
@@ -66,7 +67,7 @@ public class RejectAction extends BaseAction {
             if (preRecord == null) {
                 throw new IllegalArgumentException("preRecord is null");
             }
-            currentNode = flowSession.getWorkflow().getNode(preRecord.getNodeId());
+            currentNode = flowSession.getWorkflow().getAuditNode(preRecord.getNodeId());
         }
         if (currentNode == null) {
             throw new IllegalArgumentException("currentNode is null");

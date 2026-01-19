@@ -1,8 +1,10 @@
-package com.codingapi.flow.node;
+package com.codingapi.flow.node.audit;
 
+import com.codingapi.flow.action.DefaultAction;
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.PassAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
+import com.codingapi.flow.node.builder.AuditNodeBuilder;
+import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.script.node.OperatorLoadScript;
@@ -14,12 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 延迟节点
+ * 路由分支节点
  */
-public class DelayNode extends BaseNode {
+public class RouterBranchNode extends BaseAuditNode {
 
-    public static final String NODE_TYPE = "delay";
-    public static final String DEFAULT_NAME = "延迟节点";
+    public static final String NODE_TYPE = "router_branch";
+    public static final String DEFAULT_NAME = "路由节点";
 
     @Override
     public String getType() {
@@ -27,11 +29,11 @@ public class DelayNode extends BaseNode {
     }
 
 
-    public DelayNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
+    public RouterBranchNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
         super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, actions, nodeStrategies);
     }
 
-    protected DelayNode() {
+    public RouterBranchNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(), defaultActions(), defaultStrategies());
     }
 
@@ -48,21 +50,21 @@ public class DelayNode extends BaseNode {
 
     private static List<IFlowAction> defaultActions() {
         List<IFlowAction> actions = new ArrayList<>();
-        actions.add(new PassAction());
+        actions.add(new DefaultAction());
         return actions;
     }
 
-    public static DelayNode formMap(Map<String, Object> map) {
-        return BaseNode.formMap(map, DelayNode.class);
+    public static RouterBranchNode formMap(Map<String, Object> map) {
+        return BaseAuditNode.formMap(map, RouterBranchNode.class);
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends BaseBuilder<Builder,DelayNode> {
+    public static class Builder extends AuditNodeBuilder<Builder,RouterBranchNode> {
         public Builder() {
-            super(new DelayNode());
+            super(new RouterBranchNode());
         }
     }
 }

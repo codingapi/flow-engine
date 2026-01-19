@@ -7,6 +7,7 @@ import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
+import com.codingapi.flow.node.IAuditNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -55,7 +56,7 @@ public class FlowCreateService {
         FormData formData = new FormData(workflow.getForm());
         formData.reset(request.getFormData());
 
-        IFlowNode currentNode = workflow.getStartNode();
+        IAuditNode currentNode = workflow.getStartNode();
         FlowSession session = new FlowSession(currentOperator, workflow.getForm(), workflow, currentNode, formData, workflowBackup.getId());
 
         OperatorManager currentOperators = currentNode.operators(session);

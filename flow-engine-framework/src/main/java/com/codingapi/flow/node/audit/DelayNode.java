@@ -1,8 +1,10 @@
-package com.codingapi.flow.node;
+package com.codingapi.flow.node.audit;
 
-import com.codingapi.flow.action.DefaultAction;
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.PassAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
+import com.codingapi.flow.node.builder.AuditNodeBuilder;
+import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.script.node.OperatorLoadScript;
@@ -14,23 +16,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 子流程
+ * 延迟节点
  */
-public class SubProcessNode extends BaseNode {
+public class DelayNode extends BaseAuditNode {
 
-    public static final String NODE_TYPE = "sub_process";
-    public static final String DEFAULT_NAME = "子流程";
+    public static final String NODE_TYPE = "delay";
+    public static final String DEFAULT_NAME = "延迟节点";
 
     @Override
     public String getType() {
         return NODE_TYPE;
     }
 
-    public SubProcessNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
+
+    public DelayNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
         super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, actions, nodeStrategies);
     }
 
-    protected SubProcessNode() {
+    public DelayNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(), defaultActions(), defaultStrategies());
     }
 
@@ -47,21 +50,21 @@ public class SubProcessNode extends BaseNode {
 
     private static List<IFlowAction> defaultActions() {
         List<IFlowAction> actions = new ArrayList<>();
-        actions.add(new DefaultAction());
+        actions.add(new PassAction());
         return actions;
     }
 
-    public static SubProcessNode formMap(Map<String, Object> map) {
-        return BaseNode.formMap(map, SubProcessNode.class);
+    public static DelayNode formMap(Map<String, Object> map) {
+        return BaseAuditNode.formMap(map, DelayNode.class);
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends BaseBuilder<Builder,SubProcessNode> {
+    public static class Builder extends AuditNodeBuilder<Builder,DelayNode> {
         public Builder() {
-            super(new SubProcessNode());
+            super(new DelayNode());
         }
     }
 }

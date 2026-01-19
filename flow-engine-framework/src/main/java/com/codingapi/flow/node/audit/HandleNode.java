@@ -1,8 +1,10 @@
-package com.codingapi.flow.node;
+package com.codingapi.flow.node.audit;
 
-import com.codingapi.flow.action.DefaultAction;
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.PassAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
+import com.codingapi.flow.node.builder.AuditNodeBuilder;
+import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.script.node.OperatorLoadScript;
@@ -14,23 +16,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 触发节点
+ * 办理节点
  */
-public class TriggerNode extends BaseNode {
+public class HandleNode extends BaseAuditNode {
 
-    public static final String NODE_TYPE = "trigger";
-    public static final String DEFAULT_NAME = "触发节点";
+    public static final String NODE_TYPE = "handle";
+    public static final String DEFAULT_NAME = "办理节点";
 
     @Override
     public String getType() {
         return NODE_TYPE;
     }
 
-    public TriggerNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
+
+    public HandleNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
         super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, actions, nodeStrategies);
     }
 
-    protected TriggerNode() {
+    public HandleNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(), defaultActions(), defaultStrategies());
     }
 
@@ -47,21 +50,21 @@ public class TriggerNode extends BaseNode {
 
     private static List<IFlowAction> defaultActions() {
         List<IFlowAction> actions = new ArrayList<>();
-        actions.add(new DefaultAction());
+        actions.add(new PassAction());
         return actions;
     }
 
-    public static TriggerNode formMap(Map<String, Object> map) {
-        return BaseNode.formMap(map, TriggerNode.class);
+    public static HandleNode formMap(Map<String, Object> map) {
+        return BaseAuditNode.formMap(map, HandleNode.class);
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends BaseBuilder<Builder,TriggerNode> {
+    public static class Builder extends AuditNodeBuilder<Builder,HandleNode> {
         public Builder() {
-            super(new TriggerNode());
+            super(new HandleNode());
         }
     }
 }

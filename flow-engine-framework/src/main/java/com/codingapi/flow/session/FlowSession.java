@@ -2,6 +2,7 @@ package com.codingapi.flow.session;
 
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.node.IAuditNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.workflow.Workflow;
@@ -30,7 +31,7 @@ public class FlowSession {
     /**
      * 当前流程节点
      */
-    private final IFlowNode currentNode;
+    private final IAuditNode currentNode;
 
     /**
      * 当前流程表单数据
@@ -47,11 +48,11 @@ public class FlowSession {
     private final FlowAdvice advice;
 
 
-    public FlowSession(IFlowOperator currentOperator, FormMeta formMeta, Workflow workflow, IFlowNode currentNode, FormData formData, long backupId) {
+    public FlowSession(IFlowOperator currentOperator, FormMeta formMeta, Workflow workflow, IAuditNode currentNode, FormData formData, long backupId) {
         this(currentOperator, formMeta, workflow, currentNode, formData, backupId, FlowAdvice.nullFlowAdvice());
     }
 
-    public FlowSession(IFlowOperator currentOperator, FormMeta formMeta, Workflow workflow, IFlowNode currentNode, FormData formData, long backupId, FlowAdvice advice) {
+    public FlowSession(IFlowOperator currentOperator, FormMeta formMeta, Workflow workflow, IAuditNode currentNode, FormData formData, long backupId, FlowAdvice advice) {
         this.currentOperator = currentOperator;
         this.formMeta = formMeta;
         this.workflow = workflow;
@@ -91,7 +92,7 @@ public class FlowSession {
         return currentNode.getType();
     }
 
-    public List<IFlowNode> nextNodes() {
+    public List<IAuditNode> nextNodes() {
         return workflow.nextNodes(this);
     }
 
@@ -99,7 +100,7 @@ public class FlowSession {
         return formData.getDataBody().get(fieldName);
     }
 
-    public FlowSession updateSession(IFlowNode currentNode) {
+    public FlowSession updateSession(IAuditNode currentNode) {
         return new FlowSession(currentOperator, formMeta, workflow, currentNode, formData, backupId, advice);
     }
 

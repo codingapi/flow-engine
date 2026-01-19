@@ -1,5 +1,6 @@
 package com.codingapi.flow.action;
 
+import com.codingapi.flow.node.IAuditNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.record.FlowRecord;
@@ -62,7 +63,7 @@ public class PassAction extends BaseAction {
         List<FlowRecord> records = new ArrayList<>();
         if (currentRecord.isReturnRecord()) {
             // 退回后的流程重新提交
-            IFlowNode currentNode = flowSession.getWorkflow().getNode(currentRecord.getReturnNodeId());
+            IAuditNode currentNode = flowSession.getWorkflow().getAuditNode(currentRecord.getReturnNodeId());
             StrategyManager strategyManager = currentNode.strategies();
             // 是否退回到退回节点
             if (strategyManager.isResume()) {
@@ -71,8 +72,8 @@ public class PassAction extends BaseAction {
                 records.addAll(nextRecords);
             }
         } else {
-            List<IFlowNode> nextNodes = flowSession.nextNodes();
-            for (IFlowNode node : nextNodes) {
+            List<IAuditNode> nextNodes = flowSession.nextNodes();
+            for (IAuditNode node : nextNodes) {
                 //TODO 如果是条件节点，则自动完成当前记录，并构建下一个记录
                 List<FlowRecord> nextRecords = this.generateNextRecords(node, flowSession.updateSession(node), currentRecord);
                 records.addAll(nextRecords);
