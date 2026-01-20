@@ -3,6 +3,10 @@ package com.codingapi.flow.node;
 import com.codingapi.flow.action.*;
 import com.codingapi.flow.action.factory.FlowActionFactory;
 import com.codingapi.flow.error.ErrorThrow;
+import com.codingapi.flow.event.FlowRecordDoneEvent;
+import com.codingapi.flow.event.FlowRecordFinishEvent;
+import com.codingapi.flow.event.FlowRecordTodoEvent;
+import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
@@ -11,13 +15,20 @@ import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.INodeStrategy;
+import com.codingapi.flow.strategy.MultiOperatorAuditStrategy;
 import com.codingapi.flow.strategy.NodeStrategyFactory;
+import com.codingapi.flow.utils.RandomUtils;
+import com.codingapi.flow.workflow.Workflow;
+import com.codingapi.springboot.framework.event.EventPusher;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -220,6 +231,116 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
     @Override
     public StrategyManager strategies() {
         return new StrategyManager(nodeStrategies);
+    }
+
+
+    @Override
+    public void execute(FlowSession session, FlowRecordRepository flowRecordRepository){
+        List<IFlowEvent> flowEvents = new ArrayList<>();
+        FlowRecord flowRecord = session.getCurrentRecord();
+        IFlowAction flowAction = session.getCurrentAction();
+        List<FlowRecord> currentRecords = session.getCurrentNodeRecords();
+
+        // 判断当前节点是否已经完成
+        boolean done = this.isDone(session);
+        if (done) {
+            List<FlowRecord> records = flowAction.trigger(session);
+            if (!records.isEmpty()) {
+                for (FlowRecord record : records) {
+                    if (record.isShow()) {
+                        flowEvents.add(new FlowRecordTodoEvent(record));
+                    }
+                }
+            }
+            flowRecord.update(session.getFormData().toMapData(), session.getAdvice().getAdvice(), session.getAdvice().getSignKey(), true);
+            // 判断是否结束
+            if (records.size() == 1) {
+                FlowRecord record = records.get(0);
+                if (record.isNodeType(EndNode.NODE_TYPE)) {
+                    boolean flowFinish = flowAction instanceof PassAction;
+                    // 添加当前节点到记录中
+                    records.add(flowRecord);
+                    // 添加历史记录到记录中
+                    List<FlowRecord> historyRecords = flowRecordRepository.findRecordsByProcessId(flowRecord.getProcessId());
+                    records.addAll(historyRecords);
+                    // 设置状态为完成
+                    records.forEach(item -> {
+                        item.finish(flowFinish);
+                    });
+
+                    // 流程是否正常结束
+                    if (flowFinish) {
+                        flowEvents.add(new FlowRecordFinishEvent(record));
+                    }
+                }
+                // 添加流程结束事件
+                flowEvents.add(new FlowRecordDoneEvent(record));
+            }
+            flowRecordRepository.saveAll(records);
+        } else {
+            // 判断是否为串行多操作者
+            if (this.strategies().isSequenceMultiOperator()) {
+                int nextRecordNodeOrder = flowRecord.getNodeOrder() + 1;
+                FlowRecord nextRecord = currentRecords.stream().filter(record -> record.getNodeOrder() == nextRecordNodeOrder).findFirst().orElse(null);
+                if (nextRecord != null) {
+                    // 展示下一个审批人的待办
+                    nextRecord.show();
+                    flowEvents.add(new FlowRecordTodoEvent(nextRecord));
+                    flowRecordRepository.save(nextRecord);
+                }
+            }
+            flowRecord.update(session.getFormData().toMapData(), session.getAdvice().getAdvice(), session.getAdvice().getSignKey(), false);
+            flowRecordRepository.save(flowRecord);
+        }
+
+        // 推送待办事件
+        for (IFlowEvent event : flowEvents) {
+            EventPusher.push(event);
+        }
+
+    }
+
+
+    public boolean isDone(FlowSession session) {
+        List<FlowRecord> currentRecords = session.getCurrentNodeRecords();
+        FlowRecord currentRecord = session.getCurrentRecord();
+        // 多人审批
+        if (currentRecords.size() > 1) {
+            StrategyManager strategyManager = this.strategies();
+            MultiOperatorAuditStrategy.Type multiOperatorAuditStrategyType = strategyManager.getMultiOperatorAuditStrategyType();
+            // 顺序审批
+            if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.SEQUENCE) {
+                int currentOrder = currentRecord.getNodeOrder();
+                int maxNodeOrder = currentRecords.size() - 1;
+                return currentOrder >= maxNodeOrder;
+            }
+            // 或签
+            if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.ANY) {
+                return true;
+            }
+            // 并签
+            if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.MERGE) {
+                float percent = strategyManager.getMultiOperatorAuditMergePercent();
+                long total = currentRecords.size();
+                // 尚未办理的数量为所有待办数-1，1是当前办理的这条记录
+                long todoCount = currentRecords.stream().filter(FlowRecord::isTodo).count() - 1;
+                long doneCount = total - todoCount;
+                return doneCount >= total * percent;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void verifySession(FlowSession session) {
+        FlowRecord flowRecord = session.getCurrentRecord();
+        Workflow workflow = session.getWorkflow();
+        // 数据验证
+        FieldPermissionManager fieldPermissionManager = this.formFieldsPermissions();
+        fieldPermissionManager.verifyFormData(workflow.getForm(),flowRecord.getFormData(),session.getFormData().toMapData());
+
+        // 节点请求验证
+        this.verifyFlowAdvice(session.getAdvice());
     }
 
     @Override

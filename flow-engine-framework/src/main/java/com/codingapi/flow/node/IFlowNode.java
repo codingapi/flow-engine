@@ -1,6 +1,7 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.session.FlowSession;
 
 import java.util.List;
@@ -44,4 +45,13 @@ public interface IFlowNode {
      */
     List<IFlowNode> nextNodes(FlowSession session);
 
+    /**
+     * 执行节点
+     */
+    void execute(FlowSession session, FlowRecordRepository flowRecordRepository);
+
+    /**
+     * 节点验证会话
+     */
+    void verifySession(FlowSession session);
 }

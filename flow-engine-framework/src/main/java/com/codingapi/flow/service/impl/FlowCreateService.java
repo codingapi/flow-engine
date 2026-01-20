@@ -57,7 +57,7 @@ public class FlowCreateService {
         formData.reset(request.getFormData());
 
         IAuditNode currentNode = workflow.getStartNode();
-        FlowSession session = new FlowSession(currentOperator, workflow.getForm(), workflow, currentNode, formData, workflowBackup.getId());
+        FlowSession session = FlowSession.startSession(currentOperator, workflow, currentNode, formData, workflowBackup.getId());
 
         OperatorManager currentOperators = currentNode.operators(session);
         if (!currentOperators.match(currentOperator)) {

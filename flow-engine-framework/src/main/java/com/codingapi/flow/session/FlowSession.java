@@ -1,10 +1,11 @@
 package com.codingapi.flow.session;
 
+import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormData;
-import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IAuditNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Getter;
 
@@ -21,17 +22,28 @@ public class FlowSession {
      */
     private final IFlowOperator currentOperator;
     /**
-     * 当前流程表单
-     */
-    private final FormMeta formMeta;
-    /**
      * 当前流程设计
      */
     private final Workflow workflow;
     /**
      * 当前流程节点
      */
-    private final IAuditNode currentNode;
+    private final IFlowNode currentNode;
+
+    /**
+     * 当前流程动作
+     */
+    private final IFlowAction currentAction;
+
+    /**
+     * 当前审批流程记录
+     */
+    private final FlowRecord currentRecord;
+
+    /**
+     * 当前节点的流程记录
+     */
+    private final List<FlowRecord> currentNodeRecords;
 
     /**
      * 当前流程表单数据
@@ -48,32 +60,41 @@ public class FlowSession {
     private final FlowAdvice advice;
 
 
-    public FlowSession(IFlowOperator currentOperator, FormMeta formMeta, Workflow workflow, IAuditNode currentNode, FormData formData, long backupId) {
-        this(currentOperator, formMeta, workflow, currentNode, formData, backupId, FlowAdvice.nullFlowAdvice());
-    }
-
-    public FlowSession(IFlowOperator currentOperator, FormMeta formMeta, Workflow workflow, IAuditNode currentNode, FormData formData, long backupId, FlowAdvice advice) {
+    public FlowSession(IFlowOperator currentOperator,
+                       Workflow workflow,
+                       IFlowNode currentNode,
+                       IFlowAction currentAction,
+                       FormData formData,
+                       FlowRecord currentRecord,
+                       List<FlowRecord> currentNodeRecords,
+                       long backupId,
+                       FlowAdvice advice) {
         this.currentOperator = currentOperator;
-        this.formMeta = formMeta;
         this.workflow = workflow;
+        this.currentAction = currentAction;
         this.currentNode = currentNode;
+        this.currentRecord = currentRecord;
+        this.currentNodeRecords = currentNodeRecords;
         this.formData = formData;
         this.backupId = backupId;
         this.advice = advice;
     }
+
+
+    public static FlowSession startSession(IFlowOperator currentOperator,
+                                      Workflow workflow,
+                                      IAuditNode currentNode,
+                                      FormData formData,
+                                      long backupId) {
+        return new FlowSession(currentOperator, workflow, currentNode, null,formData, null,null, backupId, new FlowAdvice());
+    }
+
 
     /**
      * 获取流程的创建者
      */
     public IFlowOperator getCreatedOperator() {
         return workflow.getCreatedOperator();
-    }
-
-    /**
-     * 获取流程的开始节点
-     */
-    public IFlowNode getStartNode() {
-        return workflow.getStartNode();
     }
 
     public String getWorkCode() {
@@ -101,10 +122,10 @@ public class FlowSession {
     }
 
     public FlowSession updateSession(IAuditNode currentNode) {
-        return new FlowSession(currentOperator, formMeta, workflow, currentNode, formData, backupId, advice);
+        return new FlowSession(currentOperator, workflow, currentNode,currentAction, formData,currentRecord, currentNodeRecords, backupId, advice);
     }
 
     public FlowSession updateSession(IFlowOperator currentOperator) {
-        return new FlowSession(currentOperator, formMeta, workflow, currentNode, formData, backupId, advice);
+        return new FlowSession(currentOperator, workflow, currentNode,currentAction, formData,currentRecord, currentNodeRecords, backupId, advice);
     }
 }

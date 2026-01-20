@@ -1,6 +1,9 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.branch.RouterBranchNode;
+import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.AllArgsConstructor;
@@ -8,6 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 public abstract class BaseFlowNode implements IFlowNode {
@@ -34,5 +38,21 @@ public abstract class BaseFlowNode implements IFlowNode {
         }else {
             return workflow.edgeNext(this);
         }
+    }
+
+
+    @Override
+    public void verify(FormMeta form) {
+
+    }
+
+    @Override
+    public void execute(FlowSession session, FlowRecordRepository flowRecordRepository) {
+
+    }
+
+    @Override
+    public void verifySession(FlowSession session) {
+
     }
 }

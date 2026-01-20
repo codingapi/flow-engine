@@ -48,7 +48,8 @@ public class RejectAction extends BaseAction {
     }
 
     @Override
-    public List<FlowRecord> trigger(FlowSession flowSession, FlowRecord currentRecord) {
+    public List<FlowRecord> trigger(FlowSession flowSession) {
+        FlowRecord currentRecord = flowSession.getCurrentRecord();
         RejectActionScript.RejectResult rejectResult = script.execute(flowSession);
         IAuditNode currentNode = null;
         // 返回指定节点
