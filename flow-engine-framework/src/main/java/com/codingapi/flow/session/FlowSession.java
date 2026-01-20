@@ -81,11 +81,12 @@ public class FlowSession {
 
 
     public static FlowSession startSession(IFlowOperator currentOperator,
-                                      Workflow workflow,
-                                      IFlowNode currentNode,
-                                      FormData formData,
-                                      long backupId) {
-        return new FlowSession(currentOperator, workflow, currentNode, null,formData, null,null, backupId, new FlowAdvice());
+                                           Workflow workflow,
+                                           IFlowNode currentNode,
+                                           IFlowAction currentAction,
+                                           FormData formData,
+                                           long backupId) {
+        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, null, null, backupId, new FlowAdvice());
     }
 
 
@@ -125,10 +126,10 @@ public class FlowSession {
     }
 
     public FlowSession updateSession(IFlowNode currentNode) {
-        return new FlowSession(currentOperator, workflow, currentNode,currentAction, formData,currentRecord, currentNodeRecords, backupId, advice);
+        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
     }
 
     public FlowSession updateSession(IFlowOperator currentOperator) {
-        return new FlowSession(currentOperator, workflow, currentNode,currentAction, formData,currentRecord, currentNodeRecords, backupId, advice);
+        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
     }
 }

@@ -1,11 +1,11 @@
 package com.codingapi.flow.node;
 
-import com.codingapi.flow.action.*;
-import com.codingapi.flow.action.factory.FlowActionFactory;
+import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.PassAction;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.form.permission.PermissionType;
+import com.codingapi.flow.node.builder.IFormFieldPermissionsNode;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.node.manager.OperatorManager;
@@ -19,12 +19,10 @@ import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.INodeStrategy;
 import com.codingapi.flow.strategy.MultiOperatorAuditStrategy;
-import com.codingapi.flow.strategy.NodeStrategyFactory;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -32,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
+public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode, IFormFieldPermissionsNode {
 
     public static final String DEFAULT_VIEW = "default";
 
@@ -71,7 +69,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     private List<INodeStrategy> nodeStrategies;
 
 
-    public BaseAuditNode(String id, String name,List<IFlowAction> actions, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldPermissions, List<INodeStrategy> nodeStrategies) {
+    public BaseAuditNode(String id, String name, List<IFlowAction> actions, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldPermissions, List<INodeStrategy> nodeStrategies) {
         super(id, name, actions);
         this.view = view;
         this.operatorScript = operatorScript;
@@ -97,51 +95,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         return map;
     }
 
-    @SneakyThrows
-    @SuppressWarnings("unchecked")
-    public static <T extends BaseAuditNode> T formMap(Map<String, Object> map, Class<T> clazz) {
-        T node = clazz.getDeclaredConstructor().newInstance();
-        node.setId((String) map.get("id"));
-        node.setName((String) map.get("name"));
-        node.setView((String) map.get("view"));
-        node.setOperatorScript((String) map.get("operatorScript"));
-        node.setNodeTitleScript((String) map.get("nodeTitleScript"));
-        node.setErrorTriggerScript((String) map.get("errorTriggerScript"));
-        List<Map<String, Object>> permissions = (List<Map<String, Object>>) map.get("formFieldsPermissions");
-        if (permissions != null) {
-            List<FormFieldPermission> permissionList = new ArrayList<>();
-            for (Map<String, Object> item : permissions) {
-                FormFieldPermission permission = new FormFieldPermission();
-                permission.setFormCode((String) item.get("formCode"));
-                permission.setFieldName((String) item.get("fieldName"));
-                permission.setType(PermissionType.valueOf((String) item.get("type")));
-                permissionList.add(permission);
-            }
-            node.setFormFieldPermissions(permissionList);
-        }
 
-        List<Map<String, Object>> actions = (List<Map<String, Object>>) map.get("actions");
-        if (actions != null) {
-            List<IFlowAction> actionList = new ArrayList<>();
-            for (Map<String, Object> item : actions) {
-                IFlowAction action = FlowActionFactory.getInstance().createAction(item);
-                actionList.add(action);
-            }
-            node.setActions(actionList);
-        }
-
-        List<Map<String, Object>> nodeStrategies = (List<Map<String, Object>>) map.get("nodeStrategies");
-        if (nodeStrategies != null) {
-            List<INodeStrategy> strategyList = new ArrayList<>();
-            for (Map<String, Object> item : nodeStrategies) {
-                INodeStrategy strategy = NodeStrategyFactory.getInstance().createStrategy(item);
-                strategyList.add(strategy);
-            }
-            node.setNodeStrategies(strategyList);
-        }
-
-        return node;
-    }
 
     /**
      * 设置审批人配置脚本
@@ -171,7 +125,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     }
 
 
-    public FieldPermissionManager formFieldsPermissions() {
+    public FieldPermissionManager formFieldsPermissionsManager() {
         return new FieldPermissionManager(formFieldPermissions);
     }
 
@@ -200,8 +154,25 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     }
 
     public void verifyNode(FormMeta form) {
-        this.verifyFields();
-        FieldPermissionManager fieldPermissionManager = this.formFieldsPermissions();
+        if (!StringUtils.hasText(view)) {
+            throw new IllegalArgumentException("view can not be null");
+        }
+        if (!StringUtils.hasText(name)) {
+            throw new IllegalArgumentException("name can not be null");
+        }
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("id can not be null");
+        }
+        if (actions == null || actions.isEmpty()) {
+            throw new IllegalArgumentException("actions can not be null");
+        }
+        if (operatorScript == null) {
+            throw new IllegalArgumentException("operator can not be null");
+        }
+        if (nodeTitleScript == null) {
+            throw new IllegalArgumentException("nodeTitle can not be null");
+        }
+        FieldPermissionManager fieldPermissionManager = this.formFieldsPermissionsManager();
         fieldPermissionManager.verifyPermissions(form);
     }
 
@@ -301,20 +272,15 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
 
     @Override
     public void verifySession(FlowSession session) {
+        super.verifySession(session);
         FlowRecord flowRecord = session.getCurrentRecord();
         Workflow workflow = session.getWorkflow();
         // 数据验证
-        FieldPermissionManager fieldPermissionManager = this.formFieldsPermissions();
+        FieldPermissionManager fieldPermissionManager = this.formFieldsPermissionsManager();
         fieldPermissionManager.verifyFormData(workflow.getForm(), flowRecord.getFormData(), session.getFormData().toMapData());
 
-        // 节点请求验证
-        this.verifyDefaultFlowAdviceAction(session.getAdvice());
-    }
-
-    public void verifyDefaultFlowAdviceAction(FlowAdvice flowAdvice) {
-
+        FlowAdvice flowAdvice = session.getAdvice();
         IFlowAction flowAction = flowAdvice.getAction();
-        super.verifyDefaultFlowAdviceAction(flowAdvice);
 
         StrategyManager strategyManager = this.strategies();
         // 是否必须填写审批意见
@@ -334,24 +300,4 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         }
     }
 
-    private void verifyFields() {
-        if (!StringUtils.hasText(view)) {
-            throw new IllegalArgumentException("view can not be null");
-        }
-        if (!StringUtils.hasText(name)) {
-            throw new IllegalArgumentException("name can not be null");
-        }
-        if (!StringUtils.hasText(id)) {
-            throw new IllegalArgumentException("id can not be null");
-        }
-        if (actions == null || actions.isEmpty()) {
-            throw new IllegalArgumentException("actions can not be null");
-        }
-        if (operatorScript == null) {
-            throw new IllegalArgumentException("operator can not be null");
-        }
-        if (nodeTitleScript == null) {
-            throw new IllegalArgumentException("nodeTitle can not be null");
-        }
-    }
 }

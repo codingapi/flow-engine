@@ -5,6 +5,7 @@ import com.codingapi.flow.action.PassAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.node.builder.AuditNodeBuilder;
 import com.codingapi.flow.node.BaseAuditNode;
+import com.codingapi.flow.node.builder.NodeMapBuilder;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.script.node.OperatorLoadScript;
@@ -55,7 +56,7 @@ public class HandleNode extends BaseAuditNode {
     }
 
     public static HandleNode formMap(Map<String, Object> map) {
-        return BaseAuditNode.formMap(map, HandleNode.class);
+        return NodeMapBuilder.formMap(map, HandleNode.class);
     }
 
     public static Builder builder() {

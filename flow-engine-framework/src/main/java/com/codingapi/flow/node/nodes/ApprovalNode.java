@@ -7,6 +7,7 @@ import com.codingapi.flow.action.SaveAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.node.builder.AuditNodeBuilder;
 import com.codingapi.flow.node.BaseAuditNode;
+import com.codingapi.flow.node.builder.NodeMapBuilder;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.script.node.OperatorLoadScript;
@@ -60,7 +61,7 @@ public class ApprovalNode extends BaseAuditNode {
 
 
     public static ApprovalNode formMap(Map<String, Object> map) {
-        return BaseAuditNode.formMap(map, ApprovalNode.class);
+        return NodeMapBuilder.formMap(map, ApprovalNode.class);
     }
 
 

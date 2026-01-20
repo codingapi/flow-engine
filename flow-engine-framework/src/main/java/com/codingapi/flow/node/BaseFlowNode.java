@@ -6,10 +6,13 @@ import com.codingapi.flow.action.SaveAction;
 import com.codingapi.flow.action.TransferAction;
 import com.codingapi.flow.action.factory.FlowActionFactory;
 import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.node.builder.NodeMapBuilder;
 import com.codingapi.flow.node.manager.ActionManager;
+import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.workflow.Workflow;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -80,21 +83,12 @@ public abstract class BaseFlowNode implements IFlowNode {
 
 
     @SneakyThrows
-    @SuppressWarnings("unchecked")
     public static <T extends BaseFlowNode> T loadFromMap(Map<String, Object> map, Class<T> clazz) {
         T node = clazz.getDeclaredConstructor().newInstance();
         node.setId((String) map.get("id"));
         node.setName((String) map.get("name"));
         node.setOrder(Integer.parseInt((String) map.get("order")));
-        List<Map<String, Object>> actions = (List<Map<String, Object>>) map.get("actions");
-        if (actions != null) {
-            List<IFlowAction> actionList = new ArrayList<>();
-            for (Map<String, Object> item : actions) {
-                IFlowAction action = FlowActionFactory.getInstance().createAction(item);
-                actionList.add(action);
-            }
-            node.setActions(actionList);
-        }
+        node.setActions(NodeMapBuilder.loadActions(map));
         return node;
     }
 
@@ -111,7 +105,25 @@ public abstract class BaseFlowNode implements IFlowNode {
 
     @Override
     public void verifySession(FlowSession session) {
+        FlowAdvice flowAdvice = session.getAdvice();
 
+        IFlowAction flowAction = flowAdvice.getAction();
+        // 保存操作,不做检查
+        if (flowAction instanceof SaveAction) {
+            return;
+        }
+        // 转办操作
+        if (flowAction instanceof TransferAction) {
+            if (flowAdvice.getTransferOperators() == null || flowAdvice.getTransferOperators().isEmpty()) {
+                throw new IllegalArgumentException("transferOperators can not be null");
+            }
+        }
+        // 退回操作
+        if (flowAction instanceof ReturnAction) {
+            if (flowAdvice.getBackNode() == null) {
+                throw new IllegalArgumentException("backNode can not be null");
+            }
+        }
     }
 
     @Override
@@ -134,25 +146,4 @@ public abstract class BaseFlowNode implements IFlowNode {
         return new ActionManager(actions);
     }
 
-
-
-    public void verifyDefaultFlowAdviceAction(FlowAdvice flowAdvice) {
-        IFlowAction flowAction = flowAdvice.getAction();
-        // 保存操作,不做检查
-        if (flowAction instanceof SaveAction) {
-            return;
-        }
-        // 转办操作
-        if (flowAction instanceof TransferAction) {
-            if (flowAdvice.getTransferOperators() == null || flowAdvice.getTransferOperators().isEmpty()) {
-                throw new IllegalArgumentException("transferOperators can not be null");
-            }
-        }
-        // 退回操作
-        if (flowAction instanceof ReturnAction) {
-            if (flowAdvice.getBackNode() == null) {
-                throw new IllegalArgumentException("backNode can not be null");
-            }
-        }
-    }
 }

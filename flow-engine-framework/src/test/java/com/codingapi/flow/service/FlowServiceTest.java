@@ -7,13 +7,14 @@ import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.gateway.impl.UserGateway;
+import com.codingapi.flow.node.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.node.nodes.ApprovalNode;
-import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.node.nodes.BranchNodeBranchNode;
 import com.codingapi.flow.node.nodes.EndNode;
+import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
-import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
+import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
@@ -56,21 +57,25 @@ class FlowServiceTest {
 
         StartNode startNode = StartNode
                 .builder()
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.WRITE)
-                .addPermission("leave", "days", PermissionType.WRITE)
-                .addPermission("leave", "reason", PermissionType.WRITE)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         ApprovalNode approvalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .operatorScript("def run(request){return [$bind.getOperatorById(2)]}")
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.READ)
-                .addPermission("leave", "days", PermissionType.READ)
-                .addPermission("leave", "reason", PermissionType.READ)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.READ)
+                                .addPermission("leave", "days", PermissionType.READ)
+                                .addPermission("leave", "reason", PermissionType.READ)
+                                .build()
+                )
                 .build();
 
         EndNode endNode = EndNode.builder().build();
@@ -124,21 +129,25 @@ class FlowServiceTest {
 
         StartNode startNode = StartNode
                 .builder()
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.WRITE)
-                .addPermission("leave", "days", PermissionType.WRITE)
-                .addPermission("leave", "reason", PermissionType.WRITE)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         ApprovalNode approvalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .operatorScript("def run(request){return [$bind.getOperatorById(2)]}")
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.READ)
-                .addPermission("leave", "days", PermissionType.READ)
-                .addPermission("leave", "reason", PermissionType.READ)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.READ)
+                                .addPermission("leave", "days", PermissionType.READ)
+                                .addPermission("leave", "reason", PermissionType.READ)
+                                .build()
+                )
                 .build();
 
         EndNode endNode = EndNode.builder().build();
@@ -217,11 +226,13 @@ class FlowServiceTest {
 
         StartNode startNode = StartNode
                 .builder()
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.WRITE)
-                .addPermission("leave", "days", PermissionType.WRITE)
-                .addPermission("leave", "reason", PermissionType.WRITE)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         BranchNodeBranchNode departConditionNode = BranchNodeBranchNode.builder()
@@ -239,21 +250,25 @@ class FlowServiceTest {
         ApprovalNode departApprovalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .operatorScript("def run(request){return [$bind.getOperatorById(2)]}")
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.READ)
-                .addPermission("leave", "days", PermissionType.READ)
-                .addPermission("leave", "reason", PermissionType.READ)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         ApprovalNode bossApprovalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .operatorScript("def run(request){return [$bind.getOperatorById(3)]}")
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.READ)
-                .addPermission("leave", "days", PermissionType.READ)
-                .addPermission("leave", "reason", PermissionType.READ)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         EndNode endNode = EndNode.builder().build();
@@ -345,21 +360,25 @@ class FlowServiceTest {
 
         StartNode startNode = StartNode
                 .builder()
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.WRITE)
-                .addPermission("leave", "days", PermissionType.WRITE)
-                .addPermission("leave", "reason", PermissionType.WRITE)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         ApprovalNode approvalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .operatorScript("def run(request){return [$bind.getOperatorById(2)]}")
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.READ)
-                .addPermission("leave", "days", PermissionType.READ)
-                .addPermission("leave", "reason", PermissionType.READ)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         EndNode endNode = EndNode.builder().build();
