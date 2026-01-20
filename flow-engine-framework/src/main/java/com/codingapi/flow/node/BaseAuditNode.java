@@ -2,12 +2,7 @@ package com.codingapi.flow.node;
 
 import com.codingapi.flow.action.*;
 import com.codingapi.flow.action.factory.FlowActionFactory;
-import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.error.ErrorThrow;
-import com.codingapi.flow.event.FlowRecordDoneEvent;
-import com.codingapi.flow.event.FlowRecordFinishEvent;
-import com.codingapi.flow.event.FlowRecordTodoEvent;
-import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
@@ -15,7 +10,6 @@ import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
-import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
@@ -28,7 +22,6 @@ import com.codingapi.flow.strategy.MultiOperatorAuditStrategy;
 import com.codingapi.flow.strategy.NodeStrategyFactory;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
-import com.codingapi.springboot.framework.event.EventPusher;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -220,6 +213,14 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     @Override
     public boolean isContinueTrigger(FlowSession session) {
         return false;
+    }
+
+    @Override
+    public void fillNewRecord(FlowSession session, FlowRecord flowRecord) {
+        StrategyManager strategyManager = this.strategies();
+        flowRecord.setTitle(this.generateTitle(session));
+        flowRecord.setTimeoutTime(strategyManager.getTimeoutTime());
+        flowRecord.setMergeable(strategyManager.isMergeable());
     }
 
     @Override

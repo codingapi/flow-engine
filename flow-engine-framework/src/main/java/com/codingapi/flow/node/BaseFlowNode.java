@@ -91,6 +91,11 @@ public abstract class BaseFlowNode implements IFlowNode {
     }
 
     @Override
+    public void fillNewRecord(FlowSession session, FlowRecord flowRecord) {
+
+    }
+
+    @Override
     public List<FlowRecord> generateCurrentRecords(FlowSession session) {
         return List.of();
     }

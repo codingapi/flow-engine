@@ -1,6 +1,5 @@
 package com.codingapi.flow.record;
 
-import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +8,7 @@ import org.springframework.util.StringUtils;
 import java.util.Map;
 
 @Getter
+@Setter
 public class FlowRecord {
 
     // 待办、已办
@@ -160,7 +160,6 @@ public class FlowRecord {
         this.formData = flowSession.getFormData().toMapData();
         this.fromId = fromId;
         this.nodeOrder = nodeOrder;
-        this.title = ((BaseAuditNode)flowSession.getCurrentNode()).generateTitle(flowSession);
         this.processId = processId;
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
         this.recordState = SATE_RECORD_TODO;
@@ -171,10 +170,9 @@ public class FlowRecord {
         this.signKey = flowSession.getAdvice().getSignKey();
         this.flowState = SATE_FLOW_RUNNING;
         this.createTime = System.currentTimeMillis();
-        this.timeoutTime = ((BaseAuditNode)flowSession.getCurrentNode()).strategies().getTimeoutTime();
-        this.mergeable = ((BaseAuditNode)flowSession.getCurrentNode()).strategies().isMergeable();
         this.isInterfere = flowSession.getWorkflow().isInterfere();
         this.hidden = false;
+        flowSession.getCurrentNode().fillNewRecord(flowSession,this);
     }
 
     public void verify() {

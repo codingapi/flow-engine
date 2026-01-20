@@ -70,4 +70,10 @@ public interface IFlowNode {
      */
     boolean isDone(FlowSession session);
 
+    /**
+     * 填充流程记录
+     * @param session 会话
+     * @param flowRecord 流程记录
+     */
+    void fillNewRecord(FlowSession session,FlowRecord flowRecord);
 }
