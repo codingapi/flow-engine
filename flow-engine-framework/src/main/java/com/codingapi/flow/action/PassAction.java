@@ -1,11 +1,10 @@
 package com.codingapi.flow.action;
 
-import com.codingapi.flow.node.IAuditNode;
+import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.strategy.MultiOperatorAuditStrategy;
 import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
@@ -14,7 +13,7 @@ import java.util.Map;
 
 
 /**
- *   通过
+ * 通过
  */
 public class PassAction extends BaseAction {
 
@@ -31,29 +30,27 @@ public class PassAction extends BaseAction {
 
 
     @Override
-    public List<FlowRecord> trigger(FlowSession flowSession) {
+    public List<FlowRecord> generateRecords(FlowSession flowSession) {
         FlowRecord currentRecord = flowSession.getCurrentRecord();
         List<FlowRecord> records = new ArrayList<>();
         if (currentRecord.isReturnRecord()) {
             // 退回后的流程重新提交
-            IAuditNode currentNode = flowSession.getWorkflow().getAuditNode(currentRecord.getReturnNodeId());
+            BaseAuditNode currentNode = (BaseAuditNode)flowSession.getWorkflow().getFlowNode(currentRecord.getReturnNodeId());
             StrategyManager strategyManager = currentNode.strategies();
             // 是否退回到退回节点
             if (strategyManager.isResume()) {
                 FlowSession triggerSession = flowSession.updateSession(currentNode);
-                List<FlowRecord> nextRecords = this.generateNextRecords(currentNode, triggerSession.updateSession(currentNode), currentRecord);
+                List<FlowRecord> nextRecords = currentNode.generateNextRecords(triggerSession.updateSession(currentNode));
                 records.addAll(nextRecords);
             }
         } else {
-            List<IAuditNode> nextNodes = flowSession.nextNodes();
-            for (IAuditNode node : nextNodes) {
-                //TODO 如果是条件节点，则自动完成当前记录，并构建下一个记录
-                List<FlowRecord> nextRecords = this.generateNextRecords(node, flowSession.updateSession(node), currentRecord);
+            IFlowNode currentNode = flowSession.getCurrentNode();
+            List<FlowRecord> nextRecords = currentNode.generateNextRecords(flowSession);
+            if (!nextRecords.isEmpty()) {
                 records.addAll(nextRecords);
             }
         }
         return records;
     }
-
 
 }

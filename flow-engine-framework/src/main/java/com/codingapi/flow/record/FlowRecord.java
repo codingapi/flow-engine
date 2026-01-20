@@ -1,7 +1,6 @@
 package com.codingapi.flow.record;
 
-import com.codingapi.flow.node.IAuditNode;
-import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
 import lombok.Setter;
@@ -161,7 +160,7 @@ public class FlowRecord {
         this.formData = flowSession.getFormData().toMapData();
         this.fromId = fromId;
         this.nodeOrder = nodeOrder;
-        this.title = ((IAuditNode)flowSession.getCurrentNode()).generateTitle(flowSession);
+        this.title = ((BaseAuditNode)flowSession.getCurrentNode()).generateTitle(flowSession);
         this.processId = processId;
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
         this.recordState = SATE_RECORD_TODO;
@@ -172,8 +171,8 @@ public class FlowRecord {
         this.signKey = flowSession.getAdvice().getSignKey();
         this.flowState = SATE_FLOW_RUNNING;
         this.createTime = System.currentTimeMillis();
-        this.timeoutTime = ((IAuditNode)flowSession.getCurrentNode()).strategies().getTimeoutTime();
-        this.mergeable = ((IAuditNode)flowSession.getCurrentNode()).strategies().isMergeable();
+        this.timeoutTime = ((BaseAuditNode)flowSession.getCurrentNode()).strategies().getTimeoutTime();
+        this.mergeable = ((BaseAuditNode)flowSession.getCurrentNode()).strategies().isMergeable();
         this.isInterfere = flowSession.getWorkflow().isInterfere();
         this.hidden = false;
     }

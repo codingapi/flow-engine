@@ -1,8 +1,8 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.session.FlowSession;
 
 import java.util.List;
@@ -38,36 +38,31 @@ public interface IFlowNode {
      */
     void verifyNode(FormMeta form);
 
-
-    /**
-     * 获取下一个节点列表
-     * @param session 会话
-     * @return 下一个节点列表
-     */
-    List<IFlowNode> nextNodes(FlowSession session);
-
     /**
      * 执行节点
+     * @param session 会话
+     * @return true: 继续执行下一个节点
      */
-    void execute(FlowSession session, FlowRecordRepository flowRecordRepository);
+    boolean trigger(FlowSession session);
 
     /**
      * 节点验证会话
      */
     void verifySession(FlowSession session);
 
-    /**
-     * 节点是否继续
-     * @param session 会话
-     * @return 节点是否继续
-     */
-    boolean continueNode(FlowSession session);
-
 
     /**
-     * 生成下一个节点记录
+     * 构建当前节点下的流程记录
      * @param session 会话
-     * @return 下一个节点记录
+     * @return 流程记录
      */
     List<FlowRecord> generateNextRecords(FlowSession session);
+
+
+    /**
+     * 获取节点操作
+     * @return 节点操作
+     */
+    ActionManager actions();
+
 }

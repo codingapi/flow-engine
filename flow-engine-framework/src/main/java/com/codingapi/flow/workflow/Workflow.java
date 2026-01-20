@@ -4,17 +4,12 @@ import com.alibaba.fastjson.JSON;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.node.IAuditNode;
-import com.codingapi.flow.node.IBranchNode;
-import com.codingapi.flow.node.IConfigNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.audit.StartNode;
-import com.codingapi.flow.node.branch.RouterBranchNode;
 import com.codingapi.flow.node.fixed.EndNode;
 import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.script.node.OperatorMatchScript;
-import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -306,57 +301,24 @@ public class Workflow {
         }
     }
 
-
     public List<IFlowNode> nextNodes(IFlowNode node) {
         return edges.stream().filter(edge -> edge.getFrom().equals(node.getId()))
                 .map(edge -> nodes.stream().filter(item -> item.getId().equals(edge.getTo())).findFirst().get()).toList();
     }
 
-    public List<IAuditNode> generateNodes(FlowSession session) {
-        List<IFlowNode> nodeList = nextNodes(session.getCurrentNode());
-        return this.loadNextAuditNodes(nodeList, session);
-    }
-
-
-    private List<IAuditNode> loadNextAuditNodes(List<IFlowNode> nodeList, FlowSession session) {
-        List<IAuditNode> auditNodeList = new ArrayList<>();
-        for (IFlowNode node : nodeList) {
-            // 审批节点
-            if (node instanceof IAuditNode) {
-                auditNodeList.add((IAuditNode) node);
-            }
-            // 配置节点
-            if (node instanceof IConfigNode) {
-                ((IConfigNode) node).execute(session);
-            }
-            if (node instanceof IBranchNode) {
-                if (((IBranchNode) node).match(session)) {
-                    List<IFlowNode> nextNodes = node.nextNodes(session);
-                    auditNodeList.addAll(this.loadNextAuditNodes(nextNodes, session));
-                }
-            }
-        }
-        return auditNodeList;
-    }
-
-
-    public IAuditNode getAuditNode(String nodeId) {
+    public IFlowNode getFlowNode(String nodeId) {
         return nodes.stream()
-                .filter(node -> node instanceof IAuditNode)
                 .filter(node -> node.getId().equals(nodeId))
-                .map(node -> (IAuditNode) node)
                 .findFirst().orElse(null);
     }
 
-    public IAuditNode getStartNode() {
+    public IFlowNode getStartNode() {
         return nodes.stream().filter(node -> node instanceof StartNode)
-                .map(node -> (IAuditNode) node)
                 .findFirst().orElse(null);
     }
 
-    public IAuditNode getEndNode() {
+    public IFlowNode getEndNode() {
         return nodes.stream().filter(node -> node instanceof EndNode)
-                .map(node -> (IAuditNode) node)
                 .findFirst().orElse(null);
     }
 }

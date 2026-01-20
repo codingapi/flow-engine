@@ -1,7 +1,6 @@
 package com.codingapi.flow.action;
 
 
-import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 
@@ -36,12 +35,15 @@ public interface IFlowAction {
     /**
      * 执行动作
      */
-    List<FlowRecord> trigger(FlowSession flowSession);
+    List<FlowRecord> generateRecords(FlowSession flowSession);
 
     /**
      * 转换为map
      */
     Map<String, Object> toMap();
+
+
+    void triggerNode(FlowSession flowSession);
 
     /**
      * 流程是否结束

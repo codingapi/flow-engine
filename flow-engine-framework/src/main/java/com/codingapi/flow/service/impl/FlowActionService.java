@@ -2,10 +2,10 @@ package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.backup.WorkflowBackup;
+import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
-import com.codingapi.flow.node.IAuditNode;
-import com.codingapi.flow.node.manager.FieldPermissionManager;
+import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.record.FlowRecord;
@@ -27,6 +27,9 @@ public class FlowActionService {
     private final WorkflowBackupRepository workflowBackupRepository;
 
     public void action() {
+        RepositoryContext.getInstance().setFlowRecordRepository(flowRecordRepository);
+        RepositoryContext.getInstance().setFlowOperatorGateway(flowOperatorGateway);
+
         request.verify();
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getAdvice().getOperatorId());
@@ -52,7 +55,7 @@ public class FlowActionService {
         }
 
         Workflow workflow = workflowBackup.toWorkflow();
-        IAuditNode currentNode = workflow.getAuditNode(flowRecord.getNodeId());
+        IFlowNode currentNode = workflow.getFlowNode(flowRecord.getNodeId());
         if (currentNode == null) {
             throw new IllegalArgumentException("currentNode not exist");
         }
@@ -64,14 +67,13 @@ public class FlowActionService {
         // 构建表单数据
         FormData formData = new FormData(workflow.getForm());
         formData.reset(request.getFormData());
-        FlowAdvice flowAdvice = request.toFlowAdvice(workflow,flowAction);
+        FlowAdvice flowAdvice = request.toFlowAdvice(workflow, flowAction);
         List<FlowRecord> currentRecords = flowRecordRepository.findRecordsByFromId(flowRecord.getFromId());
-        FlowSession session = new FlowSession(currentOperator, workflow, currentNode,flowAction, formData,flowRecord,currentRecords, workflowBackup.getId(),flowAdvice);
+        FlowSession session = new FlowSession(currentOperator, workflow, currentNode, flowAction, formData, flowRecord, currentRecords, workflowBackup.getId(), flowAdvice);
 
         currentNode.verifySession(session);
 
-
-        currentNode.execute(session,flowRecordRepository);
+        flowAction.triggerNode(session);
 
     }
 }

@@ -2,6 +2,7 @@ package com.codingapi.flow.node;
 
 import com.codingapi.flow.action.*;
 import com.codingapi.flow.action.factory.FlowActionFactory;
+import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordFinishEvent;
@@ -17,7 +18,6 @@ import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.script.node.OperatorLoadScript;
@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
+public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
 
     public static final String DEFAULT_VIEW = "default";
 
@@ -185,33 +185,27 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
     }
 
 
-    @Override
     public FieldPermissionManager formFieldsPermissions() {
         return new FieldPermissionManager(formFieldPermissions);
     }
 
-    @Override
     public ActionManager actions() {
         return new ActionManager(actions);
     }
 
 
-    @Override
     public OperatorManager operators(FlowSession flowSession) {
         return new OperatorManager(operatorScript.execute(flowSession));
     }
 
-    @Override
     public String generateTitle(FlowSession flowSession) {
         return nodeTitleScript.execute(flowSession);
     }
 
-    @Override
     public ErrorThrow errorTrigger(FlowSession flowSession) {
         return errorTriggerScript.execute(flowSession);
     }
 
-    @Override
     public void addAction(IFlowAction action) {
         if(this.actions == null){
             this.actions = new ArrayList<>();
@@ -219,7 +213,6 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
         this.actions.add(action);
     }
 
-    @Override
     public void verifyNode(FormMeta form) {
         this.verifyFields();
         if (!(this instanceof EndNode)) {
@@ -228,14 +221,13 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
         }
     }
 
-    @Override
     public StrategyManager strategies() {
         return new StrategyManager(nodeStrategies);
     }
 
 
     @Override
-    public void execute(FlowSession session, FlowRecordRepository flowRecordRepository){
+    public boolean trigger(FlowSession session){
         List<IFlowEvent> flowEvents = new ArrayList<>();
         FlowRecord flowRecord = session.getCurrentRecord();
         IFlowAction flowAction = session.getCurrentAction();
@@ -244,7 +236,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
         // 判断当前节点是否已经完成
         boolean done = this.isDone(session);
         if (done) {
-            List<FlowRecord> records = flowAction.trigger(session);
+            List<FlowRecord> records = flowAction.generateRecords(session);
             if (!records.isEmpty()) {
                 for (FlowRecord record : records) {
                     if (record.isShow()) {
@@ -261,7 +253,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
                     // 添加当前节点到记录中
                     records.add(flowRecord);
                     // 添加历史记录到记录中
-                    List<FlowRecord> historyRecords = flowRecordRepository.findRecordsByProcessId(flowRecord.getProcessId());
+                    List<FlowRecord> historyRecords = RepositoryContext.getInstance().findRecordsByProcessId(flowRecord.getProcessId());
                     records.addAll(historyRecords);
                     // 设置状态为完成
                     records.forEach(item -> {
@@ -276,7 +268,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
                 // 添加流程结束事件
                 flowEvents.add(new FlowRecordDoneEvent(record));
             }
-            flowRecordRepository.saveAll(records);
+            RepositoryContext.getInstance().saveRecords(records);
         } else {
             // 判断是否为串行多操作者
             if (this.strategies().isSequenceMultiOperator()) {
@@ -286,11 +278,11 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
                     // 展示下一个审批人的待办
                     nextRecord.show();
                     flowEvents.add(new FlowRecordTodoEvent(nextRecord));
-                    flowRecordRepository.save(nextRecord);
+                    RepositoryContext.getInstance().saveRecord(nextRecord);
                 }
             }
             flowRecord.update(session.getFormData().toMapData(), session.getAdvice().getAdvice(), session.getAdvice().getSignKey(), false);
-            flowRecordRepository.save(flowRecord);
+            RepositoryContext.getInstance().saveRecord(flowRecord);
         }
 
         // 推送待办事件
@@ -298,6 +290,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
             EventPusher.push(event);
         }
 
+        return false;
     }
 
 
@@ -329,6 +322,51 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
             }
         }
         return true;
+    }
+
+
+    /**
+     * 生成下一节点的记录
+     *
+     * @param session 触发会话
+     * @return 下一节节点的记录
+     */
+    @Override
+    public List<FlowRecord> generateNextRecords(FlowSession session) {
+        List<FlowRecord> records = new ArrayList<>();
+        FlowRecord currentRecord = session.getCurrentRecord();
+        OperatorManager operatorManager = this.operators(session);
+        List<IFlowOperator> operators = operatorManager.getOperators();
+        for (int order = 0; order < operators.size(); order++) {
+            IFlowOperator operator = operators.get(order);
+            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator), this.id, currentRecord.getProcessId(), currentRecord.getId(), order);
+            records.add(flowRecord);
+        }
+        if (operators.size() > 1) {
+            StrategyManager strategyManager = this.strategies();
+            MultiOperatorAuditStrategy.Type multiOperatorAuditStrategyType = strategyManager.getMultiOperatorAuditStrategyType();
+            // 如果是顺序审批，则隐藏掉后续的人员的审批记录
+            if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.SEQUENCE) {
+                for (int i = 1; i < records.size(); i++) {
+                    FlowRecord record = records.get(i);
+                    record.hidden();
+                }
+            }
+            // 如果是随机审批，则隐藏掉后续的人员的审批记录
+            if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.RANDOM_ONE) {
+                int index = RandomUtils.randomInt(operators.size());
+
+                List<FlowRecord> newRecords = new ArrayList<>();
+                for (FlowRecord record : records) {
+                    if (record.getNodeOrder() == index) {
+                        record.resetNodeOrder(0);
+                        newRecords.add(record);
+                    }
+                }
+                return newRecords;
+            }
+        }
+        return records;
     }
 
     @Override

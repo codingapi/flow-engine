@@ -2,7 +2,6 @@ package com.codingapi.flow.session;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormData;
-import com.codingapi.flow.node.IAuditNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
@@ -83,7 +82,7 @@ public class FlowSession {
 
     public static FlowSession startSession(IFlowOperator currentOperator,
                                       Workflow workflow,
-                                      IAuditNode currentNode,
+                                      IFlowNode currentNode,
                                       FormData formData,
                                       long backupId) {
         return new FlowSession(currentOperator, workflow, currentNode, null,formData, null,null, backupId, new FlowAdvice());
@@ -113,15 +112,15 @@ public class FlowSession {
         return currentNode.getType();
     }
 
-    public List<IAuditNode> nextNodes() {
-        return workflow.generateNodes(this);
+    public List<IFlowNode> nextNodes() {
+        return workflow.nextNodes(this.getCurrentNode());
     }
 
     public Object getFormData(String fieldName) {
         return formData.getDataBody().get(fieldName);
     }
 
-    public FlowSession updateSession(IAuditNode currentNode) {
+    public FlowSession updateSession(IFlowNode currentNode) {
         return new FlowSession(currentOperator, workflow, currentNode,currentAction, formData,currentRecord, currentNodeRecords, backupId, advice);
     }
 

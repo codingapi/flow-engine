@@ -39,7 +39,7 @@ public class BranchNodeBranchNode extends BaseBranchNode {
      * 匹配条件
      */
     @Override
-    public boolean match(FlowSession request) {
+    public boolean trigger(FlowSession request) {
         return conditionScript.execute(request);
     }
 

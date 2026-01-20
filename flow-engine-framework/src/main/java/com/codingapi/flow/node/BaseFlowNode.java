@@ -1,15 +1,14 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.node.branch.RouterBranchNode;
+import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.workflow.Workflow;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -30,24 +29,13 @@ public abstract class BaseFlowNode implements IFlowNode {
 
 
     @Override
-    public List<IFlowNode> nextNodes(FlowSession session) {
-        Workflow workflow = session.getWorkflow();
-        if(this instanceof RouterBranchNode routerBranchNode){
-            return routerBranchNode.matchRouters(session);
-        }else {
-            return workflow.nextNodes(this);
-        }
-    }
-
-
-    @Override
     public void verifyNode(FormMeta form) {
 
     }
 
     @Override
-    public void execute(FlowSession session, FlowRecordRepository flowRecordRepository) {
-
+    public boolean trigger(FlowSession session) {
+        return true;
     }
 
     @Override
@@ -56,12 +44,12 @@ public abstract class BaseFlowNode implements IFlowNode {
     }
 
     @Override
-    public boolean continueNode(FlowSession session) {
-        return true;
+    public List<FlowRecord> generateNextRecords(FlowSession session) {
+        return List.of();
     }
 
     @Override
-    public List<FlowRecord> generateNextRecords(FlowSession session) {
-        return List.of();
+    public ActionManager actions() {
+        return new ActionManager(new ArrayList<>());
     }
 }

@@ -1,14 +1,15 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.node.manager.ActionManager;
 import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class BaseConfigNode extends BaseFlowNode implements IConfigNode {
+public abstract class BaseConfigNode extends BaseFlowNode implements IFlowNode {
 
     public BaseConfigNode(String id, String name) {
         super(id, name);
@@ -28,10 +29,6 @@ public abstract class BaseConfigNode extends BaseFlowNode implements IConfigNode
         }
     }
 
-    @Override
-    public void execute(FlowSession flowSession) {
-
-    }
 
     @Override
     public Map<String, Object> toMap() {
@@ -51,4 +48,8 @@ public abstract class BaseConfigNode extends BaseFlowNode implements IConfigNode
         return node;
     }
 
+    @Override
+    public ActionManager actions() {
+        return new ActionManager(new ArrayList<>());
+    }
 }
