@@ -182,7 +182,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode, I
 
 
     @Override
-    public boolean isContinueTrigger(FlowSession session) {
+    public boolean continueTrigger(FlowSession session) {
         return false;
     }
 

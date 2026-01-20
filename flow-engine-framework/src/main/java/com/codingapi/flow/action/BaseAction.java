@@ -100,7 +100,7 @@ public abstract class BaseAction implements IFlowAction {
         List<IFlowNode> nextNodes = flowSession.nextNodes();
         for (IFlowNode node : nextNodes) {
             FlowSession triggerSession = flowSession.updateSession(node);
-            if (node.isContinueTrigger(triggerSession)) {
+            if (node.continueTrigger(triggerSession)) {
                 this.triggerNode(triggerSession);
             }
         }

@@ -49,7 +49,7 @@ public interface IFlowNode {
      * @param session 会话
      * @return true: 继续执行下一个节点
      */
-    boolean isContinueTrigger(FlowSession session);
+    boolean continueTrigger(FlowSession session);
 
     /**
      * 节点验证会话
