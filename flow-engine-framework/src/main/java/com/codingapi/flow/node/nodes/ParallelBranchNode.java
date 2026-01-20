@@ -1,9 +1,10 @@
-package com.codingapi.flow.node.branch;
+package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.node.BaseBranchNode;
 import com.codingapi.flow.node.builder.BranchNodeBuilder;
 import com.codingapi.flow.utils.RandomUtils;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -20,7 +21,7 @@ public class ParallelBranchNode extends BaseBranchNode {
     }
 
     public ParallelBranchNode(String id, String name) {
-        super(id, name);
+        super(id, name,new ArrayList<>());
     }
 
     public ParallelBranchNode() {

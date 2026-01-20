@@ -11,11 +11,11 @@ import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
-import com.codingapi.flow.node.fixed.EndNode;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
@@ -72,35 +72,28 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     private List<FormFieldPermission> formFieldPermissions;
 
     /**
-     * 节点操作
-     */
-    @Setter
-    private List<IFlowAction> actions;
-
-    /**
      * 节点策略
      */
     @Setter
     private List<INodeStrategy> nodeStrategies;
 
 
-    public BaseAuditNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name);
+    public BaseAuditNode(String id, String name, List<IFlowAction> actions, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldPermissions, List<INodeStrategy> nodeStrategies) {
+        super(id, name, actions);
         this.view = view;
         this.operatorScript = operatorScript;
         this.nodeTitleScript = nodeTitleScript;
         this.errorTriggerScript = errorTriggerScript;
         this.formFieldPermissions = formFieldPermissions;
-        this.actions = actions;
         this.nodeStrategies = nodeStrategies;
     }
 
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("view", view);
         map.put("name", name);
         map.put("id", id);
+        map.put("view", view);
         map.put("operatorScript", operatorScript.getScript());
         map.put("nodeTitleScript", nodeTitleScript.getScript());
         map.put("errorTriggerScript", errorTriggerScript.getScript());
@@ -207,7 +200,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     }
 
     public void addAction(IFlowAction action) {
-        if(this.actions == null){
+        if (this.actions == null) {
             this.actions = new ArrayList<>();
         }
         this.actions.add(action);
@@ -215,10 +208,8 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
 
     public void verifyNode(FormMeta form) {
         this.verifyFields();
-        if (!(this instanceof EndNode)) {
-            FieldPermissionManager fieldPermissionManager = this.formFieldsPermissions();
-            fieldPermissionManager.verifyPermissions(form);
-        }
+        FieldPermissionManager fieldPermissionManager = this.formFieldsPermissions();
+        fieldPermissionManager.verifyPermissions(form);
     }
 
     public StrategyManager strategies() {
@@ -227,7 +218,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
 
 
     @Override
-    public boolean trigger(FlowSession session){
+    public boolean trigger(FlowSession session) {
         List<IFlowEvent> flowEvents = new ArrayList<>();
         FlowRecord flowRecord = session.getCurrentRecord();
         IFlowAction flowAction = session.getCurrentAction();
@@ -375,7 +366,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         Workflow workflow = session.getWorkflow();
         // 数据验证
         FieldPermissionManager fieldPermissionManager = this.formFieldsPermissions();
-        fieldPermissionManager.verifyFormData(workflow.getForm(),flowRecord.getFormData(),session.getFormData().toMapData());
+        fieldPermissionManager.verifyFormData(workflow.getForm(), flowRecord.getFormData(), session.getFormData().toMapData());
 
         // 节点请求验证
         this.verifyFlowAdvice(session.getAdvice());
@@ -386,32 +377,32 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         IFlowAction flowAction = flowAdvice.getAction();
 
         // 保存操作,不做检查
-        if(flowAction instanceof SaveAction){
+        if (flowAction instanceof SaveAction) {
             return;
         }
 
         // 转办操作
-        if(flowAction instanceof TransferAction){
-            if(flowAdvice.getTransferOperators()==null || flowAdvice.getTransferOperators().isEmpty()){
+        if (flowAction instanceof TransferAction) {
+            if (flowAdvice.getTransferOperators() == null || flowAdvice.getTransferOperators().isEmpty()) {
                 throw new IllegalArgumentException("transferOperators can not be null");
             }
         }
 
         // 退回操作
-        if(flowAction instanceof ReturnAction){
-            if(flowAdvice.getBackNode()==null ){
+        if (flowAction instanceof ReturnAction) {
+            if (flowAdvice.getBackNode() == null) {
                 throw new IllegalArgumentException("backNode can not be null");
             }
         }
 
         // 是否必须填写审批意见
-        if(strategyManager.isEnableAdvice()){
-            if(!StringUtils.hasText(flowAdvice.getAdvice())){
+        if (strategyManager.isEnableAdvice()) {
+            if (!StringUtils.hasText(flowAdvice.getAdvice())) {
                 throw new IllegalArgumentException("advice can not be null");
             }
         }
         //  通过操作
-        if(flowAction instanceof PassAction) {
+        if (flowAction instanceof PassAction) {
             // 是否必须签名
             if (strategyManager.isEnableSignable()) {
                 if (!StringUtils.hasText(flowAdvice.getSignKey())) {

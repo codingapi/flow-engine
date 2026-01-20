@@ -1,5 +1,6 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormMeta;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,12 +8,13 @@ import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class BaseBranchNode extends BaseFlowNode implements IFlowNode {
 
-    public BaseBranchNode(String id, String name) {
-        super(id, name);
+    public BaseBranchNode(String id, String name, List<IFlowAction> actions) {
+        super(id, name,actions);
     }
 
     /**

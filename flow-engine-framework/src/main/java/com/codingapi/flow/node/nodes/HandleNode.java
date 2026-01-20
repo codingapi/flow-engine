@@ -1,18 +1,13 @@
-package com.codingapi.flow.node.audit;
+package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.PassAction;
-import com.codingapi.flow.action.RejectAction;
-import com.codingapi.flow.action.SaveAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.node.builder.AuditNodeBuilder;
 import com.codingapi.flow.node.BaseAuditNode;
-import com.codingapi.flow.node.manager.StrategyManager;
-import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.script.node.OperatorLoadScript;
-import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.*;
 import com.codingapi.flow.utils.RandomUtils;
 
@@ -21,24 +16,25 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 审批节点
+ * 办理节点
  */
-public class ApprovalNode extends BaseAuditNode {
+public class HandleNode extends BaseAuditNode {
 
-    public static final String NODE_TYPE = "approval";
-    public static final String DEFAULT_NAME = "审批节点";
+    public static final String NODE_TYPE = "handle";
+    public static final String DEFAULT_NAME = "办理节点";
 
     @Override
     public String getType() {
         return NODE_TYPE;
     }
 
-    public ApprovalNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, actions, nodeStrategies);
+
+    public HandleNode(String id, String name,List<IFlowAction> actions, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions,  List<INodeStrategy> nodeStrategies) {
+        super(id, name,actions, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, nodeStrategies);
     }
 
-    public ApprovalNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(), defaultActions(), defaultStrategies());
+    public HandleNode() {
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, defaultActions(), DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(),new ArrayList<>(), defaultStrategies());
     }
 
     private static List<INodeStrategy> defaultStrategies() {
@@ -55,26 +51,20 @@ public class ApprovalNode extends BaseAuditNode {
     private static List<IFlowAction> defaultActions() {
         List<IFlowAction> actions = new ArrayList<>();
         actions.add(new PassAction());
-        actions.add(new RejectAction());
-        actions.add(new SaveAction());
         return actions;
     }
 
-
-
-    public static ApprovalNode formMap(Map<String, Object> map) {
-        return BaseAuditNode.formMap(map, ApprovalNode.class);
+    public static HandleNode formMap(Map<String, Object> map) {
+        return BaseAuditNode.formMap(map, HandleNode.class);
     }
-
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends AuditNodeBuilder<Builder,ApprovalNode> {
-
+    public static class Builder extends AuditNodeBuilder<Builder,HandleNode> {
         public Builder() {
-            super(new ApprovalNode());
+            super(new HandleNode());
         }
     }
 }

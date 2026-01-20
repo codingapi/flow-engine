@@ -1,4 +1,4 @@
-package com.codingapi.flow.node.audit;
+package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.DefaultAction;
 import com.codingapi.flow.action.IFlowAction;
@@ -28,12 +28,12 @@ public class NotifyNode extends BaseAuditNode {
         return NODE_TYPE;
     }
 
-    public NotifyNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, actions, nodeStrategies);
+    public NotifyNode(String id, String name,List<IFlowAction> actions, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions,  List<INodeStrategy> nodeStrategies) {
+        super(id, name,actions, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions,  nodeStrategies);
     }
 
     public NotifyNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(), defaultActions(), defaultStrategies());
+        this(RandomUtils.generateStringId(), DEFAULT_NAME,defaultActions(), DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(),  defaultStrategies());
     }
 
     private static List<INodeStrategy> defaultStrategies() {
