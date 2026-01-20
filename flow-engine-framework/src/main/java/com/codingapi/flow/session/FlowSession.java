@@ -118,7 +118,12 @@ public class FlowSession {
     }
 
     public List<IFlowNode> nextNodes() {
-        return workflow.nextNodes(this.getCurrentNode());
+        List<IFlowNode> nodeList = workflow.nextNodes(this.getCurrentNode());
+        if(!nodeList.isEmpty() && nodeList.size()>1){
+            IFlowNode currentNode = nodeList.get(0);
+            return currentNode.matchBranch(nodeList,this);
+        }
+        return nodeList;
     }
 
     public Object getFormData(String fieldName) {

@@ -137,6 +137,11 @@ public abstract class BaseFlowNode implements IFlowNode {
     }
 
     @Override
+    public List<IFlowNode> matchBranch(List<IFlowNode> nodeList, FlowSession flowSession) {
+        return nodeList;
+    }
+
+    @Override
     public List<FlowRecord> generateCurrentRecords(FlowSession session) {
         return List.of();
     }

@@ -1,12 +1,16 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.builder.BaseNodeBuilder;
 import com.codingapi.flow.script.node.ConditionScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,6 +47,22 @@ public class BranchNodeBranchNode extends BaseFlowNode {
     @Override
     public boolean isContinueTrigger(FlowSession request) {
         return conditionScript.execute(request);
+    }
+
+    @Override
+    public List<IFlowNode> matchBranch(List<IFlowNode> nodeList, FlowSession flowSession) {
+        List<IFlowNode> nodes = new ArrayList<>();
+        for (IFlowNode node: nodeList){
+            if (node.isContinueTrigger(flowSession)){
+                nodes.add(node);
+            }
+        }
+        // 获取最小order的节点
+        nodes.sort(Comparator.comparingInt(IFlowNode::getOrder));
+        if(!nodes.isEmpty()){
+            return nodes.subList(0,1);
+        }
+        return nodes;
     }
 
     @Override

@@ -82,4 +82,14 @@ public interface IFlowNode {
      * @param flowRecord 流程记录
      */
     void fillNewRecord(FlowSession session,FlowRecord flowRecord);
+
+
+    /**
+     * 匹配条件分支
+     * @param nodeList 当前节点下的所有条件
+     * @param flowSession 当前会话
+     * @return 匹配的节点
+     */
+    List<IFlowNode> matchBranch(List<IFlowNode> nodeList, FlowSession flowSession);
+
 }
