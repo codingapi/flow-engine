@@ -54,7 +54,7 @@ public abstract class BaseBranchNode extends BaseFlowNode implements IBranchNode
     }
 
     @Override
-    public void verify(FormMeta form) {
+    public void verifyNode(FormMeta form) {
         this.verifyFields();
     }
 

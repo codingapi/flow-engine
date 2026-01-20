@@ -220,7 +220,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
     }
 
     @Override
-    public void verify(FormMeta form) {
+    public void verifyNode(FormMeta form) {
         this.verifyFields();
         if (!(this instanceof EndNode)) {
             FieldPermissionManager fieldPermissionManager = this.formFieldsPermissions();
@@ -343,7 +343,6 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IAuditNode{
         this.verifyFlowAdvice(session.getAdvice());
     }
 
-    @Override
     public void verifyFlowAdvice(FlowAdvice flowAdvice) {
         StrategyManager strategyManager = this.strategies();
         IFlowAction flowAction = flowAdvice.getAction();

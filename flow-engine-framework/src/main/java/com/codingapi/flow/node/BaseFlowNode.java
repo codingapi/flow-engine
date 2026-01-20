@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Map;
 
 @AllArgsConstructor
 public abstract class BaseFlowNode implements IFlowNode {
@@ -36,13 +35,13 @@ public abstract class BaseFlowNode implements IFlowNode {
         if(this instanceof RouterBranchNode routerBranchNode){
             return routerBranchNode.matchRouters(session);
         }else {
-            return workflow.edgeNext(this);
+            return workflow.nextNodes(this);
         }
     }
 
 
     @Override
-    public void verify(FormMeta form) {
+    public void verifyNode(FormMeta form) {
 
     }
 
@@ -54,5 +53,15 @@ public abstract class BaseFlowNode implements IFlowNode {
     @Override
     public void verifySession(FlowSession session) {
 
+    }
+
+    @Override
+    public boolean continueNode(FlowSession session) {
+        return true;
+    }
+
+    @Override
+    public List<FlowRecord> generateNextRecords(FlowSession session) {
+        return List.of();
     }
 }

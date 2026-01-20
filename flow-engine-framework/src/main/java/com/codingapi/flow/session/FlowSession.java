@@ -114,7 +114,7 @@ public class FlowSession {
     }
 
     public List<IAuditNode> nextNodes() {
-        return workflow.nextNodes(this);
+        return workflow.generateNodes(this);
     }
 
     public Object getFormData(String fieldName) {

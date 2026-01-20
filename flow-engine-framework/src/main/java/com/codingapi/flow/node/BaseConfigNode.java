@@ -15,7 +15,7 @@ public abstract class BaseConfigNode extends BaseFlowNode implements IConfigNode
     }
 
     @Override
-    public void verify(FormMeta form) {
+    public void verifyNode(FormMeta form) {
         this.verifyFields();
     }
 

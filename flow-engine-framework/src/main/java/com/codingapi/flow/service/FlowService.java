@@ -9,10 +9,12 @@ import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.service.impl.FlowCreateService;
 import com.codingapi.flow.service.impl.FlowActionService;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * 流程服务
  */
+@Configuration
 @AllArgsConstructor
 public class FlowService {
 

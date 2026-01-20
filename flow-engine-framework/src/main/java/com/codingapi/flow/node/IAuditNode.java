@@ -6,7 +6,6 @@ import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
-import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 
 /**
@@ -40,7 +39,7 @@ public interface IAuditNode extends IFlowNode {
     OperatorManager operators(FlowSession flowSession);
 
     /**
-     * 构建待办标题z
+     * 构建待办标题
      */
     String generateTitle(FlowSession flowSession);
 
@@ -53,11 +52,5 @@ public interface IAuditNode extends IFlowNode {
      * 节点策略
      */
     StrategyManager strategies();
-
-    /**
-     * 校验提交参数
-     * @param flowAdvice 请求参数
-     */
-    void verifyFlowAdvice(FlowAdvice flowAdvice);
 
 }

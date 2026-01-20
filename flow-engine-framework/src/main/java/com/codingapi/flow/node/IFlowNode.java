@@ -1,6 +1,7 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.session.FlowSession;
 
@@ -35,7 +36,7 @@ public interface IFlowNode {
     /**
      * 节点验证
      */
-    void verify(FormMeta form);
+    void verifyNode(FormMeta form);
 
 
     /**
@@ -54,4 +55,19 @@ public interface IFlowNode {
      * 节点验证会话
      */
     void verifySession(FlowSession session);
+
+    /**
+     * 节点是否继续
+     * @param session 会话
+     * @return 节点是否继续
+     */
+    boolean continueNode(FlowSession session);
+
+
+    /**
+     * 生成下一个节点记录
+     * @param session 会话
+     * @return 下一个节点记录
+     */
+    List<FlowRecord> generateNextRecords(FlowSession session);
 }

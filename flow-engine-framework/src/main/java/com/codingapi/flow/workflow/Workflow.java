@@ -9,6 +9,7 @@ import com.codingapi.flow.node.IBranchNode;
 import com.codingapi.flow.node.IConfigNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.audit.StartNode;
+import com.codingapi.flow.node.branch.RouterBranchNode;
 import com.codingapi.flow.node.fixed.EndNode;
 import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -273,7 +274,7 @@ public class Workflow {
         }
 
         for (IFlowNode node : nodes) {
-            node.verify(form);
+            node.verifyNode(form);
         }
     }
 
@@ -285,7 +286,7 @@ public class Workflow {
         }
         IFlowNode startNode = this.nodes.stream().filter(node -> node instanceof StartNode).findFirst().get();
 
-        List<IFlowNode> nextNodes = edgeNext(startNode);
+        List<IFlowNode> nextNodes = nextNodes(startNode);
         for (IFlowNode nextNode : nextNodes) {
             this.verifyNextEdge(nextNode);
         }
@@ -295,7 +296,7 @@ public class Workflow {
         if (node instanceof EndNode) {
             return;
         } else {
-            List<IFlowNode> nextNodes = edgeNext(node);
+            List<IFlowNode> nextNodes = nextNodes(node);
             if (nextNodes.isEmpty()) {
                 throw new IllegalArgumentException("workflow edges must have one end edge");
             }
@@ -306,13 +307,13 @@ public class Workflow {
     }
 
 
-    public List<IFlowNode> edgeNext(IFlowNode node) {
+    public List<IFlowNode> nextNodes(IFlowNode node) {
         return edges.stream().filter(edge -> edge.getFrom().equals(node.getId()))
                 .map(edge -> nodes.stream().filter(item -> item.getId().equals(edge.getTo())).findFirst().get()).toList();
     }
 
-    public List<IAuditNode> nextNodes(FlowSession session) {
-        List<IFlowNode> nodeList = edgeNext(session.getCurrentNode());
+    public List<IAuditNode> generateNodes(FlowSession session) {
+        List<IFlowNode> nodeList = nextNodes(session.getCurrentNode());
         return this.loadNextAuditNodes(nodeList, session);
     }
 
