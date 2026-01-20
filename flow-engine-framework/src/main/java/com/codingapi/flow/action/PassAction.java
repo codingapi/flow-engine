@@ -78,9 +78,9 @@ public class PassAction extends BaseAction {
             List<IFlowNode> nextNodes = flowSession.nextNodes();
             for (IFlowNode node : nextNodes) {
                 FlowSession triggerSession = flowSession.updateSession(node);
-                IFlowNode latestNode = triggerSession.getCurrentNode();
                 List<FlowRecord> records = this.generateRecords(triggerSession);
                 if (records.isEmpty()) {
+                    IFlowNode latestNode = triggerSession.getCurrentNode();
                     super.flowFinish(flowRecord, latestNode);
                 }else {
                     for (FlowRecord record : records) {

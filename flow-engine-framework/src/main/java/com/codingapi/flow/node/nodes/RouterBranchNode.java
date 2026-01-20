@@ -32,12 +32,6 @@ public class RouterBranchNode extends BaseBranchNode {
         this(RandomUtils.generateStringId(), DEFAULT_NAME);
     }
 
-
-    public List<IFlowNode> matchRouters(FlowSession session) {
-        return null;
-    }
-
-
     public static RouterBranchNode formMap(Map<String, Object> map) {
         return BaseBranchNode.formMap(map, RouterBranchNode.class);
     }
