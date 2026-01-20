@@ -37,14 +37,7 @@ public class StartNode extends BaseAuditNode {
     }
 
     private static List<INodeStrategy> defaultStrategies() {
-        List<INodeStrategy> strategies = new ArrayList<>();
-        strategies.add(TimeoutStrategy.defaultStrategy());
-        strategies.add(MultiOperatorAuditStrategy.defaultStrategy());
-        strategies.add(SameOperatorAuditStrategy.defaultStrategy());
-        strategies.add(RecordMergeStrategy.defaultStrategy());
-        strategies.add(ResubmitStrategy.defaultStrategy());
-        strategies.add(AdviceStrategy.defaultStrategy());
-        return strategies;
+        return new ArrayList<>();
     }
 
     private static List<IFlowAction> defaultActions() {

@@ -1,10 +1,14 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.ReturnAction;
+import com.codingapi.flow.action.SaveAction;
+import com.codingapi.flow.action.TransferAction;
 import com.codingapi.flow.action.factory.FlowActionFactory;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
 import lombok.Setter;
@@ -128,5 +132,27 @@ public abstract class BaseFlowNode implements IFlowNode {
     @Override
     public ActionManager actions() {
         return new ActionManager(actions);
+    }
+
+
+
+    public void verifyDefaultFlowAdviceAction(FlowAdvice flowAdvice) {
+        IFlowAction flowAction = flowAdvice.getAction();
+        // 保存操作,不做检查
+        if (flowAction instanceof SaveAction) {
+            return;
+        }
+        // 转办操作
+        if (flowAction instanceof TransferAction) {
+            if (flowAdvice.getTransferOperators() == null || flowAdvice.getTransferOperators().isEmpty()) {
+                throw new IllegalArgumentException("transferOperators can not be null");
+            }
+        }
+        // 退回操作
+        if (flowAction instanceof ReturnAction) {
+            if (flowAdvice.getBackNode() == null) {
+                throw new IllegalArgumentException("backNode can not be null");
+            }
+        }
     }
 }

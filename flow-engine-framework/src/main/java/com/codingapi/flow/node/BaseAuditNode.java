@@ -308,32 +308,15 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         fieldPermissionManager.verifyFormData(workflow.getForm(), flowRecord.getFormData(), session.getFormData().toMapData());
 
         // 节点请求验证
-        this.verifyFlowAdvice(session.getAdvice());
+        this.verifyDefaultFlowAdviceAction(session.getAdvice());
     }
 
-    public void verifyFlowAdvice(FlowAdvice flowAdvice) {
-        StrategyManager strategyManager = this.strategies();
+    public void verifyDefaultFlowAdviceAction(FlowAdvice flowAdvice) {
+
         IFlowAction flowAction = flowAdvice.getAction();
+        super.verifyDefaultFlowAdviceAction(flowAdvice);
 
-        // 保存操作,不做检查
-        if (flowAction instanceof SaveAction) {
-            return;
-        }
-
-        // 转办操作
-        if (flowAction instanceof TransferAction) {
-            if (flowAdvice.getTransferOperators() == null || flowAdvice.getTransferOperators().isEmpty()) {
-                throw new IllegalArgumentException("transferOperators can not be null");
-            }
-        }
-
-        // 退回操作
-        if (flowAction instanceof ReturnAction) {
-            if (flowAdvice.getBackNode() == null) {
-                throw new IllegalArgumentException("backNode can not be null");
-            }
-        }
-
+        StrategyManager strategyManager = this.strategies();
         // 是否必须填写审批意见
         if (strategyManager.isEnableAdvice()) {
             if (!StringUtils.hasText(flowAdvice.getAdvice())) {
