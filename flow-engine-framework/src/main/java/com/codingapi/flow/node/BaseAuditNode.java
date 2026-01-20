@@ -71,7 +71,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     private List<INodeStrategy> nodeStrategies;
 
 
-    public BaseAuditNode(String id, String name, List<IFlowAction> actions, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldPermissions, List<INodeStrategy> nodeStrategies) {
+    public BaseAuditNode(String id, String name,List<IFlowAction> actions, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldPermissions, List<INodeStrategy> nodeStrategies) {
         super(id, name, actions);
         this.view = view;
         this.operatorScript = operatorScript;

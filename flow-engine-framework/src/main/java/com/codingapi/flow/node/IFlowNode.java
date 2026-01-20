@@ -29,6 +29,12 @@ public interface IFlowNode {
     String getType();
 
     /**
+     * 节点顺序,同一层级下的节点顺序，越小则优先级越高
+     * @return 节点顺序
+     */
+    int getOrder();
+
+    /**
      * 转化为map
      */
     Map<String, Object> toMap();

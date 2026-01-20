@@ -29,12 +29,12 @@ public class EndNode extends BaseFlowNode {
         return false;
     }
 
-    public EndNode(String id, String name, List<IFlowAction> actions) {
-        super(id, name, actions);
+    public EndNode(String id, String name) {
+        super(id, name);
     }
 
     public EndNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME,new ArrayList<>());
+        this(RandomUtils.generateStringId(), DEFAULT_NAME);
     }
 
     public static EndNode formMap(Map<String, Object> map) {

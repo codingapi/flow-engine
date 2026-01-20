@@ -22,7 +22,7 @@ public class DelayNode extends BaseFlowNode {
 
 
     public DelayNode(String id, String name) {
-        super(id, name,new ArrayList<>());
+        super(id, name);
     }
 
     public DelayNode() {

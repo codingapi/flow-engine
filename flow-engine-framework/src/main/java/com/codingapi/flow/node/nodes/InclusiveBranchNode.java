@@ -1,16 +1,15 @@
 package com.codingapi.flow.node.nodes;
 
-import com.codingapi.flow.node.BaseBranchNode;
-import com.codingapi.flow.node.builder.BranchNodeBuilder;
+import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.builder.BaseNodeBuilder;
 import com.codingapi.flow.utils.RandomUtils;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 /**
  * 包容分支节点
  */
-public class InclusiveBranchNode extends BaseBranchNode {
+public class InclusiveBranchNode extends BaseFlowNode {
 
     public static final String NODE_TYPE = "inclusive_branch";
     public static final String DEFAULT_NAME = "包容分支节点";
@@ -22,7 +21,7 @@ public class InclusiveBranchNode extends BaseBranchNode {
 
 
     public InclusiveBranchNode(String id, String name) {
-        super(id, name,new ArrayList<>());
+        super(id, name);
     }
 
     public InclusiveBranchNode() {
@@ -30,14 +29,14 @@ public class InclusiveBranchNode extends BaseBranchNode {
     }
 
     public static InclusiveBranchNode formMap(Map<String, Object> map) {
-        return BaseBranchNode.formMap(map, InclusiveBranchNode.class);
+        return BaseFlowNode.loadFromMap(map, InclusiveBranchNode.class);
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends BranchNodeBuilder<Builder,InclusiveBranchNode> {
+    public static class Builder extends BaseNodeBuilder<Builder,InclusiveBranchNode> {
 
         public Builder() {
             super(new InclusiveBranchNode());
