@@ -40,7 +40,7 @@ public class BranchNodeBranchNode extends BaseBranchNode {
      * 匹配条件
      */
     @Override
-    public boolean trigger(FlowSession request) {
+    public boolean isContinueTrigger(FlowSession request) {
         return conditionScript.execute(request);
     }
 
@@ -70,8 +70,5 @@ public class BranchNodeBranchNode extends BaseBranchNode {
             node.conditionScript = new ConditionScript(script);
             return this;
         }
-
-
-
     }
 }

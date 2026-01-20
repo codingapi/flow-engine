@@ -76,7 +76,7 @@ public abstract class BaseFlowNode implements IFlowNode {
     }
 
     @Override
-    public boolean trigger(FlowSession session) {
+    public boolean isContinueTrigger(FlowSession session) {
         return true;
     }
 
@@ -86,7 +86,12 @@ public abstract class BaseFlowNode implements IFlowNode {
     }
 
     @Override
-    public List<FlowRecord> generateNextRecords(FlowSession session) {
+    public boolean isDone(FlowSession session) {
+        return true;
+    }
+
+    @Override
+    public List<FlowRecord> generateCurrentRecords(FlowSession session) {
         return List.of();
     }
 

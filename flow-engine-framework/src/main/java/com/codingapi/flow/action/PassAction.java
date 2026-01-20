@@ -1,11 +1,18 @@
 package com.codingapi.flow.action;
 
+import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.event.FlowRecordDoneEvent;
+import com.codingapi.flow.event.FlowRecordFinishEvent;
+import com.codingapi.flow.event.FlowRecordTodoEvent;
+import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
+import com.codingapi.springboot.framework.event.EventPusher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,17 +42,17 @@ public class PassAction extends BaseAction {
         List<FlowRecord> records = new ArrayList<>();
         if (currentRecord.isReturnRecord()) {
             // 退回后的流程重新提交
-            BaseAuditNode currentNode = (BaseAuditNode)flowSession.getWorkflow().getFlowNode(currentRecord.getReturnNodeId());
+            BaseAuditNode currentNode = (BaseAuditNode) flowSession.getWorkflow().getFlowNode(currentRecord.getReturnNodeId());
             StrategyManager strategyManager = currentNode.strategies();
             // 是否退回到退回节点
             if (strategyManager.isResume()) {
                 FlowSession triggerSession = flowSession.updateSession(currentNode);
-                List<FlowRecord> nextRecords = currentNode.generateNextRecords(triggerSession.updateSession(currentNode));
+                List<FlowRecord> nextRecords = currentNode.generateCurrentRecords(triggerSession.updateSession(currentNode));
                 records.addAll(nextRecords);
             }
         } else {
             IFlowNode currentNode = flowSession.getCurrentNode();
-            List<FlowRecord> nextRecords = currentNode.generateNextRecords(flowSession);
+            List<FlowRecord> nextRecords = currentNode.generateCurrentRecords(flowSession);
             if (!nextRecords.isEmpty()) {
                 records.addAll(nextRecords);
             }
@@ -53,4 +60,41 @@ public class PassAction extends BaseAction {
         return records;
     }
 
+
+    @Override
+    public void triggerNode(FlowSession flowSession) {
+        List<IFlowEvent> flowEvents = new ArrayList<>();
+        List<FlowRecord> recordList = new ArrayList<>();
+        FlowRecord flowRecord = flowSession.getCurrentRecord();
+        IFlowNode currentNode = flowSession.getCurrentNode();
+        boolean done = currentNode.isDone(flowSession);
+        flowRecord.update(flowSession.getFormData().toMapData(), flowSession.getAdvice().getAdvice(), flowSession.getAdvice().getSignKey(), done);
+        // 添加流程结束事件
+        flowEvents.add(new FlowRecordDoneEvent(flowRecord));
+        recordList.add(flowRecord);
+
+        if (done) {
+            super.triggerNode(flowSession);
+            List<IFlowNode> nextNodes = flowSession.nextNodes();
+            for (IFlowNode node : nextNodes) {
+                FlowSession triggerSession = flowSession.updateSession(node);
+                IFlowNode latestNode = triggerSession.getCurrentNode();
+                List<FlowRecord> records = this.generateRecords(triggerSession);
+                if (records.isEmpty()) {
+                    super.flowFinish(flowRecord, latestNode);
+                }else {
+                    for (FlowRecord record : records) {
+                        if (record.isShow()) {
+                            flowEvents.add(new FlowRecordTodoEvent(record));
+                        }
+                    }
+                    recordList.addAll(records);
+                }
+            }
+        }
+
+        RepositoryContext.getInstance().saveRecords(recordList);
+
+        flowEvents.forEach(EventPusher::push);
+    }
 }

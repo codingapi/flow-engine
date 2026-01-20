@@ -1,13 +1,17 @@
 package com.codingapi.flow.action;
 
+import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.event.FlowRecordTodoEvent;
+import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.action.RejectActionScript;
-import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
+import com.codingapi.springboot.framework.event.EventPusher;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +29,7 @@ public class RejectAction extends BaseAction {
         this.title = "拒绝";
         this.type = ActionType.REJECT;
         this.display = new ActionDisplay(this.title);
-        this.script = RejectActionScript.defaultScript();
+        this.script = RejectActionScript.startScript();
     }
 
     public void setScript(String script) {
@@ -48,7 +52,6 @@ public class RejectAction extends BaseAction {
 
     @Override
     public List<FlowRecord> generateRecords(FlowSession flowSession) {
-        FlowRecord currentRecord = flowSession.getCurrentRecord();
         RejectActionScript.RejectResult rejectResult = script.execute(flowSession);
         IFlowNode currentNode = null;
         // 返回指定节点
@@ -60,20 +63,36 @@ public class RejectAction extends BaseAction {
         if (rejectResult.isTerminate()) {
             currentNode = flowSession.getWorkflow().getEndNode();
         }
-        // 退回上级节点
-        if (rejectResult.isReturnPrev()) {
-            long fromId = currentRecord.getFromId();
-            FlowRecord preRecord = FlowScriptContext.getInstance().getRecordById(fromId);
-            if (preRecord == null) {
-                throw new IllegalArgumentException("preRecord is null");
-            }
-            currentNode = flowSession.getWorkflow().getFlowNode(preRecord.getNodeId());
-        }
         if (currentNode == null) {
             throw new IllegalArgumentException("currentNode is null");
         }
+        flowSession = flowSession.updateSession(currentNode);
+        return currentNode.generateCurrentRecords(flowSession);
+    }
 
-        FlowSession triggerSession = flowSession.updateSession(currentNode);
-        return currentNode.generateNextRecords(triggerSession);
+    @Override
+    public void triggerNode(FlowSession flowSession) {
+        List<IFlowEvent> flowEvents = new ArrayList<>();
+        List<FlowRecord> recordList = new ArrayList<>();
+
+        FlowRecord flowRecord = flowSession.getCurrentRecord();
+        flowRecord.update(flowSession.getFormData().toMapData(), flowSession.getAdvice().getAdvice(), flowSession.getAdvice().getSignKey(), true);
+        recordList.add(flowRecord);
+
+        List<FlowRecord> records = this.generateRecords(flowSession);
+        IFlowNode latestNode = flowSession.getCurrentNode();
+        if(records.isEmpty()){
+            super.flowFinish(flowRecord, latestNode);
+        }
+        recordList.addAll(records);
+        for (FlowRecord record : records){
+            if (record.isShow()) {
+                flowEvents.add(new FlowRecordTodoEvent(record));
+            }
+        }
+
+        RepositoryContext.getInstance().saveRecords(recordList);
+        flowEvents.forEach(EventPusher::push);
+
     }
 }

@@ -39,30 +39,35 @@ public interface IFlowNode {
     void verifyNode(FormMeta form);
 
     /**
-     * 执行节点
+     * 是否执行节点
      * @param session 会话
      * @return true: 继续执行下一个节点
      */
-    boolean trigger(FlowSession session);
+    boolean isContinueTrigger(FlowSession session);
 
     /**
      * 节点验证会话
      */
     void verifySession(FlowSession session);
 
-
     /**
-     * 构建当前节点下的流程记录
+     * 构建当前节点下的流程记录，不需要创建记录的返回 空集合
      * @param session 会话
      * @return 流程记录
      */
-    List<FlowRecord> generateNextRecords(FlowSession session);
-
+    List<FlowRecord> generateCurrentRecords(FlowSession session);
 
     /**
      * 获取节点操作
      * @return 节点操作
      */
     ActionManager actions();
+
+    /**
+     * 节点是否完成
+     * @param session 会话
+     * @return true: 节点完成
+     */
+    boolean isDone(FlowSession session);
 
 }

@@ -1,11 +1,16 @@
 package com.codingapi.flow.action;
 
+import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.event.FlowRecordFinishEvent;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.springboot.framework.event.EventPusher;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,9 +100,31 @@ public abstract class BaseAction implements IFlowAction {
         List<IFlowNode> nextNodes = flowSession.nextNodes();
         for (IFlowNode node : nextNodes) {
             FlowSession triggerSession = flowSession.updateSession(node);
-            if (node.trigger(triggerSession)) {
+            if (node.isContinueTrigger(triggerSession)) {
                 this.triggerNode(triggerSession);
             }
         }
     }
+
+
+    public void flowFinish(FlowRecord latestRecord,IFlowNode latestNode){
+        List<FlowRecord> recordList = new ArrayList<>();
+        // 添加当前节点到记录中
+        if (latestNode instanceof EndNode) {
+            recordList.add(latestRecord);
+            // 添加历史记录到记录中
+            List<FlowRecord> historyRecords = RepositoryContext.getInstance().findRecordsByProcessId(latestRecord.getProcessId());
+            recordList.addAll(historyRecords);
+            // 设置状态为完成
+            recordList.forEach(item -> {
+                item.finish(true);
+            });
+
+            RepositoryContext.getInstance().saveRecords(recordList);
+
+            // 流程是否正常结束
+            EventPusher.push(new FlowRecordFinishEvent(latestRecord));
+        }
+    }
+
 }

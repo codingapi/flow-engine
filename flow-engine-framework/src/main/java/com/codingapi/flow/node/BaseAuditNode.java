@@ -218,73 +218,11 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
 
 
     @Override
-    public boolean trigger(FlowSession session) {
-        List<IFlowEvent> flowEvents = new ArrayList<>();
-        FlowRecord flowRecord = session.getCurrentRecord();
-        IFlowAction flowAction = session.getCurrentAction();
-        List<FlowRecord> currentRecords = session.getCurrentNodeRecords();
-
-        // 判断当前节点是否已经完成
-        boolean done = this.isDone(session);
-        if (done) {
-            List<FlowRecord> records = flowAction.generateRecords(session);
-            if (!records.isEmpty()) {
-                for (FlowRecord record : records) {
-                    if (record.isShow()) {
-                        flowEvents.add(new FlowRecordTodoEvent(record));
-                    }
-                }
-            }
-            flowRecord.update(session.getFormData().toMapData(), session.getAdvice().getAdvice(), session.getAdvice().getSignKey(), true);
-            // 判断是否结束
-            if (records.size() == 1) {
-                FlowRecord record = records.get(0);
-                if (record.isNodeType(EndNode.NODE_TYPE)) {
-                    boolean flowFinish = flowAction instanceof PassAction;
-                    // 添加当前节点到记录中
-                    records.add(flowRecord);
-                    // 添加历史记录到记录中
-                    List<FlowRecord> historyRecords = RepositoryContext.getInstance().findRecordsByProcessId(flowRecord.getProcessId());
-                    records.addAll(historyRecords);
-                    // 设置状态为完成
-                    records.forEach(item -> {
-                        item.finish(flowFinish);
-                    });
-
-                    // 流程是否正常结束
-                    if (flowFinish) {
-                        flowEvents.add(new FlowRecordFinishEvent(record));
-                    }
-                }
-                // 添加流程结束事件
-                flowEvents.add(new FlowRecordDoneEvent(record));
-            }
-            RepositoryContext.getInstance().saveRecords(records);
-        } else {
-            // 判断是否为串行多操作者
-            if (this.strategies().isSequenceMultiOperator()) {
-                int nextRecordNodeOrder = flowRecord.getNodeOrder() + 1;
-                FlowRecord nextRecord = currentRecords.stream().filter(record -> record.getNodeOrder() == nextRecordNodeOrder).findFirst().orElse(null);
-                if (nextRecord != null) {
-                    // 展示下一个审批人的待办
-                    nextRecord.show();
-                    flowEvents.add(new FlowRecordTodoEvent(nextRecord));
-                    RepositoryContext.getInstance().saveRecord(nextRecord);
-                }
-            }
-            flowRecord.update(session.getFormData().toMapData(), session.getAdvice().getAdvice(), session.getAdvice().getSignKey(), false);
-            RepositoryContext.getInstance().saveRecord(flowRecord);
-        }
-
-        // 推送待办事件
-        for (IFlowEvent event : flowEvents) {
-            EventPusher.push(event);
-        }
-
+    public boolean isContinueTrigger(FlowSession session) {
         return false;
     }
 
-
+    @Override
     public boolean isDone(FlowSession session) {
         List<FlowRecord> currentRecords = session.getCurrentNodeRecords();
         FlowRecord currentRecord = session.getCurrentRecord();
@@ -317,13 +255,13 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
 
 
     /**
-     * 生成下一节点的记录
+     * 生成当前节点的记录
      *
      * @param session 触发会话
-     * @return 下一节节点的记录
+     * @return 生成当前节点的记录
      */
     @Override
-    public List<FlowRecord> generateNextRecords(FlowSession session) {
+    public List<FlowRecord> generateCurrentRecords(FlowSession session) {
         List<FlowRecord> records = new ArrayList<>();
         FlowRecord currentRecord = session.getCurrentRecord();
         OperatorManager operatorManager = this.operators(session);

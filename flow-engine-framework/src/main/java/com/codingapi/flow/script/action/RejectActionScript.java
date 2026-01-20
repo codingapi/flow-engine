@@ -7,12 +7,13 @@ import lombok.Getter;
 
 /**
  * 拒绝脚本
- * 拒绝，拒绝时需要根据拒绝的配置流程来设置,退回上级节点、退回指定节点、终止流程
+ * 拒绝，拒绝时需要根据拒绝的配置流程来设置,退回指定节点、终止流程
  */
 @AllArgsConstructor
 public class RejectActionScript {
 
-    public static final String SCRIPT_DEFAULT = "def run(session){return new com.codingapi.flow.script.action.RejectActionScript.RejectResult('RETURN_PREV')}";
+    public static final String SCRIPT_START = "def run(session){return new com.codingapi.flow.script.action.RejectActionScript.RejectResult(session.getStartNode().getId())}";
+    public static final String SCRIPT_TERMINATE = "def run(session){return new com.codingapi.flow.script.action.RejectActionScript.RejectResult(\"TERMINATE\")}";
 
     @Getter
     private final String script;
@@ -22,16 +23,21 @@ public class RejectActionScript {
     }
 
     /**
-     * 退回至上一流程
+     * 退回至发起节点
      */
-    public static RejectActionScript defaultScript() {
-        return new RejectActionScript(SCRIPT_DEFAULT);
+    public static RejectActionScript startScript() {
+        return new RejectActionScript(SCRIPT_START);
+    }
+
+    /**
+     * 终止流程
+     */
+    public static RejectActionScript terminateScript() {
+        return new RejectActionScript(SCRIPT_TERMINATE);
     }
 
 
     public enum RejectType {
-        // 退回上级节点
-        RETURN_PREV,
         // 退回指定节点
         RETURN_NODE,
         // 终止流程
@@ -43,11 +49,6 @@ public class RejectActionScript {
         private final RejectType type;
         private String nodeId;
 
-
-        public boolean isReturnPrev() {
-            return type == RejectType.RETURN_PREV;
-        }
-
         public boolean isReturnNode() {
             return type == RejectType.RETURN_NODE;
         }
@@ -57,9 +58,7 @@ public class RejectActionScript {
         }
 
         public RejectResult(String result) {
-            if (result.equals("RETURN_PREV")) {
-                this.type = RejectType.RETURN_PREV;
-            } else if (result.equals("TERMINATE")) {
+            if (result.equals("TERMINATE")) {
                 this.type = RejectType.TERMINATE;
             } else {
                 this.type = RejectType.RETURN_NODE;

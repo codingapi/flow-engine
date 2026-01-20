@@ -108,6 +108,10 @@ public class FlowSession {
         return currentNode.getId();
     }
 
+    public IFlowNode getStartNode() {
+        return workflow.getStartNode();
+    }
+
     public String getCurrentNodeType() {
         return currentNode.getType();
     }
