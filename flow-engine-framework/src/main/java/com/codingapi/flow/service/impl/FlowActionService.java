@@ -68,7 +68,8 @@ public class FlowActionService {
         FormData formData = new FormData(workflow.getForm());
         formData.reset(request.getFormData());
         FlowAdvice flowAdvice = request.toFlowAdvice(workflow, flowAction);
-        List<FlowRecord> currentRecords = flowRecordRepository.findRecordsByFromId(flowRecord.getFromId());
+
+        List<FlowRecord> currentRecords = flowRecordRepository.findRecordsByFromIdAndNodeId(flowRecord.getFromId(), flowRecord.getNodeId());
         FlowSession session = new FlowSession(currentOperator, workflow, currentNode, flowAction, formData, flowRecord, currentRecords, workflowBackup.getId(), flowAdvice);
 
         currentNode.verifySession(session);

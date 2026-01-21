@@ -42,8 +42,8 @@ public class RepositoryContext {
         flowRecordRepository.saveAll(flowRecords);
     }
 
-    public List<FlowRecord> findRecordsByFromId(long fromId) {
-        return flowRecordRepository.findRecordsByFromId(fromId);
+    public List<FlowRecord> findRecordsByFromIdAndNodeId(long fromId,String nodeId) {
+        return flowRecordRepository.findRecordsByFromIdAndNodeId(fromId,nodeId);
     }
 
     public List<FlowRecord> findRecordsByProcessId(String processId) {

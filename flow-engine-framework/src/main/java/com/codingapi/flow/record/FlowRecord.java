@@ -152,6 +152,17 @@ public class FlowRecord {
      */
     private long interferedOperatorId;
 
+    /**
+     * 并行分支节点id
+     */
+    private String parallelBranchNodeId;
+
+    /**
+     * 并行分支数量
+     */
+    private int parallelBranchCount;
+
+
     public FlowRecord(FlowSession flowSession, String actionId, String processId, long fromId, int nodeOrder) {
         this.workCode = flowSession.getWorkCode();
         this.workBackupId = flowSession.getBackupId();
@@ -172,7 +183,30 @@ public class FlowRecord {
         this.createTime = System.currentTimeMillis();
         this.isInterfere = flowSession.getWorkflow().isInterfere();
         this.hidden = false;
+
         flowSession.getCurrentNode().fillNewRecord(flowSession,this);
+        this.extendsRecord(flowSession.getCurrentRecord());
+
+        this.verify();
+    }
+
+
+    public void extendsRecord(FlowRecord record) {
+        if(record!=null) {
+            this.parallelBranchNodeId = record.parallelBranchNodeId;
+            this.parallelBranchCount = record.parallelBranchCount;
+        }
+    }
+
+
+    /**
+     * 并行分支节点
+     * @param parallelBranchNodeId 并行分支节点id
+     * @param parallelBranchCount 并行分支数量
+     */
+    public void parallelBranchNode(String parallelBranchNodeId, int parallelBranchCount) {
+        this.parallelBranchNodeId = parallelBranchNodeId;
+        this.parallelBranchCount = parallelBranchCount;
     }
 
     public void verify() {
