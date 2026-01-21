@@ -41,7 +41,7 @@ public class PassAction extends BaseAction {
         if (currentRecord.isReturnRecord()) {
             // 退回后的流程重新提交
             BaseAuditNode currentNode = (BaseAuditNode) flowSession.getWorkflow().getFlowNode(currentRecord.getReturnNodeId());
-            StrategyManager strategyManager = currentNode.strategies();
+            StrategyManager strategyManager = currentNode.strategyManager();
             // 是否退回到退回节点
             if (strategyManager.isResume()) {
                 FlowSession triggerSession = flowSession.updateSession(currentNode);

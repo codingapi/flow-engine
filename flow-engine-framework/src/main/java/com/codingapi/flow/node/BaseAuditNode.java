@@ -2,19 +2,11 @@ package com.codingapi.flow.node;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.PassAction;
-import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.node.builder.IFormFieldPermissionsNode;
-import com.codingapi.flow.node.manager.ActionManager;
-import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.script.node.ErrorTriggerScript;
-import com.codingapi.flow.script.node.NodeTitleScript;
-import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.INodeStrategy;
@@ -26,11 +18,10 @@ import lombok.Setter;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode, IFormFieldPermissionsNode {
+public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
 
     public static final String DEFAULT_VIEW = "default";
 
@@ -41,117 +32,19 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode, I
     @Setter
     private String view;
 
-    /**
-     * 审批人配置脚本
-     */
-    private OperatorLoadScript operatorScript;
 
-    /**
-     * 节点待办标题脚本
-     */
-    private NodeTitleScript nodeTitleScript;
-
-    /**
-     * 异常触发脚本
-     */
-    private ErrorTriggerScript errorTriggerScript;
-
-    /**
-     * 表单字段权限
-     */
-    @Setter
-    private List<FormFieldPermission> formFieldPermissions;
-
-    /**
-     * 节点策略
-     */
-    @Setter
-    private List<INodeStrategy> nodeStrategies;
-
-
-    public BaseAuditNode(String id, String name, List<IFlowAction> actions, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldPermissions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, actions);
+    public BaseAuditNode(String id, String name, String view, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
+        super(id, name, 0, actions, nodeStrategies);
         this.view = view;
-        this.operatorScript = operatorScript;
-        this.nodeTitleScript = nodeTitleScript;
-        this.errorTriggerScript = errorTriggerScript;
-        this.formFieldPermissions = formFieldPermissions;
-        this.nodeStrategies = nodeStrategies;
     }
 
     @Override
     public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("name", name);
-        map.put("id", id);
+        Map<String, Object> map = super.toMap();
         map.put("view", view);
-        map.put("operatorScript", operatorScript.getScript());
-        map.put("nodeTitleScript", nodeTitleScript.getScript());
-        map.put("errorTriggerScript", errorTriggerScript.getScript());
-        map.put("formFieldPermissions", formFieldPermissions);
-        map.put("type", getType());
-        map.put("actions", actions.stream().map(IFlowAction::toMap).toList());
-        map.put("nodeStrategies", nodeStrategies.stream().map(INodeStrategy::toMap).toList());
         return map;
     }
 
-
-
-    /**
-     * 设置审批人配置脚本
-     *
-     * @param operatorScript 审批人配置脚本
-     */
-    public void setOperatorScript(String operatorScript) {
-        this.operatorScript = new OperatorLoadScript(operatorScript);
-    }
-
-    /**
-     * 设置节点待办标题脚本
-     *
-     * @param nodeTitleScript 节点待办标题脚本
-     */
-    public void setNodeTitleScript(String nodeTitleScript) {
-        this.nodeTitleScript = new NodeTitleScript(nodeTitleScript);
-    }
-
-    /**
-     * 错误触发脚本
-     *
-     * @param errorTriggerScript 错误触发脚本
-     */
-    public void setErrorTriggerScript(String errorTriggerScript) {
-        this.errorTriggerScript = new ErrorTriggerScript(errorTriggerScript);
-    }
-
-
-    public FieldPermissionManager formFieldsPermissionsManager() {
-        return new FieldPermissionManager(formFieldPermissions);
-    }
-
-    public ActionManager actionManager() {
-        return new ActionManager(actions);
-    }
-
-
-    public OperatorManager operators(FlowSession flowSession) {
-        return new OperatorManager(operatorScript.execute(flowSession));
-    }
-
-    public String generateTitle(FlowSession flowSession) {
-        return nodeTitleScript.execute(flowSession);
-    }
-
-    public ErrorThrow errorTrigger(FlowSession flowSession) {
-        return errorTriggerScript.execute(flowSession);
-    }
-
-    public void addAction(IFlowAction action) {
-        if (this.actions == null) {
-            this.actions = new ArrayList<>();
-        }
-        this.actions.add(action);
-    }
 
     public void verifyNode(FormMeta form) {
         if (!StringUtils.hasText(view)) {
@@ -166,18 +59,8 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode, I
         if (actions == null || actions.isEmpty()) {
             throw new IllegalArgumentException("actions can not be null");
         }
-        if (operatorScript == null) {
-            throw new IllegalArgumentException("operator can not be null");
-        }
-        if (nodeTitleScript == null) {
-            throw new IllegalArgumentException("nodeTitle can not be null");
-        }
-        FieldPermissionManager fieldPermissionManager = this.formFieldsPermissionsManager();
-        fieldPermissionManager.verifyPermissions(form);
-    }
-
-    public StrategyManager strategies() {
-        return new StrategyManager(nodeStrategies);
+        StrategyManager strategyManager = this.strategyManager();
+        strategyManager.verifyStrategies(form);
     }
 
 
@@ -188,8 +71,8 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode, I
 
     @Override
     public void fillNewRecord(FlowSession session, FlowRecord flowRecord) {
-        StrategyManager strategyManager = this.strategies();
-        flowRecord.setTitle(this.generateTitle(session));
+        StrategyManager strategyManager = this.strategyManager();
+        flowRecord.setTitle(strategyManager.generateTitle(session));
         flowRecord.setTimeoutTime(strategyManager.getTimeoutTime());
         flowRecord.setMergeable(strategyManager.isMergeable());
     }
@@ -200,7 +83,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode, I
         FlowRecord currentRecord = session.getCurrentRecord();
         // 多人审批
         if (currentRecords.size() > 1) {
-            StrategyManager strategyManager = this.strategies();
+            StrategyManager strategyManager = this.strategyManager();
             MultiOperatorAuditStrategy.Type multiOperatorAuditStrategyType = strategyManager.getMultiOperatorAuditStrategyType();
             // 顺序审批
             if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.SEQUENCE) {
@@ -235,21 +118,20 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode, I
     @Override
     public List<FlowRecord> generateCurrentRecords(FlowSession session) {
 
-        if(this.isWaitParallelRecord(session)){
+        if (this.isWaitParallelRecord(session)) {
             return List.of();
         }
 
         List<FlowRecord> records = new ArrayList<>();
-        FlowRecord currentRecord = session.getCurrentRecord();
-        OperatorManager operatorManager = this.operators(session);
+        StrategyManager strategyManager = this.strategyManager();
+        OperatorManager operatorManager = strategyManager.loadOperators(session);
         List<IFlowOperator> operators = operatorManager.getOperators();
         for (int order = 0; order < operators.size(); order++) {
             IFlowOperator operator = operators.get(order);
-            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator), this.id,  order);
+            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator), this.id, order);
             records.add(flowRecord);
         }
         if (operators.size() > 1) {
-            StrategyManager strategyManager = this.strategies();
             MultiOperatorAuditStrategy.Type multiOperatorAuditStrategyType = strategyManager.getMultiOperatorAuditStrategyType();
             // 如果是顺序审批，则隐藏掉后续的人员的审批记录
             if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.SEQUENCE) {
@@ -281,13 +163,14 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode, I
         FlowRecord flowRecord = session.getCurrentRecord();
         Workflow workflow = session.getWorkflow();
         // 数据验证
-        FieldPermissionManager fieldPermissionManager = this.formFieldsPermissionsManager();
-        fieldPermissionManager.verifyFormData(workflow.getForm(), flowRecord.getFormData(), session.getFormData().toMapData());
+//        FieldPermissionManager fieldPermissionManager = this.formFieldsPermissionsManager();
+//        fieldPermissionManager.verifyFormData(workflow.getForm(), flowRecord.getFormData(), session.getFormData().toMapData());
 
         FlowAdvice flowAdvice = session.getAdvice();
         IFlowAction flowAction = flowAdvice.getAction();
 
-        StrategyManager strategyManager = this.strategies();
+        StrategyManager strategyManager = this.strategyManager();
+        strategyManager.verifySession(session);
         // 是否必须填写审批意见
         if (strategyManager.isEnableAdvice()) {
             if (!StringUtils.hasText(flowAdvice.getAdvice())) {

@@ -6,10 +6,13 @@ import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.node.builder.FormFieldPermissionsBuilder;
+import com.codingapi.flow.node.builder.NodeStrategyBuilder;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.gateway.impl.UserGateway;
+import com.codingapi.flow.strategy.FormFieldPermissionStrategy;
+import com.codingapi.flow.strategy.OperatorLoadStrategy;
 import com.codingapi.flow.user.User;
 import org.junit.jupiter.api.Test;
 
@@ -37,24 +40,25 @@ class WorkflowBuilderTest {
 
         StartNode startNode = StartNode
                 .builder()
-                .formFieldsPermissions(
-                        FormFieldPermissionsBuilder.builder()
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
                                 .addPermission("leave", "name", PermissionType.WRITE)
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
-                                .build()
-                )
+                                .build()))
+                        .build())
                 .build();
 
         ApprovalNode approvalNode = ApprovalNode.builder()
                 .name("经理审批")
-                .operatorScript("def run(request){return [request.getCreatedOperator()]}")
-                .formFieldsPermissions(
-                        FormFieldPermissionsBuilder.builder()
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
                                 .addPermission("leave", "name", PermissionType.WRITE)
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
-                                .build()
+                                .build()))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [request.getCreatedOperator()]}"))
+                        .build()
                 )
                 .build();
 

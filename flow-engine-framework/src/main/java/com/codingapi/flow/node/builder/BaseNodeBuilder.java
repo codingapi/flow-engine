@@ -2,6 +2,7 @@ package com.codingapi.flow.node.builder;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.strategy.INodeStrategy;
 
 import java.util.List;
 
@@ -25,6 +26,11 @@ public abstract class BaseNodeBuilder<B extends BaseNodeBuilder<B, N>, N extends
 
     public B name(String name) {
         node.setName(name);
+        return (B) this;
+    }
+
+    public B strategies(List<INodeStrategy> nodeStrategies) {
+        node.setStrategies(nodeStrategies);
         return (B) this;
     }
 

@@ -2,13 +2,9 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.PassAction;
-import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.node.builder.AuditNodeBuilder;
 import com.codingapi.flow.node.BaseAuditNode;
+import com.codingapi.flow.node.builder.BaseNodeBuilder;
 import com.codingapi.flow.node.builder.NodeMapBuilder;
-import com.codingapi.flow.script.node.ErrorTriggerScript;
-import com.codingapi.flow.script.node.NodeTitleScript;
-import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.strategy.*;
 import com.codingapi.flow.utils.RandomUtils;
 
@@ -30,13 +26,14 @@ public class HandleNode extends BaseAuditNode {
     }
 
 
-    public HandleNode(String id, String name,List<IFlowAction> actions, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions,  List<INodeStrategy> nodeStrategies) {
-        super(id, name,actions, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, nodeStrategies);
+    public HandleNode(String id, String name, String view, List<IFlowAction> actions,  List<INodeStrategy> nodeStrategies) {
+        super(id, name, view, actions, nodeStrategies);
     }
 
     public HandleNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, defaultActions(), DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(),new ArrayList<>(), defaultStrategies());
+        this(RandomUtils.generateStringId(), DEFAULT_NAME,  DEFAULT_VIEW, defaultActions(), defaultStrategies());
     }
+
 
     private static List<INodeStrategy> defaultStrategies() {
         List<INodeStrategy> strategies = new ArrayList<>();
@@ -46,6 +43,9 @@ public class HandleNode extends BaseAuditNode {
         strategies.add(RecordMergeStrategy.defaultStrategy());
         strategies.add(ResubmitStrategy.defaultStrategy());
         strategies.add(AdviceStrategy.defaultStrategy());
+        strategies.add(OperatorLoadStrategy.defaultStrategy());
+        strategies.add(ErrorTriggerStrategy.defaultStrategy());
+        strategies.add(NodeTitleStrategy.defaultStrategy());
         return strategies;
     }
 
@@ -63,7 +63,7 @@ public class HandleNode extends BaseAuditNode {
         return new Builder();
     }
 
-    public static class Builder extends AuditNodeBuilder<Builder,HandleNode> {
+    public static class Builder extends BaseNodeBuilder<Builder,HandleNode> {
         public Builder() {
             super(new HandleNode());
         }

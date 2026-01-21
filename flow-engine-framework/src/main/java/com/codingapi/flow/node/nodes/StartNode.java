@@ -3,16 +3,13 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.PassAction;
 import com.codingapi.flow.context.GatewayContext;
-import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.builder.BaseNodeBuilder;
-import com.codingapi.flow.node.builder.IFormFieldPermissionsNode;
-import com.codingapi.flow.node.builder.NodeMapBuilder;
-import com.codingapi.flow.node.manager.FieldPermissionManager;
+import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.strategy.*;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,7 +21,7 @@ import java.util.Map;
 /**
  * 开始节点
  */
-public class StartNode extends BaseFlowNode implements IFormFieldPermissionsNode {
+public class StartNode extends BaseFlowNode {
 
     public static final String NODE_TYPE = "start";
     public static final String DEFAULT_NAME = "开始节点";
@@ -38,41 +35,20 @@ public class StartNode extends BaseFlowNode implements IFormFieldPermissionsNode
     @Setter
     private String view;
 
-    /**
-     * 节点待办标题脚本
-     */
-    private NodeTitleScript nodeTitleScript;
-
-    /**
-     * 表单字段权限
-     */
-    @Setter
-    private List<FormFieldPermission> formFieldPermissions;
-
 
     @Override
     public String getType() {
         return NODE_TYPE;
     }
 
-    public String generateTitle(FlowSession flowSession) {
-        return nodeTitleScript.execute(flowSession);
-    }
 
-
-    public void setNodeTitleScript(String script) {
-        this.nodeTitleScript = new NodeTitleScript(script);
-    }
-
-    public StartNode(String id, String name, List<IFlowAction> actions, String view, NodeTitleScript nodeTitleScript, List<FormFieldPermission> formFieldPermissions) {
-        super(id, name, actions);
+    public StartNode(String id, String name, String view, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
+        super(id, name,0, actions,nodeStrategies);
         this.view = view;
-        this.nodeTitleScript = nodeTitleScript;
-        this.formFieldPermissions = formFieldPermissions;
     }
 
     public StartNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, defaultActions(), DEFAULT_VIEW, NodeTitleScript.defaultScript(), new ArrayList<>());
+        this(RandomUtils.generateStringId(), DEFAULT_NAME,  DEFAULT_VIEW, defaultActions(), defaultStrategies());
     }
 
 
@@ -94,9 +70,12 @@ public class StartNode extends BaseFlowNode implements IFormFieldPermissionsNode
         return records;
     }
 
-    @Override
-    public FieldPermissionManager formFieldsPermissionsManager() {
-        return new FieldPermissionManager(formFieldPermissions);
+
+    private static List<INodeStrategy> defaultStrategies() {
+        List<INodeStrategy> strategies = new ArrayList<>();
+        strategies.add(NodeTitleStrategy.defaultStrategy());
+        strategies.add(new FormFieldPermissionStrategy());
+        return strategies;
     }
 
     private static List<IFlowAction> defaultActions() {
@@ -107,27 +86,21 @@ public class StartNode extends BaseFlowNode implements IFormFieldPermissionsNode
 
     public static StartNode formMap(Map<String, Object> map) {
         StartNode startNode = BaseFlowNode.loadFromMap(map, StartNode.class);
-        startNode.setNodeTitleScript((String) map.get("nodeTitleScript"));
-        startNode.setFormFieldPermissions(NodeMapBuilder.loadFormFieldPermissions(map));
+        startNode.setView((String) map.get("view"));
         return startNode;
     }
 
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
-        map.put("name", name);
-        map.put("id", id);
         map.put("view", view);
-        map.put("nodeTitleScript", nodeTitleScript.getScript());
-        map.put("formFieldPermissions", formFieldPermissions);
-        map.put("type", getType());
-        map.put("actions", actions.stream().map(IFlowAction::toMap).toList());
         return map;
     }
 
     @Override
     public void fillNewRecord(FlowSession session, FlowRecord flowRecord) {
-        flowRecord.setTitle(this.generateTitle(session));
+        StrategyManager strategyManager = this.strategyManager();
+        flowRecord.setTitle(strategyManager.generateTitle(session));
     }
 
 
@@ -136,14 +109,8 @@ public class StartNode extends BaseFlowNode implements IFormFieldPermissionsNode
     }
 
     public static class Builder extends BaseNodeBuilder<Builder, StartNode> {
-
         public Builder() {
             super(new StartNode());
-        }
-
-        public Builder formFieldsPermissions(List<FormFieldPermission> permissions) {
-            node.setFormFieldPermissions(permissions);
-            return this;
         }
     }
 }

@@ -3,7 +3,6 @@ package com.codingapi.flow.node.builder;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.factory.FlowActionFactory;
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.strategy.INodeStrategy;
 import com.codingapi.flow.strategy.NodeStrategyFactory;
@@ -21,10 +20,7 @@ public class NodeMapBuilder {
         if (permissions != null) {
             List<FormFieldPermission> permissionList = new ArrayList<>();
             for (Map<String, Object> item : permissions) {
-                FormFieldPermission permission = new FormFieldPermission();
-                permission.setFormCode((String) item.get("formCode"));
-                permission.setFieldName((String) item.get("fieldName"));
-                permission.setType(PermissionType.valueOf((String) item.get("type")));
+                FormFieldPermission permission = FormFieldPermission.fromMap(item);
                 permissionList.add(permission);
             }
             return permissionList;
@@ -67,15 +63,10 @@ public class NodeMapBuilder {
         node.setId((String) map.get("id"));
         node.setName((String) map.get("name"));
         node.setView((String) map.get("view"));
-        node.setOperatorScript((String) map.get("operatorScript"));
-        node.setNodeTitleScript((String) map.get("nodeTitleScript"));
-        node.setErrorTriggerScript((String) map.get("errorTriggerScript"));
-        List<FormFieldPermission> permissionList = NodeMapBuilder.loadFormFieldPermissions(map);
-        node.setFormFieldPermissions(permissionList);
         List<IFlowAction> actionList = NodeMapBuilder.loadActions(map);
         node.setActions(actionList);
         List<INodeStrategy> strategyList = NodeMapBuilder.loadNodeStrategies(map);
-        node.setNodeStrategies(strategyList);
+        node.setStrategies(strategyList);
         return node;
     }
 }
