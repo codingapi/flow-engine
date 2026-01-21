@@ -4,6 +4,7 @@ import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
+import com.codingapi.flow.repository.ParallelBranchRepository;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +22,8 @@ public class RepositoryContext {
     private FlowRecordRepository flowRecordRepository;
     @Setter
     private FlowOperatorGateway flowOperatorGateway;
+    @Setter
+    private ParallelBranchRepository parallelBranchRepository;
 
     public FlowRecord getRecordById(long id) {
         return flowRecordRepository.get(id);
@@ -50,7 +53,11 @@ public class RepositoryContext {
         return flowRecordRepository.findRecordsByProcessId(processId);
     }
 
-    public List<FlowRecord> findRecordsNodeIdAndParallelId(String nodeId, String parallelId) {
-        return flowRecordRepository.findRecordsNodeIdAndParallelId(nodeId, parallelId);
+    public int getParallelBranchTriggerCount(String parallelId) {
+        return parallelBranchRepository.getTriggerCount(parallelId);
+    }
+
+    public void addParallelTriggerCount(String parallelId) {
+        parallelBranchRepository.addTriggerCount(parallelId);
     }
 }

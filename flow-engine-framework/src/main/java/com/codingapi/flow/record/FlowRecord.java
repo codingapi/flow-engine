@@ -1,5 +1,6 @@
 package com.codingapi.flow.record;
 
+import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
@@ -166,10 +167,10 @@ public class FlowRecord {
     /**
      * 并行分支数量
      */
-    private int parallelBranchCount;
+    private int parallelBranchTotal;
 
 
-    public FlowRecord(FlowSession flowSession, String actionId,  int nodeOrder) {
+    public FlowRecord(FlowSession flowSession, String actionId, int nodeOrder) {
         this.workCode = flowSession.getWorkCode();
         this.workBackupId = flowSession.getBackupId();
         this.nodeId = flowSession.getCurrentNodeId();
@@ -182,7 +183,7 @@ public class FlowRecord {
         this.recordState = SATE_RECORD_TODO;
         this.actionId = actionId;
         this.currentOperatorId = flowSession.getCurrentOperator().getUserId();
-        this.interferedOperatorId = flowSession.getCurrentOperator().entrustOperator()!=null?flowSession.getCurrentOperator().entrustOperator().getUserId():0;
+        this.interferedOperatorId = flowSession.getCurrentOperator().entrustOperator() != null ? flowSession.getCurrentOperator().entrustOperator().getUserId() : 0;
         this.advice = flowSession.getAdvice().getAdvice();
         this.signKey = flowSession.getAdvice().getSignKey();
         this.flowState = SATE_FLOW_RUNNING;
@@ -190,7 +191,7 @@ public class FlowRecord {
         this.isInterfere = flowSession.getWorkflow().isInterfere();
         this.hidden = false;
 
-        flowSession.getCurrentNode().fillNewRecord(flowSession,this);
+        flowSession.getCurrentNode().fillNewRecord(flowSession, this);
         this.extendsRecord(flowSession.getCurrentRecord());
 
         this.verify();
@@ -198,24 +199,34 @@ public class FlowRecord {
 
 
     public void extendsRecord(FlowRecord record) {
-        if(record!=null) {
+        if (record != null) {
             this.parallelBranchNodeId = record.parallelBranchNodeId;
-            this.parallelBranchCount = record.parallelBranchCount;
+            this.parallelBranchTotal = record.parallelBranchTotal;
             this.parallelId = record.parallelId;
             this.fromId = record.id;
             this.processId = record.processId;
         }
     }
 
+    /**
+     * 当满足条件以后需要清空并行的记录数据
+     */
+    public void clearParallel() {
+        this.parallelBranchNodeId = null;
+        this.parallelBranchTotal = 0;
+        this.parallelId = null;
+    }
+
 
     /**
      * 并行分支节点
+     *
      * @param parallelBranchNodeId 并行分支节点id
-     * @param parallelBranchCount 并行分支数量
+     * @param parallelBranchCount  并行分支数量
      */
-    public void parallelBranchNode(String parallelBranchNodeId, int parallelBranchCount,String parallelId) {
+    public void parallelBranchNode(String parallelBranchNodeId, int parallelBranchCount, String parallelId) {
         this.parallelBranchNodeId = parallelBranchNodeId;
-        this.parallelBranchCount = parallelBranchCount;
+        this.parallelBranchTotal = parallelBranchCount;
         this.parallelId = parallelId;
     }
 

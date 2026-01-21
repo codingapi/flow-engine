@@ -10,6 +10,7 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
+import com.codingapi.flow.repository.ParallelBranchRepository;
 import com.codingapi.flow.repository.WorkflowBackupRepository;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
@@ -25,10 +26,12 @@ public class FlowActionService {
     private final FlowOperatorGateway flowOperatorGateway;
     private final FlowRecordRepository flowRecordRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
+    private final ParallelBranchRepository parallelBranchRepository;
 
     public void action() {
         RepositoryContext.getInstance().setFlowRecordRepository(flowRecordRepository);
         RepositoryContext.getInstance().setFlowOperatorGateway(flowOperatorGateway);
+        RepositoryContext.getInstance().setParallelBranchRepository(parallelBranchRepository);
 
         request.verify();
         // 验证当前用户
@@ -69,7 +72,7 @@ public class FlowActionService {
         formData.reset(request.getFormData());
         FlowAdvice flowAdvice = request.toFlowAdvice(workflow, flowAction);
 
-        List<FlowRecord> currentRecords = flowRecordRepository.findRecordsByFromIdAndNodeId(flowRecord.getFromId(), flowRecord.getNodeId());
+        List<FlowRecord> currentRecords = RepositoryContext.getInstance().findRecordsByFromIdAndNodeId(flowRecord.getFromId(), flowRecord.getNodeId());
         FlowSession session = new FlowSession(currentOperator, workflow, currentNode, flowAction, formData, flowRecord, currentRecords, workflowBackup.getId(), flowAdvice);
 
         currentNode.verifySession(session);

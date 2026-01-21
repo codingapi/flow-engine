@@ -18,5 +18,4 @@ public interface FlowRecordRepository {
 
     List<FlowRecord> findRecordsByProcessId(String processId);
 
-    List<FlowRecord> findRecordsNodeIdAndParallelId(String nodeId, String parallelId);
 }

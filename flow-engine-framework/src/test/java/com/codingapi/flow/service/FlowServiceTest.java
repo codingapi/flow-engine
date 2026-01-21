@@ -32,7 +32,8 @@ class FlowServiceTest {
     private final UserGateway userGateway = new UserGateway();
     private final WorkflowBackupRepository workflowBackupRepository = new WorkflowBackupRepositoryImpl();
     private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
-    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository);
+    private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
+    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository,parallelBranchRepository);
 
     @Test
     void create() {
@@ -587,9 +588,9 @@ class FlowServiceTest {
 
 
         List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(departRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
+        assertEquals(4, records.size());
         assertEquals(0, records.stream().filter(FlowRecord::isTodo).toList().size());
-        assertEquals(0, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 

@@ -102,13 +102,14 @@ public abstract class BaseFlowNode implements IFlowNode {
     public boolean isWaitParallelRecord(FlowSession session) {
         FlowRecord currentRecord = session.getCurrentRecord();
         if (currentRecord != null && this.getId().equals(currentRecord.getParallelBranchNodeId())) {
-            //TODO
-            System.out.println(currentRecord.isTodo());
-            // 此时还没有创建当前节点的记录数据，当时已经到了该汇聚节点，需要判断汇聚次数。
-            int parallelBranchCount = currentRecord.getParallelBranchCount();
-            List<FlowRecord> parallelRecords = RepositoryContext.getInstance().findRecordsNodeIdAndParallelId(this.getId(), currentRecord.getParallelId());
-            List<FlowRecord> finishRecords = parallelRecords.stream().filter(FlowRecord::isFinish).toList();
-            return parallelBranchCount != finishRecords.size();
+            RepositoryContext.getInstance().addParallelTriggerCount(currentRecord.getParallelId());
+            int parallelBranchTotal = currentRecord.getParallelBranchTotal();
+            int parallelBranchCount = RepositoryContext.getInstance().getParallelBranchTriggerCount(currentRecord.getParallelId());
+            if(parallelBranchCount == parallelBranchTotal){
+                // 清空并行节点，防止数据继续继承到后续节点
+                currentRecord.clearParallel();
+            }
+            return parallelBranchCount != parallelBranchTotal;
         }
         return false;
     }

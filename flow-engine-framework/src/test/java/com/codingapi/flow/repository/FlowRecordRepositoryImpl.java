@@ -58,11 +58,4 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
         return cache.values().stream().filter(flowRecord -> flowRecord.getProcessId().equals(processId)).toList();
     }
 
-    @Override
-    public List<FlowRecord> findRecordsNodeIdAndParallelId( String nodeId, String parallelId) {
-        return cache.values().stream().filter(flowRecord ->
-                flowRecord.getNodeId().equals(nodeId)
-                && flowRecord.getParallelId().equals(parallelId))
-                .toList();
-    }
 }
