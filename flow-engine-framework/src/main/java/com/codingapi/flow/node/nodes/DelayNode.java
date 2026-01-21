@@ -4,7 +4,6 @@ import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.builder.BaseNodeBuilder;
 import com.codingapi.flow.utils.RandomUtils;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 /**
