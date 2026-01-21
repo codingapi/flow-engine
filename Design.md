@@ -245,8 +245,66 @@
 
 #### ScriptRuntimeContext
 - **位置**: `com.codingapi.flow.script.runtime.ScriptRuntimeContext`
-- **职责**: Groovy脚本运行时环境
-- **核心方法**: `execute(String method, String script, ...)`
+- **职责**: Groovy脚本运行时环境，支持线程安全的脚本执行和自动资源清理
+- **设计特点**:
+  - **线程安全**: 使用脚本哈希值进行细粒度同步，不同脚本可并发执行
+  - **自动清理**: 双重清理机制（阈值触发 + 定时清理）
+  - **资源管理**: 单例自动管理定时任务生命周期，注册JVM关闭钩子
+- **核心属性**:
+  - `SCRIPT_LOCKS`: 脚本锁映射表（ConcurrentHashMap），键为脚本哈希值
+  - `EXECUTION_COUNTER`: 脚本执行计数器（AtomicInteger）
+  - `maxLockCacheSize`: 最大锁缓存阈值（默认1000）
+  - `CLEANUP_INTERVAL_SECONDS`: 定时清理间隔（默认300秒，可通过系统属性`flow.script.cleanup.interval`覆盖）
+- **核心方法**:
+  - `run(String script, Class<T> returnType, Object... args)`: 执行脚本
+  - `execute(String method, String script, Class<T> returnType, Object... args)`: 执行指定方法
+  - `clearLockCache()`: 手动清理锁缓存
+  - `setMaxLockCacheSize(int)`: 设置最大锁缓存阈值
+  - `getLockCacheSize()`: 获取当前锁缓存大小
+  - `getExecutionCount()`: 获取脚本执行总次数
+  - `enableAutoCleanup()`: 启用自动清理
+  - `disableAutoCleanup()`: 禁用自动清理
+  - `getCleanupIntervalSeconds()`: 获取清理间隔
+
+#### 自动清理机制
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    ScriptRuntimeContext                         │
+│                    自动清理双重机制                              │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+              ┌───────────────┴───────────────┐
+              ▼                               ▼
+┌─────────────────────────┐       ┌─────────────────────────┐
+│   阈值触发清理           │       │   定时清理任务           │
+│   (Threshold-based)      │       │   (Scheduled)           │
+└─────────────────────────┘       └─────────────────────────┘
+              │                               │
+              ▼                               ▼
+┌─────────────────────────┐       ┌─────────────────────────┐
+│ 触发条件：               │       │ 触发条件：               │
+│ SCRIPT_LOCKS.size() >    │       │ 每隔 CLEANUP_INTERVAL_  │
+│ maxLockCacheSize         │       │ SECONDS 秒执行一次       │
+└─────────────────────────┘       └─────────────────────────┘
+              │                               │
+              ▼                               ▼
+┌─────────────────────────┐       ┌─────────────────────────┐
+│ 清理动作：               │       │ 清理动作：               │
+│ SCRIPT_LOCKS.clear()    │       │ SCRIPT_LOCKS.clear()    │
+│ EXECUTION_COUNTER.set(0)│       │ EXECUTION_COUNTER.set(0)│
+└─────────────────────────┘       └─────────────────────────┘
+```
+
+**配置方式**:
+- **阈值配置**: `ScriptRuntimeContext.setMaxLockCacheSize(500)`
+- **定时配置**: JVM启动参数 `-Dflow.script.cleanup.interval=300`
+- **动态控制**: `enableAutoCleanup()` / `disableAutoCleanup()`
+
+**生命周期管理**:
+1. 单例初始化时自动启动定时清理任务（守护线程）
+2. 注册JVM关闭钩子确保资源释放
+3. 支持运行时动态启用/禁用自动清理
 
 #### 脚本类型
 
@@ -693,3 +751,18 @@
 - 节点的`setActions()`和`setStrategies()`方法支持增量更新
 - 根据类型匹配现有对象，调用`copy()`方法复制属性
 - `CustomAction`特殊处理，支持动态添加
+
+### 5. 脚本运行时线程安全设计
+- **问题**: GroovyShell和GroovyClassLoader都不是线程安全的
+- **方案**: 每次执行创建独立的GroovyClassLoader和GroovyShell实例
+- **细粒度同步**: 使用脚本哈希值作为锁键，相同脚本串行执行，不同脚本并发执行
+- **自动清理**: 阈值触发 + 定时清理双重机制，避免内存泄漏
+
+### 6. 框架异常体系
+- `FlowException`: 所有框架异常的基类（RuntimeException）
+- `FlowValidationException`: 参数验证异常（required、notEmpty）
+- `FlowNotFoundException`: 资源未找到异常（workflow、record、node等）
+- `FlowStateException`: 状态异常（recordAlreadyDone、operatorNotMatch等）
+- `FlowPermissionException`: 权限异常（fieldReadOnly、accessDenied等）
+- `FlowConfigException`: 配置异常（strategiesNotNull、actionsNotNull等）
+- `FlowExecutionException`: 执行异常（scriptExecutionError、nodeExecutionError等）
