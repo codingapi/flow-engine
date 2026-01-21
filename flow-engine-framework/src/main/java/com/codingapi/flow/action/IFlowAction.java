@@ -51,4 +51,9 @@ public interface IFlowAction {
     void run(FlowSession flowSession);
 
 
+    /**
+     * 复制动作
+     */
+    void copy(IFlowAction action);
+
 }

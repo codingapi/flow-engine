@@ -1,6 +1,12 @@
 package com.codingapi.flow.node.manager;
 
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.actions.ReturnAction;
+import com.codingapi.flow.action.actions.SaveAction;
+import com.codingapi.flow.action.actions.TransferAction;
+import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.session.FlowAdvice;
+import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -30,4 +36,38 @@ public class ActionManager {
         return null;
     }
 
+    public void verify(FormMeta form) {
+
+    }
+
+    public void verifySession(FlowSession session) {
+        FlowAdvice flowAdvice = session.getAdvice();
+
+        IFlowAction flowAction = flowAdvice.getAction();
+        // 保存操作,不做检查
+        if (flowAction instanceof SaveAction) {
+            return;
+        }
+        // 转办操作
+        if (flowAction instanceof TransferAction) {
+            if (flowAdvice.getTransferOperators() == null || flowAdvice.getTransferOperators().isEmpty()) {
+                throw new IllegalArgumentException("transferOperators can not be null");
+            }
+        }
+        // 退回操作
+        if (flowAction instanceof ReturnAction) {
+            if (flowAdvice.getBackNode() == null) {
+                throw new IllegalArgumentException("backNode can not be null");
+            }
+        }
+    }
+
+    public IFlowAction getAction(Class<? extends IFlowAction> clazz) {
+        for (IFlowAction action : actions) {
+            if (action.getClass() == clazz) {
+                return action;
+            }
+        }
+        return null;
+    }
 }

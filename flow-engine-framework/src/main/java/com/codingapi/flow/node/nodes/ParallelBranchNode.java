@@ -2,7 +2,7 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.builder.BaseNodeBuilder;
+import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;

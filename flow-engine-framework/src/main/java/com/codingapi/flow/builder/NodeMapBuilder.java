@@ -1,4 +1,4 @@
-package com.codingapi.flow.node.builder;
+package com.codingapi.flow.builder;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.factory.FlowActionFactory;

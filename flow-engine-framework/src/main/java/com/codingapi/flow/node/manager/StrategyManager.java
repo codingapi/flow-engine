@@ -1,10 +1,13 @@
 package com.codingapi.flow.node.manager;
 
+import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,7 +138,7 @@ public class StrategyManager {
         return 0;
     }
 
-    public void verifyStrategies(FormMeta form) {
+    public void verify(FormMeta form) {
 
     }
 
@@ -160,7 +163,23 @@ public class StrategyManager {
     }
 
     public void verifySession(FlowSession session) {
-
+        FlowAdvice flowAdvice = session.getAdvice();
+        IFlowAction flowAction = flowAdvice.getAction();
+        // 是否必须填写审批意见
+        if (this.isEnableAdvice()) {
+            if (!StringUtils.hasText(flowAdvice.getAdvice())) {
+                throw new IllegalArgumentException("advice can not be null");
+            }
+        }
+        //  通过操作
+        if (flowAction instanceof PassAction) {
+            // 是否必须签名
+            if (this.isEnableSignable()) {
+                if (!StringUtils.hasText(flowAdvice.getSignKey())) {
+                    throw new IllegalArgumentException("signKey can not be null");
+                }
+            }
+        }
     }
 
     public INodeStrategy getStrategy(Class<? extends INodeStrategy> aClass) {

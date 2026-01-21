@@ -1,7 +1,7 @@
 package com.codingapi.flow.strategy;
 
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.node.builder.NodeMapBuilder;
+import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;

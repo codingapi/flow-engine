@@ -1,18 +1,15 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.PassAction;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.INodeStrategy;
 import com.codingapi.flow.strategy.MultiOperatorAuditStrategy;
 import com.codingapi.flow.utils.RandomUtils;
-import com.codingapi.flow.workflow.Workflow;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -48,20 +45,10 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
 
 
     public void verifyNode(FormMeta form) {
+        super.verifyNode(form);
         if (!StringUtils.hasText(view)) {
             throw new IllegalArgumentException("view can not be null");
         }
-        if (!StringUtils.hasText(name)) {
-            throw new IllegalArgumentException("name can not be null");
-        }
-        if (!StringUtils.hasText(id)) {
-            throw new IllegalArgumentException("id can not be null");
-        }
-        if (actions == null || actions.isEmpty()) {
-            throw new IllegalArgumentException("actions can not be null");
-        }
-        StrategyManager strategyManager = this.strategyManager();
-        strategyManager.verifyStrategies(form);
     }
 
 
@@ -164,37 +151,6 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         T node = BaseFlowNode.loadFromMap(map, clazz);
         node.setView((String) map.get("view"));
         return node;
-    }
-
-    @Override
-    public void verifySession(FlowSession session) {
-        super.verifySession(session);
-        FlowRecord flowRecord = session.getCurrentRecord();
-        Workflow workflow = session.getWorkflow();
-        // 数据验证
-//        FieldPermissionManager fieldPermissionManager = this.formFieldsPermissionsManager();
-//        fieldPermissionManager.verifyFormData(workflow.getForm(), flowRecord.getFormData(), session.getFormData().toMapData());
-
-        FlowAdvice flowAdvice = session.getAdvice();
-        IFlowAction flowAction = flowAdvice.getAction();
-
-        StrategyManager strategyManager = this.strategyManager();
-        strategyManager.verifySession(session);
-        // 是否必须填写审批意见
-        if (strategyManager.isEnableAdvice()) {
-            if (!StringUtils.hasText(flowAdvice.getAdvice())) {
-                throw new IllegalArgumentException("advice can not be null");
-            }
-        }
-        //  通过操作
-        if (flowAction instanceof PassAction) {
-            // 是否必须签名
-            if (strategyManager.isEnableSignable()) {
-                if (!StringUtils.hasText(flowAdvice.getSignKey())) {
-                    throw new IllegalArgumentException("signKey can not be null");
-                }
-            }
-        }
     }
 
 }
