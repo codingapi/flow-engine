@@ -2,16 +2,20 @@ package com.codingapi.flow.strategy;
 
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.utils.RandomUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class NodeTitleStrategy implements INodeStrategy {
+public class NodeTitleStrategy extends BaseStrategy {
 
     /**
      * 审批人配置脚本
      */
     private NodeTitleScript nodeTitleScript;
+
+    public NodeTitleStrategy() {
+        super(RandomUtils.generateStringId());
+    }
 
     public void setOperatorScript(String script) {
         this.nodeTitleScript = new NodeTitleScript(script);
@@ -31,15 +35,14 @@ public class NodeTitleStrategy implements INodeStrategy {
 
     @Override
     public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put(TYPE_KEY, strategyType());
+        Map<String, Object> map = super.toMap();
         map.put("script", nodeTitleScript.getScript());
         return map;
     }
 
     public static NodeTitleStrategy fromMap(Map<String, Object> map) {
-        if (map == null || map.isEmpty()) return null;
-        NodeTitleStrategy strategy = new NodeTitleStrategy();
+        NodeTitleStrategy strategy = BaseStrategy.fromMap(map, NodeTitleStrategy.class);
+        if (strategy == null) return null;
         strategy.setOperatorScript((String) map.get("script"));
         return strategy;
     }

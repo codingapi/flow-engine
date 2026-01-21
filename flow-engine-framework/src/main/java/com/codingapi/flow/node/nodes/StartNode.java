@@ -74,7 +74,6 @@ public class StartNode extends BaseFlowNode {
     private static List<INodeStrategy> defaultStrategies() {
         List<INodeStrategy> strategies = new ArrayList<>();
         strategies.add(NodeTitleStrategy.defaultStrategy());
-        strategies.add(new FormFieldPermissionStrategy());
         return strategies;
     }
 

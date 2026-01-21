@@ -3,13 +3,18 @@ package com.codingapi.flow.strategy;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.utils.RandomUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class ErrorTriggerStrategy implements INodeStrategy{
+public class ErrorTriggerStrategy extends BaseStrategy {
 
     private ErrorTriggerScript errorTriggerScript;
+
+
+    public ErrorTriggerStrategy() {
+        super(RandomUtils.generateStringId());
+    }
 
     public void setErrorTriggerScript(String script) {
         this.errorTriggerScript = new ErrorTriggerScript(script);
@@ -17,15 +22,14 @@ public class ErrorTriggerStrategy implements INodeStrategy{
 
     @Override
     public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put(TYPE_KEY, strategyType());
+        Map<String, Object> map = super.toMap();
         map.put("script", errorTriggerScript.getScript());
         return map;
     }
 
     public static ErrorTriggerStrategy fromMap(Map<String, Object> map) {
-        if (map == null || map.isEmpty()) return null;
-        ErrorTriggerStrategy strategy = new ErrorTriggerStrategy();
+        ErrorTriggerStrategy strategy = BaseStrategy.fromMap(map, ErrorTriggerStrategy.class);
+        if (strategy == null) return null;
         strategy.setErrorTriggerScript((String) map.get("script"));
         return strategy;
     }

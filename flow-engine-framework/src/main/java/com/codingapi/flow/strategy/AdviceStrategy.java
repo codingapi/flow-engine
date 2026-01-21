@@ -1,15 +1,15 @@
 package com.codingapi.flow.strategy;
 
+import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 节点审批意见策略
  */
 @Data
-public class AdviceStrategy implements INodeStrategy {
+public class AdviceStrategy extends BaseStrategy {
 
     /**
      * 是否可空
@@ -20,6 +20,9 @@ public class AdviceStrategy implements INodeStrategy {
      */
     private boolean signable;
 
+    public AdviceStrategy() {
+        super(RandomUtils.generateStringId());
+    }
 
     public static AdviceStrategy defaultStrategy() {
         AdviceStrategy strategy = new AdviceStrategy();
@@ -31,16 +34,15 @@ public class AdviceStrategy implements INodeStrategy {
 
     @Override
     public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put(TYPE_KEY, strategyType());
+        Map<String, Object> map = super.toMap();
         map.put("adviceNullable", adviceNullable);
         map.put("signable", signable);
         return map;
     }
 
     public static AdviceStrategy fromMap(Map<String, Object> map) {
-        if (map == null || map.isEmpty()) return null;
-        AdviceStrategy strategy = new AdviceStrategy();
+        AdviceStrategy strategy = BaseStrategy.fromMap(map, AdviceStrategy.class);
+        if (strategy == null) return null;
         strategy.setAdviceNullable((boolean) map.get("adviceNullable"));
         strategy.setSignable((boolean) map.get("signable"));
         return strategy;

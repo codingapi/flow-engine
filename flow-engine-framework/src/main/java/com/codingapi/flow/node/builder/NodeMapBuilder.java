@@ -16,7 +16,7 @@ public class NodeMapBuilder {
 
     @SuppressWarnings("unchecked")
     public static List<FormFieldPermission> loadFormFieldPermissions(Map<String, Object> data) {
-        List<Map<String, Object>> permissions = (List<Map<String, Object>>) data.get("formFieldPermissions");
+        List<Map<String, Object>> permissions = (List<Map<String, Object>>) data.get("fieldPermissions");
         if (permissions != null) {
             List<FormFieldPermission> permissionList = new ArrayList<>();
             for (Map<String, Object> item : permissions) {

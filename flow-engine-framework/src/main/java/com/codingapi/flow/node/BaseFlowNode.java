@@ -58,10 +58,19 @@ public abstract class BaseFlowNode implements IFlowNode {
     protected List<INodeStrategy> strategies;
 
 
+    public void clear() {
+        this.actions.clear();
+        this.strategies.clear();
+    }
+
     public void setStrategies(List<INodeStrategy> strategies) {
         if(strategies!=null && !strategies.isEmpty()) {
             if(this.strategies!=null){
-                this.strategies.addAll(strategies);
+                for(INodeStrategy nodeStrategy: strategies){
+                    if(!this.strategies.contains(nodeStrategy)){
+                        this.strategies.add(nodeStrategy);
+                    }
+                }
             }else {
                 this.strategies = strategies;
             }
@@ -104,6 +113,7 @@ public abstract class BaseFlowNode implements IFlowNode {
     @SneakyThrows
     public static <T extends BaseFlowNode> T loadFromMap(Map<String, Object> map, Class<T> clazz) {
         T node = clazz.getDeclaredConstructor().newInstance();
+        node.clear();
         node.setId((String) map.get("id"));
         node.setName((String) map.get("name"));
         node.setOrder(Integer.parseInt((String) map.get("order")));

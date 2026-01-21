@@ -3,42 +3,43 @@ package com.codingapi.flow.strategy;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.node.builder.NodeMapBuilder;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import com.codingapi.flow.utils.RandomUtils;
+import lombok.Data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@AllArgsConstructor
-public class FormFieldPermissionStrategy implements INodeStrategy {
+@Data
+public class FormFieldPermissionStrategy extends BaseStrategy  {
 
     /**
      * 表单字段权限
      */
-    @Setter
-    @Getter
-    private List<FormFieldPermission> formFieldPermissions;
+    private List<FormFieldPermission> fieldPermissions;
 
 
     public FormFieldPermissionStrategy() {
-        this.formFieldPermissions = new ArrayList<>();
+        super(RandomUtils.generateStringId());
+        this.fieldPermissions = new ArrayList<>();
+    }
+
+    public FormFieldPermissionStrategy(List<FormFieldPermission> fieldPermissions) {
+        super(RandomUtils.generateStringId());
+        this.fieldPermissions = fieldPermissions;
     }
 
     @Override
     public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put(TYPE_KEY, strategyType());
-        map.put("fieldPermissions", formFieldPermissions.stream().map(FormFieldPermission::toMap).toList());
+        Map<String, Object> map = super.toMap();
+        map.put("fieldPermissions", fieldPermissions.stream().map(FormFieldPermission::toMap).toList());
         return map;
     }
 
     public static FormFieldPermissionStrategy fromMap(Map<String, Object> map) {
-        if (map == null || map.isEmpty()) return null;
-        FormFieldPermissionStrategy strategy = new FormFieldPermissionStrategy();
-        strategy.setFormFieldPermissions(NodeMapBuilder.loadFormFieldPermissions(map));
+        FormFieldPermissionStrategy strategy = BaseStrategy.fromMap(map, FormFieldPermissionStrategy.class);
+        if (strategy == null) return null;
+        strategy.setFieldPermissions(NodeMapBuilder.loadFormFieldPermissions(map));
         return strategy;
     }
 

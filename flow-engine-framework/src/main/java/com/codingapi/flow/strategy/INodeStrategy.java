@@ -8,6 +8,8 @@ public interface INodeStrategy {
 
     Map<String, Object> toMap();
 
+    String getId();
+
     default String strategyType() {
         return this.getClass().getSimpleName();
     }
