@@ -6,9 +6,10 @@ import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
-import com.codingapi.flow.node.audit.ApprovalNode;
-import com.codingapi.flow.node.audit.StartNode;
-import com.codingapi.flow.node.fixed.EndNode;
+import com.codingapi.flow.node.builder.FormFieldPermissionsBuilder;
+import com.codingapi.flow.node.nodes.ApprovalNode;
+import com.codingapi.flow.node.nodes.StartNode;
+import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.User;
@@ -33,21 +34,25 @@ class ErrorTriggerScriptTest {
                 .build();
 
         StartNode startNode = StartNode.builder()
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.WRITE)
-                .addPermission("leave", "days", PermissionType.WRITE)
-                .addPermission("leave", "reason", PermissionType.WRITE)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                        .addPermission("leave", "name", PermissionType.READ)
+                        .addPermission("leave", "days", PermissionType.READ)
+                        .addPermission("leave", "reason", PermissionType.READ)
+                        .build()
+                )
                 .build();
 
         ApprovalNode approvalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .operatorScript("def run(request){return [request.getCreatedOperator()]}")
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.READ)
-                .addPermission("leave", "days", PermissionType.READ)
-                .addPermission("leave", "reason", PermissionType.READ)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.READ)
+                                .addPermission("leave", "days", PermissionType.READ)
+                                .addPermission("leave", "reason", PermissionType.READ)
+                                .build()
+                )
                 .build();
 
         EndNode endNode = EndNode.builder().build();
@@ -66,7 +71,7 @@ class ErrorTriggerScriptTest {
         FormData data = new FormData(form);
         data.getDataBody().set("name", "张三").set("days", 10).set("reason", "事由");
 
-        FlowSession flowSession = new FlowSession(user, form, workflow, startNode, data, 0);
+        FlowSession flowSession =  FlowSession.startSession(user, workflow, startNode,startNode.getActions().get(0), data, 0);
 
         ErrorTriggerScript errorNodeTriggerScript = ErrorTriggerScript.defaultNodeScript();
         ErrorThrow errorThrow = errorNodeTriggerScript.execute(flowSession);

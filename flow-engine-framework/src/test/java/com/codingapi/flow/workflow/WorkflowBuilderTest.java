@@ -5,9 +5,10 @@ import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
-import com.codingapi.flow.node.audit.ApprovalNode;
-import com.codingapi.flow.node.audit.StartNode;
-import com.codingapi.flow.node.fixed.EndNode;
+import com.codingapi.flow.node.builder.FormFieldPermissionsBuilder;
+import com.codingapi.flow.node.nodes.ApprovalNode;
+import com.codingapi.flow.node.nodes.StartNode;
+import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.user.User;
 import org.junit.jupiter.api.Test;
@@ -36,21 +37,25 @@ class WorkflowBuilderTest {
 
         StartNode startNode = StartNode
                 .builder()
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.WRITE)
-                .addPermission("leave", "days", PermissionType.WRITE)
-                .addPermission("leave", "reason", PermissionType.WRITE)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         ApprovalNode approvalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .operatorScript("def run(request){return [request.getCreatedOperator()]}")
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.READ)
-                .addPermission("leave", "days", PermissionType.READ)
-                .addPermission("leave", "reason", PermissionType.READ)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         EndNode endNode = EndNode.builder().build();

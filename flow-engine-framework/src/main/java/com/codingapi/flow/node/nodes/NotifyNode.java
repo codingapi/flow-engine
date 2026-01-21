@@ -1,10 +1,11 @@
-package com.codingapi.flow.node.audit;
+package com.codingapi.flow.node.nodes;
 
+import com.codingapi.flow.action.DefaultAction;
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.PassAction;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.node.builder.AuditNodeBuilder;
 import com.codingapi.flow.node.BaseAuditNode;
+import com.codingapi.flow.node.builder.NodeMapBuilder;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.script.node.OperatorLoadScript;
@@ -16,24 +17,24 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 开始节点
+ * 抄送节点
  */
-public class StartNode extends BaseAuditNode {
+public class NotifyNode extends BaseAuditNode {
 
-    public static final String NODE_TYPE = "start";
-    public static final String DEFAULT_NAME = "开始节点";
+    public static final String NODE_TYPE = "notify";
+    public static final String DEFAULT_NAME = "抄送节点";
 
     @Override
     public String getType() {
         return NODE_TYPE;
     }
 
-    public StartNode(String id, String name, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions, actions, nodeStrategies);
+    public NotifyNode(String id, String name,List<IFlowAction> actions, String view, OperatorLoadScript operatorScript, NodeTitleScript nodeTitleScript, ErrorTriggerScript errorTriggerScript, List<FormFieldPermission> formFieldsPermissions,  List<INodeStrategy> nodeStrategies) {
+        super(id, name,actions, view, operatorScript, nodeTitleScript, errorTriggerScript, formFieldsPermissions,  nodeStrategies);
     }
 
-    public StartNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(), defaultActions(), defaultStrategies());
+    public NotifyNode() {
+        this(RandomUtils.generateStringId(), DEFAULT_NAME,defaultActions(), DEFAULT_VIEW, OperatorLoadScript.creator(), NodeTitleScript.defaultScript(), ErrorTriggerScript.defaultNodeScript(), new ArrayList<>(),  defaultStrategies());
     }
 
     private static List<INodeStrategy> defaultStrategies() {
@@ -49,22 +50,21 @@ public class StartNode extends BaseAuditNode {
 
     private static List<IFlowAction> defaultActions() {
         List<IFlowAction> actions = new ArrayList<>();
-        actions.add(new PassAction());
+        actions.add(new DefaultAction());
         return actions;
     }
 
-    public static StartNode formMap(Map<String, Object> map) {
-        return BaseAuditNode.formMap(map, StartNode.class);
+    public static NotifyNode formMap(Map<String, Object> map) {
+        return NodeMapBuilder.formMap(map, NotifyNode.class);
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends AuditNodeBuilder<Builder,StartNode> {
-
+    public static class Builder extends AuditNodeBuilder<Builder,NotifyNode> {
         public Builder() {
-            super(new StartNode());
+            super(new NotifyNode());
         }
     }
 }

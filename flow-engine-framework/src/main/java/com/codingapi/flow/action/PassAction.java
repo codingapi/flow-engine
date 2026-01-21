@@ -1,12 +1,16 @@
 package com.codingapi.flow.action;
 
-import com.codingapi.flow.node.IAuditNode;
+import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.event.FlowRecordDoneEvent;
+import com.codingapi.flow.event.FlowRecordTodoEvent;
+import com.codingapi.flow.event.IFlowEvent;
+import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.strategy.MultiOperatorAuditStrategy;
 import com.codingapi.flow.utils.RandomUtils;
+import com.codingapi.springboot.framework.event.EventPusher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +18,7 @@ import java.util.Map;
 
 
 /**
- *   通过
+ * 通过
  */
 public class PassAction extends BaseAction {
 
@@ -29,53 +33,25 @@ public class PassAction extends BaseAction {
         return BaseAction.fromMap(data, PassAction.class);
     }
 
-    @Override
-    public boolean isDone(FlowSession session, FlowRecord currentRecord, List<FlowRecord> currentRecords) {
-        // 多人审批
-        if (currentRecords.size() > 1) {
-            StrategyManager strategyManager = session.getCurrentNode().strategies();
-            MultiOperatorAuditStrategy.Type multiOperatorAuditStrategyType = strategyManager.getMultiOperatorAuditStrategyType();
-            // 顺序审批
-            if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.SEQUENCE) {
-                int currentOrder = currentRecord.getNodeOrder();
-                int maxNodeOrder = currentRecords.size() - 1;
-                return currentOrder >= maxNodeOrder;
-            }
-            // 或签
-            if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.ANY) {
-                return true;
-            }
-            // 并签
-            if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.MERGE) {
-                float percent = strategyManager.getMultiOperatorAuditMergePercent();
-                long total = currentRecords.size();
-                // 尚未办理的数量为所有待办数-1，1是当前办理的这条记录
-                long todoCount = currentRecords.stream().filter(FlowRecord::isTodo).count() - 1;
-                long doneCount = total - todoCount;
-                return doneCount >= total * percent;
-            }
-        }
-        return true;
-    }
 
     @Override
-    public List<FlowRecord> trigger(FlowSession flowSession, FlowRecord currentRecord) {
+    public List<FlowRecord> generateRecords(FlowSession flowSession) {
+        FlowRecord currentRecord = flowSession.getCurrentRecord();
         List<FlowRecord> records = new ArrayList<>();
         if (currentRecord.isReturnRecord()) {
             // 退回后的流程重新提交
-            IAuditNode currentNode = flowSession.getWorkflow().getAuditNode(currentRecord.getReturnNodeId());
+            BaseAuditNode currentNode = (BaseAuditNode) flowSession.getWorkflow().getFlowNode(currentRecord.getReturnNodeId());
             StrategyManager strategyManager = currentNode.strategies();
             // 是否退回到退回节点
             if (strategyManager.isResume()) {
                 FlowSession triggerSession = flowSession.updateSession(currentNode);
-                List<FlowRecord> nextRecords = this.generateNextRecords(currentNode, triggerSession.updateSession(currentNode), currentRecord);
+                List<FlowRecord> nextRecords = currentNode.generateCurrentRecords(triggerSession.updateSession(currentNode));
                 records.addAll(nextRecords);
             }
         } else {
-            List<IAuditNode> nextNodes = flowSession.nextNodes();
-            for (IAuditNode node : nextNodes) {
-                //TODO 如果是条件节点，则自动完成当前记录，并构建下一个记录
-                List<FlowRecord> nextRecords = this.generateNextRecords(node, flowSession.updateSession(node), currentRecord);
+            IFlowNode currentNode = flowSession.getCurrentNode();
+            List<FlowRecord> nextRecords = currentNode.generateCurrentRecords(flowSession);
+            if (!nextRecords.isEmpty()) {
                 records.addAll(nextRecords);
             }
         }
@@ -83,4 +59,34 @@ public class PassAction extends BaseAction {
     }
 
 
+    @Override
+    public void run(FlowSession flowSession) {
+        List<IFlowEvent> flowEvents = new ArrayList<>();
+        List<FlowRecord> recordList = new ArrayList<>();
+        FlowRecord flowRecord = flowSession.getCurrentRecord();
+        IFlowNode currentNode = flowSession.getCurrentNode();
+        boolean done = currentNode.isDone(flowSession);
+        flowRecord.update(flowSession.getFormData().toMapData(), flowSession.getAdvice().getAdvice(), flowSession.getAdvice().getSignKey(), done);
+        // 添加流程结束事件
+        flowEvents.add(new FlowRecordDoneEvent(flowRecord));
+        recordList.add(flowRecord);
+
+        if (done) {
+            this.triggerNode(flowSession,(triggerSession)->{
+                List<FlowRecord> records = this.generateRecords(triggerSession);
+                if (!records.isEmpty()) {
+                    for (FlowRecord record : records) {
+                        if (record.isShow()) {
+                            flowEvents.add(new FlowRecordTodoEvent(record));
+                        }
+                    }
+                    recordList.addAll(records);
+                }
+            });
+        }
+
+        RepositoryContext.getInstance().saveRecords(recordList);
+
+        flowEvents.forEach(EventPusher::push);
+    }
 }

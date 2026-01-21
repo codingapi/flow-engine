@@ -7,13 +7,11 @@ import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.gateway.impl.UserGateway;
-import com.codingapi.flow.node.audit.ApprovalNode;
-import com.codingapi.flow.node.audit.StartNode;
-import com.codingapi.flow.node.branch.BranchNodeBranchNode;
-import com.codingapi.flow.node.fixed.EndNode;
+import com.codingapi.flow.node.builder.FormFieldPermissionsBuilder;
+import com.codingapi.flow.node.nodes.*;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
-import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
+import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
@@ -34,7 +32,8 @@ class FlowServiceTest {
     private final UserGateway userGateway = new UserGateway();
     private final WorkflowBackupRepository workflowBackupRepository = new WorkflowBackupRepositoryImpl();
     private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
-    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository);
+    private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
+    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository,parallelBranchRepository);
 
     @Test
     void create() {
@@ -56,21 +55,25 @@ class FlowServiceTest {
 
         StartNode startNode = StartNode
                 .builder()
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.WRITE)
-                .addPermission("leave", "days", PermissionType.WRITE)
-                .addPermission("leave", "reason", PermissionType.WRITE)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         ApprovalNode approvalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .operatorScript("def run(request){return [$bind.getOperatorById(2)]}")
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.READ)
-                .addPermission("leave", "days", PermissionType.READ)
-                .addPermission("leave", "reason", PermissionType.READ)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.READ)
+                                .addPermission("leave", "days", PermissionType.READ)
+                                .addPermission("leave", "reason", PermissionType.READ)
+                                .build()
+                )
                 .build();
 
         EndNode endNode = EndNode.builder().build();
@@ -91,7 +94,7 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
-        List<IFlowAction> actions = startNode.actions().getActions();
+        List<IFlowAction> actions = startNode.actionManager().getActions();
         request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", test.getUserId()));
 
         flowService.create(request);
@@ -124,21 +127,25 @@ class FlowServiceTest {
 
         StartNode startNode = StartNode
                 .builder()
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.WRITE)
-                .addPermission("leave", "days", PermissionType.WRITE)
-                .addPermission("leave", "reason", PermissionType.WRITE)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         ApprovalNode approvalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .operatorScript("def run(request){return [$bind.getOperatorById(2)]}")
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.READ)
-                .addPermission("leave", "days", PermissionType.READ)
-                .addPermission("leave", "reason", PermissionType.READ)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.READ)
+                                .addPermission("leave", "days", PermissionType.READ)
+                                .addPermission("leave", "reason", PermissionType.READ)
+                                .build()
+                )
                 .build();
 
         EndNode endNode = EndNode.builder().build();
@@ -159,7 +166,7 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
-        List<IFlowAction> actions = startNode.actions().getActions();
+        List<IFlowAction> actions = startNode.actionManager().getActions();
         request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", test.getUserId()));
 
         flowService.create(request);
@@ -177,7 +184,7 @@ class FlowServiceTest {
         assertEquals(1, lorneRecordList.size());
 
 
-        List<IFlowAction> lorneActions = approvalNode.actions().getActions();
+        List<IFlowAction> lorneActions = approvalNode.actionManager().getActions();
 
         FlowActionRequest lorneRequest = new FlowActionRequest();
         lorneRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
@@ -217,11 +224,13 @@ class FlowServiceTest {
 
         StartNode startNode = StartNode
                 .builder()
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.WRITE)
-                .addPermission("leave", "days", PermissionType.WRITE)
-                .addPermission("leave", "reason", PermissionType.WRITE)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         BranchNodeBranchNode departConditionNode = BranchNodeBranchNode.builder()
@@ -239,21 +248,25 @@ class FlowServiceTest {
         ApprovalNode departApprovalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .operatorScript("def run(request){return [$bind.getOperatorById(2)]}")
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.READ)
-                .addPermission("leave", "days", PermissionType.READ)
-                .addPermission("leave", "reason", PermissionType.READ)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         ApprovalNode bossApprovalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .operatorScript("def run(request){return [$bind.getOperatorById(3)]}")
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.READ)
-                .addPermission("leave", "days", PermissionType.READ)
-                .addPermission("leave", "reason", PermissionType.READ)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         EndNode endNode = EndNode.builder().build();
@@ -283,7 +296,7 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(data);
-        List<IFlowAction> actions = startNode.actions().getActions();
+        List<IFlowAction> actions = startNode.actionManager().getActions();
         request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", user.getUserId()));
 
         flowService.create(request);
@@ -301,7 +314,7 @@ class FlowServiceTest {
         assertEquals(1, lorneRecordList.size());
 
 
-        List<IFlowAction> lorneActions = departApprovalNode.actions().getActions();
+        List<IFlowAction> lorneActions = departApprovalNode.actionManager().getActions();
 
         FlowActionRequest lorneRequest = new FlowActionRequest();
         lorneRequest.setFormData(data);
@@ -345,21 +358,25 @@ class FlowServiceTest {
 
         StartNode startNode = StartNode
                 .builder()
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.WRITE)
-                .addPermission("leave", "days", PermissionType.WRITE)
-                .addPermission("leave", "reason", PermissionType.WRITE)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         ApprovalNode approvalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .operatorScript("def run(request){return [$bind.getOperatorById(2)]}")
-                .formFieldPermissionsBuilder()
-                .addPermission("leave", "name", PermissionType.READ)
-                .addPermission("leave", "days", PermissionType.READ)
-                .addPermission("leave", "reason", PermissionType.READ)
-                .build()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
                 .build();
 
         EndNode endNode = EndNode.builder().build();
@@ -380,7 +397,7 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
-        List<IFlowAction> startActions = startNode.actions().getActions();
+        List<IFlowAction> startActions = startNode.actionManager().getActions();
         request.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", test.getUserId()));
 
         flowService.create(request);
@@ -398,7 +415,7 @@ class FlowServiceTest {
         assertEquals(1, lorneRecordList.size());
 
 
-        List<IFlowAction> lorneActions = approvalNode.actions().getActions();
+        List<IFlowAction> lorneActions = approvalNode.actionManager().getActions();
 
         FlowActionRequest lorneRequest = new FlowActionRequest();
         lorneRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
@@ -430,4 +447,176 @@ class FlowServiceTest {
         assertEquals(5, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
+
+
+
+
+    /**
+     * 并行分支测试
+     */
+    @Test
+    void parallel() {
+
+        User user = new User(1, "user");
+        User depart = new User(2, "depart");
+        User boss = new User(3, "boss");
+        userGateway.save(user);
+        userGateway.save(depart);
+        userGateway.save(boss);
+
+        GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
+
+        FormMeta form = FormMetaBuilder.builder()
+                .name("请假流程")
+                .code("leave")
+                .addField("请假人", "name", "string")
+                .addField("请假天数", "days", "int")
+                .addField("请假事由", "reason", "string")
+                .build();
+
+        StartNode startNode = StartNode
+                .builder()
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
+                .build();
+
+        ParallelBranchNode parallelBranchNode1 = ParallelBranchNode.builder()
+                .name("并行分支1")
+                .order(1)
+                .build();
+
+        ParallelBranchNode parallelBranchNode2 = ParallelBranchNode.builder()
+                .name("并行分支2")
+                .order(2)
+                .build();
+
+        ApprovalNode departApprovalNode = ApprovalNode.builder()
+                .name("经理审批")
+                .operatorScript("def run(request){return [$bind.getOperatorById(2)]}")
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
+                .build();
+
+        ApprovalNode bossApprovalNode = ApprovalNode.builder()
+                .name("老板审批")
+                .operatorScript("def run(request){return [$bind.getOperatorById(3)]}")
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
+                .build();
+
+        ApprovalNode bigBossApprovalNode = ApprovalNode.builder()
+                .name("大老板审批")
+                .operatorScript("def run(request){return [$bind.getOperatorById(3)]}")
+                .formFieldsPermissions(
+                        FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()
+                )
+                .build();
+
+        EndNode endNode = EndNode.builder().build();
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("请假流程")
+                .code("leave")
+                .createdOperator(user)
+                .form(form)
+                .addNode(startNode)
+                .addNode(parallelBranchNode1)
+                .addNode(parallelBranchNode2)
+                .addNode(departApprovalNode)
+                .addNode(bossApprovalNode)
+                .addNode(bigBossApprovalNode)
+                .addNode(endNode)
+                .addEdge(new FlowEdge(startNode.getId(), parallelBranchNode1.getId()))
+                .addEdge(new FlowEdge(startNode.getId(), parallelBranchNode2.getId()))
+                .addEdge(new FlowEdge(parallelBranchNode1.getId(), departApprovalNode.getId()))
+                .addEdge(new FlowEdge(parallelBranchNode2.getId(), bossApprovalNode.getId()))
+                .addEdge(new FlowEdge(bossApprovalNode.getId(), bigBossApprovalNode.getId()))
+                .addEdge(new FlowEdge(departApprovalNode.getId(), endNode.getId()))
+                .addEdge(new FlowEdge(bigBossApprovalNode.getId(), endNode.getId()))
+                .build();
+
+        workflowRepository.save(workflow);
+
+        Map<String, Object> data = Map.of("name", "lorne", "days", 3, "reason", "leave");
+
+        FlowCreateRequest request = new FlowCreateRequest();
+        request.setWorkId(workflow.getId());
+        request.setFormData(data);
+        List<IFlowAction> actions = startNode.actionManager().getActions();
+        request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", user.getUserId()));
+
+        flowService.create(request);
+
+        List<FlowRecord> recordList = flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(1, recordList.size());
+
+        FlowActionRequest submitRequest = new FlowActionRequest();
+        submitRequest.setFormData(data);
+        submitRequest.setRecordId(recordList.get(0).getId());
+        submitRequest.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", user.getUserId()));
+        flowService.action(submitRequest);
+
+        List<FlowRecord> departRecordList = flowRecordRepository.findTodoByOperator(depart.getUserId());
+        assertEquals(1, departRecordList.size());
+
+        List<FlowRecord> boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        assertEquals(1, boosRecordList.size());
+
+
+        List<IFlowAction> departActions = departApprovalNode.actionManager().getActions();
+
+        FlowActionRequest departRequest = new FlowActionRequest();
+        departRequest.setFormData(data);
+        departRequest.setRecordId(departRecordList.get(0).getId());
+        departRequest.setAdvice(new FlowAdviceBody(departActions.get(0).id(), "同意", depart.getUserId()));
+        flowService.action(departRequest);
+
+        boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        assertEquals(1, boosRecordList.size());
+
+        List<IFlowAction> bossActions = bossApprovalNode.actionManager().getActions();
+
+        FlowActionRequest dossRequest = new FlowActionRequest();
+        dossRequest.setFormData(data);
+        dossRequest.setRecordId(boosRecordList.get(0).getId());
+        dossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", boss.getUserId()));
+        flowService.action(dossRequest);
+
+
+        boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        assertEquals(1, boosRecordList.size());
+
+        List<IFlowAction> bigBossActions = bigBossApprovalNode.actionManager().getActions();
+
+        FlowActionRequest bigBossRequest = new FlowActionRequest();
+        bigBossRequest.setFormData(data);
+        bigBossRequest.setRecordId(boosRecordList.get(0).getId());
+        bigBossRequest.setAdvice(new FlowAdviceBody(bigBossActions.get(0).id(), "同意", boss.getUserId()));
+        flowService.action(bigBossRequest);
+
+        List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(departRecordList.get(0).getProcessId());
+        assertEquals(5, records.size());
+        assertEquals(0, records.stream().filter(FlowRecord::isTodo).toList().size());
+        assertEquals(5, records.stream().filter(FlowRecord::isFinish).toList().size());
+
+    }
+
 }

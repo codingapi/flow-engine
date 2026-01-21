@@ -1,0 +1,81 @@
+package com.codingapi.flow.node.builder;
+
+import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.factory.FlowActionFactory;
+import com.codingapi.flow.form.permission.FormFieldPermission;
+import com.codingapi.flow.form.permission.PermissionType;
+import com.codingapi.flow.node.BaseAuditNode;
+import com.codingapi.flow.strategy.INodeStrategy;
+import com.codingapi.flow.strategy.NodeStrategyFactory;
+import lombok.SneakyThrows;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class NodeMapBuilder {
+
+    @SuppressWarnings("unchecked")
+    public static List<FormFieldPermission> loadFormFieldPermissions(Map<String, Object> data) {
+        List<Map<String, Object>> permissions = (List<Map<String, Object>>) data.get("formFieldPermissions");
+        if (permissions != null) {
+            List<FormFieldPermission> permissionList = new ArrayList<>();
+            for (Map<String, Object> item : permissions) {
+                FormFieldPermission permission = new FormFieldPermission();
+                permission.setFormCode((String) item.get("formCode"));
+                permission.setFieldName((String) item.get("fieldName"));
+                permission.setType(PermissionType.valueOf((String) item.get("type")));
+                permissionList.add(permission);
+            }
+            return permissionList;
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<IFlowAction> loadActions(Map<String, Object> data) {
+        List<Map<String, Object>> actions = (List<Map<String, Object>>) data.get("actions");
+        if (actions != null) {
+            List<IFlowAction> actionList = new ArrayList<>();
+            for (Map<String, Object> item : actions) {
+                IFlowAction action = FlowActionFactory.getInstance().createAction(item);
+                actionList.add(action);
+            }
+            return actionList;
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<INodeStrategy> loadNodeStrategies(Map<String, Object> data) {
+        List<Map<String, Object>> nodeStrategies = (List<Map<String, Object>>) data.get("nodeStrategies");
+        if (nodeStrategies != null) {
+            List<INodeStrategy> strategyList = new ArrayList<>();
+            for (Map<String, Object> item : nodeStrategies) {
+                INodeStrategy strategy = NodeStrategyFactory.getInstance().createStrategy(item);
+                strategyList.add(strategy);
+            }
+            return strategyList;
+        }
+        return null;
+    }
+
+
+    @SneakyThrows
+    public static <T extends BaseAuditNode> T formMap(Map<String, Object> map, Class<T> clazz) {
+        T node = clazz.getDeclaredConstructor().newInstance();
+        node.setId((String) map.get("id"));
+        node.setName((String) map.get("name"));
+        node.setView((String) map.get("view"));
+        node.setOperatorScript((String) map.get("operatorScript"));
+        node.setNodeTitleScript((String) map.get("nodeTitleScript"));
+        node.setErrorTriggerScript((String) map.get("errorTriggerScript"));
+        List<FormFieldPermission> permissionList = NodeMapBuilder.loadFormFieldPermissions(map);
+        node.setFormFieldPermissions(permissionList);
+        List<IFlowAction> actionList = NodeMapBuilder.loadActions(map);
+        node.setActions(actionList);
+        List<INodeStrategy> strategyList = NodeMapBuilder.loadNodeStrategies(map);
+        node.setNodeStrategies(strategyList);
+        return node;
+    }
+}

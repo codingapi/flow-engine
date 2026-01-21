@@ -39,7 +39,7 @@ public class FlowActionRequest {
             flowAdvice.setTransferOperators(GatewayContext.getInstance().findByIds(advice.getTransferOperatorIds()));
         }
         if (StringUtils.hasText(advice.getBackNodeId())) {
-            flowAdvice.setBackNode(workflow.getAuditNode(advice.getBackNodeId()));
+            flowAdvice.setBackNode(workflow.getFlowNode(advice.getBackNodeId()));
         }
 
         return flowAdvice;

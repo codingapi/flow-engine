@@ -1,0 +1,87 @@
+package com.codingapi.flow.node.nodes;
+
+import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.PassAction;
+import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.event.FlowRecordFinishEvent;
+import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.builder.BaseNodeBuilder;
+import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.utils.RandomUtils;
+import com.codingapi.springboot.framework.event.EventPusher;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 结束节点
+ */
+public class EndNode extends BaseFlowNode {
+
+    public static final String NODE_TYPE = "end";
+    public static final String DEFAULT_NAME = "结束节点";
+
+    @Override
+    public String getType() {
+        return NODE_TYPE;
+    }
+
+
+    @Override
+    public List<FlowRecord> generateCurrentRecords(FlowSession session) {
+        if(this.isWaitParallelRecord(session)){
+            return List.of();
+        }
+        // 构建结束记录
+        FlowRecord finishRecord = new FlowRecord(session, session.getCurrentAction().id(), 0);
+        finishRecord.finish(true);
+        return List.of(finishRecord);
+    }
+
+    @Override
+    public void fillNewRecord(FlowSession session, FlowRecord flowRecord) {
+        flowRecord.setTitle("over");
+        flowRecord.setCurrentOperatorId(-1);
+
+        IFlowAction currentAction = session.getCurrentAction();
+        // 标记当前流程结束
+        FlowRecord latestRecord = session.getCurrentRecord();
+        // 添加历史记录到记录中
+        List<FlowRecord> historyRecords = RepositoryContext.getInstance().findRecordsByProcessId(latestRecord.getProcessId());
+        // 设置状态为完成
+        historyRecords.forEach(item -> {
+            item.finish(currentAction instanceof PassAction);
+        });
+        RepositoryContext.getInstance().saveRecords(historyRecords);
+        // 流程是否正常结束
+        EventPusher.push(new FlowRecordFinishEvent(latestRecord));
+    }
+
+    @Override
+    public boolean continueTrigger(FlowSession session) {
+        return false;
+    }
+
+    public EndNode(String id, String name) {
+        super(id, name);
+    }
+
+    public EndNode() {
+        this(RandomUtils.generateStringId(), DEFAULT_NAME);
+    }
+
+    public static EndNode formMap(Map<String, Object> map) {
+        return BaseFlowNode.loadFromMap(map, EndNode.class);
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder extends BaseNodeBuilder<Builder, EndNode> {
+        public Builder() {
+            super(new EndNode());
+        }
+    }
+}

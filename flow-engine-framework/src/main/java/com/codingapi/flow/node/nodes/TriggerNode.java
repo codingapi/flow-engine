@@ -1,15 +1,16 @@
-package com.codingapi.flow.node.config;
+package com.codingapi.flow.node.nodes;
 
-import com.codingapi.flow.node.BaseConfigNode;
-import com.codingapi.flow.node.builder.ConfigNodeBuilder;
+import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.builder.BaseNodeBuilder;
 import com.codingapi.flow.utils.RandomUtils;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
  * 触发节点
  */
-public class TriggerNode extends BaseConfigNode {
+public class TriggerNode extends BaseFlowNode {
 
     public static final String NODE_TYPE = "trigger";
     public static final String DEFAULT_NAME = "触发节点";
@@ -20,7 +21,7 @@ public class TriggerNode extends BaseConfigNode {
     }
 
     public TriggerNode(String id, String name) {
-        super(id, name);
+        super(id, name,new ArrayList<>());
     }
 
     public TriggerNode() {
@@ -28,14 +29,14 @@ public class TriggerNode extends BaseConfigNode {
     }
 
     public static TriggerNode formMap(Map<String, Object> map) {
-        return BaseConfigNode.formMap(map, TriggerNode.class);
+        return BaseFlowNode.loadFromMap(map, TriggerNode.class);
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends ConfigNodeBuilder<Builder,TriggerNode> {
+    public static class Builder extends BaseNodeBuilder<Builder,TriggerNode> {
         public Builder() {
             super(new TriggerNode());
         }

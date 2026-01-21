@@ -1,17 +1,22 @@
-package com.codingapi.flow.node.branch;
+package com.codingapi.flow.node.nodes;
 
-import com.codingapi.flow.node.BaseBranchNode;
-import com.codingapi.flow.node.builder.BranchNodeBuilder;
+import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.builder.BaseNodeBuilder;
 import com.codingapi.flow.script.node.ConditionScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
+import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 /**
  * 分支节点
  */
-public class BranchNodeBranchNode extends BaseBranchNode {
+public class BranchNodeBranchNode extends BaseFlowNode {
 
     public static final String NODE_TYPE = "condition_branch";
     public static final String DEFAULT_NAME = "分支节点";
@@ -19,6 +24,7 @@ public class BranchNodeBranchNode extends BaseBranchNode {
     /**
      * 条件脚本
      */
+    @Setter
     private ConditionScript conditionScript;
 
     @Override
@@ -26,21 +32,37 @@ public class BranchNodeBranchNode extends BaseBranchNode {
         return NODE_TYPE;
     }
 
-    public BranchNodeBranchNode(String id, String name) {
-        super(id, name);
+    public BranchNodeBranchNode(String id, String name, int order) {
+        super(id, name, order);
         this.conditionScript = ConditionScript.defaultScript();
     }
 
     public BranchNodeBranchNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME);
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, 0);
     }
 
     /**
      * 匹配条件
      */
     @Override
-    public boolean match(FlowSession request) {
+    public boolean continueTrigger(FlowSession request) {
         return conditionScript.execute(request);
+    }
+
+    @Override
+    public List<IFlowNode> filterBranches(List<IFlowNode> nodeList, FlowSession flowSession) {
+        List<IFlowNode> nodes = new ArrayList<>();
+        for (IFlowNode node: nodeList){
+            if (node.continueTrigger(flowSession)){
+                nodes.add(node);
+            }
+        }
+        // 获取最小order的节点
+        nodes.sort(Comparator.comparingInt(IFlowNode::getOrder));
+        if(!nodes.isEmpty()){
+            return nodes.subList(0,1);
+        }
+        return nodes;
     }
 
     @Override
@@ -51,7 +73,7 @@ public class BranchNodeBranchNode extends BaseBranchNode {
     }
 
     public static BranchNodeBranchNode formMap(Map<String, Object> map) {
-        BranchNodeBranchNode branchNode = BaseBranchNode.formMap(map, BranchNodeBranchNode.class);
+        BranchNodeBranchNode branchNode = BaseFlowNode.loadFromMap(map, BranchNodeBranchNode.class);
         branchNode.conditionScript = new ConditionScript((String) map.get("script"));
         return branchNode;
     }
@@ -60,7 +82,8 @@ public class BranchNodeBranchNode extends BaseBranchNode {
         return new Builder();
     }
 
-    public static class Builder extends BranchNodeBuilder<Builder, BranchNodeBranchNode> {
+    public static class Builder extends BaseNodeBuilder<Builder, BranchNodeBranchNode> {
+
         public Builder() {
             super(new BranchNodeBranchNode());
         }
@@ -69,8 +92,5 @@ public class BranchNodeBranchNode extends BaseBranchNode {
             node.conditionScript = new ConditionScript(script);
             return this;
         }
-
-
-
     }
 }

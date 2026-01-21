@@ -1,29 +1,22 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.PassAction;
 import com.codingapi.flow.backup.WorkflowBackup;
-import com.codingapi.flow.event.FlowRecordDoneEvent;
-import com.codingapi.flow.event.FlowRecordFinishEvent;
-import com.codingapi.flow.event.FlowRecordTodoEvent;
-import com.codingapi.flow.event.IFlowEvent;
+import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
-import com.codingapi.flow.node.fixed.EndNode;
-import com.codingapi.flow.node.IAuditNode;
-import com.codingapi.flow.node.manager.FieldPermissionManager;
+import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
+import com.codingapi.flow.repository.ParallelBranchRepository;
 import com.codingapi.flow.repository.WorkflowBackupRepository;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
-import com.codingapi.springboot.framework.event.EventPusher;
 import lombok.AllArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -33,8 +26,13 @@ public class FlowActionService {
     private final FlowOperatorGateway flowOperatorGateway;
     private final FlowRecordRepository flowRecordRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
+    private final ParallelBranchRepository parallelBranchRepository;
 
     public void action() {
+        RepositoryContext.getInstance().setFlowRecordRepository(flowRecordRepository);
+        RepositoryContext.getInstance().setFlowOperatorGateway(flowOperatorGateway);
+        RepositoryContext.getInstance().setParallelBranchRepository(parallelBranchRepository);
+
         request.verify();
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getAdvice().getOperatorId());
@@ -60,11 +58,11 @@ public class FlowActionService {
         }
 
         Workflow workflow = workflowBackup.toWorkflow();
-        IAuditNode currentNode = workflow.getAuditNode(flowRecord.getNodeId());
+        IFlowNode currentNode = workflow.getFlowNode(flowRecord.getNodeId());
         if (currentNode == null) {
             throw new IllegalArgumentException("currentNode not exist");
         }
-        IFlowAction flowAction = currentNode.actions().getActionById(request.getAdvice().getActionId());
+        IFlowAction flowAction = currentNode.actionManager().getActionById(request.getAdvice().getActionId());
         if (flowAction == null) {
             throw new IllegalArgumentException("action not exist");
         }
@@ -72,75 +70,15 @@ public class FlowActionService {
         // 构建表单数据
         FormData formData = new FormData(workflow.getForm());
         formData.reset(request.getFormData());
+        FlowAdvice flowAdvice = request.toFlowAdvice(workflow, flowAction);
 
-        FlowAdvice flowAdvice = request.toFlowAdvice(workflow,flowAction);
-        // 数据验证
-        FieldPermissionManager fieldPermissionManager = currentNode.formFieldsPermissions();
-        fieldPermissionManager.verifyFormData(workflow.getForm(),flowRecord.getFormData(),request.getFormData());
+        List<FlowRecord> currentRecords = RepositoryContext.getInstance().findRecordsByFromIdAndNodeId(flowRecord.getFromId(), flowRecord.getNodeId());
+        FlowSession session = new FlowSession(currentOperator, workflow, currentNode, flowAction, formData, flowRecord, currentRecords, workflowBackup.getId(), flowAdvice);
 
-        // 节点验证
-        currentNode.verifyFlowAdvice(flowAdvice);
+        currentNode.verifySession(session);
 
-        List<FlowRecord> currentRecords = flowRecordRepository.findRecordsByFromId(flowRecord.getFromId());
-        FlowSession session = new FlowSession(currentOperator, workflow.getForm(), workflow, currentNode, formData, workflowBackup.getId(),flowAdvice);
+        flowAction.run(session);
 
-        List<IFlowEvent> flowEvents = new ArrayList<>();
-
-        // 判断当前节点是否已经完成
-        boolean done = flowAction.isDone(session, flowRecord, currentRecords);
-        if (done) {
-            List<FlowRecord> records = flowAction.trigger(session, flowRecord);
-            if (!records.isEmpty()) {
-                for (FlowRecord record : records) {
-                    if (record.isShow()) {
-                        flowEvents.add(new FlowRecordTodoEvent(record));
-                    }
-                }
-            }
-            flowRecord.update(formData.toMapData(), request.getAdvice().getAdvice(), request.getAdvice().getSignKey(), true);
-            // 判断是否结束
-            if (records.size() == 1) {
-                FlowRecord record = records.get(0);
-                if (record.isNodeType(EndNode.NODE_TYPE)) {
-                    boolean flowFinish = flowAction instanceof PassAction;
-                    // 添加当前节点到记录中
-                    records.add(flowRecord);
-                    // 添加历史记录到记录中
-                    List<FlowRecord> historyRecords = flowRecordRepository.findRecordsByProcessId(flowRecord.getProcessId());
-                    records.addAll(historyRecords);
-                    // 设置状态为完成
-                    records.forEach(item -> {
-                        item.finish(flowFinish);
-                    });
-
-                    // 流程是否正常结束
-                    if (flowFinish) {
-                        flowEvents.add(new FlowRecordFinishEvent(record));
-                    }
-                }
-                // 添加流程结束事件
-                flowEvents.add(new FlowRecordDoneEvent(record));
-            }
-            flowRecordRepository.saveAll(records);
-        } else {
-            // 判断是否为串行多操作者
-            if (currentNode.strategies().isSequenceMultiOperator()) {
-                int nextRecordNodeOrder = flowRecord.getNodeOrder() + 1;
-                FlowRecord nextRecord = currentRecords.stream().filter(record -> record.getNodeOrder() == nextRecordNodeOrder).findFirst().orElse(null);
-                if (nextRecord != null) {
-                    // 展示下一个审批人的待办
-                    nextRecord.show();
-                    flowEvents.add(new FlowRecordTodoEvent(nextRecord));
-                    flowRecordRepository.save(nextRecord);
-                }
-            }
-            flowRecord.update(formData.toMapData(), request.getAdvice().getAdvice(), request.getAdvice().getSignKey(), false);
-            flowRecordRepository.save(flowRecord);
-        }
-
-        // 推送待办事件
-        for (IFlowEvent event : flowEvents) {
-            EventPusher.push(event);
-        }
     }
 }
+

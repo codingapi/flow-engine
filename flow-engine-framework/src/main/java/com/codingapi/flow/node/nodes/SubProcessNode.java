@@ -1,15 +1,16 @@
-package com.codingapi.flow.node.config;
+package com.codingapi.flow.node.nodes;
 
-import com.codingapi.flow.node.BaseConfigNode;
-import com.codingapi.flow.node.builder.ConfigNodeBuilder;
+import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.builder.BaseNodeBuilder;
 import com.codingapi.flow.utils.RandomUtils;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
  * 子流程
  */
-public class SubProcessNode extends BaseConfigNode {
+public class SubProcessNode extends BaseFlowNode {
 
     public static final String NODE_TYPE = "sub_process";
     public static final String DEFAULT_NAME = "子流程";
@@ -20,7 +21,7 @@ public class SubProcessNode extends BaseConfigNode {
     }
 
     public SubProcessNode(String id, String name) {
-        super(id, name);
+        super(id, name,new ArrayList<>());
     }
 
     public SubProcessNode() {
@@ -28,14 +29,14 @@ public class SubProcessNode extends BaseConfigNode {
     }
 
     public static SubProcessNode formMap(Map<String, Object> map) {
-        return BaseConfigNode.formMap(map, SubProcessNode.class);
+        return BaseFlowNode.loadFromMap(map, SubProcessNode.class);
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends ConfigNodeBuilder<Builder,SubProcessNode> {
+    public static class Builder extends BaseNodeBuilder<Builder,SubProcessNode> {
         public Builder() {
             super(new SubProcessNode());
         }

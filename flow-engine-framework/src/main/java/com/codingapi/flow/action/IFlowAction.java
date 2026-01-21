@@ -1,7 +1,6 @@
 package com.codingapi.flow.action;
 
 
-import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 
@@ -36,20 +35,20 @@ public interface IFlowAction {
     /**
      * 执行动作
      */
-    List<FlowRecord> trigger(FlowSession flowSession, FlowRecord currentRecord);
+    List<FlowRecord> generateRecords(FlowSession flowSession);
 
     /**
      * 转换为map
      */
     Map<String, Object> toMap();
 
+
     /**
-     * 流程是否结束
-     *
-     * @param session        session
-     * @param currentRecord  当前审批记录
-     * @param currentRecords 当前节点所有人提交的记录
-     * @return 是否结束
+     * 执行动作
+     * 业务流程的处理入口时通过run函数触发开启的流程
+     * @param flowSession 会话
      */
-    boolean isDone(FlowSession session, FlowRecord currentRecord, List<FlowRecord> currentRecords);
+    void run(FlowSession flowSession);
+
+
 }

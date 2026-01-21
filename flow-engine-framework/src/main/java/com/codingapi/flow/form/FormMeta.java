@@ -36,7 +36,10 @@ public class FormMeta {
 
 
     public boolean isSubForm(String formCode){
-        return subForms.stream().anyMatch(form -> form.getCode().equals(formCode));
+        if(subForms!=null) {
+            return subForms.stream().anyMatch(form -> form.getCode().equals(formCode));
+        }
+        return false;
     }
 
 

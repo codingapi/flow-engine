@@ -1,7 +1,8 @@
 package com.codingapi.flow.record;
 
-import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
@@ -9,6 +10,7 @@ import org.springframework.util.StringUtils;
 import java.util.Map;
 
 @Getter
+@Setter
 public class FlowRecord {
 
     // 待办、已办
@@ -152,29 +154,80 @@ public class FlowRecord {
      */
     private long interferedOperatorId;
 
-    public FlowRecord(FlowSession flowSession, String actionId, String processId, long fromId, int nodeOrder) {
+    /**
+     * 并行id
+     */
+    private String parallelId;
+
+    /**
+     * 并行分支节点id
+     */
+    private String parallelBranchNodeId;
+
+    /**
+     * 并行分支数量
+     */
+    private int parallelBranchTotal;
+
+
+    public FlowRecord(FlowSession flowSession, String actionId, int nodeOrder) {
         this.workCode = flowSession.getWorkCode();
         this.workBackupId = flowSession.getBackupId();
         this.nodeId = flowSession.getCurrentNodeId();
         this.nodeType = flowSession.getCurrentNodeType();
         this.formData = flowSession.getFormData().toMapData();
-        this.fromId = fromId;
+        this.fromId = 0;
         this.nodeOrder = nodeOrder;
-        this.title = flowSession.getCurrentNode().generateTitle(flowSession);
-        this.processId = processId;
+        this.processId = RandomUtils.generateStringId();
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
         this.recordState = SATE_RECORD_TODO;
         this.actionId = actionId;
         this.currentOperatorId = flowSession.getCurrentOperator().getUserId();
-        this.interferedOperatorId = flowSession.getCurrentOperator().entrustOperator()!=null?flowSession.getCurrentOperator().entrustOperator().getUserId():0;
+        this.interferedOperatorId = flowSession.getCurrentOperator().entrustOperator() != null ? flowSession.getCurrentOperator().entrustOperator().getUserId() : 0;
         this.advice = flowSession.getAdvice().getAdvice();
         this.signKey = flowSession.getAdvice().getSignKey();
         this.flowState = SATE_FLOW_RUNNING;
         this.createTime = System.currentTimeMillis();
-        this.timeoutTime = flowSession.getCurrentNode().strategies().getTimeoutTime();
-        this.mergeable = flowSession.getCurrentNode().strategies().isMergeable();
         this.isInterfere = flowSession.getWorkflow().isInterfere();
         this.hidden = false;
+
+        flowSession.getCurrentNode().fillNewRecord(flowSession, this);
+        this.extendsRecord(flowSession.getCurrentRecord());
+
+        this.verify();
+    }
+
+
+    public void extendsRecord(FlowRecord record) {
+        if (record != null) {
+            this.parallelBranchNodeId = record.parallelBranchNodeId;
+            this.parallelBranchTotal = record.parallelBranchTotal;
+            this.parallelId = record.parallelId;
+            this.fromId = record.id;
+            this.processId = record.processId;
+        }
+    }
+
+    /**
+     * 当满足条件以后需要清空并行的记录数据
+     */
+    public void clearParallel() {
+        this.parallelBranchNodeId = null;
+        this.parallelBranchTotal = 0;
+        this.parallelId = null;
+    }
+
+
+    /**
+     * 并行分支节点
+     *
+     * @param parallelBranchNodeId 并行分支节点id
+     * @param parallelBranchCount  并行分支数量
+     */
+    public void parallelBranchNode(String parallelBranchNodeId, int parallelBranchCount, String parallelId) {
+        this.parallelBranchNodeId = parallelBranchNodeId;
+        this.parallelBranchTotal = parallelBranchCount;
+        this.parallelId = parallelId;
     }
 
     public void verify() {
@@ -201,9 +254,6 @@ public class FlowRecord {
         }
         if (createOperatorId <= 0) {
             throw new IllegalArgumentException("createOperator is null");
-        }
-        if (currentOperatorId <= 0) {
-            throw new IllegalArgumentException("currentOperatorId is null");
         }
         if (actionId == null) {
             throw new IllegalArgumentException("actionId is null");

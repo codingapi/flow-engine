@@ -1,7 +1,7 @@
-package com.codingapi.flow.node.config;
+package com.codingapi.flow.node.nodes;
 
-import com.codingapi.flow.node.BaseConfigNode;
-import com.codingapi.flow.node.builder.ConfigNodeBuilder;
+import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.builder.BaseNodeBuilder;
 import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * 延迟节点
  */
-public class DelayNode extends BaseConfigNode {
+public class DelayNode extends BaseFlowNode {
 
     public static final String NODE_TYPE = "delay";
     public static final String DEFAULT_NAME = "延迟节点";
@@ -29,14 +29,14 @@ public class DelayNode extends BaseConfigNode {
     }
 
     public static DelayNode formMap(Map<String, Object> map) {
-        return BaseConfigNode.formMap(map, DelayNode.class);
+        return BaseFlowNode.loadFromMap(map, DelayNode.class);
     }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends ConfigNodeBuilder<Builder,DelayNode> {
+    public static class Builder extends BaseNodeBuilder<Builder,DelayNode> {
         public Builder() {
             super(new DelayNode());
         }
