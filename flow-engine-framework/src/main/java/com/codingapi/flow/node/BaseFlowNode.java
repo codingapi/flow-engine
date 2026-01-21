@@ -97,6 +97,13 @@ public abstract class BaseFlowNode implements IFlowNode {
 
     @Override
     public boolean continueTrigger(FlowSession session) {
+        FlowRecord currentRecord = session.getCurrentRecord();
+        String id = this.getId();
+        // 如果是合并的汇聚节点的话，需要等全部分支结束才能继续执行
+        if(currentRecord.getParallelBranchNodeId().equals(id)){
+            //TODO 判断并行分支是的都汇聚到了该节点，如果都汇聚到了则继续执行。
+        }
+
         return true;
     }
 

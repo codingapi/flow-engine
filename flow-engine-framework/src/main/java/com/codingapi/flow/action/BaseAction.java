@@ -107,6 +107,7 @@ public abstract class BaseAction implements IFlowAction {
     }
 
 
+    // TODO 需要判断是从什么情况下触发的完成，如果是非PASS结束的视为非正常结束
     public void flowFinish(FlowRecord latestRecord,IFlowNode latestNode){
         List<FlowRecord> recordList = new ArrayList<>();
         // 添加当前节点到记录中
