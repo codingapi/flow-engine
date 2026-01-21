@@ -1,31 +1,259 @@
-# 流程开发
+# Flow Engine 开发进度
 
-在节点设置上支持的功能如下：
-1. 流程节点设置支持多人办理设置：按顺序执行、会签（设置比例）、或签、随机人员审批 ✅
-2. 审批人与提交人时的控制，由自己审批、自动跳过 ✅
-3. 审批意见是否必填的控制 ✅
-4. 是否需要签名的控制，开启以后在审批时需要填写签名 ✅
-5. 超时处理机制，超时以后自动处理流程，设定超时时间，执行方式：自动提醒、自动同意、自动拒绝 ✅
-6. 退回时是直接回到退回节点，还是逐级提交 ✅
+## 已完成功能 ✅
 
-流程全局配置的功能如下：
-1. 是否开启撤销流程 ✅
+### 节点功能
 
+| 功能 | 状态 | 说明 |
+|-----|------|------|
+| 12 种节点类型 | ✅ | StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, BranchNodeBranchNode, ParallelBranchNode, RouterBranchNode, InclusiveBranchNode, SubProcessNode, DelayNode, TriggerNode |
+| 节点生命周期管理 | ✅ | verifySession → continueTrigger → generateCurrentRecords → fillNewRecord → isDone |
+| 节点配置面板 | ✅ | 基础信息、审批人配置、策略配置 |
 
-# 流程支持的操作：
-1. 通过，流程继续往下流转 ✅
-2. 拒绝，拒绝时需要根据拒绝的配置流程来设置,退回上级节点、退回指定节点、终止流程（需要设定拒绝的处理方式） ✅
-3. 加签，指定给其他人一块审批，以会签模式来处理（需要设定人员范围）
-4. 委派，委派给其他人员来审批，当人员审批完成以后再流程给自己审批（需要设定人员范围）
-5. 退回，退回时需要设置退回的节点（需要设置退回的节点）
-6. 转办，将流程转移给指定用户来审批，需要配置人员匹配范围（需要设定人员范围）
-7. 撤销，再流程已经办理之后当下一个审批人员尚未办理之前可以撤回流程
-8. 保存，保存提交记录 ✅
-9. 自定义，支持用户根据需求自定义配置的流程按钮操作能力（需要设定脚本）
+### 多人审批策略
 
-委托人员支持
-在审批人请假或不在岗时，可以将审批权限委托给他人。✅
+| 功能 | 状态 | 说明 |
+|-----|------|------|
+| 顺序审批 (SEQUENCE) | ✅ | 按顺序依次审批，隐藏后续记录 |
+| 会签 (MERGE) | ✅ | 可设置完成比例 |
+| 或签 (ANY) | ✅ | 任意一人完成即可 |
+| 随机审批 (RANDOM_ONE) | ✅ | 随机选择一人审批 |
 
+### 审批控制
 
-# TODO
-1. 开发条件分支的节点支持能力
+| 功能 | 状态 | 说明 |
+|-----|------|------|
+| 相同审批人自动跳过 | ✅ | SameOperatorAuditStrategy |
+| 审批意见必填控制 | ✅ | AdviceStrategy.adviceNullable |
+| 签名控制 | ✅ | AdviceStrategy.signable |
+| 超时处理 | ✅ | TimeoutStrategy (自动提醒、自动同意、自动拒绝) |
+| 退回模式控制 | ✅ | ResubmitStrategy (恢复到退回节点/逐级提交) |
+
+### 流程操作
+
+| 操作 | 状态 | 说明 |
+|-----|------|------|
+| 通过 (PASS) | ✅ | PassAction |
+| 拒绝 (REJECT) | ✅ | RejectAction，支持退回上级/指定节点/终止流程 |
+| 保存 (SAVE) | ✅ | SaveAction |
+| 加签 (ADD_AUDIT) | ✅ | AddAuditAction |
+| 委派 (DELEGATE) | ✅ | DelegateAction |
+| 退回 (RETURN) | ✅ | ReturnAction |
+| 转办 (TRANSFER) | ✅ | TransferAction |
+| 自定义 (CUSTOM) | ✅ | CustomAction，支持脚本配置 |
+| 默认操作 (DEFAULT) | ✅ | DefaultAction |
+
+### 流程全局配置
+
+| 功能 | 状态 | 说明 |
+|-----|------|------|
+| 流程撤销 | ✅ | Workflow.isRevoke |
+| 流程干预 | ✅ | Workflow.isInterfere |
+| 发起人匹配 | ✅ | OperatorMatchScript |
+
+### 委托功能
+
+| 功能 | 状态 | 说明 |
+|-----|------|------|
+| 委托代理 | ✅ | 支持审批权限委托 |
+
+### 并行分支
+
+| 功能 | 状态 | 说明 |
+|-----|------|------|
+| 并行分支执行 | ✅ | ParallelBranchNode |
+| 汇聚节点检测 | ✅ | ParallelNodeRelationHelper |
+| 并行分支同步 | ✅ | parallelId, parallelBranchNodeId, parallelBranchTotal |
+
+### 策略体系
+
+| 策略 | 状态 | 说明 |
+|-----|------|------|
+| MultiOperatorAuditStrategy | ✅ | 多人审批策略 |
+| TimeoutStrategy | ✅ | 超时策略 |
+| SameOperatorAuditStrategy | ✅ | 同一操作者审批策略 |
+| RecordMergeStrategy | ✅ | 记录合并策略 |
+| ResubmitStrategy | ✅ | 重新提交策略 |
+| AdviceStrategy | ✅ | 审批意见策略 |
+| OperatorLoadStrategy | ✅ | 操作者加载策略 |
+| ErrorTriggerStrategy | ✅ | 异常触发策略 |
+| NodeTitleStrategy | ✅ | 节点标题策略 |
+| FormFieldPermissionStrategy | ✅ | 表单字段权限策略 |
+
+### 脚本系统
+
+| 功能 | 状态 | 说明 |
+|-----|------|------|
+| Groovy 脚本执行 | ✅ | ScriptRuntimeContext |
+| 发起人匹配脚本 | ✅ | OperatorMatchScript |
+| 审批人加载脚本 | ✅ | OperatorLoadScript |
+| 节点标题脚本 | ✅ | NodeTitleScript |
+| 条件判断脚本 | ✅ | ConditionScript |
+| 异常触发脚本 | ✅ | ErrorTriggerScript |
+| 拒绝动作脚本 | ✅ | RejectActionScript |
+| 线程安全 | ✅ | 细粒度同步锁，支持并发执行 |
+| 自动资源清理 | ✅ | 阈值触发 + 定时清理 |
+
+### 异常体系
+
+| 异常 | 状态 | 说明 |
+|-----|------|------|
+| FlowException | ✅ | 基类 (RuntimeException) |
+| FlowValidationException | ✅ | 参数验证异常 |
+| FlowNotFoundException | ✅ | 资源未找到异常 |
+| FlowStateException | ✅ | 状态异常 |
+| FlowPermissionException | ✅ | 权限异常 |
+| FlowConfigException | ✅ | 配置异常 |
+| FlowExecutionException | ✅ | 执行异常 |
+
+### 表单系统
+
+| 功能 | 状态 | 说明 |
+|-----|------|------|
+| 主表字段配置 | ✅ | FormMeta |
+| 子表支持 | ✅ | SubFormMeta |
+| 字段权限控制 | ✅ | READ/WRITE/NONE |
+| 表单数据验证 | ✅ | FormData |
+
+### 事件系统
+
+| 事件 | 状态 | 说明 |
+|-----|------|------|
+| FlowRecordStartEvent | ✅ | 流程开始事件 |
+| FlowRecordTodoEvent | ✅ | 待办事件 |
+| FlowRecordDoneEvent | ✅ | 已办事件 |
+| FlowRecordFinishEvent | ✅ | 流程完成事件 |
+
+### 设计模式应用
+
+| 模式 | 状态 | 说明 |
+|-----|------|------|
+| Builder Pattern | ✅ | WorkflowBuilder, BaseNodeBuilder |
+| Factory Pattern | ✅ | NodeFactory, NodeStrategyFactory, FlowActionFactory |
+| Strategy Pattern | ✅ | INodeStrategy + StrategyManager |
+| Template Method | ✅ | BaseFlowNode, BaseAction, BaseStrategy |
+| Singleton Pattern | ✅ | ScriptRuntimeContext, RepositoryContext, GatewayContext |
+| Chain of Responsibility | ✅ | triggerNode() 递归触发 |
+| Composite Pattern | ✅ | 节点包含多个策略和动作 |
+| Copy Pattern | ✅ | 策略和动作的复制更新 |
+
+---
+
+## 待开发功能 🚧
+
+### 节点功能增强
+
+- [ ] **条件分支节点增强**
+  - [ ] 支持多条件表达式
+  - [ ] 条件优先级配置
+  - [ ] 默认分支配置
+
+- [ ] **子流程节点完善**
+  - [ ] 子流程参数传递
+  - [ ] 子流程结果返回
+  - [ ] 子流程异步调用
+
+- [ ] **延迟节点实现**
+  - [ ] 延迟时间单位配置
+  - [ ] 延迟触发机制
+
+- [ ] **触发节点实现**
+  - [ ] 触发事件定义
+  - [ ] 事件监听机制
+
+### 流程功能
+
+- [ ] **流程版本管理**
+  - [ ] 流程版本历史
+  - [ ] 版本对比
+  - [ ] 版本回滚
+
+- [ ] **流程模拟**
+  - [ ] 流程预执行
+  - [ ] 流程路径分析
+  - [ ] 潜在问题检测
+
+- [ ] **流程撤回**
+  - [ ] 撤回条件判断
+  - [ ] 撤回权限控制
+
+### 监控与分析
+
+- [ ] **流程监控大屏**
+  - [ ] 流程实例统计
+  - [ ] 节点效率分析
+  - [ ] 异常流程预警
+
+- [ ] **流程数据分析**
+  - [ ] 流程周期统计
+  - [ ] 审批效率分析
+  - [ ] 流程瓶颈识别
+
+### 性能优化
+
+- [ ] **缓存机制**
+  - [ ] 流程定义缓存
+  - [ ] 审批人缓存
+
+- [ ] **异步处理**
+  - [ ] 异步事件通知
+  - [ ] 异步脚本执行
+
+### 前端功能
+
+- [ ] **流程设计器**
+  - [ ] 节点拖拽
+  - [ ] 连线绘制
+  - [ ] 节点配置面板
+
+- [ ] **流程展示**
+  - [ ] PC 端流程处理界面
+  - [ ] 移动端流程处理界面
+  - [ ] 流程进度可视化
+
+- [ ] **流程监控**
+  - [ ] 流程实例查询
+  - [ ] 流程记录查询
+  - [ ] 待办/已办列表
+
+---
+
+## 技术债务 🔧
+
+- [ ] 补充单元测试覆盖率
+- [ ] 完善 API 文档
+- [ ] 代码规范检查工具集成
+- [ ] 性能基准测试
+- [ ] 安全漏洞扫描
+
+---
+
+## 版本规划
+
+### v0.1.0 (当前版本)
+
+- ✅ 核心流程引擎框架
+- ✅ 12 种节点类型
+- ✅ 9 种操作类型
+- ✅ 多人审批策略
+- ✅ 策略驱动配置
+- ✅ Groovy 脚本扩展
+- ✅ 线程安全的脚本运行时
+- ✅ 完善的异常体系
+
+### v0.2.0 (计划中)
+
+- [ ] 条件分支节点增强
+- [ ] 子流程节点完善
+- [ ] 延迟节点实现
+- [ ] 触发节点实现
+- [ ] 流程版本管理
+- [ ] 前端流程设计器
+
+### v1.0.0 (未来)
+
+- [ ] 流程模拟
+- [ ] 流程监控大屏
+- [ ] 流程数据分析
+- [ ] 性能优化
+- [ ] 完整的前后端实现
