@@ -17,4 +17,9 @@ public class ParallelBranchRepositoryImpl implements ParallelBranchRepository{
     public void addTriggerCount(String parallelId) {
         this.cache.put(parallelId, this.getTriggerCount(parallelId) + 1);
     }
+
+    @Override
+    public void clearTriggerCount(String parallelId) {
+        this.cache.remove(parallelId);
+    }
 }

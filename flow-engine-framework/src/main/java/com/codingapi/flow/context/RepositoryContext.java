@@ -60,4 +60,8 @@ public class RepositoryContext {
     public void addParallelTriggerCount(String parallelId) {
         parallelBranchRepository.addTriggerCount(parallelId);
     }
+
+    public void clearParallelTriggerCount(String parallelId) {
+        parallelBranchRepository.clearTriggerCount(parallelId);
+    }
 }

@@ -171,7 +171,7 @@ public abstract class BaseFlowNode implements IFlowNode {
     /**
      * 是否等待并行节点的汇聚
      */
-    public boolean isWaitParallelRecord(FlowSession session) {
+    public boolean isWaitRecordMargeParallelNode(FlowSession session) {
         FlowRecord currentRecord = session.getCurrentRecord();
         if (currentRecord != null && this.getId().equals(currentRecord.getParallelBranchNodeId())) {
             RepositoryContext.getInstance().addParallelTriggerCount(currentRecord.getParallelId());
@@ -180,6 +180,7 @@ public abstract class BaseFlowNode implements IFlowNode {
             if (parallelBranchCount == parallelBranchTotal) {
                 // 清空并行节点，防止数据继续继承到后续节点
                 currentRecord.clearParallel();
+                RepositoryContext.getInstance().clearParallelTriggerCount(currentRecord.getParallelId());
             }
             return parallelBranchCount != parallelBranchTotal;
         }

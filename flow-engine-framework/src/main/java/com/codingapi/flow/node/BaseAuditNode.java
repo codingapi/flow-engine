@@ -107,7 +107,8 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     @Override
     public List<FlowRecord> generateCurrentRecords(FlowSession session) {
 
-        if (this.isWaitParallelRecord(session)) {
+        // 是否等待并行合并节点
+        if (this.isWaitRecordMargeParallelNode(session)) {
             return List.of();
         }
 

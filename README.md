@@ -25,20 +25,37 @@ flow-engine
 │   ├── src/main/java
 │   │   └── com.codingapi.flow
 │   │       ├── action            # 操作层
+│   │       │   ├── actions       # 具体操作实现
+│   │       │   └── factory       # 操作工厂
+│   │       ├── backup            # 流程备份
 │   │       ├── builder           # 构建器
 │   │       ├── context           # 上下文
+│   │       ├── edge              # 节点连线
+│   │       ├── error             # 错误处理
 │   │       ├── event             # 事件
-│   │       ├── exception         # 异常
-│   │       ├── form              # 表单
-│   │       ├── gateway           # 网关
+│   │       ├── exception         # 异常体系
+│   │       ├── form              # 表单系统
+│   │       │   └── permission    # 字段权限
+│   │       ├── gateway           # 网关接口防腐层
 │   │       ├── node              # 节点层
-│   │       ├── operator          # 操作人
+│   │       │   ├── factory       # 节点工厂
+│   │       │   ├── helper        # 节点辅助类
+│   │       │   ├── manager       # 节点管理器
+│   │       │   └── nodes         # 具体节点实现
+│   │       ├── operator          # 操作人接口
 │   │       ├── pojo              # 数据对象
-│   │       ├── record            # 记录层
-│   │       ├── script            # 脚本层
+│   │       │   ├── body          # 请求体
+│   │       │   └── request       # 请求对象
+│   │       ├── record            # 流程记录
+│   │       ├── repository        # 仓储接口
+│   │       ├── script            # 脚本系统
+│   │       │   ├── action        # 操作脚本
+│   │       │   ├── node          # 节点脚本
+│   │       │   └── runtime       # 脚本运行时
+│   │       ├── service           # 服务层
+│   │       │   └── impl          # 服务实现
 │   │       ├── session           # 会话层
 │   │       ├── strategy          # 策略层
-│   │       ├── user              # 用户
 │   │       ├── utils             # 工具类
 │   │       └── workflow          # 流程层
 │   └── src/test/java             # 测试代码

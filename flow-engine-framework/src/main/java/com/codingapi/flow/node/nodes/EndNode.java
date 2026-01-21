@@ -30,7 +30,7 @@ public class EndNode extends BaseFlowNode {
 
     @Override
     public List<FlowRecord> generateCurrentRecords(FlowSession session) {
-        if(this.isWaitParallelRecord(session)){
+        if(this.isWaitRecordMargeParallelNode(session)){
             return List.of();
         }
         // 构建结束记录
