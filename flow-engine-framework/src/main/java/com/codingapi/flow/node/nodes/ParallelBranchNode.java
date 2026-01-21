@@ -40,7 +40,7 @@ public class ParallelBranchNode extends BaseFlowNode {
      * @param flowSession 当前会话
      * @return 匹配的节点
      */
-    public List<IFlowNode> matchBranch(List<IFlowNode> nodeList, FlowSession flowSession) {
+    public List<IFlowNode> filterBranches(List<IFlowNode> nodeList, FlowSession flowSession) {
         Workflow workflow = flowSession.getWorkflow();
         ParallelNodeRelationHelper helper = new ParallelNodeRelationHelper(nodeList, workflow);
         // 分析并行分支的结束汇聚节点

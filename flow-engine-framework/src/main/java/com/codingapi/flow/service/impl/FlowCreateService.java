@@ -62,7 +62,7 @@ public class FlowCreateService {
         formData.reset(request.getFormData());
 
         StartNode currentNode = (StartNode) workflow.getStartNode();
-        IFlowAction action = currentNode.actions().getActionById(request.getAdvice().getActionId());
+        IFlowAction action = currentNode.actionManager().getActionById(request.getAdvice().getActionId());
         FlowSession session = FlowSession.startSession(currentOperator, workflow, currentNode, action, formData, workflowBackup.getId());
 
         currentNode.verifySession(session);

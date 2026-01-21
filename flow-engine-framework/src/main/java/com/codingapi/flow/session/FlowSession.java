@@ -80,6 +80,16 @@ public class FlowSession {
     }
 
 
+    /**
+     * 构建开始会话
+     * @param currentOperator 当前操作者
+     * @param workflow 流程设计
+     * @param currentNode 当前节点
+     * @param currentAction 当前动作
+     * @param formData 表单数据
+     * @param backupId 流程备份id
+     * @return 新的会话
+     */
     public static FlowSession startSession(IFlowOperator currentOperator,
                                            Workflow workflow,
                                            IFlowNode currentNode,
@@ -91,49 +101,71 @@ public class FlowSession {
 
 
     /**
+     * 获取流程开始节点
+     */
+    public IFlowNode getStartNode() {
+        return workflow.getStartNode();
+    }
+
+
+    /**
      * 获取流程的创建者
      */
     public IFlowOperator getCreatedOperator() {
         return workflow.getCreatedOperator();
     }
 
+    /**
+     * 获取流程设计编号
+     */
     public String getWorkCode() {
         return workflow.getCode();
-    }
-
-    public String getWorkTitle() {
-        return workflow.getTitle();
     }
 
     public String getCurrentNodeId() {
         return currentNode.getId();
     }
 
-    public IFlowNode getStartNode() {
-        return workflow.getStartNode();
-    }
-
     public String getCurrentNodeType() {
         return currentNode.getType();
     }
 
-    public List<IFlowNode> nextNodes() {
+    /**
+     * 获取下一节点列表
+     * @return 下一节点列表
+     */
+    public List<IFlowNode> matchNextNodes() {
         List<IFlowNode> nodeList = workflow.nextNodes(this.getCurrentNode());
         if(!nodeList.isEmpty() && nodeList.size()>1){
             IFlowNode currentNode = nodeList.get(0);
-            return currentNode.matchBranch(nodeList,this);
+            return currentNode.filterBranches(nodeList,this);
         }
         return nodeList;
     }
 
+    /**
+     * 获取表单数据
+     * @param fieldName 字段名称
+     * @return 表单数据
+     */
     public Object getFormData(String fieldName) {
         return formData.getDataBody().get(fieldName);
     }
 
+    /**
+     * 更新会话
+     * @param currentNode 当前节点
+     * @return 新的会话
+     */
     public FlowSession updateSession(IFlowNode currentNode) {
         return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
     }
 
+    /**
+     * 更新会话
+     * @param currentOperator 当前操作者
+     * @return 新的会话
+     */
     public FlowSession updateSession(IFlowOperator currentOperator) {
         return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
     }

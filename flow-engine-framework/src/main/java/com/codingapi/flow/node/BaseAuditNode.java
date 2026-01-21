@@ -129,7 +129,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode, I
         return new FieldPermissionManager(formFieldPermissions);
     }
 
-    public ActionManager actions() {
+    public ActionManager actionManager() {
         return new ActionManager(actions);
     }
 

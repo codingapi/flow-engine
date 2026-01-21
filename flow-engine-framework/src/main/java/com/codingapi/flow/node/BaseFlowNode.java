@@ -154,7 +154,7 @@ public abstract class BaseFlowNode implements IFlowNode {
     }
 
     @Override
-    public List<IFlowNode> matchBranch(List<IFlowNode> nodeList, FlowSession flowSession) {
+    public List<IFlowNode> filterBranches(List<IFlowNode> nodeList, FlowSession flowSession) {
         return nodeList;
     }
 
@@ -164,7 +164,7 @@ public abstract class BaseFlowNode implements IFlowNode {
     }
 
     @Override
-    public ActionManager actions() {
+    public ActionManager actionManager() {
         return new ActionManager(actions);
     }
 

@@ -43,6 +43,11 @@ public interface IFlowAction {
     Map<String, Object> toMap();
 
 
+    /**
+     * 执行动作
+     * 业务流程的处理入口时通过run函数触发开启的流程
+     * @param flowSession 会话
+     */
     void run(FlowSession flowSession);
 
 

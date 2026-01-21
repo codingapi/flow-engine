@@ -91,12 +91,12 @@ public abstract class BaseAction implements IFlowAction {
     public void run(FlowSession flowSession) {}
 
     /**
-     * 触发节点
+     * 触发并执行后续节点
      * @param flowSession 当前会话
      * @param consumer 节点处理
      */
     public void triggerNode(FlowSession flowSession, Consumer<FlowSession> consumer) {
-        List<IFlowNode> nextNodes = flowSession.nextNodes();
+        List<IFlowNode> nextNodes = flowSession.matchNextNodes();
         for (IFlowNode node : nextNodes) {
             FlowSession triggerSession = flowSession.updateSession(node);
             if (node.continueTrigger(triggerSession)) {

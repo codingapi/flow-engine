@@ -50,7 +50,7 @@ public class BranchNodeBranchNode extends BaseFlowNode {
     }
 
     @Override
-    public List<IFlowNode> matchBranch(List<IFlowNode> nodeList, FlowSession flowSession) {
+    public List<IFlowNode> filterBranches(List<IFlowNode> nodeList, FlowSession flowSession) {
         List<IFlowNode> nodes = new ArrayList<>();
         for (IFlowNode node: nodeList){
             if (node.continueTrigger(flowSession)){

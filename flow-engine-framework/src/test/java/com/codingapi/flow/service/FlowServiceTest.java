@@ -94,7 +94,7 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
-        List<IFlowAction> actions = startNode.actions().getActions();
+        List<IFlowAction> actions = startNode.actionManager().getActions();
         request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", test.getUserId()));
 
         flowService.create(request);
@@ -166,7 +166,7 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
-        List<IFlowAction> actions = startNode.actions().getActions();
+        List<IFlowAction> actions = startNode.actionManager().getActions();
         request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", test.getUserId()));
 
         flowService.create(request);
@@ -184,7 +184,7 @@ class FlowServiceTest {
         assertEquals(1, lorneRecordList.size());
 
 
-        List<IFlowAction> lorneActions = approvalNode.actions().getActions();
+        List<IFlowAction> lorneActions = approvalNode.actionManager().getActions();
 
         FlowActionRequest lorneRequest = new FlowActionRequest();
         lorneRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
@@ -296,7 +296,7 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(data);
-        List<IFlowAction> actions = startNode.actions().getActions();
+        List<IFlowAction> actions = startNode.actionManager().getActions();
         request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", user.getUserId()));
 
         flowService.create(request);
@@ -314,7 +314,7 @@ class FlowServiceTest {
         assertEquals(1, lorneRecordList.size());
 
 
-        List<IFlowAction> lorneActions = departApprovalNode.actions().getActions();
+        List<IFlowAction> lorneActions = departApprovalNode.actionManager().getActions();
 
         FlowActionRequest lorneRequest = new FlowActionRequest();
         lorneRequest.setFormData(data);
@@ -397,7 +397,7 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
-        List<IFlowAction> startActions = startNode.actions().getActions();
+        List<IFlowAction> startActions = startNode.actionManager().getActions();
         request.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", test.getUserId()));
 
         flowService.create(request);
@@ -415,7 +415,7 @@ class FlowServiceTest {
         assertEquals(1, lorneRecordList.size());
 
 
-        List<IFlowAction> lorneActions = approvalNode.actions().getActions();
+        List<IFlowAction> lorneActions = approvalNode.actionManager().getActions();
 
         FlowActionRequest lorneRequest = new FlowActionRequest();
         lorneRequest.setFormData(Map.of("name", "lorne", "days", 1, "reason", "leave"));
@@ -560,7 +560,7 @@ class FlowServiceTest {
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());
         request.setFormData(data);
-        List<IFlowAction> actions = startNode.actions().getActions();
+        List<IFlowAction> actions = startNode.actionManager().getActions();
         request.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", user.getUserId()));
 
         flowService.create(request);
@@ -581,7 +581,7 @@ class FlowServiceTest {
         assertEquals(1, boosRecordList.size());
 
 
-        List<IFlowAction> departActions = departApprovalNode.actions().getActions();
+        List<IFlowAction> departActions = departApprovalNode.actionManager().getActions();
 
         FlowActionRequest departRequest = new FlowActionRequest();
         departRequest.setFormData(data);
@@ -592,7 +592,7 @@ class FlowServiceTest {
         boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, boosRecordList.size());
 
-        List<IFlowAction> bossActions = bossApprovalNode.actions().getActions();
+        List<IFlowAction> bossActions = bossApprovalNode.actionManager().getActions();
 
         FlowActionRequest dossRequest = new FlowActionRequest();
         dossRequest.setFormData(data);
@@ -604,7 +604,7 @@ class FlowServiceTest {
         boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, boosRecordList.size());
 
-        List<IFlowAction> bigBossActions = bigBossApprovalNode.actions().getActions();
+        List<IFlowAction> bigBossActions = bigBossApprovalNode.actionManager().getActions();
 
         FlowActionRequest bigBossRequest = new FlowActionRequest();
         bigBossRequest.setFormData(data);
