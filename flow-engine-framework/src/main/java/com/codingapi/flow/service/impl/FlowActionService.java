@@ -77,7 +77,7 @@ public class FlowActionService {
 
         currentNode.verifySession(session);
 
-        flowAction.triggerNode(session);
+        flowAction.run(session);
 
     }
 }

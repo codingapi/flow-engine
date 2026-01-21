@@ -60,7 +60,7 @@ public class PassAction extends BaseAction {
 
 
     @Override
-    public void triggerNode(FlowSession flowSession) {
+    public void run(FlowSession flowSession) {
         List<IFlowEvent> flowEvents = new ArrayList<>();
         List<FlowRecord> recordList = new ArrayList<>();
         FlowRecord flowRecord = flowSession.getCurrentRecord();
@@ -72,10 +72,7 @@ public class PassAction extends BaseAction {
         recordList.add(flowRecord);
 
         if (done) {
-            super.triggerNode(flowSession);
-            List<IFlowNode> nextNodes = flowSession.nextNodes();
-            for (IFlowNode node : nextNodes) {
-                FlowSession triggerSession = flowSession.updateSession(node);
+            this.triggerNode(flowSession,(triggerSession)->{
                 List<FlowRecord> records = this.generateRecords(triggerSession);
                 if (!records.isEmpty()) {
                     for (FlowRecord record : records) {
@@ -85,7 +82,7 @@ public class PassAction extends BaseAction {
                     }
                     recordList.addAll(records);
                 }
-            }
+            });
         }
 
         RepositoryContext.getInstance().saveRecords(recordList);

@@ -1,19 +1,15 @@
 package com.codingapi.flow.action;
 
-import com.codingapi.flow.context.RepositoryContext;
-import com.codingapi.flow.event.FlowRecordFinishEvent;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.springboot.framework.event.EventPusher;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Getter
 public abstract class BaseAction implements IFlowAction {
@@ -72,13 +68,9 @@ public abstract class BaseAction implements IFlowAction {
 
     @Override
     public List<FlowRecord> generateRecords(FlowSession flowSession) {
-        return null;
+        return List.of();
     }
 
-    @Override
-    public boolean isDone(FlowSession session, FlowRecord currentRecord, List<FlowRecord> currentRecords) {
-        return true;
-    }
 
     @SneakyThrows
     @SuppressWarnings("unchecked")
@@ -96,15 +88,24 @@ public abstract class BaseAction implements IFlowAction {
 
 
     @Override
-    public void triggerNode(FlowSession flowSession) {
+    public void run(FlowSession flowSession) {}
+
+    /**
+     * 触发节点
+     * @param flowSession 当前会话
+     * @param consumer 节点处理
+     */
+    public void triggerNode(FlowSession flowSession, Consumer<FlowSession> consumer) {
         List<IFlowNode> nextNodes = flowSession.nextNodes();
         for (IFlowNode node : nextNodes) {
             FlowSession triggerSession = flowSession.updateSession(node);
             if (node.continueTrigger(triggerSession)) {
-                this.triggerNode(triggerSession);
+                this.triggerNode(triggerSession,consumer);
+            }else {
+                if (consumer != null) {
+                    consumer.accept(triggerSession);
+                }
             }
         }
     }
-
-
 }

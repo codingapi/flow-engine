@@ -71,7 +71,7 @@ public class RejectAction extends BaseAction {
     }
 
     @Override
-    public void triggerNode(FlowSession flowSession) {
+    public void run(FlowSession flowSession) {
         List<IFlowEvent> flowEvents = new ArrayList<>();
         List<FlowRecord> recordList = new ArrayList<>();
 

@@ -10,6 +10,13 @@ import java.util.Map;
 
 /**
  * 流程节点
+ *
+ * 流程执行的生命周期
+ * {@link IFlowNode#verifyNode(FormMeta)}} 用于流程配置完成以后的验证时触发
+ * {@link IFlowNode#verifySession(FlowSession)} 流程执行continueTrigger之前需要先对判断请求会话的参数是否满足节点参数要求
+ * {@link IFlowNode#continueTrigger(FlowSession)} 当前流程节点执行完成以后，触发下一环节时执行的函数，当返回true时则将继续执行后续流程，当返回false时则不继续执行后续流程，将执行当前节点的创建流程记录函数 {@link  IFlowNode#generateCurrentRecords(FlowSession)}
+ * {@link IFlowNode#generateCurrentRecords(FlowSession)} 创建当前节点下的流程记录数据。
+ *
  */
 public interface IFlowNode {
 
