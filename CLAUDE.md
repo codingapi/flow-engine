@@ -72,12 +72,12 @@ The workflow engine is organized into 8 layers:
    - `IFlowNode` - Interface defining node lifecycle methods
    - `BaseFlowNode` - Abstract base for all nodes, manages actions and strategies
    - `BaseAuditNode` - Abstract base for audit nodes (ApprovalNode, HandleNode)
-   - 11 node types: StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, ConditionBranchNode, ParallelBranchNode, RouterBranchNode, InclusiveBranchNode, DelayNode, TriggerNode, SubProcessNode
+   - 12 node types: StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, BranchNodeBranchNode, ParallelBranchNode, RouterBranchNode, InclusiveBranchNode, SubProcessNode, DelayNode, TriggerNode
 
 3. **Action Layer** (`com.codingapi.flow.action`, `com.codingapi.flow.action.actions`)
    - `IFlowAction` - Interface for node actions with `copy()` method
    - `BaseAction` - Abstract base with `triggerNode()` for recursive traversal
-   - 8 action types: DefaultAction, PassAction, RejectAction, SaveAction, ReturnAction, TransferAction, AddAuditAction, DelegateAction, CustomAction
+   - 9 action types: DefaultAction, PassAction, RejectAction, SaveAction, ReturnAction, TransferAction, AddAuditAction, DelegateAction, CustomAction
 
 4. **Record Layer** (`com.codingapi.flow.record`)
    - `FlowRecord` - Execution record with states (TODO/DONE, RUNNING/FINISH/ERROR/DELETE)
@@ -99,6 +99,13 @@ The workflow engine is organized into 8 layers:
 8. **Script Layer** (`com.codingapi.flow.script.runtime`)
    - `ScriptRuntimeContext` - Groovy script execution with thread-safe design and auto-cleanup
    - Script types: OperatorMatchScript, OperatorLoadScript, NodeTitleScript, ConditionScript, ErrorTriggerScript, RejectActionScript
+
+### Supporting Architectures
+
+- **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation
+- **Gateway Pattern** (`com.codingapi.flow.gateway`) - Anti-corruption layer for external system integration (operators, users)
+- **Backup System** (`com.codingapi.flow.backup`) - Workflow versioning and backup management
+- **Error Handling** (`com.codingapi.flow.error`) - Centralized error throwing mechanism for flow control
 
 ### Node Lifecycle (Critical for Understanding Flow)
 
@@ -139,6 +146,8 @@ When encountering `ParallelBranchNode`:
 - **Chain of Responsibility**: `triggerNode()` recursive traversal, `StrategyManager` strategy iteration
 - **Composite**: Nodes contain multiple strategies and actions
 - **Copy Pattern**: `INodeStrategy.copy()`, `IFlowAction.copy()`, `BaseFlowNode.setActions()`, `BaseFlowNode.setStrategies()`
+- **Repository**: Abstracts data persistence, implementations in infra layer
+- **Gateway**: Anti-corruption layer for external system integration
 
 ### Strategy-Driven Node Configuration (Critical Architecture)
 
@@ -200,6 +209,8 @@ Use framework exceptions instead of generic exceptions (IllegalArgumentException
 - **Custom Strategies**: Extend `BaseStrategy`, implement `INodeStrategy`
 - **Custom Scripts**: Use `ScriptRuntimeContext` for Groovy execution
 - **Event Listeners**: Listen to `FlowRecordStartEvent`, `FlowRecordTodoEvent`, `FlowRecordDoneEvent`, `FlowRecordFinishEvent`
+- **Repository Implementations**: Implement repository interfaces in infra layer for persistence
+- **Gateway Implementations**: Implement gateway interfaces for system integration
 
 ## Documentation References
 

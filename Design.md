@@ -17,13 +17,16 @@
     - `operatorCreateScript`: 创建者匹配脚本
     - `isInterfere`: 是否开启干预
     - `isRevoke`: 是否开启撤销
+    - `createdOperator`: 创建者ID
+    - `createdTime`: 创建时间
+    - `schema`: 流程版本标识
 - **核心方法**:
     - `verify()`: 验证流程定义的合法性
     - `nextNodes(IFlowNode)`: 获取指定节点的后续节点
     - `getStartNode()`: 获取开始节点
     - `getEndNode()`: 获取结束节点
     - `toJson()`: 序列化为JSON
-    - `formJson()`: 从JSON反序列化
+    - `formJson(String)`: 从JSON反序列化（静态方法）
 
 #### WorkflowBuilder
 - **位置**: `com.codingapi.flow.workflow.WorkflowBuilder`
@@ -70,7 +73,7 @@
     - `isDone()`: 通过StrategyManager判断多人审批完成状态
     - `generateCurrentRecords()`: 通过StrategyManager加载操作者并生成记录
 
-#### 节点类型一览 (11种)
+#### 节点类型一览 (12种)
 
 | 节点类型 | 类名 | NODE_TYPE | 说明 |
 |---------|------|-----------|------|
@@ -167,7 +170,12 @@
 #### FlowAdvice
 - **位置**: `com.codingapi.flow.session.FlowAdvice`
 - **职责**: 封装审批操作的相关参数
-- **核心属性**: `advice`(审批意见), `signKey`(签名), `action`(动作), `backNode`(退回节点), `transferOperators`(转办人员)
+- **核心属性**:
+    - `advice`: 审批意见
+    - `signKey`: 签名
+    - `action`: 动作类型
+    - `backNode`: 退回节点（类型为 `IFlowNode`，节点对象引用）
+    - `transferOperators`: 转办人员列表
 
 ---
 
