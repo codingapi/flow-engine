@@ -234,13 +234,18 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode, I
      */
     @Override
     public List<FlowRecord> generateCurrentRecords(FlowSession session) {
+
+        if(this.isWaitParallelRecord(session)){
+            return List.of();
+        }
+
         List<FlowRecord> records = new ArrayList<>();
         FlowRecord currentRecord = session.getCurrentRecord();
         OperatorManager operatorManager = this.operators(session);
         List<IFlowOperator> operators = operatorManager.getOperators();
         for (int order = 0; order < operators.size(); order++) {
             IFlowOperator operator = operators.get(order);
-            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator), this.id, currentRecord.getProcessId(), currentRecord.getId(), order);
+            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator), this.id,  order);
             records.add(flowRecord);
         }
         if (operators.size() > 1) {

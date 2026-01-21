@@ -4,6 +4,7 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.ReturnAction;
 import com.codingapi.flow.action.SaveAction;
 import com.codingapi.flow.action.TransferAction;
+import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.builder.NodeMapBuilder;
 import com.codingapi.flow.node.manager.ActionManager;
@@ -56,7 +57,7 @@ public abstract class BaseFlowNode implements IFlowNode {
         this(id, name, order, new ArrayList<>());
     }
 
-    public BaseFlowNode(String id, String name,List<IFlowAction> actions) {
+    public BaseFlowNode(String id, String name, List<IFlowAction> actions) {
         this(id, name, 0, actions);
     }
 
@@ -95,15 +96,26 @@ public abstract class BaseFlowNode implements IFlowNode {
 
     }
 
+    /**
+     * 是否等待并行节点的汇聚
+     */
+    public boolean isWaitParallelRecord(FlowSession session) {
+        FlowRecord currentRecord = session.getCurrentRecord();
+        if (currentRecord != null && this.getId().equals(currentRecord.getParallelBranchNodeId())) {
+            //TODO
+            System.out.println(currentRecord.isTodo());
+            // 此时还没有创建当前节点的记录数据，当时已经到了该汇聚节点，需要判断汇聚次数。
+            int parallelBranchCount = currentRecord.getParallelBranchCount();
+            List<FlowRecord> parallelRecords = RepositoryContext.getInstance().findRecordsNodeIdAndParallelId(this.getId(), currentRecord.getParallelId());
+            List<FlowRecord> finishRecords = parallelRecords.stream().filter(FlowRecord::isFinish).toList();
+            return parallelBranchCount != finishRecords.size();
+        }
+        return false;
+    }
+
+
     @Override
     public boolean continueTrigger(FlowSession session) {
-        FlowRecord currentRecord = session.getCurrentRecord();
-        String id = this.getId();
-        // 如果是合并的汇聚节点的话，需要等全部分支结束才能继续执行
-        if(currentRecord.getParallelBranchNodeId().equals(id)){
-            //TODO 判断并行分支是的都汇聚到了该节点，如果都汇聚到了则继续执行。
-        }
-
         return true;
     }
 

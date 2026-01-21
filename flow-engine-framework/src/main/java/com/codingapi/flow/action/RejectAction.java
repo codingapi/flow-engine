@@ -80,17 +80,14 @@ public class RejectAction extends BaseAction {
         recordList.add(flowRecord);
 
         List<FlowRecord> records = this.generateRecords(flowSession);
-        IFlowNode latestNode = flowSession.getCurrentNode();
-        if(records.isEmpty()){
-            super.flowFinish(flowRecord, latestNode);
-        }
-        recordList.addAll(records);
-        for (FlowRecord record : records){
-            if (record.isShow()) {
-                flowEvents.add(new FlowRecordTodoEvent(record));
+        if(!records.isEmpty()) {
+            recordList.addAll(records);
+            for (FlowRecord record : records) {
+                if (record.isShow()) {
+                    flowEvents.add(new FlowRecordTodoEvent(record));
+                }
             }
         }
-
         RepositoryContext.getInstance().saveRecords(recordList);
         flowEvents.forEach(EventPusher::push);
 

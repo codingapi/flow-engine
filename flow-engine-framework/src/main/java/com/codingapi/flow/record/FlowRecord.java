@@ -1,6 +1,7 @@
 package com.codingapi.flow.record;
 
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
@@ -153,6 +154,11 @@ public class FlowRecord {
     private long interferedOperatorId;
 
     /**
+     * 并行id
+     */
+    private String parallelId;
+
+    /**
      * 并行分支节点id
      */
     private String parallelBranchNodeId;
@@ -163,15 +169,15 @@ public class FlowRecord {
     private int parallelBranchCount;
 
 
-    public FlowRecord(FlowSession flowSession, String actionId, String processId, long fromId, int nodeOrder) {
+    public FlowRecord(FlowSession flowSession, String actionId,  int nodeOrder) {
         this.workCode = flowSession.getWorkCode();
         this.workBackupId = flowSession.getBackupId();
         this.nodeId = flowSession.getCurrentNodeId();
         this.nodeType = flowSession.getCurrentNodeType();
         this.formData = flowSession.getFormData().toMapData();
-        this.fromId = fromId;
+        this.fromId = 0;
         this.nodeOrder = nodeOrder;
-        this.processId = processId;
+        this.processId = RandomUtils.generateStringId();
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
         this.recordState = SATE_RECORD_TODO;
         this.actionId = actionId;
@@ -195,6 +201,9 @@ public class FlowRecord {
         if(record!=null) {
             this.parallelBranchNodeId = record.parallelBranchNodeId;
             this.parallelBranchCount = record.parallelBranchCount;
+            this.parallelId = record.parallelId;
+            this.fromId = record.id;
+            this.processId = record.processId;
         }
     }
 
@@ -204,9 +213,10 @@ public class FlowRecord {
      * @param parallelBranchNodeId 并行分支节点id
      * @param parallelBranchCount 并行分支数量
      */
-    public void parallelBranchNode(String parallelBranchNodeId, int parallelBranchCount) {
+    public void parallelBranchNode(String parallelBranchNodeId, int parallelBranchCount,String parallelId) {
         this.parallelBranchNodeId = parallelBranchNodeId;
         this.parallelBranchCount = parallelBranchCount;
+        this.parallelId = parallelId;
     }
 
     public void verify() {
@@ -233,9 +243,6 @@ public class FlowRecord {
         }
         if (createOperatorId <= 0) {
             throw new IllegalArgumentException("createOperator is null");
-        }
-        if (currentOperatorId <= 0) {
-            throw new IllegalArgumentException("currentOperatorId is null");
         }
         if (actionId == null) {
             throw new IllegalArgumentException("actionId is null");

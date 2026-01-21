@@ -192,8 +192,8 @@ class FlowServiceTest {
         flowService.action(lorneRequest);
 
         List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(lorneRecordList.get(0).getProcessId());
-        assertEquals(2, records.size());
-        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(3, records.size());
+        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -322,8 +322,8 @@ class FlowServiceTest {
         flowService.action(lorneRequest);
 
         List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(lorneRecordList.get(0).getProcessId());
-        assertEquals(2, records.size());
-        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(3, records.size());
+        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -442,8 +442,8 @@ class FlowServiceTest {
         flowService.action(lorneRequest);
 
         List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(lorneRecordList.get(0).getProcessId());
-        assertEquals(4, records.size());
-        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(5, records.size());
+        assertEquals(5, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -506,44 +506,8 @@ class FlowServiceTest {
                 )
                 .build();
 
-        ApprovalNode bossApprovalNode1 = ApprovalNode.builder()
+        ApprovalNode bossApprovalNode = ApprovalNode.builder()
                 .name("经理审批")
-                .operatorScript("def run(request){return [$bind.getOperatorById(3)]}")
-                .formFieldsPermissions(
-                        FormFieldPermissionsBuilder.builder()
-                                .addPermission("leave", "name", PermissionType.WRITE)
-                                .addPermission("leave", "days", PermissionType.WRITE)
-                                .addPermission("leave", "reason", PermissionType.WRITE)
-                                .build()
-                )
-                .build();
-
-        ApprovalNode bossApprovalNode2 = ApprovalNode.builder()
-                .name("经理审批")
-                .operatorScript("def run(request){return [$bind.getOperatorById(3)]}")
-                .formFieldsPermissions(
-                        FormFieldPermissionsBuilder.builder()
-                                .addPermission("leave", "name", PermissionType.WRITE)
-                                .addPermission("leave", "days", PermissionType.WRITE)
-                                .addPermission("leave", "reason", PermissionType.WRITE)
-                                .build()
-                )
-                .build();
-
-        ApprovalNode endOver1 = ApprovalNode.builder()
-                .name("end-over1")
-                .operatorScript("def run(request){return [$bind.getOperatorById(3)]}")
-                .formFieldsPermissions(
-                        FormFieldPermissionsBuilder.builder()
-                                .addPermission("leave", "name", PermissionType.WRITE)
-                                .addPermission("leave", "days", PermissionType.WRITE)
-                                .addPermission("leave", "reason", PermissionType.WRITE)
-                                .build()
-                )
-                .build();
-
-        ApprovalNode endOver2 = ApprovalNode.builder()
-                .name("end-over2")
                 .operatorScript("def run(request){return [$bind.getOperatorById(3)]}")
                 .formFieldsPermissions(
                         FormFieldPermissionsBuilder.builder()
@@ -564,20 +528,14 @@ class FlowServiceTest {
                 .addNode(parallelBranchNode1)
                 .addNode(parallelBranchNode2)
                 .addNode(departApprovalNode)
-                .addNode(bossApprovalNode1)
-                .addNode(bossApprovalNode2)
-                .addNode(endOver1)
-                .addNode(endOver2)
+                .addNode(bossApprovalNode)
                 .addNode(endNode)
                 .addEdge(new FlowEdge(startNode.getId(), parallelBranchNode1.getId()))
                 .addEdge(new FlowEdge(startNode.getId(), parallelBranchNode2.getId()))
                 .addEdge(new FlowEdge(parallelBranchNode1.getId(), departApprovalNode.getId()))
-                .addEdge(new FlowEdge(parallelBranchNode2.getId(), bossApprovalNode1.getId()))
-                .addEdge(new FlowEdge(departApprovalNode.getId(), endOver1.getId()))
-                .addEdge(new FlowEdge(bossApprovalNode1.getId(), bossApprovalNode2.getId()))
-                .addEdge(new FlowEdge(bossApprovalNode2.getId(), endOver1.getId()))
-                .addEdge(new FlowEdge(endOver1.getId(), endOver2.getId()))
-                .addEdge(new FlowEdge(endOver2.getId(), endNode.getId()))
+                .addEdge(new FlowEdge(parallelBranchNode2.getId(), bossApprovalNode.getId()))
+                .addEdge(new FlowEdge(departApprovalNode.getId(), endNode.getId()))
+                .addEdge(new FlowEdge(bossApprovalNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -601,21 +559,36 @@ class FlowServiceTest {
         submitRequest.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", user.getUserId()));
         flowService.action(submitRequest);
 
-        List<FlowRecord> lorneRecordList = flowRecordRepository.findTodoByOperator(depart.getUserId());
-        assertEquals(1, lorneRecordList.size());
+        List<FlowRecord> departRecordList = flowRecordRepository.findTodoByOperator(depart.getUserId());
+        assertEquals(1, departRecordList.size());
+
+        List<FlowRecord> boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        assertEquals(1, boosRecordList.size());
 
 
-        List<IFlowAction> lorneActions = departApprovalNode.actions().getActions();
+        List<IFlowAction> departActions = departApprovalNode.actions().getActions();
 
-        FlowActionRequest lorneRequest = new FlowActionRequest();
-        lorneRequest.setFormData(data);
-        lorneRequest.setRecordId(lorneRecordList.get(0).getId());
-        lorneRequest.setAdvice(new FlowAdviceBody(lorneActions.get(0).id(), "同意", depart.getUserId()));
-        flowService.action(lorneRequest);
+        FlowActionRequest departRequest = new FlowActionRequest();
+        departRequest.setFormData(data);
+        departRequest.setRecordId(departRecordList.get(0).getId());
+        departRequest.setAdvice(new FlowAdviceBody(departActions.get(0).id(), "同意", depart.getUserId()));
+        flowService.action(departRequest);
 
-        List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(lorneRecordList.get(0).getProcessId());
-        assertEquals(4, records.size());
-        assertEquals(2, records.stream().filter(FlowRecord::isTodo).toList().size());
+        boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        assertEquals(1, boosRecordList.size());
+
+        List<IFlowAction> bossActions = bossApprovalNode.actions().getActions();
+
+        FlowActionRequest dossRequest = new FlowActionRequest();
+        dossRequest.setFormData(data);
+        dossRequest.setRecordId(boosRecordList.get(0).getId());
+        dossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", boss.getUserId()));
+        flowService.action(dossRequest);
+
+
+        List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(departRecordList.get(0).getProcessId());
+        assertEquals(3, records.size());
+        assertEquals(0, records.stream().filter(FlowRecord::isTodo).toList().size());
         assertEquals(0, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }

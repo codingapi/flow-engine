@@ -42,12 +42,15 @@ public class RepositoryContext {
         flowRecordRepository.saveAll(flowRecords);
     }
 
-    public List<FlowRecord> findRecordsByFromIdAndNodeId(long fromId,String nodeId) {
-        return flowRecordRepository.findRecordsByFromIdAndNodeId(fromId,nodeId);
+    public List<FlowRecord> findRecordsByFromIdAndNodeId(long fromId, String nodeId) {
+        return flowRecordRepository.findRecordsByFromIdAndNodeId(fromId, nodeId);
     }
 
     public List<FlowRecord> findRecordsByProcessId(String processId) {
         return flowRecordRepository.findRecordsByProcessId(processId);
     }
 
+    public List<FlowRecord> findRecordsNodeIdAndParallelId(String nodeId, String parallelId) {
+        return flowRecordRepository.findRecordsNodeIdAndParallelId(nodeId, parallelId);
+    }
 }

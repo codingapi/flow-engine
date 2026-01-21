@@ -51,7 +51,7 @@ public class ParallelBranchNode extends BaseFlowNode {
 
         // 在流程记录中记录，合并的条件信息。
         FlowRecord flowRecord = flowSession.getCurrentRecord();
-        flowRecord.parallelBranchNode(overNode.getId(), nodeList.size());
+        flowRecord.parallelBranchNode(overNode.getId(), nodeList.size(),RandomUtils.generateStringId());
 
         return nodeList;
     }

@@ -107,25 +107,4 @@ public abstract class BaseAction implements IFlowAction {
     }
 
 
-    // TODO 需要判断是从什么情况下触发的完成，如果是非PASS结束的视为非正常结束
-    public void flowFinish(FlowRecord latestRecord,IFlowNode latestNode){
-        List<FlowRecord> recordList = new ArrayList<>();
-        // 添加当前节点到记录中
-        if (latestNode instanceof EndNode) {
-            recordList.add(latestRecord);
-            // 添加历史记录到记录中
-            List<FlowRecord> historyRecords = RepositoryContext.getInstance().findRecordsByProcessId(latestRecord.getProcessId());
-            recordList.addAll(historyRecords);
-            // 设置状态为完成
-            recordList.forEach(item -> {
-                item.finish(true);
-            });
-
-            RepositoryContext.getInstance().saveRecords(recordList);
-
-            // 流程是否正常结束
-            EventPusher.push(new FlowRecordFinishEvent(latestRecord));
-        }
-    }
-
 }
