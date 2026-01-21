@@ -1,5 +1,6 @@
 package com.codingapi.flow.pojo.body;
 
+import com.codingapi.flow.exception.FlowValidationException;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -52,10 +53,10 @@ public class FlowAdviceBody {
 
     public void verify() {
         if (actionId == null || actionId.isEmpty()) {
-            throw new IllegalArgumentException("action can not be null");
+            throw FlowValidationException.required("actionId");
         }
         if (operatorId <= 0) {
-            throw new IllegalArgumentException("operatorId can not be null");
+            throw FlowValidationException.required("operatorId");
         }
     }
 }

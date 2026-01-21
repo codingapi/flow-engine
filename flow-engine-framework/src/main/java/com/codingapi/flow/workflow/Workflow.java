@@ -3,6 +3,8 @@ package com.codingapi.flow.workflow;
 import com.alibaba.fastjson.JSON;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.edge.FlowEdge;
+import com.codingapi.flow.exception.FlowConfigException;
+import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.factory.NodeFactory;
@@ -227,28 +229,28 @@ public class Workflow {
 
     private void verifyFields() {
         if (!StringUtils.hasText(id)) {
-            throw new IllegalArgumentException("workflow id can not be null");
+            throw FlowValidationException.required("workflow id");
         }
         if (!StringUtils.hasText(code)) {
-            throw new IllegalArgumentException("workflow code can not be null");
+            throw FlowValidationException.required("workflow code");
         }
         if (!StringUtils.hasText(title)) {
-            throw new IllegalArgumentException("workflow title can not be null");
+            throw FlowValidationException.required("workflow title");
         }
         if (createdTime <= 0) {
-            throw new IllegalArgumentException("workflow createdTime can not be null");
+            throw FlowValidationException.required("workflow createdTime");
         }
         if (form == null) {
-            throw new IllegalArgumentException("workflow form can not be null");
+            throw FlowValidationException.required("workflow form");
         }
         if (createdOperator == null) {
-            throw new IllegalArgumentException("workflow createdOperator can not be null");
+            throw FlowValidationException.required("workflow createdOperator");
         }
         if (nodes == null || nodes.isEmpty()) {
-            throw new IllegalArgumentException("workflow nodes can not be null");
+            throw FlowConfigException.nodeConfigError(title, "nodes can not be null");
         }
         if (edges == null || edges.isEmpty()) {
-            throw new IllegalArgumentException("workflow edges can not be null");
+            throw FlowConfigException.edgeConfigError("edges can not be null");
         }
     }
 
@@ -265,7 +267,7 @@ public class Workflow {
             }
         }
         if (start != 1 || end != 1) {
-            throw new IllegalArgumentException("workflow nodes must have one start node and one end node");
+            throw FlowConfigException.nodeConfigError(title, "must have one start node and one end node");
         }
 
         for (IFlowNode node : nodes) {
@@ -276,7 +278,7 @@ public class Workflow {
     private void verifyEdges() {
         for (FlowEdge edge : edges) {
             if (edge.getFrom().equals(edge.getTo())) {
-                throw new IllegalArgumentException("workflow edges can not have same from and to");
+                throw FlowConfigException.edgeConfigError("can not have same from and to");
             }
         }
         IFlowNode startNode = this.nodes.stream().filter(node -> node instanceof StartNode).findFirst().get();
@@ -293,7 +295,7 @@ public class Workflow {
         } else {
             List<IFlowNode> nextNodes = nextNodes(node);
             if (nextNodes.isEmpty()) {
-                throw new IllegalArgumentException("workflow edges must have one end edge");
+                throw FlowConfigException.edgeConfigError("must have one end edge");
             }
             for (IFlowNode nextNode : nextNodes) {
                 this.verifyNextEdge(nextNode);

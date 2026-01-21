@@ -2,6 +2,7 @@ package com.codingapi.flow.pojo.request;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.context.GatewayContext;
+import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.workflow.Workflow;
@@ -47,13 +48,13 @@ public class FlowActionRequest {
 
     public void verify() {
         if (recordId <= 0) {
-            throw new IllegalArgumentException("recordId can not be null");
+            throw FlowValidationException.required("recordId");
         }
         if (formData == null || formData.isEmpty()) {
-            throw new IllegalArgumentException("formData can not be null");
+            throw FlowValidationException.required("formData");
         }
         if (advice == null) {
-            throw new IllegalArgumentException("advice can not be null");
+            throw FlowValidationException.required("advice");
         }
         advice.verify();
     }

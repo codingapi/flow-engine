@@ -3,6 +3,8 @@ package com.codingapi.flow.service.impl;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.backup.WorkflowBackup;
 import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.exception.FlowNotFoundException;
+import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.node.IFlowNode;
@@ -37,34 +39,34 @@ public class FlowActionService {
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getAdvice().getOperatorId());
         if (currentOperator == null) {
-            throw new IllegalArgumentException("currentOperator not exist");
+            throw FlowNotFoundException.operator(request.getAdvice().getOperatorId());
         }
         FlowRecord flowRecord = flowRecordRepository.get(request.getRecordId());
         if (flowRecord == null) {
-            throw new IllegalArgumentException("record not exist");
+            throw FlowNotFoundException.record(request.getRecordId());
         }
         if (!flowRecord.isTodo()) {
-            throw new IllegalArgumentException("record has done");
+            throw FlowStateException.recordAlreadyDone();
         }
 
         long currentOperatorId = flowRecord.getCurrentOperatorId();
         if (currentOperatorId != currentOperator.getUserId()) {
-            throw new IllegalArgumentException("currentOperator not match");
+            throw FlowStateException.operatorNotMatch();
         }
 
         WorkflowBackup workflowBackup = workflowBackupRepository.get(flowRecord.getWorkBackupId());
         if (workflowBackup == null) {
-            throw new IllegalArgumentException("workflow not exist");
+            throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + "");
         }
 
         Workflow workflow = workflowBackup.toWorkflow();
         IFlowNode currentNode = workflow.getFlowNode(flowRecord.getNodeId());
         if (currentNode == null) {
-            throw new IllegalArgumentException("currentNode not exist");
+            throw FlowNotFoundException.node(flowRecord.getNodeId());
         }
         IFlowAction flowAction = currentNode.actionManager().getActionById(request.getAdvice().getActionId());
         if (flowAction == null) {
-            throw new IllegalArgumentException("action not exist");
+            throw FlowNotFoundException.action(request.getAdvice().getActionId());
         }
 
         // 构建表单数据

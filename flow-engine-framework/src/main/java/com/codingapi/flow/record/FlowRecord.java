@@ -1,6 +1,7 @@
 package com.codingapi.flow.record;
 
 import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
@@ -232,31 +233,31 @@ public class FlowRecord {
 
     public void verify() {
         if (!StringUtils.hasText(workCode)) {
-            throw new IllegalArgumentException("workCode is null");
+            throw FlowValidationException.required("workCode");
         }
         if (!StringUtils.hasText(nodeId)) {
-            throw new IllegalArgumentException("nodeId is null");
+            throw FlowValidationException.required("nodeId");
         }
         if (!StringUtils.hasText(title)) {
-            throw new IllegalArgumentException("title is null");
+            throw FlowValidationException.required("title");
         }
         if (!StringUtils.hasText(processId)) {
-            throw new IllegalArgumentException("processId is null");
+            throw FlowValidationException.required("processId");
         }
         if (createTime <= 0) {
-            throw new IllegalArgumentException("createTime is null");
+            throw FlowValidationException.required("createTime");
         }
         if (fromId < 0) {
-            throw new IllegalArgumentException("fromId is null");
+            throw FlowValidationException.required("fromId");
         }
         if (formData == null) {
-            throw new IllegalArgumentException("formData is null");
+            throw FlowValidationException.required("formData");
         }
         if (createOperatorId <= 0) {
-            throw new IllegalArgumentException("createOperator is null");
+            throw FlowValidationException.required("createOperator");
         }
         if (actionId == null) {
-            throw new IllegalArgumentException("actionId is null");
+            throw FlowValidationException.required("actionId");
         }
     }
 
