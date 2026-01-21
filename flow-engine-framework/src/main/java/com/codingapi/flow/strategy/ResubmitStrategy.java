@@ -1,15 +1,15 @@
 package com.codingapi.flow.strategy;
 
+import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 重新提交策略
  */
 @Data
-public class ResubmitStrategy implements INodeStrategy {
+public class ResubmitStrategy extends BaseStrategy {
 
     private Type type;
 
@@ -20,21 +20,29 @@ public class ResubmitStrategy implements INodeStrategy {
         CHAIN,
     }
 
+    public ResubmitStrategy() {
+        super(RandomUtils.generateStringId());
+    }
+
+    @Override
+    public void copy(INodeStrategy target) {
+        this.type = ((ResubmitStrategy) target).type;
+    }
+
     public boolean isResume() {
         return type == Type.RESUME;
     }
 
     @Override
     public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put(TYPE_KEY, strategyType());
+        Map<String, Object> map = super.toMap();
         map.put("type", type);
         return map;
     }
 
     public static ResubmitStrategy fromMap(Map<String, Object> map) {
-        if (map == null || map.isEmpty()) return null;
-        ResubmitStrategy strategy = new ResubmitStrategy();
+        ResubmitStrategy strategy = BaseStrategy.fromMap( map, ResubmitStrategy.class);
+        if (strategy == null) return null;
         strategy.setType(Type.valueOf((String) map.get("type")));
         return strategy;
     }

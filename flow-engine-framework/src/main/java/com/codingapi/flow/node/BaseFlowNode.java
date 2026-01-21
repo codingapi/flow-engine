@@ -1,21 +1,19 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.ReturnAction;
-import com.codingapi.flow.action.SaveAction;
-import com.codingapi.flow.action.TransferAction;
+import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.node.builder.NodeMapBuilder;
+import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.INodeStrategy;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,15 +56,46 @@ public abstract class BaseFlowNode implements IFlowNode {
     protected List<INodeStrategy> strategies;
 
 
+    /**
+     * 节点策略
+     * @param strategies 节点策略
+     */
     public void setStrategies(List<INodeStrategy> strategies) {
-        if(strategies!=null && !strategies.isEmpty()) {
-            if(this.strategies!=null){
-                this.strategies.addAll(strategies);
-            }else {
+        if (strategies != null && !strategies.isEmpty()) {
+            if (this.strategies != null) {
+                StrategyManager strategyManager = new StrategyManager(this.strategies);
+                for (INodeStrategy nodeStrategy : strategies) {
+                    INodeStrategy currentStrategy = strategyManager.getStrategy(nodeStrategy.getClass());
+                    if (currentStrategy != null) {
+                        currentStrategy.copy(nodeStrategy);
+                    }
+                }
+            } else {
                 this.strategies = strategies;
             }
         }
     }
+
+    public void setActions(List<IFlowAction> actions) {
+        if (actions != null && !actions.isEmpty()) {
+            if (this.actions != null) {
+                ActionManager actionManager = new ActionManager(this.actions);
+                for (IFlowAction action : actions) {
+                    IFlowAction currentAction = actionManager.getAction(action.getClass());
+                    if (currentAction != null) {
+                        currentAction.copy(action);
+                    }else {
+                        if(action instanceof CustomAction) {
+                            this.actions.add(action);
+                        }
+                    }
+                }
+            } else {
+                this.actions = actions;
+            }
+        }
+    }
+
 
     public BaseFlowNode(String name, String id) {
         this(name, id, 0, new ArrayList<>(), new ArrayList<>());
@@ -115,7 +144,27 @@ public abstract class BaseFlowNode implements IFlowNode {
 
     @Override
     public void verifyNode(FormMeta form) {
+        this.verifyDefaultConfig();
+        ActionManager actionManager = this.actionManager();
+        actionManager.verify(form);
 
+        StrategyManager strategyManager = this.strategyManager();
+        strategyManager.verify(form);
+    }
+
+    private void verifyDefaultConfig(){
+        if (!StringUtils.hasText(name)) {
+            throw new IllegalArgumentException("name can not be null");
+        }
+        if (!StringUtils.hasText(id)) {
+            throw new IllegalArgumentException("id can not be null");
+        }
+        if (actions == null) {
+            throw new IllegalArgumentException("actions can not be null");
+        }
+        if (strategies == null) {
+            throw new IllegalArgumentException("strategies can not be null");
+        }
     }
 
     /**
@@ -127,7 +176,7 @@ public abstract class BaseFlowNode implements IFlowNode {
             RepositoryContext.getInstance().addParallelTriggerCount(currentRecord.getParallelId());
             int parallelBranchTotal = currentRecord.getParallelBranchTotal();
             int parallelBranchCount = RepositoryContext.getInstance().getParallelBranchTriggerCount(currentRecord.getParallelId());
-            if(parallelBranchCount == parallelBranchTotal){
+            if (parallelBranchCount == parallelBranchTotal) {
                 // 清空并行节点，防止数据继续继承到后续节点
                 currentRecord.clearParallel();
             }
@@ -144,25 +193,11 @@ public abstract class BaseFlowNode implements IFlowNode {
 
     @Override
     public void verifySession(FlowSession session) {
-        FlowAdvice flowAdvice = session.getAdvice();
+        ActionManager actionManager = this.actionManager();
+        actionManager.verifySession(session);
 
-        IFlowAction flowAction = flowAdvice.getAction();
-        // 保存操作,不做检查
-        if (flowAction instanceof SaveAction) {
-            return;
-        }
-        // 转办操作
-        if (flowAction instanceof TransferAction) {
-            if (flowAdvice.getTransferOperators() == null || flowAdvice.getTransferOperators().isEmpty()) {
-                throw new IllegalArgumentException("transferOperators can not be null");
-            }
-        }
-        // 退回操作
-        if (flowAction instanceof ReturnAction) {
-            if (flowAdvice.getBackNode() == null) {
-                throw new IllegalArgumentException("backNode can not be null");
-            }
-        }
+        StrategyManager strategyManager = this.strategyManager();
+        strategyManager.verifySession(session);
     }
 
     @Override

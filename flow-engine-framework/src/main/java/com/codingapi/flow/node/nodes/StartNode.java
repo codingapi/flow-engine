@@ -1,10 +1,10 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.PassAction;
+import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.node.BaseFlowNode;
-import com.codingapi.flow.node.builder.BaseNodeBuilder;
+import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
@@ -74,7 +74,7 @@ public class StartNode extends BaseFlowNode {
     private static List<INodeStrategy> defaultStrategies() {
         List<INodeStrategy> strategies = new ArrayList<>();
         strategies.add(NodeTitleStrategy.defaultStrategy());
-        strategies.add(new FormFieldPermissionStrategy());
+        strategies.add(FormFieldPermissionStrategy.defaultStrategy());
         return strategies;
     }
 

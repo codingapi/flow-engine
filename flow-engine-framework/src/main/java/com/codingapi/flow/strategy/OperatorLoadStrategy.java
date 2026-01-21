@@ -3,21 +3,29 @@ package com.codingapi.flow.strategy;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
-import lombok.NoArgsConstructor;
+import com.codingapi.flow.utils.RandomUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 
-@NoArgsConstructor
-public class OperatorLoadStrategy implements INodeStrategy{
+public class OperatorLoadStrategy extends BaseStrategy{
 
     /**
      * 审批人配置脚本
      */
     private OperatorLoadScript operatorLoadScript;
 
+    public OperatorLoadStrategy() {
+        super(RandomUtils.generateStringId());
+    }
+
     public OperatorLoadStrategy(String script) {
+        super(RandomUtils.generateStringId());
         this.operatorLoadScript = new OperatorLoadScript(script);
+    }
+
+    @Override
+    public void copy(INodeStrategy target) {
+        this.operatorLoadScript = ((OperatorLoadStrategy) target).operatorLoadScript;
     }
 
     public void setOperatorLoadScript(String script) {
@@ -37,15 +45,14 @@ public class OperatorLoadStrategy implements INodeStrategy{
 
     @Override
     public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put(TYPE_KEY, strategyType());
+        Map<String, Object> map = super.toMap();
         map.put("script", operatorLoadScript.getScript());
         return map;
     }
 
     public static OperatorLoadStrategy fromMap(Map<String, Object> map) {
-        if (map == null || map.isEmpty()) return null;
-        OperatorLoadStrategy strategy = new OperatorLoadStrategy();
+        OperatorLoadStrategy strategy = BaseStrategy.fromMap(map, OperatorLoadStrategy.class);
+        if (strategy == null) return null;
         strategy.setOperatorLoadScript((String) map.get("script"));
         return strategy;
     }

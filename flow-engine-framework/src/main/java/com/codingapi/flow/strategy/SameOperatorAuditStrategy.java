@@ -1,15 +1,15 @@
 package com.codingapi.flow.strategy;
 
+import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 提交人与审批人一致
  */
 @Data
-public class SameOperatorAuditStrategy implements INodeStrategy {
+public class SameOperatorAuditStrategy extends BaseStrategy  {
 
     private Type type;
 
@@ -20,17 +20,25 @@ public class SameOperatorAuditStrategy implements INodeStrategy {
         MANUAL_PASS,
     }
 
+    public SameOperatorAuditStrategy() {
+        super(RandomUtils.generateStringId());
+    }
+
+    @Override
+    public void copy(INodeStrategy target) {
+        this.type = ((SameOperatorAuditStrategy) target).getType();
+    }
+
     @Override
     public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put(TYPE_KEY, strategyType());
+        Map<String, Object> map = super.toMap();
         map.put("type", type);
         return map;
     }
 
     public static SameOperatorAuditStrategy fromMap(Map<String, Object> map) {
-        if (map == null || map.isEmpty()) return null;
-        SameOperatorAuditStrategy strategy = new SameOperatorAuditStrategy();
+        SameOperatorAuditStrategy strategy = BaseStrategy.fromMap(map, SameOperatorAuditStrategy.class);
+        if (strategy == null) return null;
         strategy.setType(Type.valueOf((String) map.get("type")));
         return strategy;
     }

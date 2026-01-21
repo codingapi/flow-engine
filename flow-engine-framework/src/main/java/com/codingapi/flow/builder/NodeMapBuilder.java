@@ -1,12 +1,10 @@
-package com.codingapi.flow.node.builder;
+package com.codingapi.flow.builder;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.factory.FlowActionFactory;
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.strategy.INodeStrategy;
 import com.codingapi.flow.strategy.NodeStrategyFactory;
-import lombok.SneakyThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +14,7 @@ public class NodeMapBuilder {
 
     @SuppressWarnings("unchecked")
     public static List<FormFieldPermission> loadFormFieldPermissions(Map<String, Object> data) {
-        List<Map<String, Object>> permissions = (List<Map<String, Object>>) data.get("formFieldPermissions");
+        List<Map<String, Object>> permissions = (List<Map<String, Object>>) data.get("fieldPermissions");
         if (permissions != null) {
             List<FormFieldPermission> permissionList = new ArrayList<>();
             for (Map<String, Object> item : permissions) {
@@ -57,16 +55,4 @@ public class NodeMapBuilder {
     }
 
 
-    @SneakyThrows
-    public static <T extends BaseAuditNode> T formMap(Map<String, Object> map, Class<T> clazz) {
-        T node = clazz.getDeclaredConstructor().newInstance();
-        node.setId((String) map.get("id"));
-        node.setName((String) map.get("name"));
-        node.setView((String) map.get("view"));
-        List<IFlowAction> actionList = NodeMapBuilder.loadActions(map);
-        node.setActions(actionList);
-        List<INodeStrategy> strategyList = NodeMapBuilder.loadNodeStrategies(map);
-        node.setStrategies(strategyList);
-        return node;
-    }
 }

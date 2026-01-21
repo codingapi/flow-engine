@@ -1,5 +1,6 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.StrategyManager;
@@ -84,7 +85,7 @@ public interface IFlowNode {
     /**
      * 节点是否完成
      * 当前节点是否完成，由于IFlowAction无法判断节点是否完成，是否完成需要根据节点配置的多人审批规则来判定，因此在提交通过节点时
-     * {@link com.codingapi.flow.action.PassAction#run(FlowSession)} 函数中会判断当前节点是否完成
+     * {@link PassAction#run(FlowSession)} 函数中会判断当前节点是否完成
      * 如果完成则将执行当前节点的生成流程记录函数 {@link  IFlowNode#continueTrigger(FlowSession)}
      * @param session 会话
      * @return true: 节点完成

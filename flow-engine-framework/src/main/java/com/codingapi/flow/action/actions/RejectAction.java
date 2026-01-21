@@ -1,5 +1,9 @@
-package com.codingapi.flow.action;
+package com.codingapi.flow.action.actions;
 
+import com.codingapi.flow.action.ActionDisplay;
+import com.codingapi.flow.action.ActionType;
+import com.codingapi.flow.action.BaseAction;
+import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -30,6 +34,12 @@ public class RejectAction extends BaseAction {
         this.type = ActionType.REJECT;
         this.display = new ActionDisplay(this.title);
         this.script = RejectActionScript.startScript();
+    }
+
+    @Override
+    public void copy(IFlowAction action) {
+        super.copy(action);
+        this.script = ((RejectAction) action).script;
     }
 
     public void setScript(String script) {

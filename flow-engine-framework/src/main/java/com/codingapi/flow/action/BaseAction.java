@@ -4,6 +4,7 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 @Getter
+@Setter
 public abstract class BaseAction implements IFlowAction {
 
     protected String id;
@@ -39,21 +41,12 @@ public abstract class BaseAction implements IFlowAction {
         return display;
     }
 
-
-    protected void setId(String id) {
-        this.id = id;
-    }
-
-    protected void setType(ActionType type) {
-        this.type = type;
-    }
-
-    protected void setTitle(String title) {
-        this.title = title;
-    }
-
-    protected void setDisplay(ActionDisplay display) {
-        this.display = display;
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof BaseAction action){
+            return action.getId().equals(id);
+        }
+        return super.equals(obj);
     }
 
     @Override
@@ -71,6 +64,13 @@ public abstract class BaseAction implements IFlowAction {
         return List.of();
     }
 
+    @Override
+    public void copy(IFlowAction action) {
+        this.id = action.id();
+        this.type = action.type();
+        this.title = action.title();
+        this.display = action.display();
+    }
 
     @SneakyThrows
     @SuppressWarnings("unchecked")

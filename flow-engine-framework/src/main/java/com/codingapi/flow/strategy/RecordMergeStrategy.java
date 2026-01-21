@@ -1,29 +1,37 @@
 package com.codingapi.flow.strategy;
 
+import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 记录合并策略
  */
 @Data
-public class RecordMergeStrategy implements INodeStrategy {
+public class RecordMergeStrategy extends BaseStrategy {
 
     private boolean mergeable;
 
+    public RecordMergeStrategy() {
+        super(RandomUtils.generateStringId());
+    }
+
+    @Override
+    public void copy(INodeStrategy target) {
+        this.mergeable = ((RecordMergeStrategy)target).mergeable;
+    }
+
     @Override
     public Map<String, Object> toMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put(TYPE_KEY, strategyType());
+        Map<String, Object> map = super.toMap();
         map.put("mergeable", mergeable);
         return map;
     }
 
     public static RecordMergeStrategy fromMap(Map<String, Object> map) {
-        if (map == null || map.isEmpty()) return null;
-        RecordMergeStrategy strategy = new RecordMergeStrategy();
+        RecordMergeStrategy strategy = BaseStrategy.fromMap( map, RecordMergeStrategy.class);
+        if (strategy == null) return null;
         strategy.mergeable = (boolean) map.get("mergeable");
         return strategy;
     }

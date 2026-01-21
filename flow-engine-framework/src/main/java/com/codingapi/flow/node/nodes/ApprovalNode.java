@@ -1,12 +1,11 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.PassAction;
-import com.codingapi.flow.action.RejectAction;
-import com.codingapi.flow.action.SaveAction;
+import com.codingapi.flow.action.actions.PassAction;
+import com.codingapi.flow.action.actions.RejectAction;
+import com.codingapi.flow.action.actions.SaveAction;
 import com.codingapi.flow.node.BaseAuditNode;
-import com.codingapi.flow.node.builder.BaseNodeBuilder;
-import com.codingapi.flow.node.builder.NodeMapBuilder;
+import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.strategy.*;
 import com.codingapi.flow.utils.RandomUtils;
 
@@ -45,6 +44,8 @@ public class ApprovalNode extends BaseAuditNode {
         strategies.add(AdviceStrategy.defaultStrategy());
         strategies.add(ErrorTriggerStrategy.defaultStrategy());
         strategies.add(NodeTitleStrategy.defaultStrategy());
+        strategies.add(FormFieldPermissionStrategy.defaultStrategy());
+        strategies.add(OperatorLoadStrategy.defaultStrategy());
         return strategies;
     }
 
@@ -58,7 +59,7 @@ public class ApprovalNode extends BaseAuditNode {
 
 
     public static ApprovalNode formMap(Map<String, Object> map) {
-        return NodeMapBuilder.formMap(map, ApprovalNode.class);
+        return BaseAuditNode.formMap(map, ApprovalNode.class);
     }
 
 

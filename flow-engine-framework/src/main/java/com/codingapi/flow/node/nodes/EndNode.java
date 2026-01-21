@@ -1,11 +1,11 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.PassAction;
+import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.event.FlowRecordFinishEvent;
 import com.codingapi.flow.node.BaseFlowNode;
-import com.codingapi.flow.node.builder.BaseNodeBuilder;
+import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;

@@ -1,14 +1,16 @@
 package com.codingapi.flow.service;
 
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.actions.CustomAction;
+import com.codingapi.flow.builder.ActionBuilder;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.gateway.impl.UserGateway;
-import com.codingapi.flow.node.builder.FormFieldPermissionsBuilder;
-import com.codingapi.flow.node.builder.NodeStrategyBuilder;
+import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
+import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.node.nodes.*;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
@@ -137,6 +139,9 @@ class FlowServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
+                        .build())
+                .actions(ActionBuilder.builder()
+                        .addAction(new CustomAction())
                         .build())
                 .build();
 

@@ -1,10 +1,9 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.PassAction;
+import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.node.BaseAuditNode;
-import com.codingapi.flow.node.builder.BaseNodeBuilder;
-import com.codingapi.flow.node.builder.NodeMapBuilder;
+import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.strategy.*;
 import com.codingapi.flow.utils.RandomUtils;
 
@@ -46,6 +45,8 @@ public class HandleNode extends BaseAuditNode {
         strategies.add(OperatorLoadStrategy.defaultStrategy());
         strategies.add(ErrorTriggerStrategy.defaultStrategy());
         strategies.add(NodeTitleStrategy.defaultStrategy());
+        strategies.add(FormFieldPermissionStrategy.defaultStrategy());
+        strategies.add(OperatorLoadStrategy.defaultStrategy());
         return strategies;
     }
 
@@ -56,7 +57,7 @@ public class HandleNode extends BaseAuditNode {
     }
 
     public static HandleNode formMap(Map<String, Object> map) {
-        return NodeMapBuilder.formMap(map, HandleNode.class);
+        return BaseAuditNode.formMap(map, HandleNode.class);
     }
 
     public static Builder builder() {
