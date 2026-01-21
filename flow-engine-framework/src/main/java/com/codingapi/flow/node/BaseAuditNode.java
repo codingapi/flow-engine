@@ -1,6 +1,7 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
@@ -47,7 +48,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     public void verifyNode(FormMeta form) {
         super.verifyNode(form);
         if (!StringUtils.hasText(view)) {
-            throw new IllegalArgumentException("view can not be null");
+            throw FlowConfigException.viewNotNull();
         }
     }
 

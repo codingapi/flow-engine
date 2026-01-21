@@ -1,5 +1,7 @@
 package com.codingapi.flow.node.manager;
 
+import com.codingapi.flow.exception.FlowConfigException;
+import com.codingapi.flow.exception.FlowPermissionException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
@@ -27,7 +29,7 @@ public class FieldPermissionManager {
         for (FormFieldPermission permission : permissions) {
             String key = permission.getFormCode() + "." + permission.getFieldName();
             if (!fieldTypes.containsKey(key)) {
-                throw new IllegalArgumentException("field " + key + " not found in form " + form.getName());
+                throw FlowPermissionException.fieldNotFound(key);
             }
         }
     }
@@ -47,11 +49,11 @@ public class FieldPermissionManager {
                     List<Map<String, Object>> currentSubFormData = (List<Map<String, Object>>) currentData.get(permission.getFormCode());
                     List<Map<String, Object>> latestSubFormData = (List<Map<String, Object>>) latestData.get(permission.getFormCode());
                     if (currentSubFormData == null || latestSubFormData == null) {
-                        throw new IllegalArgumentException("field " + permission.getFormCode() + " is not a sub form");
+                        throw FlowConfigException.formConfigError(permission.getFormCode(), "is not a sub form");
                     }
 
                     if (currentSubFormData.size() != latestSubFormData.size()) {
-                        throw new IllegalArgumentException("field " + permission.getFormCode() + " size is not equal");
+                        throw FlowConfigException.formConfigError(permission.getFormCode(), "size is not equal");
                     }
 
                     for (int i = 0; i < currentSubFormData.size(); i++) {
@@ -60,7 +62,7 @@ public class FieldPermissionManager {
                         Object currentValue = currentSubFormItem.get(permission.getFieldName());
                         Object latestValue = latestSubFormItem.get(permission.getFieldName());
                         if (!currentValue.equals(latestValue)) {
-                            throw new IllegalArgumentException("field " + permission.getFieldName() + " is readonly");
+                            throw FlowPermissionException.fieldReadOnly(permission.getFieldName());
                         }
                     }
                 }
@@ -70,7 +72,7 @@ public class FieldPermissionManager {
                     Object currentValue = currentData.get(permission.getFieldName());
                     Object latestValue = latestData.get(permission.getFieldName());
                     if (!currentValue.equals(latestValue)) {
-                        throw new IllegalArgumentException("field " + permission.getFieldName() + " is readonly");
+                        throw FlowPermissionException.fieldReadOnly(permission.getFieldName());
                     }
                 }
             }

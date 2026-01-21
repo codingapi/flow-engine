@@ -3,6 +3,7 @@ package com.codingapi.flow.node;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.node.manager.ActionManager;
@@ -154,16 +155,16 @@ public abstract class BaseFlowNode implements IFlowNode {
 
     private void verifyDefaultConfig(){
         if (!StringUtils.hasText(name)) {
-            throw new IllegalArgumentException("name can not be null");
+            throw FlowConfigException.nodeConfigError(name, "name can not be null");
         }
         if (!StringUtils.hasText(id)) {
-            throw new IllegalArgumentException("id can not be null");
+            throw FlowConfigException.nodeConfigError(id, "id can not be null");
         }
         if (actions == null) {
-            throw new IllegalArgumentException("actions can not be null");
+            throw FlowConfigException.actionsNotNull();
         }
         if (strategies == null) {
-            throw new IllegalArgumentException("strategies can not be null");
+            throw FlowConfigException.strategiesNotNull();
         }
     }
 

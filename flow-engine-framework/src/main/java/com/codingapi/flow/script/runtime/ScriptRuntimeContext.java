@@ -6,7 +6,8 @@ import lombok.Getter;
 
 public class ScriptRuntimeContext {
 
-    private final static GroovyShell groovyShell = new GroovyShell();
+    private final static ThreadLocal<GroovyShell> threadLocalShell =
+            ThreadLocal.withInitial(GroovyShell::new);
 
     @Getter
     private final static ScriptRuntimeContext instance = new ScriptRuntimeContext();
@@ -20,8 +21,13 @@ public class ScriptRuntimeContext {
 
     @SuppressWarnings("unchecked")
     public <T> T execute(String method, String script, Class<T> returnType, Object... args) {
-        Script runtime = groovyShell.parse(script);
-        runtime.setProperty("$bind", FlowScriptContext.getInstance());
-        return (T) runtime.invokeMethod(method, args);
+        GroovyShell shell = new GroovyShell();
+        try {
+            Script runtime = shell.parse(script);
+            runtime.setProperty("$bind", FlowScriptContext.getInstance());
+            return (T) runtime.invokeMethod(method, args);
+        } finally {
+            shell = null; // 帮助GC
+        }
     }
 }

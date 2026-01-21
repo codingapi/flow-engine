@@ -4,6 +4,7 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.ReturnAction;
 import com.codingapi.flow.action.actions.SaveAction;
 import com.codingapi.flow.action.actions.TransferAction;
+import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
@@ -51,13 +52,13 @@ public class ActionManager {
         // 转办操作
         if (flowAction instanceof TransferAction) {
             if (flowAdvice.getTransferOperators() == null || flowAdvice.getTransferOperators().isEmpty()) {
-                throw new IllegalArgumentException("transferOperators can not be null");
+                throw FlowValidationException.required("transferOperators");
             }
         }
         // 退回操作
         if (flowAction instanceof ReturnAction) {
             if (flowAdvice.getBackNode() == null) {
-                throw new IllegalArgumentException("backNode can not be null");
+                throw FlowValidationException.required("backNode");
             }
         }
     }

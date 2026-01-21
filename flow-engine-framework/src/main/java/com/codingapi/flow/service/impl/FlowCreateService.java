@@ -6,6 +6,9 @@ import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.event.FlowRecordStartEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
+import com.codingapi.flow.exception.FlowNotFoundException;
+import com.codingapi.flow.exception.FlowPermissionException;
+import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.node.nodes.StartNode;
@@ -43,7 +46,7 @@ public class FlowCreateService {
         request.verify();
         Workflow workflow = workflowRepository.get(request.getWorkId());
         if (workflow == null) {
-            throw new IllegalArgumentException("workflow not found");
+            throw FlowNotFoundException.workflow(request.getWorkId());
         }
         workflow.verify();
         // 获取备份
@@ -55,7 +58,7 @@ public class FlowCreateService {
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getAdvice().getOperatorId());
         if (!workflow.matchCreatedOperator(currentOperator)) {
-            throw new IllegalArgumentException("operator not match");
+            throw FlowPermissionException.accessDenied("create workflow");
         }
         // 构建表单数据
         FormData formData = new FormData(workflow.getForm());

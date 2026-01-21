@@ -1,5 +1,6 @@
 package com.codingapi.flow.node.nodes;
 
+import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.builder.BaseNodeBuilder;
@@ -46,7 +47,7 @@ public class ParallelBranchNode extends BaseFlowNode {
         // 分析并行分支的结束汇聚节点
         IFlowNode overNode = helper.fetchParallelEndNode();
         if(overNode==null){
-            throw new IllegalArgumentException("parallel end node is null");
+            throw FlowConfigException.parallelEndNodeNotNull();
         }
 
         // 在流程记录中记录，合并的条件信息。

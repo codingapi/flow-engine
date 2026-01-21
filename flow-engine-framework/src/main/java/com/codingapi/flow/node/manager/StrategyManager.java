@@ -2,6 +2,8 @@ package com.codingapi.flow.node.manager;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
+import com.codingapi.flow.exception.FlowConfigException;
+import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
@@ -24,7 +26,7 @@ public class StrategyManager {
     public StrategyManager(List<INodeStrategy> strategies) {
         this.strategies = strategies;
         if(this.strategies==null){
-            throw new IllegalArgumentException("strategies can not be null");
+            throw FlowConfigException.strategiesNotNull();
         }
     }
 
@@ -168,7 +170,7 @@ public class StrategyManager {
         // 是否必须填写审批意见
         if (this.isEnableAdvice()) {
             if (!StringUtils.hasText(flowAdvice.getAdvice())) {
-                throw new IllegalArgumentException("advice can not be null");
+                throw FlowValidationException.required("advice");
             }
         }
         //  通过操作
@@ -176,7 +178,7 @@ public class StrategyManager {
             // 是否必须签名
             if (this.isEnableSignable()) {
                 if (!StringUtils.hasText(flowAdvice.getSignKey())) {
-                    throw new IllegalArgumentException("signKey can not be null");
+                    throw FlowValidationException.required("signKey");
                 }
             }
         }

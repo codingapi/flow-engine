@@ -1,5 +1,6 @@
 package com.codingapi.flow.pojo.request;
 
+import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import lombok.Data;
 
@@ -27,13 +28,13 @@ public class FlowCreateRequest {
 
     public void verify() {
         if (workId == null) {
-            throw new IllegalArgumentException("workId can not be null");
+            throw FlowValidationException.required("workId");
         }
         if (formData == null || formData.isEmpty()) {
-            throw new IllegalArgumentException("formData can not be null");
+            throw FlowValidationException.required("formData");
         }
         if (advice == null) {
-            throw new IllegalArgumentException("advice can not be null");
+            throw FlowValidationException.required("advice");
         }
         advice.verify();
     }
