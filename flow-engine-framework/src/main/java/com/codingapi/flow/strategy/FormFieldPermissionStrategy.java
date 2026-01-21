@@ -2,11 +2,9 @@ package com.codingapi.flow.strategy;
 
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.node.builder.NodeMapBuilder;
-import com.codingapi.flow.node.manager.FieldPermissionManager;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -32,7 +30,7 @@ public class FormFieldPermissionStrategy implements INodeStrategy {
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("type", strategyType());
+        map.put(TYPE_KEY, strategyType());
         map.put("fieldPermissions", formFieldPermissions.stream().map(FormFieldPermission::toMap).toList());
         return map;
     }
@@ -43,12 +41,6 @@ public class FormFieldPermissionStrategy implements INodeStrategy {
         strategy.setFormFieldPermissions(NodeMapBuilder.loadFormFieldPermissions(map));
         return strategy;
     }
-
-
-    public FieldPermissionManager fieldPermissionManager() {
-        return new FieldPermissionManager(formFieldPermissions);
-    }
-
 
     public static ErrorTriggerStrategy defaultStrategy() {
         ErrorTriggerStrategy strategy = new ErrorTriggerStrategy();

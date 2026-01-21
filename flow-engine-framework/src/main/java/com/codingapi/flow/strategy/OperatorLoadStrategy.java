@@ -38,7 +38,7 @@ public class OperatorLoadStrategy implements INodeStrategy{
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
-        map.put("type", strategyType());
+        map.put(TYPE_KEY, strategyType());
         map.put("script", operatorLoadScript.getScript());
         return map;
     }

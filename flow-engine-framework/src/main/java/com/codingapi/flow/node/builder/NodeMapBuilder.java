@@ -44,7 +44,7 @@ public class NodeMapBuilder {
 
     @SuppressWarnings("unchecked")
     public static List<INodeStrategy> loadNodeStrategies(Map<String, Object> data) {
-        List<Map<String, Object>> nodeStrategies = (List<Map<String, Object>>) data.get("nodeStrategies");
+        List<Map<String, Object>> nodeStrategies = (List<Map<String, Object>>) data.get("strategies");
         if (nodeStrategies != null) {
             List<INodeStrategy> strategyList = new ArrayList<>();
             for (Map<String, Object> item : nodeStrategies) {
