@@ -8,22 +8,22 @@
 - **位置**: `com.codingapi.flow.workflow.Workflow`
 - **职责**: 流程定义的顶层容器，包含流程的完整定义信息
 - **核心属性**:
-  - `id`: 流程唯一标识
-  - `code`: 流程编号
-  - `title`: 流程名称
-  - `form`: 流程表单定义 (`FormMeta`)
-  - `nodes`: 节点列表 (`List<IFlowNode>`)
-  - `edges`: 节点连接关系 (`List<FlowEdge>`)
-  - `operatorCreateScript`: 创建者匹配脚本
-  - `isInterfere`: 是否开启干预
-  - `isRevoke`: 是否开启撤销
+    - `id`: 流程唯一标识
+    - `code`: 流程编号
+    - `title`: 流程名称
+    - `form`: 流程表单定义 (`FormMeta`)
+    - `nodes`: 节点列表 (`List<IFlowNode>`)
+    - `edges`: 节点连接关系 (`List<FlowEdge>`)
+    - `operatorCreateScript`: 创建者匹配脚本
+    - `isInterfere`: 是否开启干预
+    - `isRevoke`: 是否开启撤销
 - **核心方法**:
-  - `verify()`: 验证流程定义的合法性
-  - `nextNodes(IFlowNode)`: 获取指定节点的后续节点
-  - `getStartNode()`: 获取开始节点
-  - `getEndNode()`: 获取结束节点
-  - `toJson()`: 序列化为JSON
-  - `formJson()`: 从JSON反序列化
+    - `verify()`: 验证流程定义的合法性
+    - `nextNodes(IFlowNode)`: 获取指定节点的后续节点
+    - `getStartNode()`: 获取开始节点
+    - `getEndNode()`: 获取结束节点
+    - `toJson()`: 序列化为JSON
+    - `formJson()`: 从JSON反序列化
 
 #### WorkflowBuilder
 - **位置**: `com.codingapi.flow.workflow.WorkflowBuilder`
@@ -39,34 +39,36 @@
 - **位置**: `com.codingapi.flow.node.IFlowNode`
 - **职责**: 所有流程节点的顶层接口，定义节点生命周期方法
 - **核心方法**（按执行顺序）:
-  1. `verifySession(FlowSession)`: 验证会话参数
-  2. `continueTrigger(FlowSession)`: 判断是否继续执行后续节点
-  3. `generateCurrentRecords(FlowSession)`: 生成当前节点的流程记录
-  4. `isDone(FlowSession)`: 判断节点是否完成
-  5. `fillNewRecord(FlowSession, FlowRecord)`: 填充新记录数据
-  6. `filterBranches()`: 过滤条件分支
-  7. `actionManager()`: 获取动作管理器
+    1. `verifySession(FlowSession)`: 验证会话参数（委托给ActionManager和StrategyManager）
+    2. `continueTrigger(FlowSession)`: 判断是否继续执行后续节点
+    3. `generateCurrentRecords(FlowSession)`: 生成当前节点的流程记录
+    4. `isDone(FlowSession)`: 判断节点是否完成
+    5. `fillNewRecord(FlowSession, FlowRecord)`: 填充新记录数据
+    6. `filterBranches()`: 过滤条件分支
+    7. `actionManager()`: 获取动作管理器
+    8. `strategyManager()`: 获取策略管理器
 
 #### BaseFlowNode
 - **位置**: `com.codingapi.flow.node.BaseFlowNode`
 - **职责**: 所有节点的抽象基类，实现IFlowNode的默认行为
-- **核心属性**: `id`, `name`, `order`, `actions`
+- **核心属性**: `id`, `name`, `order`, `actions`, `strategies`
 - **核心方法**:
-  - `isWaitParallelRecord()`: 判断是否等待并行节点汇聚
+    - `isWaitParallelRecord()`: 判断是否等待并行节点汇聚
+    - `verifySession()`: 委托给ActionManager和StrategyManager验证
+    - `setActions()`: 支持动作的复制更新（CustomAction除外）
+    - `setStrategies()`: 支持策略的复制更新
 
 #### BaseAuditNode
 - **位置**: `com.codingapi.flow.node.BaseAuditNode`
 - **职责**: 审批类节点的抽象基类（ApprovalNode、HandleNode）
 - **核心属性**:
-  - `operatorScript`: 审批人加载脚本
-  - `nodeTitleScript`: 节点标题脚本
-  - `errorTriggerScript`: 异常触发脚本
-  - `formFieldPermissions`: 表单字段权限
-  - `nodeStrategies`: 节点策略列表
+    - `view`: 渲染视图
+    - 继承自BaseFlowNode的actions和strategies
 - **核心方法**:
-  - `operators()`: 获取操作者管理器
-  - `strategies()`: 获取策略管理器
-  - `generateTitle()`: 生成节点标题
+    - `continueTrigger()`: 返回false（审批节点需要生成记录）
+    - `fillNewRecord()`: 通过StrategyManager填充记录
+    - `isDone()`: 通过StrategyManager判断多人审批完成状态
+    - `generateCurrentRecords()`: 通过StrategyManager加载操作者并生成记录
 
 #### 节点类型一览 (11种)
 
@@ -93,28 +95,31 @@
 - **位置**: `com.codingapi.flow.action.IFlowAction`
 - **职责**: 节点上可执行的动作接口
 - **核心方法**:
-  - `type()`: 动作类型
-  - `run(FlowSession)`: 执行动作的主入口
-  - `generateRecords()`: 生成流程记录
+    - `type()`: 动作类型
+    - `run(FlowSession)`: 执行动作的主入口
+    - `generateRecords()`: 生成流程记录
+    - `copy(IFlowAction)`: 复制动作属性
 
 #### BaseAction
 - **位置**: `com.codingapi.flow.action.BaseAction`
 - **职责**: 动作的抽象基类
 - **核心方法**:
-  - `triggerNode()`: 递归触发后续节点
+    - `triggerNode()`: 递归触发后续节点
+    - `equals()`: 基于id判断相等
 
-#### 动作类型
+#### 动作类型 (ActionType枚举)
 
 | 动作类 | ActionType | 说明 |
 |-------|------------|------|
-| PassAction | `PASS` | 通过 |
-| RejectAction | `REJECT` | 驳回 |
+| DefaultAction | `DEFAULT` | 默认动作，无审批操作时配置 |
 | SaveAction | `SAVE` | 保存 |
-| ReturnAction | `RETURN` | 退回 |
-| TransferAction | `TRANSFER` | 转办 |
-| AddAuditAction | `ADD_AUDIT` | 加签 |
-| DelegateAction | `DELEGATE` | 委托 |
-| CustomAction | `CUSTOM` | 自定义 |
+| PassAction | `PASS` | 通过，流程继续往下流转 |
+| RejectAction | `REJECT` | 拒绝，根据配置退回上级/指定节点或终止流程 |
+| AddAuditAction | `ADD_AUDIT` | 加签，指定其他人一块审批（会签模式） |
+| DelegateAction | `DELEGATE` | 委派，委派给其他人员审批，完成后流程返回自己 |
+| ReturnAction | `RETURN` | 退回，需要设置退回的节点 |
+| TransferAction | `TRANSFER` | 转办，将流程转移给指定用户审批 |
+| CustomAction | `CUSTOM` | 自定义，需要配置脚本 |
 
 ---
 
@@ -124,21 +129,21 @@
 - **位置**: `com.codingapi.flow.record.FlowRecord`
 - **职责**: 流程执行过程中的每一条记录
 - **状态定义**:
-  - `SATE_RECORD_TODO = 0`: 待办
-  - `SATE_RECORD_DONE = 1`: 已办
-  - `SATE_FLOW_RUNNING = 0`: 运行中
-  - `SATE_FLOW_DONE = 1`: 已完成
-  - `SATE_FLOW_FINISH = 2`: 终止
-  - `SATE_FLOW_ERROR = 3`: 异常
-  - `SATE_FLOW_DELETE = 4`: 删除
+    - `SATE_RECORD_TODO = 0`: 待办
+    - `SATE_RECORD_DONE = 1`: 已办
+    - `SATE_FLOW_RUNNING = 0`: 运行中
+    - `SATE_FLOW_DONE = 1`: 已完成
+    - `SATE_FLOW_FINISH = 2`: 终止
+    - `SATE_FLOW_ERROR = 3`: 异常
+    - `SATE_FLOW_DELETE = 4`: 删除
 - **核心属性**:
-  - `processId`: 流程实例ID（每次启动生成）
-  - `nodeId`: 当前节点ID
-  - `currentOperatorId`: 当前审批人ID
-  - `formData`: 表单数据
-  - `parallelId`: 并行分支ID
-  - `parallelBranchNodeId`: 并行分支节点ID
-  - `parallelBranchTotal`: 并行分支总数
+    - `processId`: 流程实例ID（每次启动生成）
+    - `nodeId`: 当前节点ID
+    - `currentOperatorId`: 当前审批人ID
+    - `formData`: 表单数据
+    - `parallelId`: 并行分支ID
+    - `parallelBranchNodeId`: 并行分支节点ID
+    - `parallelBranchTotal`: 并行分支总数
 
 ---
 
@@ -148,16 +153,16 @@
 - **位置**: `com.codingapi.flow.session.FlowSession`
 - **职责**: 流程执行的上下文会话对象
 - **核心属性**:
-  - `currentOperator`: 当前操作者
-  - `workflow`: 流程定义
-  - `currentNode`: 当前节点
-  - `currentAction`: 当前动作
-  - `currentRecord`: 当前记录
-  - `formData`: 表单数据
-  - `advice`: 审批意见
+    - `currentOperator`: 当前操作者
+    - `workflow`: 流程定义
+    - `currentNode`: 当前节点
+    - `currentAction`: 当前动作
+    - `currentRecord`: 当前记录
+    - `formData`: 表单数据
+    - `advice`: 审批意见
 - **核心方法**:
-  - `matchNextNodes()`: 匹配后续节点
-  - `updateSession()`: 更新会话
+    - `matchNextNodes()`: 匹配后续节点
+    - `updateSession()`: 更新会话
 
 #### FlowAdvice
 - **位置**: `com.codingapi.flow.session.FlowAdvice`
@@ -171,20 +176,33 @@
 #### ActionManager
 - **位置**: `com.codingapi.flow.node.manager.ActionManager`
 - **职责**: 管理节点的动作列表
-- **核心方法**: `getActionById(String)`
+- **核心方法**:
+    - `getActionById(String)`: 根据id获取动作
+    - `getAction(Class)`: 根据类型获取动作
+    - `verifySession()`: 验证会话参数
+    - `verify()`: 验证动作配置
 
 #### OperatorManager
 - **位置**: `com.codingapi.flow.node.manager.OperatorManager`
 - **职责**: 管理节点的操作者列表
-- **核心方法**: `match(IFlowOperator)`
-
-#### FieldPermissionManager
-- **位置**: `com.codingapi.flow.node.manager.FieldPermissionManager`
-- **职责**: 管理表单字段权限
+- **核心方法**:
+    - `match(IFlowOperator)`: 判断操作者是否匹配
 
 #### StrategyManager
 - **位置**: `com.codingapi.flow.node.manager.StrategyManager`
 - **职责**: 管理节点策略（多人审批、超时、退回等）
+- **核心方法**:
+    - `getTimeoutTime()`: 获取超时时间
+    - `isMergeable()`: 是否可合并
+    - `isEnableAdvice()`: 审批意见是否必须填写
+    - `isEnableSignable()`: 是否可签名
+    - `isResume()`: 是否恢复到退回节点
+    - `getMultiOperatorAuditStrategyType()`: 获取多人审批类型
+    - `getMultiOperatorAuditMergePercent()`: 获取并签比例
+    - `generateTitle()`: 生成节点标题
+    - `loadOperators()`: 加载操作者
+    - `verifySession()`: 验证会话参数
+    - `getStrategy(Class)`: 获取指定策略
 
 ---
 
@@ -193,17 +211,33 @@
 #### INodeStrategy
 - **位置**: `com.codingapi.flow.strategy.INodeStrategy`
 - **职责**: 节点策略的顶层接口
+- **核心方法**:
+    - `toMap()`: 转换为Map
+    - `getId()`: 获取策略ID
+    - `strategyType()`: 获取策略类型
+    - `copy(INodeStrategy)`: 复制策略属性
+
+#### BaseStrategy
+- **位置**: `com.codingapi.flow.strategy.BaseStrategy`
+- **职责**: 策略的抽象基类
+- **核心方法**:
+    - `equals()`: 基于id判断相等
+    - `fromMap()`: 从Map构建策略对象
 
 #### 策略类型
 
 | 策略类 | 说明 |
 |-------|------|
-| MultiOperatorAuditStrategy | 多人审批策略（顺序/或签/并签/随机） |
+| MultiOperatorAuditStrategy | 多人审批策略（SEQUENCE顺序/MERGE并签/ANY或签/RANDOM_ONE随机） |
 | TimeoutStrategy | 超时策略 |
 | SameOperatorAuditStrategy | 同一操作者审批策略 |
 | RecordMergeStrategy | 记录合并策略 |
-| ResubmitStrategy | 重新提交策略 |
-| AdviceStrategy | 审批意见策略 |
+| ResubmitStrategy | 重新提交策略（是否恢复到退回节点） |
+| AdviceStrategy | 审批意见策略（是否必须填写、是否可签名） |
+| OperatorLoadStrategy | 操作者加载策略 |
+| ErrorTriggerStrategy | 异常触发策略 |
+| NodeTitleStrategy | 节点标题策略 |
+| FormFieldPermissionStrategy | 表单字段权限策略 |
 
 ---
 
@@ -223,6 +257,7 @@
 | NodeTitleScript | 节点标题脚本 |
 | ConditionScript | 条件判断脚本 |
 | ErrorTriggerScript | 异常触发脚本 |
+| RejectActionScript | 拒绝动作脚本 |
 
 ---
 
@@ -281,6 +316,7 @@
                     ┌─────────────────┐
                     │ 8. 验证会话参数   │
                     │ verifySession()  │
+                    │ (委托给ActionManager和StrategyManager) │
                     └─────────────────┘
                               │
                               ▼
@@ -370,6 +406,7 @@
                     ┌─────────────────┐
                     │ 10. 验证会话参数  │
                     │ verifySession()  │
+                    │ (委托给ActionManager和StrategyManager) │
                     └─────────────────┘
                               │
                               ▼
@@ -392,6 +429,7 @@
         ┌───────────────────────────────────────────┐
         │         1. verifySession(session)         │
         │         验证会话参数是否满足节点要求        │
+        │         委托给ActionManager和StrategyManager │
         └───────────────────────────────────────────┘
                                     │
                                     ▼
@@ -413,7 +451,22 @@
         ┌───────────────────────────────────────────┐
         │         4. fillNewRecord(session, record) │
         │         填充新记录的数据                    │
+        │         通过StrategyManager填充            │
         └───────────────────────────────────────────┘
+                                    │
+                                    ▼
+        ┌───────────────────────────────────────────┐
+        │         5. isDone(session)                │
+        │         判断节点是否完成                    │
+        │         通过StrategyManager判断多人审批进度 │
+        └───────────────────────────────────────────┘
+                         │                │
+                     done │            │ not done
+                         ▼                 ▼
+        ┌─────────────────────┐   ┌─────────────────────┐
+        │   继续执行下一节点    │   │  节点未完成，等待    │
+        │                      │   │  下一次操作         │
+        └─────────────────────┘   └─────────────────────┘
 ```
 
 ---
@@ -429,6 +482,7 @@
         ┌───────────────────────────────────────────┐
         │         1. 判断节点是否完成                 │
         │         currentNode.isDone(session)        │
+        │         通过StrategyManager判断            │
         └───────────────────────────────────────────┘
                          │                │
                      done │            │ not done
@@ -442,6 +496,7 @@
         ┌───────────────────────────────────────────┐
         │         2. 生成后续记录                    │
         │         generateRecords(session)           │
+        │         判断是否为退回重新提交              │
         └───────────────────────────────────────────┘
                                     │
                                     ▼
@@ -552,28 +607,45 @@
 ### 1. 建造者模式 (Builder Pattern)
 - `WorkflowBuilder`: 构建流程定义
 - `BaseNodeBuilder`: 构建节点对象
-- `AuditNodeBuilder`: 构建审批节点
+- `ActionBuilder`: 构建动作对象
+- `NodeStrategyBuilder`: 构建策略对象
 
 ### 2. 工厂模式 (Factory Pattern)
-- `NodeFactory`: 创建不同类型的节点
+- `NodeFactory`: 创建不同类型的节点（通过反射调用静态formMap方法）
+- `NodeStrategyFactory`: 创建不同类型的策略
 - `FlowActionFactory`: 创建不同类型的动作
 
 ### 3. 策略模式 (Strategy Pattern)
 - `INodeStrategy`: 节点策略接口
-- `MultiOperatorAuditStrategy`: 多人审批策略
+- `StrategyManager`: 管理多种策略，通过策略类型执行不同逻辑
+- `MultiOperatorAuditStrategy`: 多人审批策略（SEQUENCE/MERGE/ANY/RANDOM_ONE）
 - `TimeoutStrategy`: 超时策略
+- `AdviceStrategy`: 审批意见策略
 
 ### 4. 模板方法模式 (Template Method Pattern)
-- `BaseFlowNode`: 定义节点生命周期模板
-- `BaseAction`: 定义动作执行模板
+- `BaseFlowNode`: 定义节点生命周期模板，子类实现特定行为
+- `BaseAction`: 定义动作执行模板，子类实现具体动作逻辑
+- `BaseStrategy`: 定义策略模板，子类实现具体策略逻辑
 
 ### 5. 单例模式 (Singleton Pattern)
 - `NodeFactory.getInstance()`: 节点工厂单例
 - `ScriptRuntimeContext.getInstance()`: 脚本运行时单例
 - `RepositoryContext.getInstance()`: 仓储上下文单例
+- `GatewayContext.getInstance()`: 网关上下文单例
 
 ### 6. 责任链模式 (Chain of Responsibility Pattern)
-- `triggerNode()`: 递归触发后续节点
+- `triggerNode()`: 递归触发后续节点，形成责任链
+- `StrategyManager`: 遍历策略列表查找匹配策略
+
+### 7. 组合模式 (Composite Pattern)
+- 节点与策略的组合：每个节点包含多个策略
+- 节点与动作的组合：每个节点包含多个动作
+
+### 8. 复制模式 (Copy Pattern)
+- `INodeStrategy.copy()`: 策略属性复制
+- `IFlowAction.copy()`: 动作属性复制
+- `BaseFlowNode.setActions()`: 动作复制更新
+- `BaseFlowNode.setStrategies()`: 策略复制更新
 
 ---
 
@@ -586,10 +658,38 @@
 继承 `BaseAction`，实现 `IFlowAction` 接口
 
 ### 3. 自定义策略
-实现 `INodeStrategy` 接口
+继承 `BaseStrategy`，实现 `INodeStrategy` 接口
 
 ### 4. 自定义脚本
 使用 `ScriptRuntimeContext` 执行 Groovy 脚本
 
 ### 5. 事件扩展
 监听 `FlowRecordStartEvent`, `FlowRecordTodoEvent`, `FlowRecordDoneEvent`, `FlowRecordFinishEvent`
+
+---
+
+## 五、关键实现细节
+
+### 1. 策略驱动的节点配置
+- 所有节点配置（操作者、标题、超时、权限等）都通过策略实现
+- `StrategyManager`统一管理所有策略的访问和执行
+- 策略支持复制更新，便于动态修改节点配置
+
+### 2. 多人审批实现
+- 通过`MultiOperatorAuditStrategy`的type属性控制审批模式
+- SEQUENCE: 顺序审批，隐藏后续记录
+- MERGE: 并签，根据完成比例判断
+- ANY: 或签，任意一人完成即通过
+- RANDOM_ONE: 随机一人审批
+
+### 3. 并行分支同步机制
+- 通过`parallelId`标识同一并行流程
+- 通过`parallelBranchNodeId`标记汇聚节点
+- 通过`parallelBranchTotal`记录分支总数
+- `RepositoryContext`维护并行触发计数
+- 汇聚节点检查所有分支是否到达后继续执行
+
+### 4. 动作和策略的复制更新机制
+- 节点的`setActions()`和`setStrategies()`方法支持增量更新
+- 根据类型匹配现有对象，调用`copy()`方法复制属性
+- `CustomAction`特殊处理，支持动态添加
