@@ -19,11 +19,16 @@ public class NodeStrategyFactory {
 
     private void init() {
         strategyClasses.put(AdviceStrategy.class.getSimpleName(), AdviceStrategy.class);
+        strategyClasses.put(ErrorTriggerStrategy.class.getSimpleName(), ErrorTriggerStrategy.class);
+        strategyClasses.put(FormFieldPermissionStrategy.class.getSimpleName(), FormFieldPermissionStrategy.class);
         strategyClasses.put(MultiOperatorAuditStrategy.class.getSimpleName(), MultiOperatorAuditStrategy.class);
+        strategyClasses.put(NodeTitleStrategy.class.getSimpleName(), NodeTitleStrategy.class);
+        strategyClasses.put(OperatorLoadStrategy.class.getSimpleName(), OperatorLoadStrategy.class);
         strategyClasses.put(RecordMergeStrategy.class.getSimpleName(), RecordMergeStrategy.class);
         strategyClasses.put(ResubmitStrategy.class.getSimpleName(), ResubmitStrategy.class);
         strategyClasses.put(SameOperatorAuditStrategy.class.getSimpleName(), SameOperatorAuditStrategy.class);
         strategyClasses.put(TimeoutStrategy.class.getSimpleName(), TimeoutStrategy.class);
+
     }
 
 

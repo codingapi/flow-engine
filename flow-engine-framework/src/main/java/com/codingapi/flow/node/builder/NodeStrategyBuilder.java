@@ -1,0 +1,28 @@
+package com.codingapi.flow.node.builder;
+
+import com.codingapi.flow.strategy.INodeStrategy;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class NodeStrategyBuilder {
+
+    private final List<INodeStrategy> nodeStrategies;
+
+    private NodeStrategyBuilder() {
+        this.nodeStrategies = new ArrayList<>();
+    }
+
+    public static NodeStrategyBuilder builder() {
+        return new NodeStrategyBuilder();
+    }
+
+    public NodeStrategyBuilder addStrategy(INodeStrategy strategy) {
+        this.nodeStrategies.add(strategy);
+        return this;
+    }
+
+    public List<INodeStrategy> build() {
+        return nodeStrategies;
+    }
+}

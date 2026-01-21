@@ -2,6 +2,7 @@ package com.codingapi.flow.node;
 
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.manager.ActionManager;
+import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 
@@ -73,6 +74,12 @@ public interface IFlowNode {
      * @return 节点操作对象管理器
      */
     ActionManager actionManager();
+
+    /**
+     * 获取节点策略管理器
+     * @return 节点策略管理器
+     */
+    StrategyManager strategyManager();
 
     /**
      * 节点是否完成

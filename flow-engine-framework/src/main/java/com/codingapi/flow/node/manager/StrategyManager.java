@@ -1,19 +1,29 @@
 package com.codingapi.flow.node.manager;
 
+import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  *  节点策略管理
  */
-@AllArgsConstructor
 public class StrategyManager {
 
     @Getter
     private final List<INodeStrategy> strategies;
+
+
+    public StrategyManager(List<INodeStrategy> strategies) {
+        this.strategies = strategies;
+        if(this.strategies==null){
+            throw new IllegalArgumentException("strategies can not be null");
+        }
+    }
 
     /**
      * 获取超时时间
@@ -123,5 +133,33 @@ public class StrategyManager {
             }
         }
         return 0;
+    }
+
+    public void verifyStrategies(FormMeta form) {
+
+    }
+
+    public String generateTitle(FlowSession session) {
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof NodeTitleStrategy) {
+                return ((NodeTitleStrategy) strategy).generateTitle(session);
+            }
+        }
+        return null;
+    }
+
+    public OperatorManager loadOperators(FlowSession session) {
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof OperatorLoadStrategy) {
+                return ((OperatorLoadStrategy) strategy).loadOperators(session);
+            }
+        }
+        return new OperatorManager(new ArrayList<>());
+    }
+
+    public void verifySession(FlowSession session) {
+
     }
 }

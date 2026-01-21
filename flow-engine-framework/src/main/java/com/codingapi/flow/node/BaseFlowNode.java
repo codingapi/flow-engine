@@ -8,9 +8,11 @@ import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.builder.NodeMapBuilder;
 import com.codingapi.flow.node.manager.ActionManager;
+import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.strategy.INodeStrategy;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -49,23 +51,41 @@ public abstract class BaseFlowNode implements IFlowNode {
     @Getter
     protected List<IFlowAction> actions;
 
+    /**
+     * 节点策略
+     */
+    @Getter
+    protected List<INodeStrategy> strategies;
+
+
+    public void setStrategies(List<INodeStrategy> strategies) {
+        if(strategies!=null && !strategies.isEmpty()) {
+            if(this.strategies!=null){
+                this.strategies.addAll(strategies);
+            }else {
+                this.strategies = strategies;
+            }
+        }
+    }
+
     public BaseFlowNode(String name, String id) {
-        this(name, id, 0, new ArrayList<>());
+        this(name, id, 0, new ArrayList<>(), new ArrayList<>());
     }
 
     public BaseFlowNode(String id, String name, int order) {
-        this(id, name, order, new ArrayList<>());
+        this(id, name, order, new ArrayList<>(), new ArrayList<>());
     }
 
     public BaseFlowNode(String id, String name, List<IFlowAction> actions) {
-        this(id, name, 0, actions);
+        this(id, name, 0, actions, new ArrayList<>());
     }
 
-    public BaseFlowNode(String id, String name, int order, List<IFlowAction> actions) {
+    public BaseFlowNode(String id, String name, int order, List<IFlowAction> actions, List<INodeStrategy> strategies) {
         this.id = id;
         this.name = name;
         this.order = order;
         this.actions = actions;
+        this.strategies = strategies;
     }
 
     @Override
@@ -76,6 +96,7 @@ public abstract class BaseFlowNode implements IFlowNode {
         map.put("type", getType());
         map.put("order", String.valueOf(order));
         map.put("actions", actions.stream().map(IFlowAction::toMap).toList());
+        map.put("strategies", strategies.stream().map(INodeStrategy::toMap).toList());
         return map;
     }
 
@@ -87,6 +108,7 @@ public abstract class BaseFlowNode implements IFlowNode {
         node.setName((String) map.get("name"));
         node.setOrder(Integer.parseInt((String) map.get("order")));
         node.setActions(NodeMapBuilder.loadActions(map));
+        node.setStrategies(NodeMapBuilder.loadNodeStrategies(map));
         return node;
     }
 
@@ -167,5 +189,11 @@ public abstract class BaseFlowNode implements IFlowNode {
     public ActionManager actionManager() {
         return new ActionManager(actions);
     }
+
+    @Override
+    public StrategyManager strategyManager() {
+        return new StrategyManager(strategies);
+    }
+
 
 }

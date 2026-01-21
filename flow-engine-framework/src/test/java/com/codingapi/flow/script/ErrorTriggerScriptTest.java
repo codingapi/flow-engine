@@ -7,11 +7,14 @@ import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.node.builder.FormFieldPermissionsBuilder;
+import com.codingapi.flow.node.builder.NodeStrategyBuilder;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.strategy.FormFieldPermissionStrategy;
+import com.codingapi.flow.strategy.OperatorLoadStrategy;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
@@ -34,24 +37,29 @@ class ErrorTriggerScriptTest {
                 .build();
 
         StartNode startNode = StartNode.builder()
-                .formFieldsPermissions(
-                        FormFieldPermissionsBuilder.builder()
-                        .addPermission("leave", "name", PermissionType.READ)
-                        .addPermission("leave", "days", PermissionType.READ)
-                        .addPermission("leave", "reason", PermissionType.READ)
-                        .build()
-                )
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(
+                                FormFieldPermissionsBuilder.builder()
+                                        .addPermission("leave", "name", PermissionType.READ)
+                                        .addPermission("leave", "days", PermissionType.READ)
+                                        .addPermission("leave", "reason", PermissionType.READ)
+                                        .build()
+                        ))
+                        .build())
                 .build();
 
         ApprovalNode approvalNode = ApprovalNode.builder()
                 .name("经理审批")
-                .operatorScript("def run(request){return [request.getCreatedOperator()]}")
-                .formFieldsPermissions(
-                        FormFieldPermissionsBuilder.builder()
-                                .addPermission("leave", "name", PermissionType.READ)
-                                .addPermission("leave", "days", PermissionType.READ)
-                                .addPermission("leave", "reason", PermissionType.READ)
-                                .build()
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(
+                                FormFieldPermissionsBuilder.builder()
+                                        .addPermission("leave", "name", PermissionType.READ)
+                                        .addPermission("leave", "days", PermissionType.READ)
+                                        .addPermission("leave", "reason", PermissionType.READ)
+                                        .build()
+                        ))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [request.getCreatedOperator()]}"))
+                        .build()
                 )
                 .build();
 
