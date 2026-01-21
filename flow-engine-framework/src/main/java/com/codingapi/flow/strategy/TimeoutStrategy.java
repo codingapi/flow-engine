@@ -30,6 +30,13 @@ public class TimeoutStrategy extends BaseStrategy {
         super(RandomUtils.generateStringId());
     }
 
+
+    @Override
+    public void copy(INodeStrategy target) {
+        this.type = ((TimeoutStrategy) target).getType();
+        this.timeoutTime = ((TimeoutStrategy) target).getTimeoutTime();
+    }
+
     public static TimeoutStrategy defaultStrategy() {
         TimeoutStrategy timeoutStrategy = new TimeoutStrategy();
         timeoutStrategy.setType(Type.REMIND);

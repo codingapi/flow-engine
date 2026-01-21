@@ -14,4 +14,6 @@ public interface INodeStrategy {
         return this.getClass().getSimpleName();
     }
 
+    void copy(INodeStrategy target);
+
 }

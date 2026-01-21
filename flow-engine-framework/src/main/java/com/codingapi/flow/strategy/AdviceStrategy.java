@@ -31,6 +31,11 @@ public class AdviceStrategy extends BaseStrategy {
         return strategy;
     }
 
+    @Override
+    public void copy(INodeStrategy target) {
+        this.adviceNullable = ((AdviceStrategy) target).adviceNullable;
+        this.signable = ((AdviceStrategy) target).signable;
+    }
 
     @Override
     public Map<String, Object> toMap() {

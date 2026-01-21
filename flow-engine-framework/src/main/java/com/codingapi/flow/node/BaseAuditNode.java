@@ -15,6 +15,7 @@ import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -155,6 +156,14 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
             }
         }
         return records;
+    }
+
+
+    @SneakyThrows
+    public static <T extends BaseAuditNode> T formMap(Map<String, Object> map, Class<T> clazz) {
+        T node = BaseFlowNode.loadFromMap(map, clazz);
+        node.setView((String) map.get("view"));
+        return node;
     }
 
     @Override

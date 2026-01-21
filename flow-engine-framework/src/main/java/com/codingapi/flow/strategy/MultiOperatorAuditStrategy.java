@@ -31,6 +31,12 @@ public class MultiOperatorAuditStrategy extends BaseStrategy {
     }
 
     @Override
+    public void copy(INodeStrategy target) {
+        this.type = ((MultiOperatorAuditStrategy) target).getType();
+        this.percent = ((MultiOperatorAuditStrategy) target).getPercent();
+    }
+
+    @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
         map.put("type", type);

@@ -21,6 +21,11 @@ public class ErrorTriggerStrategy extends BaseStrategy {
     }
 
     @Override
+    public void copy(INodeStrategy target) {
+        this.errorTriggerScript = ((ErrorTriggerStrategy) target).errorTriggerScript;
+    }
+
+    @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
         map.put("script", errorTriggerScript.getScript());

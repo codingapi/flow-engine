@@ -25,6 +25,11 @@ public class SameOperatorAuditStrategy extends BaseStrategy  {
     }
 
     @Override
+    public void copy(INodeStrategy target) {
+        this.type = ((SameOperatorAuditStrategy) target).getType();
+    }
+
+    @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
         map.put("type", type);

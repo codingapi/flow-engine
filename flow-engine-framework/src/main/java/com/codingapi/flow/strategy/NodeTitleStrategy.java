@@ -17,6 +17,11 @@ public class NodeTitleStrategy extends BaseStrategy {
         super(RandomUtils.generateStringId());
     }
 
+    @Override
+    public void copy(INodeStrategy target) {
+        this.nodeTitleScript = ((NodeTitleStrategy) target).nodeTitleScript;
+    }
+
     public void setOperatorScript(String script) {
         this.nodeTitleScript = new NodeTitleScript(script);
     }

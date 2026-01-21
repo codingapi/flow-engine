@@ -162,4 +162,13 @@ public class StrategyManager {
     public void verifySession(FlowSession session) {
 
     }
+
+    public INodeStrategy getStrategy(Class<? extends INodeStrategy> aClass) {
+        for (INodeStrategy strategy : strategies) {
+            if (strategy.getClass() == aClass) {
+                return strategy;
+            }
+        }
+        return null;
+    }
 }

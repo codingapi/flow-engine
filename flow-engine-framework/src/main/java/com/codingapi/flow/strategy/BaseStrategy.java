@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class BaseStrategy implements INodeStrategy {
+public abstract class BaseStrategy implements INodeStrategy {
 
     @Setter
     private String id;

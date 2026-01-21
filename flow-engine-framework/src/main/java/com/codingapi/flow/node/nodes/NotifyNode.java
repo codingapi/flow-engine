@@ -45,6 +45,8 @@ public class NotifyNode extends BaseAuditNode {
         strategies.add(OperatorLoadStrategy.defaultStrategy());
         strategies.add(ErrorTriggerStrategy.defaultStrategy());
         strategies.add(NodeTitleStrategy.defaultStrategy());
+        strategies.add(FormFieldPermissionStrategy.defaultStrategy());
+        strategies.add(OperatorLoadStrategy.defaultStrategy());
         return strategies;
     }
 
@@ -55,7 +57,7 @@ public class NotifyNode extends BaseAuditNode {
     }
 
     public static NotifyNode formMap(Map<String, Object> map) {
-        return NodeMapBuilder.formMap(map, NotifyNode.class);
+        return BaseAuditNode.formMap(map, NotifyNode.class);
     }
 
     public static Builder builder() {

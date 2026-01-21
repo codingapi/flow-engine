@@ -18,6 +18,11 @@ public class RecordMergeStrategy extends BaseStrategy {
     }
 
     @Override
+    public void copy(INodeStrategy target) {
+        this.mergeable = ((RecordMergeStrategy)target).mergeable;
+    }
+
+    @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
         map.put("mergeable", mergeable);

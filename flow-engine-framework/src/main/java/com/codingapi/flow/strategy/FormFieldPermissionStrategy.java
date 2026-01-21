@@ -30,6 +30,11 @@ public class FormFieldPermissionStrategy extends BaseStrategy  {
     }
 
     @Override
+    public void copy(INodeStrategy target) {
+        this.fieldPermissions = ((FormFieldPermissionStrategy) target).fieldPermissions;
+    }
+
+    @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
         map.put("fieldPermissions", fieldPermissions.stream().map(FormFieldPermission::toMap).toList());

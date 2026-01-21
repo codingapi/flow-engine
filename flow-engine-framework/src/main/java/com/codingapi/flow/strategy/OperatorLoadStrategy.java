@@ -23,6 +23,11 @@ public class OperatorLoadStrategy extends BaseStrategy{
         this.operatorLoadScript = new OperatorLoadScript(script);
     }
 
+    @Override
+    public void copy(INodeStrategy target) {
+        this.operatorLoadScript = ((OperatorLoadStrategy) target).operatorLoadScript;
+    }
+
     public void setOperatorLoadScript(String script) {
         this.operatorLoadScript = new OperatorLoadScript(script);
     }

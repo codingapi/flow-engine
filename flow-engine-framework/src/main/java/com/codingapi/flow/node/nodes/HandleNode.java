@@ -46,6 +46,8 @@ public class HandleNode extends BaseAuditNode {
         strategies.add(OperatorLoadStrategy.defaultStrategy());
         strategies.add(ErrorTriggerStrategy.defaultStrategy());
         strategies.add(NodeTitleStrategy.defaultStrategy());
+        strategies.add(FormFieldPermissionStrategy.defaultStrategy());
+        strategies.add(OperatorLoadStrategy.defaultStrategy());
         return strategies;
     }
 
@@ -56,7 +58,7 @@ public class HandleNode extends BaseAuditNode {
     }
 
     public static HandleNode formMap(Map<String, Object> map) {
-        return NodeMapBuilder.formMap(map, HandleNode.class);
+        return BaseAuditNode.formMap(map, HandleNode.class);
     }
 
     public static Builder builder() {

@@ -24,6 +24,11 @@ public class ResubmitStrategy extends BaseStrategy {
         super(RandomUtils.generateStringId());
     }
 
+    @Override
+    public void copy(INodeStrategy target) {
+        this.type = ((ResubmitStrategy) target).type;
+    }
+
     public boolean isResume() {
         return type == Type.RESUME;
     }
