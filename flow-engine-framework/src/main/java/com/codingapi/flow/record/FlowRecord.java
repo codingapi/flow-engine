@@ -1,8 +1,12 @@
 package com.codingapi.flow.record;
 
+import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.exception.FlowValidationException;
+import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
+import com.codingapi.flow.workflow.Workflow;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
@@ -337,5 +341,19 @@ public class FlowRecord {
 
     public void resetNodeOrder(int nodeOrder) {
         this.nodeOrder = nodeOrder;
+    }
+
+    /**
+     * 转换为FlowAdvice
+     * @param workflow 流程设计器
+     * @return FlowAdvice
+     */
+    public FlowAdvice toAdvice(Workflow workflow) {
+        FlowAdvice flowAdvice =  new FlowAdvice(advice);
+        flowAdvice.setSignKey(signKey);
+        IFlowNode flowNode = workflow.getFlowNode(nodeId);
+        IFlowAction flowAction = flowNode.actionManager().getActionById(actionId);
+        flowAdvice.setAction(flowAction);
+        return flowAdvice;
     }
 }

@@ -31,6 +31,7 @@ public class NodeStrategyFactory {
         strategyClasses.put(ResubmitStrategy.class.getSimpleName(), ResubmitStrategy.class);
         strategyClasses.put(SameOperatorAuditStrategy.class.getSimpleName(), SameOperatorAuditStrategy.class);
         strategyClasses.put(TimeoutStrategy.class.getSimpleName(), TimeoutStrategy.class);
+        strategyClasses.put(DelayStrategy.class.getSimpleName(), DelayStrategy.class);
 
     }
 

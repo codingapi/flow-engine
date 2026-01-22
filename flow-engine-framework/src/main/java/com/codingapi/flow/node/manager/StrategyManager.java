@@ -111,22 +111,6 @@ public class StrategyManager {
         return null;
     }
 
-
-    /**
-     * 是否是顺序审批
-     *
-     * @return true/false
-     */
-    public boolean isSequenceMultiOperator() {
-        List<INodeStrategy> strategies = this.strategies;
-        for (INodeStrategy strategy : strategies) {
-            if (strategy instanceof MultiOperatorAuditStrategy) {
-                return ((MultiOperatorAuditStrategy) strategy).getType() == MultiOperatorAuditStrategy.Type.SEQUENCE;
-            }
-        }
-        return false;
-    }
-
     /**
      * 多操作者审批并签比例
      */
@@ -184,10 +168,11 @@ public class StrategyManager {
         }
     }
 
-    public INodeStrategy getStrategy(Class<? extends INodeStrategy> aClass) {
+    @SuppressWarnings("unchecked")
+    public <T extends INodeStrategy> T getStrategy(Class<T> clazz) {
         for (INodeStrategy strategy : strategies) {
-            if (strategy.getClass() == aClass) {
-                return strategy;
+            if (strategy.getClass() == clazz) {
+                return (T)strategy;
             }
         }
         return null;

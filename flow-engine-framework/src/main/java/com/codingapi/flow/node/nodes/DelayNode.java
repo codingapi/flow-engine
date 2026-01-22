@@ -1,9 +1,19 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.delay.DelayTask;
+import com.codingapi.flow.delay.DelayTaskManager;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.strategy.DelayStrategy;
+import com.codingapi.flow.strategy.INodeStrategy;
 import com.codingapi.flow.utils.RandomUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,13 +29,33 @@ public class DelayNode extends BaseFlowNode {
         return NODE_TYPE;
     }
 
+    @Override
+    public boolean handle(FlowSession session) {
+        StrategyManager strategyManager = this.strategyManager();
+        DelayStrategy delayStrategy = strategyManager.getStrategy(DelayStrategy.class);
+        if(delayStrategy!=null){
+            FlowRecord currentRecord = session.getCurrentRecord();
+            DelayTask delayTask = new DelayTask(delayStrategy, currentRecord,this.getId());
+            RepositoryContext.getInstance().saveDelayTask(delayTask);
+
+            DelayTaskManager.getInstance().addTask(delayTask);
+        }
+        return false;
+    }
+
 
     public DelayNode(String id, String name) {
-        super(id, name);
+        super(id, name, 0, new ArrayList<>(), defaultStrategies());
     }
 
     public DelayNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME);
+    }
+
+    private static List<INodeStrategy> defaultStrategies() {
+        List<INodeStrategy> strategies = new ArrayList<>();
+        strategies.add(DelayStrategy.defaultStrategy());
+        return strategies;
     }
 
     public static DelayNode formMap(Map<String, Object> map) {

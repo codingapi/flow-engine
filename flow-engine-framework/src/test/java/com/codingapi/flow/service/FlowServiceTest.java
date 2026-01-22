@@ -38,7 +38,8 @@ class FlowServiceTest {
     private final WorkflowBackupRepository workflowBackupRepository = new WorkflowBackupRepositoryImpl();
     private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
     private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
-    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository, parallelBranchRepository);
+    private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
+    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository, parallelBranchRepository,delayTaskRepository);
 
     @Test
     void create() {
@@ -1196,6 +1197,10 @@ class FlowServiceTest {
                         .build())
                 .build();
 
+        DelayNode delayNode = DelayNode.builder()
+                .name("延迟节点")
+                .build();
+
         ApprovalNode bossNode = ApprovalNode.builder()
                 .name("经理审批")
                 .strategies(NodeStrategyBuilder.builder()
@@ -1216,9 +1221,11 @@ class FlowServiceTest {
                 .createdOperator(user)
                 .form(form)
                 .addNode(startNode)
+                .addNode(delayNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
+                .addEdge(new FlowEdge(startNode.getId(), delayNode.getId()))
+                .addEdge(new FlowEdge(delayNode.getId(), bossNode.getId()))
                 .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
@@ -1244,6 +1251,13 @@ class FlowServiceTest {
         flowService.action(userRequest);
 
         List<FlowRecord> bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        assertEquals(0, bossRecordList.size());
+        try {
+            // 默认等待时间为5秒
+            Thread.sleep(8000);
+        }catch (Exception ignore){}
+
+        bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, bossRecordList.size());
 
         List<IFlowAction> bossActions = bossNode.actionManager().getActions();

@@ -219,7 +219,7 @@ public abstract class BaseFlowNode implements IFlowNode {
 
     @Override
     public List<FlowRecord> generateCurrentRecords(FlowSession session) {
-        return List.of();
+        return new ArrayList<>();
     }
 
     @Override
