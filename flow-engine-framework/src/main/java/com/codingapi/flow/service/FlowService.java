@@ -1,6 +1,6 @@
 package com.codingapi.flow.service;
 
-import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
@@ -20,7 +20,6 @@ public class FlowService {
     private final FlowRecordRepository flowRecordRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
 
-
     public FlowService(WorkflowRepository workflowRepository,
                        FlowOperatorGateway flowOperatorGateway,
                        FlowRecordRepository flowRecordRepository,
@@ -32,12 +31,23 @@ public class FlowService {
         this.flowRecordRepository = flowRecordRepository;
         this.workflowBackupRepository = workflowBackupRepository;
 
-        RepositoryContext.getInstance().register(workflowBackupRepository,flowRecordRepository, flowOperatorGateway, parallelBranchRepository,delayTaskRepository);
+        RepositoryHolderContext.getInstance()
+                .register(workflowRepository,
+                        workflowBackupRepository,
+                        flowRecordRepository,
+                        flowOperatorGateway,
+                        parallelBranchRepository,
+                        delayTaskRepository);
     }
 
-    public void create(FlowCreateRequest request) {
+    /**
+     * 创建流程
+     * @param request 创建流程请求
+     * @return 创建的流程id
+     */
+    public long create(FlowCreateRequest request) {
         FlowCreateService flowCreateService = new FlowCreateService(request, flowOperatorGateway, flowRecordRepository, workflowRepository, workflowBackupRepository);
-        flowCreateService.create();
+        return flowCreateService.create();
     }
 
     public void action(FlowActionRequest request) {

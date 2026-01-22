@@ -2,7 +2,7 @@ package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.backup.WorkflowBackup;
-import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.delay.DelayTask;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.form.FormData;
@@ -53,7 +53,7 @@ public class FlowDelayTriggerService {
         formData.reset(flowRecord.getFormData());
 
         FlowAdvice advice = flowRecord.toAdvice(workflow);
-        List<FlowRecord> currentRecords = RepositoryContext.getInstance().findRecordsByFromIdAndNodeId(flowRecord.getFromId(), flowRecord.getNodeId());
+        List<FlowRecord> currentRecords = RepositoryHolderContext.getInstance().findRecordsByFromIdAndNodeId(flowRecord.getFromId(), flowRecord.getNodeId());
 
         // 获取延迟任务节点
         IFlowNode delayNode = workflow.getFlowNode(delayTask.getDelayNodeId());

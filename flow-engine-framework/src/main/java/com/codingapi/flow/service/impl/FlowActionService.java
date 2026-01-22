@@ -2,7 +2,7 @@ package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.backup.WorkflowBackup;
-import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.form.FormData;
@@ -69,7 +69,7 @@ public class FlowActionService {
         formData.reset(request.getFormData());
         FlowAdvice flowAdvice = request.toFlowAdvice(workflow, flowAction);
 
-        List<FlowRecord> currentRecords = RepositoryContext.getInstance().findRecordsByFromIdAndNodeId(flowRecord.getFromId(), flowRecord.getNodeId());
+        List<FlowRecord> currentRecords = RepositoryHolderContext.getInstance().findRecordsByFromIdAndNodeId(flowRecord.getFromId(), flowRecord.getNodeId());
         FlowSession session = new FlowSession(currentOperator, workflow, currentNode, flowAction, formData, flowRecord, currentRecords, workflowBackup.getId(), flowAdvice);
         // 验证会话
         currentNode.verifySession(session);

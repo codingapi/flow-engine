@@ -4,7 +4,7 @@ import com.codingapi.flow.action.ActionDisplay;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.BaseAction;
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowConfigException;
@@ -99,7 +99,7 @@ public class RejectAction extends BaseAction {
                 }
             }
         }
-        RepositoryContext.getInstance().saveRecords(recordList);
+        RepositoryHolderContext.getInstance().saveRecords(recordList);
         flowEvents.forEach(EventPusher::push);
 
     }

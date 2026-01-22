@@ -102,12 +102,13 @@ class FlowServiceTest {
 
         List<IFlowAction> startActions = startNode.actionManager().getActions();
 
-        FlowCreateRequest userRequest = new FlowCreateRequest();
-        userRequest.setWorkId(workflow.getId());
-        userRequest.setFormData(data);
-        userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        FlowCreateRequest userCreateRequest = new FlowCreateRequest();
+        userCreateRequest.setWorkId(workflow.getId());
+        userCreateRequest.setFormData(data);
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
 
-        flowService.create(userRequest);
+        flowService.create(userCreateRequest);
 
         List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
         assertEquals(1, userRecordList.size());
@@ -183,7 +184,8 @@ class FlowServiceTest {
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
         userCreateRequest.setWorkId(workflow.getId());
         userCreateRequest.setFormData(data);
-        userCreateRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
         flowService.create(userCreateRequest);
 
         List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
@@ -284,7 +286,8 @@ class FlowServiceTest {
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
         userCreateRequest.setWorkId(workflow.getId());
         userCreateRequest.setFormData(data);
-        userCreateRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), null, user.getUserId()));
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
         flowService.create(userCreateRequest);
 
         List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
@@ -383,7 +386,8 @@ class FlowServiceTest {
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
         userCreateRequest.setWorkId(workflow.getId());
         userCreateRequest.setFormData(data);
-        userCreateRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), null, user.getUserId()));
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
         flowService.create(userCreateRequest);
 
         List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
@@ -504,7 +508,8 @@ class FlowServiceTest {
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
         userCreateRequest.setWorkId(workflow.getId());
         userCreateRequest.setFormData(data);
-        userCreateRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
 
         flowService.create(userCreateRequest);
 
@@ -608,7 +613,8 @@ class FlowServiceTest {
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
         userCreateRequest.setWorkId(workflow.getId());
         userCreateRequest.setFormData(data);
-        userCreateRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
 
         flowService.create(userCreateRequest);
 
@@ -772,7 +778,8 @@ class FlowServiceTest {
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
         userCreateRequest.setWorkId(workflow.getId());
         userCreateRequest.setFormData(data);
-        userCreateRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
 
         flowService.create(userCreateRequest);
 
@@ -940,14 +947,16 @@ class FlowServiceTest {
         workflowRepository.save(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 3, "reason", "leave");
-
-        FlowCreateRequest request = new FlowCreateRequest();
-        request.setWorkId(workflow.getId());
-        request.setFormData(data);
         List<IFlowAction> startActions = startNode.actionManager().getActions();
-        request.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
 
-        flowService.create(request);
+        FlowCreateRequest userCreateRequest = new FlowCreateRequest();
+        userCreateRequest.setWorkId(workflow.getId());
+        userCreateRequest.setFormData(data);
+
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
+
+        flowService.create(userCreateRequest);
 
         List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
         assertEquals(1, userRecordList.size());
@@ -1112,13 +1121,16 @@ class FlowServiceTest {
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 2, "reason", "leave");
 
-        FlowCreateRequest request = new FlowCreateRequest();
-        request.setWorkId(workflow.getId());
-        request.setFormData(data);
-        List<IFlowAction> userActions = startNode.actionManager().getActions();
-        request.setAdvice(new FlowAdviceBody(userActions.get(0).id(), "同意", user.getUserId()));
+        List<IFlowAction> startActions = startNode.actionManager().getActions();
 
-        flowService.create(request);
+        FlowCreateRequest userCreateRequest = new FlowCreateRequest();
+        userCreateRequest.setWorkId(workflow.getId());
+        userCreateRequest.setFormData(data);
+
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
+
+        flowService.create(userCreateRequest);
 
         List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
         assertEquals(1, userRecordList.size());
@@ -1126,7 +1138,7 @@ class FlowServiceTest {
         FlowActionRequest submitRequest = new FlowActionRequest();
         submitRequest.setFormData(data);
         submitRequest.setRecordId(userRecordList.get(0).getId());
-        submitRequest.setAdvice(new FlowAdviceBody(userActions.get(0).id(), "同意", user.getUserId()));
+        submitRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
         flowService.action(submitRequest);
 
         List<FlowRecord> departRecordList = flowRecordRepository.findTodoByOperator(depart.getUserId());
@@ -1231,13 +1243,14 @@ class FlowServiceTest {
 
         workflowRepository.save(workflow);
 
-        List<IFlowAction> actions = startNode.actionManager().getActions();
+        List<IFlowAction> startActions = startNode.actionManager().getActions();
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
         userCreateRequest.setWorkId(workflow.getId());
         userCreateRequest.setFormData(data);
-        userCreateRequest.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", user.getUserId()));
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
 
         flowService.create(userCreateRequest);
 
@@ -1247,7 +1260,7 @@ class FlowServiceTest {
         FlowActionRequest userRequest = new FlowActionRequest();
         userRequest.setFormData(data);
         userRequest.setRecordId(userRecordList.get(0).getId());
-        userRequest.setAdvice(new FlowAdviceBody(actions.get(0).id(), "同意", user.getUserId()));
+        userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
         flowService.action(userRequest);
 
         List<FlowRecord> bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
@@ -1311,9 +1324,7 @@ class FlowServiceTest {
                         .build())
                 .build();
 
-        TriggerNode triggerNode = TriggerNode.builder()
-                .name("触发流程")
-                .build();
+
 
         ApprovalNode bossNode = ApprovalNode.builder()
                 .name("经理审批")
@@ -1326,6 +1337,10 @@ class FlowServiceTest {
                         .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
                         .build()
                 )
+                .build();
+
+        TriggerNode triggerNode = TriggerNode.builder()
+                .name("触发流程")
                 .build();
 
         EndNode endNode = EndNode.builder().build();
@@ -1351,7 +1366,8 @@ class FlowServiceTest {
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
         userCreateRequest.setWorkId(workflow.getId());
         userCreateRequest.setFormData(data);
-        userCreateRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
         flowService.create(userCreateRequest);
 
         List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
@@ -1445,9 +1461,9 @@ class FlowServiceTest {
                 .addNode(bossNode)
                 .addNode(subProcessNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), subProcessNode.getId()))
-                .addEdge(new FlowEdge(subProcessNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
+                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
+                .addEdge(new FlowEdge(bossNode.getId(), subProcessNode.getId()))
+                .addEdge(new FlowEdge(subProcessNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -1458,16 +1474,14 @@ class FlowServiceTest {
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
         userCreateRequest.setWorkId(workflow.getId());
         userCreateRequest.setFormData(data);
-        userCreateRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
         flowService.create(userCreateRequest);
 
         List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
         assertEquals(1, userRecordList.size());
 
-        FlowActionRequest userRequest = new FlowActionRequest();
-        userRequest.setFormData(data);
-        userRequest.setRecordId(userRecordList.get(0).getId());
-        userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        FlowActionRequest userRequest = userCreateRequest.toActionRequest(userRecordList.get(0).getId());
         flowService.action(userRequest);
 
         List<FlowRecord> bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
@@ -1485,6 +1499,10 @@ class FlowServiceTest {
         List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(bossRecordList.get(0).getProcessId());
         assertEquals(3, records.size());
         assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+
+        // 为老板再次创建一个待办流程
+        bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        assertEquals(1, bossRecordList.size());
 
     }
 

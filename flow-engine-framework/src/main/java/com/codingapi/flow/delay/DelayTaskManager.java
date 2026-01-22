@@ -1,6 +1,6 @@
 package com.codingapi.flow.delay;
 
-import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.service.impl.FlowDelayTriggerService;
 import lombok.Getter;
@@ -27,10 +27,10 @@ public class DelayTaskManager {
      * 加载任务并执行
      */
     public void start(){
-        if(!RepositoryContext.getInstance().isRegistered()){
+        if(!RepositoryHolderContext.getInstance().isRegistered()){
             throw new FlowConfigException(FlowConfigException.ERROR_CODE_PREFIX+"DELAY_TASK_NOT_REGISTER");
         }
-        List<DelayTask> delayTasks =  RepositoryContext.getInstance().findDelayTasks();
+        List<DelayTask> delayTasks =  RepositoryHolderContext.getInstance().findDelayTasks();
         if(delayTasks!=null && !delayTasks.isEmpty()){
             for(DelayTask delayTask:delayTasks){
                 this.addTask(delayTask);
@@ -78,13 +78,13 @@ public class DelayTaskManager {
                 @Override
                 public void run() {
                     FlowDelayTriggerService flowDelayTriggerService = new FlowDelayTriggerService(task,
-                            RepositoryContext.getInstance().getFlowOperatorGateway(),
-                            RepositoryContext.getInstance().getFlowRecordRepository(),
-                            RepositoryContext.getInstance().getWorkflowBackupRepository());
+                            RepositoryHolderContext.getInstance().getFlowOperatorGateway(),
+                            RepositoryHolderContext.getInstance().getFlowRecordRepository(),
+                            RepositoryHolderContext.getInstance().getWorkflowBackupRepository());
 
                     flowDelayTriggerService.trigger();
 
-                    RepositoryContext.getInstance().deleteDelayTask(task);
+                    RepositoryHolderContext.getInstance().deleteDelayTask(task);
                 }
             }, new Date(task.getTriggerTime()));
         }

@@ -4,22 +4,22 @@ import com.codingapi.flow.delay.DelayTask;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.DelayTaskRepository;
-import com.codingapi.flow.repository.FlowRecordRepository;
-import com.codingapi.flow.repository.ParallelBranchRepository;
-import com.codingapi.flow.repository.WorkflowBackupRepository;
+import com.codingapi.flow.repository.*;
+import com.codingapi.flow.service.FlowService;
 import lombok.Getter;
 
 import java.util.List;
 
-public class RepositoryContext {
+public class RepositoryHolderContext {
 
     @Getter
-    private final static RepositoryContext instance = new RepositoryContext();
+    private final static RepositoryHolderContext instance = new RepositoryHolderContext();
 
-    private RepositoryContext() {
+    private RepositoryHolderContext() {
     }
 
+    @Getter
+    private WorkflowRepository workflowRepository;
     @Getter
     private WorkflowBackupRepository workflowBackupRepository;
     @Getter
@@ -39,15 +39,32 @@ public class RepositoryContext {
                 && delayTaskRepository != null
                 && workflowBackupRepository != null
                 && flowRecordRepository != null
-                && flowOperatorGateway != null;
+                && flowOperatorGateway != null
+                && workflowRepository != null;
     }
 
-    public void register(WorkflowBackupRepository workflowBackupRepository, FlowRecordRepository flowRecordRepository, FlowOperatorGateway flowOperatorGateway, ParallelBranchRepository parallelBranchRepository, DelayTaskRepository delayTaskRepository) {
+    public void register(WorkflowRepository workflowRepository,
+                         WorkflowBackupRepository workflowBackupRepository,
+                         FlowRecordRepository flowRecordRepository,
+                         FlowOperatorGateway flowOperatorGateway,
+                         ParallelBranchRepository parallelBranchRepository,
+                         DelayTaskRepository delayTaskRepository) {
+        this.workflowRepository = workflowRepository;
         this.workflowBackupRepository = workflowBackupRepository;
         this.flowRecordRepository = flowRecordRepository;
         this.flowOperatorGateway = flowOperatorGateway;
         this.parallelBranchRepository = parallelBranchRepository;
         this.delayTaskRepository = delayTaskRepository;
+    }
+
+
+    public FlowService createFlowService() {
+        return new FlowService(workflowRepository,
+                flowOperatorGateway,
+                flowRecordRepository,
+                workflowBackupRepository,
+                parallelBranchRepository,
+                delayTaskRepository);
     }
 
     public FlowRecord getRecordById(long id) {

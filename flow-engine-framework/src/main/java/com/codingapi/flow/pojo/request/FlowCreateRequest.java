@@ -20,10 +20,25 @@ public class FlowCreateRequest {
      * 表单数据
      */
     private Map<String, Object> formData;
+
     /**
-     * 审批意见
+     * 流程动作
      */
-    private FlowAdviceBody advice;
+    private String actionId;
+
+    /**
+     * 操作者
+     */
+    private long operatorId;
+
+    public FlowActionRequest toActionRequest(long recordId) {
+        FlowActionRequest flowActionRequest = new FlowActionRequest();
+        flowActionRequest.setFormData(this.getFormData());
+        flowActionRequest.setRecordId(recordId);
+        flowActionRequest.setAdvice(new FlowAdviceBody(this.getActionId(), null, this.getOperatorId()));
+        flowActionRequest.verify();
+        return flowActionRequest;
+    }
 
 
     public void verify() {
@@ -33,10 +48,12 @@ public class FlowCreateRequest {
         if (formData == null || formData.isEmpty()) {
             throw FlowValidationException.required("formData");
         }
-        if (advice == null) {
-            throw FlowValidationException.required("advice");
+        if (operatorId <= 0) {
+            throw FlowValidationException.required("operatorId");
         }
-        advice.verify();
+        if (actionId == null || actionId.isEmpty()) {
+            throw FlowValidationException.required("actionId");
+        }
     }
 
 }

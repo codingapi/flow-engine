@@ -3,7 +3,7 @@ package com.codingapi.flow.node;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.builder.NodeMapBuilder;
-import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.manager.ActionManager;
@@ -174,13 +174,13 @@ public abstract class BaseFlowNode implements IFlowNode {
     public boolean isWaitRecordMargeParallelNode(FlowSession session) {
         FlowRecord currentRecord = session.getCurrentRecord();
         if (currentRecord != null && this.getId().equals(currentRecord.getParallelBranchNodeId())) {
-            RepositoryContext.getInstance().addParallelTriggerCount(currentRecord.getParallelId());
+            RepositoryHolderContext.getInstance().addParallelTriggerCount(currentRecord.getParallelId());
             int parallelBranchTotal = currentRecord.getParallelBranchTotal();
-            int parallelBranchCount = RepositoryContext.getInstance().getParallelBranchTriggerCount(currentRecord.getParallelId());
+            int parallelBranchCount = RepositoryHolderContext.getInstance().getParallelBranchTriggerCount(currentRecord.getParallelId());
             if (parallelBranchCount == parallelBranchTotal) {
                 // 清空并行节点，防止数据继续继承到后续节点
                 currentRecord.clearParallel();
-                RepositoryContext.getInstance().clearParallelTriggerCount(currentRecord.getParallelId());
+                RepositoryHolderContext.getInstance().clearParallelTriggerCount(currentRecord.getParallelId());
             }
             return parallelBranchCount != parallelBranchTotal;
         }

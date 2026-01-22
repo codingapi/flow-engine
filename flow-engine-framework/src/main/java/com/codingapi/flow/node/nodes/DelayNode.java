@@ -1,7 +1,7 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
-import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.delay.DelayTask;
 import com.codingapi.flow.delay.DelayTaskManager;
 import com.codingapi.flow.node.BaseFlowNode;
@@ -36,7 +36,7 @@ public class DelayNode extends BaseFlowNode {
         if(delayStrategy!=null){
             FlowRecord currentRecord = session.getCurrentRecord();
             DelayTask delayTask = new DelayTask(delayStrategy, currentRecord,this.getId());
-            RepositoryContext.getInstance().saveDelayTask(delayTask);
+            RepositoryHolderContext.getInstance().saveDelayTask(delayTask);
 
             DelayTaskManager.getInstance().addTask(delayTask);
         }

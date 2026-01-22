@@ -71,4 +71,8 @@ public class ActionManager {
         }
         return null;
     }
+
+    public IFlowAction getFirstAction() {
+        return actions.get(0);
+    }
 }

@@ -2,7 +2,7 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
-import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
@@ -43,7 +43,7 @@ public class NotifyNode extends BaseAuditNode {
         for (FlowRecord record : records) {
             this.fillNewRecord(session, record);
         }
-        RepositoryContext.getInstance().saveRecords(records);
+        RepositoryHolderContext.getInstance().saveRecords(records);
         return true;
     }
 

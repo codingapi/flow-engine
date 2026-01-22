@@ -3,7 +3,7 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
-import com.codingapi.flow.context.RepositoryContext;
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordFinishEvent;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.record.FlowRecord;
@@ -48,12 +48,12 @@ public class EndNode extends BaseFlowNode {
         // 标记当前流程结束
         FlowRecord latestRecord = session.getCurrentRecord();
         // 添加历史记录到记录中
-        List<FlowRecord> historyRecords = RepositoryContext.getInstance().findRecordsByProcessId(latestRecord.getProcessId());
+        List<FlowRecord> historyRecords = RepositoryHolderContext.getInstance().findRecordsByProcessId(latestRecord.getProcessId());
         // 设置状态为完成
         historyRecords.forEach(item -> {
             item.finish(currentAction instanceof PassAction);
         });
-        RepositoryContext.getInstance().saveRecords(historyRecords);
+        RepositoryHolderContext.getInstance().saveRecords(historyRecords);
         // 流程是否正常结束
         EventPusher.push(new FlowRecordFinishEvent(latestRecord));
     }

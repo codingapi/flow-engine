@@ -5,6 +5,9 @@ import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+/**
+ * 触发节点脚本
+ */
 @AllArgsConstructor
 public class TriggerScript {
 

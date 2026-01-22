@@ -4,6 +4,7 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Getter;
@@ -101,6 +102,17 @@ public class FlowSession {
     }
 
 
+
+    public FlowCreateRequest toCreateRequest() {
+        FlowCreateRequest request = new FlowCreateRequest();
+        IFlowNode startNode = workflow.getStartNode();
+        IFlowAction action = startNode.actionManager().getFirstAction();
+        request.setWorkId(workflow.getId());
+        request.setFormData(formData.toMapData());
+        request.setActionId(action.id());
+        request.setOperatorId(currentOperator.getUserId());
+        return request;
+    }
 
 
     /**

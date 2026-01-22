@@ -5,6 +5,8 @@ import com.codingapi.flow.backup.WorkflowBackup;
 import com.codingapi.flow.event.FlowRecordStartEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
+import com.codingapi.flow.exception.FlowException;
+import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowPermissionException;
 import com.codingapi.flow.form.FormData;
@@ -33,8 +35,7 @@ public class FlowCreateService {
     private final WorkflowRepository workflowRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
 
-    public void create() {
-
+    public long create() {
         request.verify();
         Workflow workflow = workflowRepository.get(request.getWorkId());
         if (workflow == null) {
@@ -48,7 +49,7 @@ public class FlowCreateService {
             workflowBackupRepository.save(workflowBackup);
         }
         // 验证当前用户
-        IFlowOperator currentOperator = flowOperatorGateway.get(request.getAdvice().getOperatorId());
+        IFlowOperator currentOperator = flowOperatorGateway.get(request.getOperatorId());
         if (!workflow.matchCreatedOperator(currentOperator)) {
             throw FlowPermissionException.accessDenied("create workflow");
         }
@@ -57,12 +58,16 @@ public class FlowCreateService {
         formData.reset(request.getFormData());
 
         StartNode currentNode = (StartNode) workflow.getStartNode();
-        IFlowAction action = currentNode.actionManager().getActionById(request.getAdvice().getActionId());
+        IFlowAction action = currentNode.actionManager().getActionById(request.getActionId());
         FlowSession session = FlowSession.startSession(currentOperator, workflow, currentNode, action, formData, workflowBackup.getId());
 
         currentNode.verifySession(session);
 
         List<FlowRecord> flowRecords = currentNode.generateCurrentRecords(session);
+
+        if(flowRecords.size()>1){
+            throw new FlowExecutionException("create record error,record size must be 1.");
+        }
 
         flowRecordRepository.saveAll(flowRecords);
 
@@ -76,5 +81,8 @@ public class FlowCreateService {
         for (IFlowEvent event : events) {
             EventPusher.push(event);
         }
+
+        FlowRecord currentRecord = flowRecords.get(0);
+        return currentRecord.getId();
     }
 }
