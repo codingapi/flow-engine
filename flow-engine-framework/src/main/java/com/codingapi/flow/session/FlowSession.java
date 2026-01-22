@@ -82,12 +82,13 @@ public class FlowSession {
 
     /**
      * 构建开始会话
+     *
      * @param currentOperator 当前操作者
-     * @param workflow 流程设计
-     * @param currentNode 当前节点
-     * @param currentAction 当前动作
-     * @param formData 表单数据
-     * @param backupId 流程备份id
+     * @param workflow        流程设计
+     * @param currentNode     当前节点
+     * @param currentAction   当前动作
+     * @param formData        表单数据
+     * @param backupId        流程备份id
      * @return 新的会话
      */
     public static FlowSession startSession(IFlowOperator currentOperator,
@@ -132,19 +133,21 @@ public class FlowSession {
 
     /**
      * 获取下一节点列表
+     *
      * @return 下一节点列表
      */
     public List<IFlowNode> matchNextNodes() {
         List<IFlowNode> nodeList = workflow.nextNodes(this.getCurrentNode());
-        if(!nodeList.isEmpty() && nodeList.size()>1){
-            IFlowNode currentNode = nodeList.get(0);
-            return currentNode.filterBranches(nodeList,this);
+        if (nodeList == null || nodeList.isEmpty()) {
+            return nodeList;
         }
-        return nodeList;
+        IFlowNode nextNode = nodeList.get(0);
+        return nextNode.filterBranches(nodeList, this);
     }
 
     /**
      * 获取表单数据
+     *
      * @param fieldName 字段名称
      * @return 表单数据
      */
@@ -154,6 +157,7 @@ public class FlowSession {
 
     /**
      * 更新会话
+     *
      * @param currentNode 当前节点
      * @return 新的会话
      */
@@ -163,6 +167,7 @@ public class FlowSession {
 
     /**
      * 更新会话
+     *
      * @param currentOperator 当前操作者
      * @return 新的会话
      */

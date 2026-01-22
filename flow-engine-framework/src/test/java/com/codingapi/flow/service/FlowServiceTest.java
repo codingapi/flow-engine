@@ -999,4 +999,161 @@ class FlowServiceTest {
 
     }
 
+
+
+    /**
+     * 路由节点测试
+     */
+    @Test
+    void router() {
+
+        User user = new User(1, "user");
+        User depart = new User(2, "depart");
+        User boss = new User(3, "boss");
+
+        userGateway.save(user);
+        userGateway.save(depart);
+        userGateway.save(boss);
+
+        GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
+
+        FormMeta form = FormMetaBuilder.builder()
+                .name("请假流程")
+                .code("leave")
+                .addField("请假人", "name", "string")
+                .addField("请假天数", "days", "int")
+                .addField("请假事由", "reason", "string")
+                .build();
+
+        StartNode startNode = StartNode
+                .builder()
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .build())
+                .actions(ActionBuilder.builder()
+                        .addAction(new CustomAction())
+                        .build())
+                .build();
+
+        BranchNodeBranchNode departConditionNode = BranchNodeBranchNode.builder()
+                .name("条件分支")
+                .conditionScript("def run(request){return request.getFormData('days') <= 3}")
+                .order(1)
+                .build();
+
+        BranchNodeBranchNode bossConditionNode = BranchNodeBranchNode.builder()
+                .name("条件分支")
+                .conditionScript("def run(request){return request.getFormData('days') > 3}")
+                .order(2)
+                .build();
+
+        ApprovalNode bossNode = ApprovalNode.builder()
+                .name("老板审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(3)]}"))
+                        .build()
+                )
+                .build();
+
+        RouterNode routerNode = RouterNode.builder()
+                .name("路由节点")
+                .routerNodeScript(String.format("def run(request){return '%s'}",bossNode.getId()))
+                .build();
+
+        ApprovalNode departNode = ApprovalNode.builder()
+                .name("经理审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .build()
+                )
+                .build();
+
+        EndNode endNode = EndNode.builder().build();
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("请假流程")
+                .code("leave")
+                .createdOperator(user)
+                .form(form)
+                .addNode(startNode)
+                .addNode(departConditionNode)
+                .addNode(bossConditionNode)
+                .addNode(departNode)
+                .addNode(bossNode)
+                .addNode(routerNode)
+                .addNode(endNode)
+                .addEdge(new FlowEdge(startNode.getId(), bossConditionNode.getId()))
+                .addEdge(new FlowEdge(bossConditionNode.getId(), bossNode.getId()))
+                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
+
+                .addEdge(new FlowEdge(startNode.getId(), departConditionNode.getId()))
+                .addEdge(new FlowEdge(departConditionNode.getId(), departNode.getId()))
+                .addEdge(new FlowEdge(departNode.getId(), routerNode.getId()))
+                .addEdge(new FlowEdge(routerNode.getId(), endNode.getId()))
+                .build();
+
+        workflowRepository.save(workflow);
+
+        Map<String, Object> data  = Map.of("name", "lorne", "days", 2, "reason", "leave");
+
+        FlowCreateRequest request = new FlowCreateRequest();
+        request.setWorkId(workflow.getId());
+        request.setFormData(data);
+        List<IFlowAction> userActions = startNode.actionManager().getActions();
+        request.setAdvice(new FlowAdviceBody(userActions.get(0).id(), "同意", user.getUserId()));
+
+        flowService.create(request);
+
+        List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(1, userRecordList.size());
+
+        FlowActionRequest submitRequest = new FlowActionRequest();
+        submitRequest.setFormData(data);
+        submitRequest.setRecordId(userRecordList.get(0).getId());
+        submitRequest.setAdvice(new FlowAdviceBody(userActions.get(0).id(), "同意", user.getUserId()));
+        flowService.action(submitRequest);
+
+        List<FlowRecord> departRecordList = flowRecordRepository.findTodoByOperator(depart.getUserId());
+        assertEquals(1, departRecordList.size());
+
+
+        List<IFlowAction> departActions = departNode.actionManager().getActions();
+
+        FlowActionRequest departRequest = new FlowActionRequest();
+        departRequest.setFormData(data);
+        departRequest.setRecordId(departRecordList.get(0).getId());
+        departRequest.setAdvice(new FlowAdviceBody(departActions.get(0).id(), "同意", depart.getUserId()));
+        flowService.action(departRequest);
+
+
+        List<FlowRecord> bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        assertEquals(1, bossRecordList.size());
+
+
+        List<IFlowAction> bossActions = bossNode.actionManager().getActions();
+
+        FlowActionRequest bossRequest = new FlowActionRequest();
+        bossRequest.setFormData(data);
+        bossRequest.setRecordId(bossRecordList.get(0).getId());
+        bossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", boss.getUserId()));
+        flowService.action(bossRequest);
+
+        List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(userRecordList.get(0).getProcessId());
+        assertEquals(4, records.size());
+        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
+
+    }
 }

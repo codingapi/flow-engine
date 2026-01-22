@@ -4,7 +4,7 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.BranchNodeBranchNode;
 import com.codingapi.flow.node.nodes.InclusiveBranchNode;
 import com.codingapi.flow.node.nodes.ParallelBranchNode;
-import com.codingapi.flow.node.nodes.RouterBranchNode;
+import com.codingapi.flow.node.nodes.RouterNode;
 import com.codingapi.flow.node.nodes.DelayNode;
 import com.codingapi.flow.node.nodes.SubProcessNode;
 import com.codingapi.flow.node.nodes.TriggerNode;
@@ -39,7 +39,7 @@ public class NodeFactory {
         nodesClasses.put(HandleNode.NODE_TYPE, HandleNode.class);
         nodesClasses.put(InclusiveBranchNode.NODE_TYPE, InclusiveBranchNode.class);
         nodesClasses.put(NotifyNode.NODE_TYPE, NotifyNode.class);
-        nodesClasses.put(RouterBranchNode.NODE_TYPE, RouterBranchNode.class);
+        nodesClasses.put(RouterNode.NODE_TYPE, RouterNode.class);
         nodesClasses.put(ParallelBranchNode.NODE_TYPE, ParallelBranchNode.class);
         nodesClasses.put(StartNode.NODE_TYPE, StartNode.class);
         nodesClasses.put(SubProcessNode.NODE_TYPE, SubProcessNode.class);
