@@ -2,7 +2,8 @@ package com.codingapi.flow.strategy;
 
 import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,8 @@ import java.util.Map;
 /**
  * 表单字段权限策略配置
  */
-@Data
+@Setter
+@Getter
 public class FormFieldPermissionStrategy extends BaseStrategy {
 
     /**

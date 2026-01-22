@@ -46,7 +46,6 @@ public abstract class BaseFlowNode implements IFlowNode {
     /**
      * 节点操作
      */
-    @Setter
     @Getter
     protected List<IFlowAction> actions;
 

@@ -1,14 +1,16 @@
 package com.codingapi.flow.strategy;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Map;
 
 /**
  * 节点审批意见策略
  */
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 public class AdviceStrategy extends BaseStrategy {
 

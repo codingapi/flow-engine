@@ -1,14 +1,16 @@
 package com.codingapi.flow.strategy;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Map;
 
 /**
  * 多人审批策略配置
  */
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 public class MultiOperatorAuditStrategy extends BaseStrategy {
 

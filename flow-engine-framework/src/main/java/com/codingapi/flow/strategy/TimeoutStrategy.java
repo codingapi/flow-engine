@@ -1,14 +1,16 @@
 package com.codingapi.flow.strategy;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Map;
 
 /**
  * 超时策略配置
  */
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 public class TimeoutStrategy extends BaseStrategy {
 

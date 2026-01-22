@@ -1,14 +1,16 @@
 package com.codingapi.flow.strategy;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Map;
 
 /**
  * 提交人与审批人一致配置
  */
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 public class SameOperatorAuditStrategy extends BaseStrategy {
 
