@@ -42,7 +42,6 @@ public class HandleNode extends BaseAuditNode {
         strategies.add(RecordMergeStrategy.defaultStrategy());
         strategies.add(ResubmitStrategy.defaultStrategy());
         strategies.add(AdviceStrategy.defaultStrategy());
-        strategies.add(OperatorLoadStrategy.defaultStrategy());
         strategies.add(ErrorTriggerStrategy.defaultStrategy());
         strategies.add(NodeTitleStrategy.defaultStrategy());
         strategies.add(FormFieldPermissionStrategy.defaultStrategy());

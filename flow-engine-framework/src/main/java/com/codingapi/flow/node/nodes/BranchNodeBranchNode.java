@@ -45,7 +45,7 @@ public class BranchNodeBranchNode extends BaseFlowNode {
      * 匹配条件
      */
     @Override
-    public boolean continueTrigger(FlowSession request) {
+    public boolean handle(FlowSession request) {
         return conditionScript.execute(request);
     }
 
@@ -53,7 +53,7 @@ public class BranchNodeBranchNode extends BaseFlowNode {
     public List<IFlowNode> filterBranches(List<IFlowNode> nodeList, FlowSession flowSession) {
         List<IFlowNode> nodes = new ArrayList<>();
         for (IFlowNode node: nodeList){
-            if (node.continueTrigger(flowSession)){
+            if (node.handle(flowSession)){
                 nodes.add(node);
             }
         }

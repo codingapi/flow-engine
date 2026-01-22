@@ -48,7 +48,7 @@ public class InclusiveBranchNode extends BaseFlowNode {
      * 匹配条件
      */
     @Override
-    public boolean continueTrigger(FlowSession request) {
+    public boolean handle(FlowSession request) {
         return conditionScript.execute(request);
     }
 

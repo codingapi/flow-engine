@@ -59,7 +59,7 @@ public class EndNode extends BaseFlowNode {
     }
 
     @Override
-    public boolean continueTrigger(FlowSession session) {
+    public boolean handle(FlowSession session) {
         return false;
     }
 

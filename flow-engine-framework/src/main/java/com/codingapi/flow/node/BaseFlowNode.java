@@ -189,7 +189,7 @@ public abstract class BaseFlowNode implements IFlowNode {
 
 
     @Override
-    public boolean continueTrigger(FlowSession session) {
+    public boolean handle(FlowSession session) {
         return true;
     }
 

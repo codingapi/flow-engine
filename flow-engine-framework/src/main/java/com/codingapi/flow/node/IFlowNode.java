@@ -51,11 +51,11 @@ public interface IFlowNode {
     /**
      * 是否执行节点
      * 当前流程节点执行完成以后，触发下一环节时执行的函数，当返回true时则将继续执行后续流程，当返回false时则不继续执行后续流程，将执行当前节点的创建流程记录函数 {@link  IFlowNode#generateCurrentRecords(FlowSession)}
-     * 同时 continueTrigger 函数也是条件分支的触发判定依据。{@link FlowSession#matchNextNodes()} 将会调用 {@link IFlowNode#filterBranches(List, FlowSession)} 匹配过滤条件
+     * 同时 handle 函数也是条件分支的触发判定依据。{@link FlowSession#matchNextNodes()} 将会调用 {@link IFlowNode#filterBranches(List, FlowSession)} 匹配过滤条件
      * @param session 会话
      * @return true: 继续执行下一个节点
      */
-    boolean continueTrigger(FlowSession session);
+    boolean handle(FlowSession session);
 
     /**
      * 节点验证会话
@@ -86,7 +86,7 @@ public interface IFlowNode {
      * 节点是否完成
      * 当前节点是否完成，由于IFlowAction无法判断节点是否完成，是否完成需要根据节点配置的多人审批规则来判定，因此在提交通过节点时
      * {@link PassAction#run(FlowSession)} 函数中会判断当前节点是否完成
-     * 如果完成则将执行当前节点的生成流程记录函数 {@link  IFlowNode#continueTrigger(FlowSession)}
+     * 如果完成则将执行当前节点的生成流程记录函数 {@link  IFlowNode#handle(FlowSession)}
      * @param session 会话
      * @return true: 节点完成
      */
