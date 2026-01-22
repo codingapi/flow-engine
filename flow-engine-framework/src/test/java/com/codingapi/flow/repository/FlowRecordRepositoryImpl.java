@@ -45,10 +45,10 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
     }
 
     @Override
-    public List<FlowRecord> findRecordsByFromIdAndNodeId(long fromId,String nodeId) {
+    public List<FlowRecord> findRecordsByFromIdAndNodeId(long fromId, String nodeId) {
         return cache.values().stream().filter(flowRecord ->
-                flowRecord.getFromId() == fromId
-                && flowRecord.getNodeId().equals(nodeId)
+                        flowRecord.getFromId() == fromId
+                                && flowRecord.getNodeId().equals(nodeId)
                 )
                 .toList();
     }

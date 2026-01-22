@@ -43,7 +43,7 @@ public abstract class BaseAction implements IFlowAction {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof BaseAction action){
+        if (obj instanceof BaseAction action) {
             return action.getId().equals(id);
         }
         return super.equals(obj);
@@ -88,20 +88,22 @@ public abstract class BaseAction implements IFlowAction {
 
 
     @Override
-    public void run(FlowSession flowSession) {}
+    public void run(FlowSession flowSession) {
+    }
 
     /**
      * 触发并执行后续节点
+     *
      * @param flowSession 当前会话
-     * @param consumer 节点处理
+     * @param consumer    节点处理
      */
     public void triggerNode(FlowSession flowSession, Consumer<FlowSession> consumer) {
         List<IFlowNode> nextNodes = flowSession.matchNextNodes();
         for (IFlowNode node : nextNodes) {
             FlowSession triggerSession = flowSession.updateSession(node);
             if (node.handle(triggerSession)) {
-                this.triggerNode(triggerSession,consumer);
-            }else {
+                this.triggerNode(triggerSession, consumer);
+            } else {
                 if (consumer != null) {
                     consumer.accept(triggerSession);
                 }

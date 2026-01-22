@@ -6,7 +6,7 @@ import com.codingapi.flow.form.permission.PermissionType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FormFieldPermissionsBuilder  {
+public class FormFieldPermissionsBuilder {
 
     private final List<FormFieldPermission> permissions;
 

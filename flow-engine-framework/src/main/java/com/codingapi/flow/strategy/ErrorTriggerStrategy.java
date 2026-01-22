@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.Map;
 
 /**
- *  错误触发策略配置(没有匹配到人时)
+ * 错误触发策略配置(没有匹配到人时)
  */
 @NoArgsConstructor
 public class ErrorTriggerStrategy extends BaseStrategy {

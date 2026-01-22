@@ -92,6 +92,6 @@ public class FlowStateException extends FlowException {
      */
     public static FlowStateException invalidStateTransition(String fromState, String toState) {
         return new FlowStateException("005",
-            String.format("invalid state transition from '%s' to '%s'", fromState, toState));
+                String.format("invalid state transition from '%s' to '%s'", fromState, toState));
     }
 }

@@ -2,14 +2,16 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
+import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.node.BaseFlowNode;
-import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.strategy.*;
+import com.codingapi.flow.strategy.FormFieldPermissionStrategy;
+import com.codingapi.flow.strategy.INodeStrategy;
+import com.codingapi.flow.strategy.NodeTitleStrategy;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,12 +45,12 @@ public class StartNode extends BaseFlowNode {
 
 
     public StartNode(String id, String name, String view, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name,0, actions,nodeStrategies);
+        super(id, name, 0, actions, nodeStrategies);
         this.view = view;
     }
 
     public StartNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME,  DEFAULT_VIEW, defaultActions(), defaultStrategies());
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, defaultActions(), defaultStrategies());
     }
 
 
@@ -59,12 +61,12 @@ public class StartNode extends BaseFlowNode {
         IFlowOperator operator = session.getCurrentOperator();
         IFlowAction action = session.getCurrentAction();
         if (currentRecord == null) {
-            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator), action.id(),  0);
+            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator), action.id(), 0);
             records.add(flowRecord);
         } else {
             // 获取流程创建者
             IFlowOperator creatorOperator = GatewayContext.getInstance().getFlowOperator(currentRecord.getCreateOperatorId());
-            FlowRecord flowRecord = new FlowRecord(session.updateSession(creatorOperator), action.id(),  0);
+            FlowRecord flowRecord = new FlowRecord(session.updateSession(creatorOperator), action.id(), 0);
             records.add(flowRecord);
         }
         return records;

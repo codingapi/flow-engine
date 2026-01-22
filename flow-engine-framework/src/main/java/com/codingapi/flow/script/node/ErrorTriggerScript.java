@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- *  异常触发脚本
+ * 异常触发脚本
  */
 @AllArgsConstructor
 public class ErrorTriggerScript {

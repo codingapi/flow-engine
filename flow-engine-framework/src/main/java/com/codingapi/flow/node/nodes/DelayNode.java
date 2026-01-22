@@ -1,7 +1,7 @@
 package com.codingapi.flow.node.nodes;
 
-import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.Map;
@@ -36,7 +36,7 @@ public class DelayNode extends BaseFlowNode {
         return new Builder();
     }
 
-    public static class Builder extends BaseNodeBuilder<Builder,DelayNode> {
+    public static class Builder extends BaseNodeBuilder<Builder, DelayNode> {
         public Builder() {
             super(new DelayNode());
         }

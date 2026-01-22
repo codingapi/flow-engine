@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
- *  节点策略配置工厂
+ * 节点策略配置工厂
  */
 public class NodeStrategyFactory {
 

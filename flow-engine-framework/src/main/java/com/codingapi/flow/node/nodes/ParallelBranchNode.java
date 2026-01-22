@@ -1,18 +1,17 @@
 package com.codingapi.flow.node.nodes;
 
+import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.node.helper.ParallelNodeRelationHelper;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 并行节点
@@ -47,13 +46,13 @@ public class ParallelBranchNode extends BaseFlowNode {
         ParallelNodeRelationHelper helper = new ParallelNodeRelationHelper(nodeList, workflow);
         // 分析并行分支的结束汇聚节点
         IFlowNode overNode = helper.fetchParallelEndNode();
-        if(overNode==null){
+        if (overNode == null) {
             throw FlowConfigException.parallelEndNodeNotNull();
         }
 
         // 在流程记录中记录，合并的条件信息。
         FlowRecord flowRecord = flowSession.getCurrentRecord();
-        flowRecord.parallelBranchNode(overNode.getId(), nodeList.size(),RandomUtils.generateStringId());
+        flowRecord.parallelBranchNode(overNode.getId(), nodeList.size(), RandomUtils.generateStringId());
 
         return nodeList;
     }

@@ -1,16 +1,16 @@
 package com.codingapi.flow.script;
 
+import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
+import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
-import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
-import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.node.nodes.ApprovalNode;
-import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.node.nodes.EndNode;
+import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.FormFieldPermissionStrategy;
@@ -79,7 +79,7 @@ class ErrorTriggerScriptTest {
         FormData data = new FormData(form);
         data.getDataBody().set("name", "张三").set("days", 10).set("reason", "事由");
 
-        FlowSession flowSession =  FlowSession.startSession(user, workflow, startNode,startNode.getActions().get(0), data, 0);
+        FlowSession flowSession = FlowSession.startSession(user, workflow, startNode, startNode.getActions().get(0), data, 0);
 
         ErrorTriggerScript errorNodeTriggerScript = ErrorTriggerScript.defaultNodeScript();
         ErrorThrow errorThrow = errorNodeTriggerScript.execute(flowSession);

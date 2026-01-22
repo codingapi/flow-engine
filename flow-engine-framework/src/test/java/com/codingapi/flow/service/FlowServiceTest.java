@@ -3,14 +3,14 @@ package com.codingapi.flow.service;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.builder.ActionBuilder;
+import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
+import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.gateway.impl.UserGateway;
-import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
-import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.node.nodes.*;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
@@ -38,7 +38,7 @@ class FlowServiceTest {
     private final WorkflowBackupRepository workflowBackupRepository = new WorkflowBackupRepositoryImpl();
     private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
     private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
-    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository,parallelBranchRepository);
+    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository, parallelBranchRepository);
 
     @Test
     void create() {
@@ -306,7 +306,6 @@ class FlowServiceTest {
         assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
-
 
 
     /**
@@ -650,8 +649,6 @@ class FlowServiceTest {
     }
 
 
-
-
     /**
      * 并行分支测试
      */
@@ -822,8 +819,6 @@ class FlowServiceTest {
         assertEquals(5, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
-
-
 
 
     /**
@@ -1000,7 +995,6 @@ class FlowServiceTest {
     }
 
 
-
     /**
      * 路由节点测试
      */
@@ -1066,7 +1060,7 @@ class FlowServiceTest {
 
         RouterNode routerNode = RouterNode.builder()
                 .name("路由节点")
-                .routerNodeScript(String.format("def run(request){return '%s'}",bossNode.getId()))
+                .routerNodeScript(String.format("def run(request){return '%s'}", bossNode.getId()))
                 .build();
 
         ApprovalNode departNode = ApprovalNode.builder()
@@ -1107,7 +1101,7 @@ class FlowServiceTest {
 
         workflowRepository.save(workflow);
 
-        Map<String, Object> data  = Map.of("name", "lorne", "days", 2, "reason", "leave");
+        Map<String, Object> data = Map.of("name", "lorne", "days", 2, "reason", "leave");
 
         FlowCreateRequest request = new FlowCreateRequest();
         request.setWorkId(workflow.getId());

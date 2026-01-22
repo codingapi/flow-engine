@@ -1,6 +1,5 @@
 package com.codingapi.flow.strategy;
 
-import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -40,7 +39,7 @@ public class ResubmitStrategy extends BaseStrategy {
     }
 
     public static ResubmitStrategy fromMap(Map<String, Object> map) {
-        ResubmitStrategy strategy = BaseStrategy.fromMap( map, ResubmitStrategy.class);
+        ResubmitStrategy strategy = BaseStrategy.fromMap(map, ResubmitStrategy.class);
         if (strategy == null) return null;
         strategy.setType(Type.valueOf((String) map.get("type")));
         return strategy;

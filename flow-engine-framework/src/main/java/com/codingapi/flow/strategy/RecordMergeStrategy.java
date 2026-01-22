@@ -16,7 +16,7 @@ public class RecordMergeStrategy extends BaseStrategy {
 
     @Override
     public void copy(INodeStrategy target) {
-        this.mergeable = ((RecordMergeStrategy)target).mergeable;
+        this.mergeable = ((RecordMergeStrategy) target).mergeable;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class RecordMergeStrategy extends BaseStrategy {
     }
 
     public static RecordMergeStrategy fromMap(Map<String, Object> map) {
-        RecordMergeStrategy strategy = BaseStrategy.fromMap( map, RecordMergeStrategy.class);
+        RecordMergeStrategy strategy = BaseStrategy.fromMap(map, RecordMergeStrategy.class);
         if (strategy == null) return null;
         strategy.mergeable = (boolean) map.get("mergeable");
         return strategy;

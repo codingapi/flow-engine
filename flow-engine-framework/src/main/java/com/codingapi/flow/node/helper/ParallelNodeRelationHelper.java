@@ -2,7 +2,6 @@ package com.codingapi.flow.node.helper;
 
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.EndNode;
-import com.codingapi.flow.node.nodes.ParallelBranchNode;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

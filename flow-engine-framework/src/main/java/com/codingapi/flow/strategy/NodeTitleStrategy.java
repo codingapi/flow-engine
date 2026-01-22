@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import java.util.Map;
 
 /**
- *  节点标题策略配置
+ * 节点标题策略配置
  */
 @NoArgsConstructor
 public class NodeTitleStrategy extends BaseStrategy {

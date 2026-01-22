@@ -40,7 +40,7 @@ public class NotifyNode extends BaseAuditNode {
     @Override
     public boolean handle(FlowSession session) {
         List<FlowRecord> records = this.generateCurrentRecords(session);
-        for (FlowRecord record : records){
+        for (FlowRecord record : records) {
             this.fillNewRecord(session, record);
         }
         RepositoryContext.getInstance().saveRecords(records);

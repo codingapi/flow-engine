@@ -1,8 +1,8 @@
 package com.codingapi.flow.node.nodes;
 
+import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.node.BaseFlowNode;
-import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.helper.ParallelNodeRelationHelper;
 import com.codingapi.flow.record.FlowRecord;
@@ -35,13 +35,13 @@ public class InclusiveBranchNode extends BaseFlowNode {
     }
 
 
-    public InclusiveBranchNode(String id, String name,int order) {
-        super(id, name,order);
+    public InclusiveBranchNode(String id, String name, int order) {
+        super(id, name, order);
         conditionScript = ConditionScript.defaultScript();
     }
 
     public InclusiveBranchNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME,0);
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, 0);
     }
 
     /**
@@ -78,13 +78,13 @@ public class InclusiveBranchNode extends BaseFlowNode {
         ParallelNodeRelationHelper helper = new ParallelNodeRelationHelper(nodeList, workflow);
         // 分析并行分支的结束汇聚节点
         IFlowNode overNode = helper.fetchParallelEndNode();
-        if(overNode==null){
+        if (overNode == null) {
             throw FlowConfigException.parallelEndNodeNotNull();
         }
 
         // 在流程记录中记录，合并的条件信息。
         FlowRecord flowRecord = flowSession.getCurrentRecord();
-        flowRecord.parallelBranchNode(overNode.getId(), nodeList.size(),RandomUtils.generateStringId());
+        flowRecord.parallelBranchNode(overNode.getId(), nodeList.size(), RandomUtils.generateStringId());
 
         return nodeList;
     }
@@ -93,7 +93,7 @@ public class InclusiveBranchNode extends BaseFlowNode {
         return new Builder();
     }
 
-    public static class Builder extends BaseNodeBuilder<Builder,InclusiveBranchNode> {
+    public static class Builder extends BaseNodeBuilder<Builder, InclusiveBranchNode> {
 
         public Builder() {
             super(new InclusiveBranchNode());

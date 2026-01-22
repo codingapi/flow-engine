@@ -1,7 +1,7 @@
 package com.codingapi.flow.node.nodes;
 
-import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class SubProcessNode extends BaseFlowNode {
     }
 
     public SubProcessNode(String id, String name) {
-        super(id, name,new ArrayList<>());
+        super(id, name, new ArrayList<>());
     }
 
     public SubProcessNode() {
@@ -36,7 +36,7 @@ public class SubProcessNode extends BaseFlowNode {
         return new Builder();
     }
 
-    public static class Builder extends BaseNodeBuilder<Builder,SubProcessNode> {
+    public static class Builder extends BaseNodeBuilder<Builder, SubProcessNode> {
         public Builder() {
             super(new SubProcessNode());
         }

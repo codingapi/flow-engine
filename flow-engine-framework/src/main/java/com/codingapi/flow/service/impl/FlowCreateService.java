@@ -2,13 +2,11 @@ package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.backup.WorkflowBackup;
-import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.event.FlowRecordStartEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowPermissionException;
-import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.node.nodes.StartNode;
@@ -16,7 +14,6 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
-import com.codingapi.flow.repository.ParallelBranchRepository;
 import com.codingapi.flow.repository.WorkflowBackupRepository;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.session.FlowSession;
@@ -35,13 +32,8 @@ public class FlowCreateService {
     private final FlowRecordRepository flowRecordRepository;
     private final WorkflowRepository workflowRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
-    private final ParallelBranchRepository parallelBranchRepository;
 
     public void create() {
-
-        RepositoryContext.getInstance().setFlowRecordRepository(flowRecordRepository);
-        RepositoryContext.getInstance().setFlowOperatorGateway(flowOperatorGateway);
-        RepositoryContext.getInstance().setParallelBranchRepository(parallelBranchRepository);
 
         request.verify();
         Workflow workflow = workflowRepository.get(request.getWorkId());

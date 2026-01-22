@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  表单字段权限管理
+ * 表单字段权限管理
  */
 @AllArgsConstructor
 public class FieldPermissionManager {
@@ -22,6 +22,7 @@ public class FieldPermissionManager {
 
     /**
      * 验证字段权限是否存在
+     *
      * @param form 表单元数据
      */
     public void verifyPermissions(FormMeta form) {
@@ -36,9 +37,10 @@ public class FieldPermissionManager {
 
     /**
      * 验证表单数据
-     * @param formMeta 表单元数据
+     *
+     * @param formMeta    表单元数据
      * @param currentData 当前表单数据
-     * @param latestData 最新表单数据
+     * @param latestData  最新表单数据
      */
     @SuppressWarnings("unchecked")
     public void verifyFormData(FormMeta formMeta, Map<String, Object> currentData, Map<String, Object> latestData) {

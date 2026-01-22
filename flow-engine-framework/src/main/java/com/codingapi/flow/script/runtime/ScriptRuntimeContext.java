@@ -11,7 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -21,8 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 1. GroovyShell 不是线程安全的，不能在多线程间共享
  * 2. GroovyClassLoader 内部使用全局类缓存，相同脚本同时执行会导致类名冲突
  * 3. 解决方案：
- *    - 每次执行创建独立的 GroovyClassLoader 和 GroovyShell 实例
- *    - 使用脚本哈希值进行细粒度同步，避免相同脚本并发执行
+ * - 每次执行创建独立的 GroovyClassLoader 和 GroovyShell 实例
+ * - 使用脚本哈希值进行细粒度同步，避免相同脚本并发执行
  * <p>
  * 性能考虑：
  * - 同粒度同步只影响相同脚本的并发执行，不同脚本可以并发执行
@@ -55,7 +58,7 @@ public class ScriptRuntimeContext {
     /**
      * 最大锁缓存数量，超过此值将触发自动清理
      * -- GETTER --
-     *  获取当前配置的最大锁缓存数量
+     * 获取当前配置的最大锁缓存数量
      *
      */
     @Getter
@@ -74,7 +77,7 @@ public class ScriptRuntimeContext {
     /**
      * 是否启用自动清理（默认启用）
      * -- GETTER --
-     *  检查自动清理是否已启用
+     * 检查自动清理是否已启用
      *
      */
     @Getter
@@ -148,10 +151,10 @@ public class ScriptRuntimeContext {
     /**
      * 运行脚本
      *
-     * @param script      脚本内容
-     * @param returnType  返回类型
-     * @param args        脚本参数
-     * @param <T>         返回类型泛型
+     * @param script     脚本内容
+     * @param returnType 返回类型
+     * @param args       脚本参数
+     * @param <T>        返回类型泛型
      * @return 脚本执行结果
      */
     public <T> T run(String script, Class<T> returnType, Object... args) {
@@ -164,11 +167,11 @@ public class ScriptRuntimeContext {
      * 线程安全：使用脚本哈希值进行细粒度同步
      * 资源管理：执行完成后确保资源被释放
      *
-     * @param method      要调用的方法名
-     * @param script      脚本内容
-     * @param returnType  返回类型
-     * @param args        脚本参数
-     * @param <T>         返回类型泛型
+     * @param method     要调用的方法名
+     * @param script     脚本内容
+     * @param returnType 返回类型
+     * @param args       脚本参数
+     * @param <T>        返回类型泛型
      * @return 脚本执行结果
      * @throws com.codingapi.flow.exception.FlowExecutionException 脚本执行失败时抛出
      */

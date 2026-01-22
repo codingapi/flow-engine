@@ -2,8 +2,8 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
-import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.strategy.*;
 import com.codingapi.flow.utils.RandomUtils;
 
@@ -25,12 +25,12 @@ public class HandleNode extends BaseAuditNode {
     }
 
 
-    public HandleNode(String id, String name, String view, List<IFlowAction> actions,  List<INodeStrategy> nodeStrategies) {
+    public HandleNode(String id, String name, String view, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
         super(id, name, view, actions, nodeStrategies);
     }
 
     public HandleNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME,  DEFAULT_VIEW, defaultActions(), defaultStrategies());
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, defaultActions(), defaultStrategies());
     }
 
 
@@ -63,7 +63,7 @@ public class HandleNode extends BaseAuditNode {
         return new Builder();
     }
 
-    public static class Builder extends BaseNodeBuilder<Builder,HandleNode> {
+    public static class Builder extends BaseNodeBuilder<Builder, HandleNode> {
         public Builder() {
             super(new HandleNode());
         }

@@ -2,10 +2,10 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
+import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.event.FlowRecordFinishEvent;
 import com.codingapi.flow.node.BaseFlowNode;
-import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
@@ -30,7 +30,7 @@ public class EndNode extends BaseFlowNode {
 
     @Override
     public List<FlowRecord> generateCurrentRecords(FlowSession session) {
-        if(this.isWaitRecordMargeParallelNode(session)){
+        if (this.isWaitRecordMargeParallelNode(session)) {
             return List.of();
         }
         // 构建结束记录

@@ -6,7 +6,6 @@ import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.repository.ParallelBranchRepository;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 
@@ -18,12 +17,16 @@ public class RepositoryContext {
     private RepositoryContext() {
     }
 
-    @Setter
     private FlowRecordRepository flowRecordRepository;
-    @Setter
     private FlowOperatorGateway flowOperatorGateway;
-    @Setter
     private ParallelBranchRepository parallelBranchRepository;
+
+
+    public void register(FlowRecordRepository flowRecordRepository, FlowOperatorGateway flowOperatorGateway, ParallelBranchRepository parallelBranchRepository) {
+        this.flowRecordRepository = flowRecordRepository;
+        this.flowOperatorGateway = flowOperatorGateway;
+        this.parallelBranchRepository = parallelBranchRepository;
+    }
 
     public FlowRecord getRecordById(long id) {
         return flowRecordRepository.get(id);

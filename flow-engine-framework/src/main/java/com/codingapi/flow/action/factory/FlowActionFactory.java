@@ -1,6 +1,7 @@
 package com.codingapi.flow.action.factory;
 
-import com.codingapi.flow.action.*;
+import com.codingapi.flow.action.ActionType;
+import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.*;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -24,7 +25,6 @@ public class FlowActionFactory {
         actionClasses.put(ActionType.REJECT.name(), RejectAction.class);
         actionClasses.put(ActionType.ADD_AUDIT.name(), AddAuditAction.class);
         actionClasses.put(ActionType.PASS.name(), PassAction.class);
-        actionClasses.put(ActionType.DEFAULT.name(), DefaultAction.class);
         actionClasses.put(ActionType.TRANSFER.name(), TransferAction.class);
         actionClasses.put(ActionType.RETURN.name(), ReturnAction.class);
         actionClasses.put(ActionType.DELEGATE.name(), DelegateAction.class);

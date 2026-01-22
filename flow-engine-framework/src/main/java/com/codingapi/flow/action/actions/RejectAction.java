@@ -91,7 +91,7 @@ public class RejectAction extends BaseAction {
         recordList.add(flowRecord);
 
         List<FlowRecord> records = this.generateRecords(flowSession);
-        if(!records.isEmpty()) {
+        if (!records.isEmpty()) {
             recordList.addAll(records);
             for (FlowRecord record : records) {
                 if (record.isShow()) {

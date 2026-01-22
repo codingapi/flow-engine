@@ -43,7 +43,7 @@ public class TimeoutStrategy extends BaseStrategy {
 
     @Override
     public Map<String, Object> toMap() {
-        Map<String, Object> map =  super.toMap();
+        Map<String, Object> map = super.toMap();
         map.put("type", type);
         map.put("timeoutTime", String.valueOf(timeoutTime));
         return map;

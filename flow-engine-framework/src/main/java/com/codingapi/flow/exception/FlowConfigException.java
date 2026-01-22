@@ -74,7 +74,7 @@ public class FlowConfigException extends FlowException {
      */
     public static FlowConfigException nodeConfigError(String nodeName, String reason) {
         return new FlowConfigException("003",
-            String.format("node '%s' configuration error: %s", nodeName, reason));
+                String.format("node '%s' configuration error: %s", nodeName, reason));
     }
 
     /**
@@ -96,7 +96,7 @@ public class FlowConfigException extends FlowException {
      */
     public static FlowConfigException formConfigError(String formName, String reason) {
         return new FlowConfigException("005",
-            String.format("form '%s' configuration error: %s", formName, reason));
+                String.format("form '%s' configuration error: %s", formName, reason));
     }
 
     /**

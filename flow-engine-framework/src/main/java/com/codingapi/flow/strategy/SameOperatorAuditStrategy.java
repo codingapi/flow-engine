@@ -10,7 +10,7 @@ import java.util.Map;
  */
 @Data
 @NoArgsConstructor
-public class SameOperatorAuditStrategy extends BaseStrategy  {
+public class SameOperatorAuditStrategy extends BaseStrategy {
 
     private Type type;
 

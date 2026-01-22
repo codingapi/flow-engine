@@ -75,7 +75,7 @@ public class PassAction extends BaseAction {
         recordList.add(flowRecord);
 
         if (done) {
-            this.triggerNode(flowSession,(triggerSession)->{
+            this.triggerNode(flowSession, (triggerSession) -> {
                 List<FlowRecord> records = this.generateRecords(triggerSession);
                 if (!records.isEmpty()) {
                     for (FlowRecord record : records) {

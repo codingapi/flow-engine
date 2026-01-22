@@ -2,10 +2,10 @@ package com.codingapi.flow.node;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.CustomAction;
+import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.record.FlowRecord;
@@ -59,6 +59,7 @@ public abstract class BaseFlowNode implements IFlowNode {
 
     /**
      * 节点策略
+     *
      * @param strategies 节点策略
      */
     public void setStrategies(List<INodeStrategy> strategies) {
@@ -85,8 +86,8 @@ public abstract class BaseFlowNode implements IFlowNode {
                     IFlowAction currentAction = actionManager.getAction(action.getClass());
                     if (currentAction != null) {
                         currentAction.copy(action);
-                    }else {
-                        if(action instanceof CustomAction) {
+                    } else {
+                        if (action instanceof CustomAction) {
                             this.actions.add(action);
                         }
                     }
@@ -153,7 +154,7 @@ public abstract class BaseFlowNode implements IFlowNode {
         strategyManager.verify(form);
     }
 
-    private void verifyDefaultConfig(){
+    private void verifyDefaultConfig() {
         if (!StringUtils.hasText(name)) {
             throw FlowConfigException.nodeConfigError(name, "name can not be null");
         }

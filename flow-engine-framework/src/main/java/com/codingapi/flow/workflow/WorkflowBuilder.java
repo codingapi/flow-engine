@@ -3,8 +3,8 @@ package com.codingapi.flow.workflow;
 import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.script.node.OperatorMatchScript;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.script.node.OperatorMatchScript;
 
 import java.util.ArrayList;
 import java.util.List;

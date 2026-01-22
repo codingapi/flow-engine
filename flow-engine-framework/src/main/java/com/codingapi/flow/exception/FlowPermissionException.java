@@ -85,6 +85,6 @@ public class FlowPermissionException extends FlowException {
      */
     public static FlowPermissionException noPermission(long operatorId) {
         return new FlowPermissionException("004",
-            String.format("operator %d has no permission to access this resource", operatorId));
+                String.format("operator %d has no permission to access this resource", operatorId));
     }
 }

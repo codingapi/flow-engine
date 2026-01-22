@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  动作显示
+ * 动作显示
  */
 @Data
 public class ActionDisplay {

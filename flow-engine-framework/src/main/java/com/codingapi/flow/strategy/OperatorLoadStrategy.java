@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 import java.util.Map;
 
 /**
- *  操作人配置策略
+ * 操作人配置策略
  */
 @NoArgsConstructor
-public class OperatorLoadStrategy extends BaseStrategy{
+public class OperatorLoadStrategy extends BaseStrategy {
 
     /**
      * 审批人配置脚本

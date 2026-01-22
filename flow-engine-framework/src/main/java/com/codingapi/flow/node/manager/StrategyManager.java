@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  节点策略管理
+ * 节点策略管理
  */
 public class StrategyManager {
 
@@ -25,7 +25,7 @@ public class StrategyManager {
 
     public StrategyManager(List<INodeStrategy> strategies) {
         this.strategies = strategies;
-        if(this.strategies==null){
+        if (this.strategies == null) {
             throw FlowConfigException.strategiesNotNull();
         }
     }
@@ -58,9 +58,9 @@ public class StrategyManager {
 
 
     /**
-     *  审批意见是否必须填写
+     * 审批意见是否必须填写
      */
-    public boolean isEnableAdvice(){
+    public boolean isEnableAdvice() {
         List<INodeStrategy> strategies = this.strategies;
         for (INodeStrategy strategy : strategies) {
             if (strategy instanceof AdviceStrategy) {
