@@ -19,8 +19,11 @@ import lombok.AllArgsConstructor;
 
 import java.util.List;
 
+/**
+ * 延时触发服务
+ */
 @AllArgsConstructor
-public class FlowTriggerService {
+public class FlowDelayTriggerService {
 
     private final DelayTask delayTask;
     private final FlowOperatorGateway flowOperatorGateway;

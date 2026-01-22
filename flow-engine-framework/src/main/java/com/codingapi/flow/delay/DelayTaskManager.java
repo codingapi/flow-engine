@@ -2,7 +2,7 @@ package com.codingapi.flow.delay;
 
 import com.codingapi.flow.context.RepositoryContext;
 import com.codingapi.flow.exception.FlowConfigException;
-import com.codingapi.flow.service.impl.FlowTriggerService;
+import com.codingapi.flow.service.impl.FlowDelayTriggerService;
 import lombok.Getter;
 
 import java.util.*;
@@ -77,12 +77,12 @@ public class DelayTaskManager {
             this.timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    FlowTriggerService flowTriggerService = new FlowTriggerService(task,
+                    FlowDelayTriggerService flowDelayTriggerService = new FlowDelayTriggerService(task,
                             RepositoryContext.getInstance().getFlowOperatorGateway(),
                             RepositoryContext.getInstance().getFlowRecordRepository(),
                             RepositoryContext.getInstance().getWorkflowBackupRepository());
 
-                    flowTriggerService.trigger();
+                    flowDelayTriggerService.trigger();
 
                     RepositoryContext.getInstance().deleteDelayTask(task);
                 }
