@@ -1,17 +1,18 @@
 package com.codingapi.flow.strategy;
 
-import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.builder.NodeMapBuilder;
-import com.codingapi.flow.script.node.ErrorTriggerScript;
-import com.codingapi.flow.utils.RandomUtils;
+import com.codingapi.flow.form.permission.FormFieldPermission;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 表单字段权限策略配置
+ */
 @Data
-public class FormFieldPermissionStrategy extends BaseStrategy  {
+public class FormFieldPermissionStrategy extends BaseStrategy {
 
     /**
      * 表单字段权限
@@ -20,12 +21,10 @@ public class FormFieldPermissionStrategy extends BaseStrategy  {
 
 
     public FormFieldPermissionStrategy() {
-        super(RandomUtils.generateStringId());
         this.fieldPermissions = new ArrayList<>();
     }
 
     public FormFieldPermissionStrategy(List<FormFieldPermission> fieldPermissions) {
-        super(RandomUtils.generateStringId());
         this.fieldPermissions = fieldPermissions;
     }
 
@@ -48,10 +47,8 @@ public class FormFieldPermissionStrategy extends BaseStrategy  {
         return strategy;
     }
 
-    public static ErrorTriggerStrategy defaultStrategy() {
-        ErrorTriggerStrategy strategy = new ErrorTriggerStrategy();
-        strategy.setErrorTriggerScript(ErrorTriggerScript.SCRIPT_NODE_DEFAULT);
-        return strategy;
+    public static FormFieldPermissionStrategy defaultStrategy() {
+        return new FormFieldPermissionStrategy();
     }
 
 

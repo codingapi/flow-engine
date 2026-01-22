@@ -1,7 +1,7 @@
 package com.codingapi.flow.strategy;
 
-import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
@@ -9,6 +9,7 @@ import java.util.Map;
  * 节点审批意见策略
  */
 @Data
+@NoArgsConstructor
 public class AdviceStrategy extends BaseStrategy {
 
     /**
@@ -20,9 +21,6 @@ public class AdviceStrategy extends BaseStrategy {
      */
     private boolean signable;
 
-    public AdviceStrategy() {
-        super(RandomUtils.generateStringId());
-    }
 
     public static AdviceStrategy defaultStrategy() {
         AdviceStrategy strategy = new AdviceStrategy();

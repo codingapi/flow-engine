@@ -1,14 +1,15 @@
 package com.codingapi.flow.strategy;
 
-import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
 /**
- * 提交人与审批人一致
+ * 提交人与审批人一致配置
  */
 @Data
+@NoArgsConstructor
 public class SameOperatorAuditStrategy extends BaseStrategy  {
 
     private Type type;
@@ -20,9 +21,6 @@ public class SameOperatorAuditStrategy extends BaseStrategy  {
         MANUAL_PASS,
     }
 
-    public SameOperatorAuditStrategy() {
-        super(RandomUtils.generateStringId());
-    }
 
     @Override
     public void copy(INodeStrategy target) {

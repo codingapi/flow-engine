@@ -3,10 +3,14 @@ package com.codingapi.flow.strategy;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.utils.RandomUtils;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
+/**
+ *  操作人配置策略
+ */
+@NoArgsConstructor
 public class OperatorLoadStrategy extends BaseStrategy{
 
     /**
@@ -14,12 +18,7 @@ public class OperatorLoadStrategy extends BaseStrategy{
      */
     private OperatorLoadScript operatorLoadScript;
 
-    public OperatorLoadStrategy() {
-        super(RandomUtils.generateStringId());
-    }
-
     public OperatorLoadStrategy(String script) {
-        super(RandomUtils.generateStringId());
         this.operatorLoadScript = new OperatorLoadScript(script);
     }
 
