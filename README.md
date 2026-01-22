@@ -166,7 +166,6 @@ pnpm run dev:app-pc
 
 | 操作类型 | 说明 | ActionType |
 |---------|------|------------|
-| DefaultAction | 默认操作 | `DEFAULT` |
 | PassAction | 通过 | `PASS` |
 | RejectAction | 拒绝 | `REJECT` |
 | SaveAction | 保存 | `SAVE` |

@@ -114,7 +114,6 @@
 
 | 动作类 | ActionType | 说明 |
 |-------|------------|------|
-| DefaultAction | `DEFAULT` | 默认动作，无审批操作时配置 |
 | SaveAction | `SAVE` | 保存 |
 | PassAction | `PASS` | 通过，流程继续往下流转 |
 | RejectAction | `REJECT` | 拒绝，根据配置退回上级/指定节点或终止流程 |
