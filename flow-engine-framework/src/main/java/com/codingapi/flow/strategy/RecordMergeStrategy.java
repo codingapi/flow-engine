@@ -1,21 +1,18 @@
 package com.codingapi.flow.strategy;
 
-import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
 /**
- * 记录合并策略
+ * 记录合并策略配置
  */
 @Data
+@NoArgsConstructor
 public class RecordMergeStrategy extends BaseStrategy {
 
     private boolean mergeable;
-
-    public RecordMergeStrategy() {
-        super(RandomUtils.generateStringId());
-    }
 
     @Override
     public void copy(INodeStrategy target) {

@@ -3,18 +3,17 @@ package com.codingapi.flow.strategy;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.utils.RandomUtils;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
+/**
+ *  错误触发策略配置(没有匹配到人时)
+ */
+@NoArgsConstructor
 public class ErrorTriggerStrategy extends BaseStrategy {
 
     private ErrorTriggerScript errorTriggerScript;
-
-
-    public ErrorTriggerStrategy() {
-        super(RandomUtils.generateStringId());
-    }
 
     public void setErrorTriggerScript(String script) {
         this.errorTriggerScript = new ErrorTriggerScript(script);

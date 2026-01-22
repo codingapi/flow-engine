@@ -2,10 +2,14 @@ package com.codingapi.flow.strategy;
 
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.utils.RandomUtils;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
+/**
+ *  节点标题策略配置
+ */
+@NoArgsConstructor
 public class NodeTitleStrategy extends BaseStrategy {
 
     /**
@@ -13,9 +17,6 @@ public class NodeTitleStrategy extends BaseStrategy {
      */
     private NodeTitleScript nodeTitleScript;
 
-    public NodeTitleStrategy() {
-        super(RandomUtils.generateStringId());
-    }
 
     @Override
     public void copy(INodeStrategy target) {

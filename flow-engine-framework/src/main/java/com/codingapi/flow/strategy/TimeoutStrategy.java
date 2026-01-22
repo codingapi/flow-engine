@@ -1,14 +1,15 @@
 package com.codingapi.flow.strategy;
 
-import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
 /**
- * 超时策略
+ * 超时策略配置
  */
 @Data
+@NoArgsConstructor
 public class TimeoutStrategy extends BaseStrategy {
 
     // 默认超时时间,默认1天
@@ -24,10 +25,6 @@ public class TimeoutStrategy extends BaseStrategy {
         PASS,
         // 自动拒绝
         REJECT,
-    }
-
-    public TimeoutStrategy() {
-        super(RandomUtils.generateStringId());
     }
 
 

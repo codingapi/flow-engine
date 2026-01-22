@@ -2,13 +2,15 @@ package com.codingapi.flow.strategy;
 
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
 /**
- * 重新提交策略
+ * 重新提交策略配置
  */
 @Data
+@NoArgsConstructor
 public class ResubmitStrategy extends BaseStrategy {
 
     private Type type;
@@ -20,9 +22,6 @@ public class ResubmitStrategy extends BaseStrategy {
         CHAIN,
     }
 
-    public ResubmitStrategy() {
-        super(RandomUtils.generateStringId());
-    }
 
     @Override
     public void copy(INodeStrategy target) {
