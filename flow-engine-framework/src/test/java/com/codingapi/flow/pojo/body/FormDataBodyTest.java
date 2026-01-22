@@ -13,7 +13,7 @@ class FormDataBodyTest {
 
 
     @Test
-    void test() {
+    void jsonSchemaTest() {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("name", "张三");
         jsonObject.put("age", 18);

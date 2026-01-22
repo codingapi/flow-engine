@@ -1,11 +1,13 @@
 package com.codingapi.flow.context;
 
 import com.codingapi.flow.delay.DelayTask;
+import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.service.FlowService;
+import com.codingapi.flow.service.impl.FlowDelayTriggerService;
 import lombok.Getter;
 
 import java.util.List;
@@ -43,6 +45,13 @@ public class RepositoryHolderContext {
                 && workflowRepository != null;
     }
 
+
+    public void verify(){
+        if(!isRegistered()){
+            throw new FlowConfigException(FlowConfigException.ERROR_CODE_PREFIX + "DELAY_TASK_NOT_REGISTER");
+        }
+    }
+
     public void register(WorkflowRepository workflowRepository,
                          WorkflowBackupRepository workflowBackupRepository,
                          FlowRecordRepository flowRecordRepository,
@@ -58,7 +67,26 @@ public class RepositoryHolderContext {
     }
 
 
+    /**
+     * 构建延迟触发执行服务
+     * @param task 延迟任务
+     * @return 延迟触发执行服务
+     */
+    public FlowDelayTriggerService createDelayTriggerService(DelayTask task) {
+        this.verify();
+        return new FlowDelayTriggerService(task,
+                flowOperatorGateway,
+                flowRecordRepository,
+                workflowBackupRepository);
+    }
+
+
+    /**
+     * 构建流程服务
+     * @return 流程服务
+     */
     public FlowService createFlowService() {
+        this.verify();
         return new FlowService(workflowRepository,
                 flowOperatorGateway,
                 flowRecordRepository,

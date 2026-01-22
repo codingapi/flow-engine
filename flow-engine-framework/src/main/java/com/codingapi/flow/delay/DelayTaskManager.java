@@ -27,9 +27,7 @@ public class DelayTaskManager {
      * 加载任务并执行
      */
     public void start() {
-        if (!RepositoryHolderContext.getInstance().isRegistered()) {
-            throw new FlowConfigException(FlowConfigException.ERROR_CODE_PREFIX + "DELAY_TASK_NOT_REGISTER");
-        }
+        RepositoryHolderContext.getInstance().verify();
         List<DelayTask> delayTasks = RepositoryHolderContext.getInstance().findDelayTasks();
         if (delayTasks != null && !delayTasks.isEmpty()) {
             for (DelayTask delayTask : delayTasks) {
@@ -77,10 +75,8 @@ public class DelayTaskManager {
             this.timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    FlowDelayTriggerService flowDelayTriggerService = new FlowDelayTriggerService(task,
-                            RepositoryHolderContext.getInstance().getFlowOperatorGateway(),
-                            RepositoryHolderContext.getInstance().getFlowRecordRepository(),
-                            RepositoryHolderContext.getInstance().getWorkflowBackupRepository());
+
+                    FlowDelayTriggerService flowDelayTriggerService = RepositoryHolderContext.getInstance().createDelayTriggerService(task);
 
                     flowDelayTriggerService.trigger();
 

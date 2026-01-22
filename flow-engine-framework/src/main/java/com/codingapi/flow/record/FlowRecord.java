@@ -13,6 +13,9 @@ import org.springframework.util.StringUtils;
 
 import java.util.Map;
 
+/**
+ *  流程流转记录数据模型
+ */
 @Getter
 @Setter
 public class FlowRecord {
@@ -202,6 +205,10 @@ public class FlowRecord {
     }
 
 
+    /**
+     * 继承记录
+     * @param record 传递的记录
+     */
     public void extendsRecord(FlowRecord record) {
         if (record != null) {
             this.parallelBranchNodeId = record.parallelBranchNodeId;
@@ -259,9 +266,6 @@ public class FlowRecord {
         if (createOperatorId <= 0) {
             throw FlowValidationException.required("createOperator");
         }
-        if (actionId == null) {
-            throw FlowValidationException.required("actionId");
-        }
     }
 
     /**
@@ -295,12 +299,14 @@ public class FlowRecord {
      * 更新记录
      *
      * @param formData 表单数据
+     * @param actionId 动作id
      * @param advice   审批意见
      * @param signKey  签名key
      * @param done     是否完成
      */
-    public void update(Map<String, Object> formData, String advice, String signKey, boolean done) {
+    public void update(Map<String, Object> formData,String actionId, String advice, String signKey, boolean done) {
         this.formData = formData;
+        this.actionId = actionId;
         this.advice = advice;
         this.signKey = signKey;
         this.readable = true;

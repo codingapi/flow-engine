@@ -5,6 +5,9 @@ import com.codingapi.flow.strategy.DelayStrategy;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 
+/**
+ * 延迟任务
+ */
 @Getter
 public class DelayTask {
 
