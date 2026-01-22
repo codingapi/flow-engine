@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- *  子流程任务脚本
+ * 子流程任务脚本
  */
 @AllArgsConstructor
 public class SubProcessScript {

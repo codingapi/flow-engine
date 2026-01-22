@@ -102,7 +102,6 @@ public class FlowSession {
     }
 
 
-
     public FlowCreateRequest toCreateRequest() {
         FlowCreateRequest request = new FlowCreateRequest();
         IFlowNode startNode = workflow.getStartNode();

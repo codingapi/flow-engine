@@ -33,9 +33,9 @@ public class DelayNode extends BaseFlowNode {
     public boolean handle(FlowSession session) {
         StrategyManager strategyManager = this.strategyManager();
         DelayStrategy delayStrategy = strategyManager.getStrategy(DelayStrategy.class);
-        if(delayStrategy!=null){
+        if (delayStrategy != null) {
             FlowRecord currentRecord = session.getCurrentRecord();
-            DelayTask delayTask = new DelayTask(delayStrategy, currentRecord,this.getId());
+            DelayTask delayTask = new DelayTask(delayStrategy, currentRecord, this.getId());
             RepositoryHolderContext.getInstance().saveDelayTask(delayTask);
 
             DelayTaskManager.getInstance().addTask(delayTask);

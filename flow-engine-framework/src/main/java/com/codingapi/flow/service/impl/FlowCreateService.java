@@ -5,7 +5,6 @@ import com.codingapi.flow.backup.WorkflowBackup;
 import com.codingapi.flow.event.FlowRecordStartEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
-import com.codingapi.flow.exception.FlowException;
 import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowPermissionException;
@@ -65,7 +64,7 @@ public class FlowCreateService {
 
         List<FlowRecord> flowRecords = currentNode.generateCurrentRecords(session);
 
-        if(flowRecords.size()>1){
+        if (flowRecords.size() > 1) {
             throw new FlowExecutionException("create record error,record size must be 1.");
         }
 

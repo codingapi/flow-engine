@@ -172,7 +172,7 @@ public class StrategyManager {
     public <T extends INodeStrategy> T getStrategy(Class<T> clazz) {
         for (INodeStrategy strategy : strategies) {
             if (strategy.getClass() == clazz) {
-                return (T)strategy;
+                return (T) strategy;
             }
         }
         return null;

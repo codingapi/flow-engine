@@ -8,9 +8,9 @@ import lombok.Getter;
 import java.util.*;
 
 /**
- *  延迟任务上下文管理对象
- *
- *  在分布式模式若都在启动延迟任务时，会导致延迟任务重复执行
+ * 延迟任务上下文管理对象
+ * <p>
+ * 在分布式模式若都在启动延迟任务时，会导致延迟任务重复执行
  */
 public class DelayTaskManager {
 
@@ -26,13 +26,13 @@ public class DelayTaskManager {
     /**
      * 加载任务并执行
      */
-    public void start(){
-        if(!RepositoryHolderContext.getInstance().isRegistered()){
-            throw new FlowConfigException(FlowConfigException.ERROR_CODE_PREFIX+"DELAY_TASK_NOT_REGISTER");
+    public void start() {
+        if (!RepositoryHolderContext.getInstance().isRegistered()) {
+            throw new FlowConfigException(FlowConfigException.ERROR_CODE_PREFIX + "DELAY_TASK_NOT_REGISTER");
         }
-        List<DelayTask> delayTasks =  RepositoryHolderContext.getInstance().findDelayTasks();
-        if(delayTasks!=null && !delayTasks.isEmpty()){
-            for(DelayTask delayTask:delayTasks){
+        List<DelayTask> delayTasks = RepositoryHolderContext.getInstance().findDelayTasks();
+        if (delayTasks != null && !delayTasks.isEmpty()) {
+            for (DelayTask delayTask : delayTasks) {
                 this.addTask(delayTask);
             }
         }
@@ -43,7 +43,7 @@ public class DelayTaskManager {
      * 关闭全部任务
      */
     public void close() {
-        for(DelayJob delayJob : delayJobs){
+        for (DelayJob delayJob : delayJobs) {
             delayJob.close();
         }
         this.delayJobs.clear();

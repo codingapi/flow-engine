@@ -15,7 +15,7 @@ public class DelayTask {
     private final String workCode;
     private final String delayNodeId;
 
-    public DelayTask(DelayStrategy delayStrategy, FlowRecord flowRecord,String delayNodeId) {
+    public DelayTask(DelayStrategy delayStrategy, FlowRecord flowRecord, String delayNodeId) {
         this.id = RandomUtils.generateStringId();
         this.delayNodeId = delayNodeId;
         this.createTime = System.currentTimeMillis();

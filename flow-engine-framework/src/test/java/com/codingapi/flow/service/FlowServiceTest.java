@@ -39,7 +39,7 @@ class FlowServiceTest {
     private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
     private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
     private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
-    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository, parallelBranchRepository,delayTaskRepository);
+    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository, parallelBranchRepository, delayTaskRepository);
 
     @Test
     void create() {
@@ -279,7 +279,7 @@ class FlowServiceTest {
 
         workflowRepository.save(workflow);
 
-        Map<String,Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
+        Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
         List<IFlowAction> startActions = startNode.actionManager().getActions();
 
@@ -380,7 +380,7 @@ class FlowServiceTest {
 
         workflowRepository.save(workflow);
 
-        Map<String,Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
+        Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
         List<IFlowAction> startActions = startNode.actionManager().getActions();
 
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
@@ -1173,7 +1173,6 @@ class FlowServiceTest {
     }
 
 
-
     /**
      * 全部通过测试
      */
@@ -1268,7 +1267,8 @@ class FlowServiceTest {
         try {
             // 默认等待时间为5秒
             Thread.sleep(8000);
-        }catch (Exception ignore){}
+        } catch (Exception ignore) {
+        }
 
         bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, bossRecordList.size());
@@ -1286,7 +1286,6 @@ class FlowServiceTest {
         assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
-
 
 
     /**
@@ -1323,7 +1322,6 @@ class FlowServiceTest {
                         .addAction(new CustomAction())
                         .build())
                 .build();
-
 
 
         ApprovalNode bossNode = ApprovalNode.builder()
@@ -1396,7 +1394,6 @@ class FlowServiceTest {
         assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
-
 
 
     /**
@@ -1505,7 +1502,6 @@ class FlowServiceTest {
         assertEquals(1, bossRecordList.size());
 
     }
-
 
 
 }

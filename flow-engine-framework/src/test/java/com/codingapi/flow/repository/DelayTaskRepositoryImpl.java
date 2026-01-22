@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DelayTaskRepositoryImpl implements DelayTaskRepository{
+public class DelayTaskRepositoryImpl implements DelayTaskRepository {
 
-    private final Map<String,DelayTask> cache = new HashMap<>();
+    private final Map<String, DelayTask> cache = new HashMap<>();
 
     @Override
     public void save(DelayTask task) {
