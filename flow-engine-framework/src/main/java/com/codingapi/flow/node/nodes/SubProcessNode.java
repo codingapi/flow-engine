@@ -2,9 +2,14 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.strategy.INodeStrategy;
+import com.codingapi.flow.strategy.SubProcessStrategy;
 import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,11 +26,26 @@ public class SubProcessNode extends BaseFlowNode {
     }
 
     public SubProcessNode(String id, String name) {
-        super(id, name, new ArrayList<>());
+        super(id, name, 0, new ArrayList<>(), defaultStrategies());
     }
 
     public SubProcessNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME);
+    }
+
+    private static List<INodeStrategy> defaultStrategies() {
+        List<INodeStrategy> strategies = new ArrayList<>();
+        strategies.add(SubProcessStrategy.defaultStrategy());
+        return strategies;
+    }
+
+
+    @Override
+    public boolean handle(FlowSession session) {
+        StrategyManager strategyManager = this.strategyManager();
+        SubProcessStrategy processStrategy = strategyManager.getStrategy(SubProcessStrategy.class);
+        processStrategy.execute(session);
+        return true;
     }
 
     public static SubProcessNode formMap(Map<String, Object> map) {
