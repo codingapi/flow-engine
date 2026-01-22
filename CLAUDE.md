@@ -49,7 +49,7 @@ pnpm run dev:app-pc
 
 - **flow-engine-framework** - Core framework with workflow engine, node types, form system, script execution
 - **flow-engine-starter** - Spring Boot starter for web applications
-- **flow-engine-starter-infra** - Infrastructure persistence layer
+- **flow-engine-starter-infra** - Infrastructure persistence layer (implements repository interfaces)
 - **flow-engine-example** - Example application
 
 ### Frontend Structure
@@ -72,12 +72,12 @@ The workflow engine is organized into 8 layers:
    - `IFlowNode` - Interface defining node lifecycle methods
    - `BaseFlowNode` - Abstract base for all nodes, manages actions and strategies
    - `BaseAuditNode` - Abstract base for audit nodes (ApprovalNode, HandleNode)
-   - 12 node types: StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, BranchNodeBranchNode, ParallelBranchNode, RouterBranchNode, InclusiveBranchNode, SubProcessNode, DelayNode, TriggerNode
+   - 12 node types: StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, BranchNodeBranchNode, ParallelBranchNode, RouterNode, InclusiveBranchNode, SubProcessNode, DelayNode, TriggerNode
 
 3. **Action Layer** (`com.codingapi.flow.action`, `com.codingapi.flow.action.actions`)
    - `IFlowAction` - Interface for node actions with `copy()` method
    - `BaseAction` - Abstract base with `triggerNode()` for recursive traversal
-   - 9 action types: DefaultAction, PassAction, RejectAction, SaveAction, ReturnAction, TransferAction, AddAuditAction, DelegateAction, CustomAction
+   - 10 action types: DefaultAction, PassAction, RejectAction, SaveAction, ReturnAction, TransferAction, AddAuditAction, DelegateAction, CustomAction
 
 4. **Record Layer** (`com.codingapi.flow.record`)
    - `FlowRecord` - Execution record with states (TODO/DONE, RUNNING/FINISH/ERROR/DELETE)
@@ -91,21 +91,27 @@ The workflow engine is organized into 8 layers:
    - `ActionManager` - Manages node actions, provides `getAction(Class)`, `verifySession()`
    - `OperatorManager` - Manages node operators
    - `StrategyManager` - Manages node strategies, provides `loadOperators()`, `generateTitle()`, `verifySession()`
+   - `FieldPermissionManager` - Manages field-level permissions
 
 7. **Strategy Layer** (`com.codingapi.flow.strategy`)
    - `INodeStrategy` - Interface with `copy()`, `getId()`, `strategyType()`
-   - 10 strategy types: MultiOperatorAuditStrategy, TimeoutStrategy, SameOperatorAuditStrategy, RecordMergeStrategy, ResubmitStrategy, AdviceStrategy, OperatorLoadStrategy, ErrorTriggerStrategy, NodeTitleStrategy, FormFieldPermissionStrategy
+   - 13 strategy types: MultiOperatorAuditStrategy, TimeoutStrategy, SameOperatorAuditStrategy, RecordMergeStrategy, ResubmitStrategy, AdviceStrategy, OperatorLoadStrategy, ErrorTriggerStrategy, NodeTitleStrategy, FormFieldPermissionStrategy, DelayStrategy, TriggerStrategy, SubProcessStrategy
 
 8. **Script Layer** (`com.codingapi.flow.script.runtime`)
    - `ScriptRuntimeContext` - Groovy script execution with thread-safe design and auto-cleanup
-   - Script types: OperatorMatchScript, OperatorLoadScript, NodeTitleScript, ConditionScript, ErrorTriggerScript, RejectActionScript
+   - Script types: OperatorMatchScript, OperatorLoadScript, NodeTitleScript, ConditionScript, ErrorTriggerScript, RejectActionScript, RouterNodeScript, SubProcessScript, TriggerScript
 
 ### Supporting Architectures
 
-- **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation
-- **Gateway Pattern** (`com.codingapi.flow.gateway`) - Anti-corruption layer for external system integration (operators, users)
-- **Backup System** (`com.codingapi.flow.backup`) - Workflow versioning and backup management
-- **Error Handling** (`com.codingapi.flow.error`) - Centralized error throwing mechanism for flow control
+- **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation. Implementations are in `flow-engine-starter-infra`. Access via `RepositoryContext` singleton.
+- **Gateway Pattern** (`com.codingapi.flow.gateway`) - Anti-corruption layer for external system integration (operators, users). Access via `GatewayContext` singleton.
+- **Builder Pattern** (`com.codingapi.flow.builder`) - 5 builders: ActionBuilder, BaseNodeBuilder, FormFieldPermissionsBuilder, NodeMapBuilder, NodeStrategyBuilder
+- **Context Layer** (`com.codingapi.flow.context`) - GatewayContext, RepositoryHolderContext
+- **Delay Task System** (`com.codingapi.flow.delay`) - DelayTask, DelayTaskManager for deferred execution
+- **Edge System** (`com.codingapi.flow.edge`) - FlowEdge for node connections
+- **Error Handling** (`com.codingapi.flow.error`) - ErrorThrow for centralized error throwing
+- **Event System** (`com.codingapi.flow.event`) - 5 event types: FlowRecordStartEvent, FlowRecordTodoEvent, FlowRecordDoneEvent, FlowRecordFinishEvent, IFlowEvent
+- **Backup System** (`com.codingapi.flow.backup`) - WorkflowBackup for workflow versioning
 
 ### Node Lifecycle (Critical for Understanding Flow)
 

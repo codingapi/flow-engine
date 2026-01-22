@@ -83,7 +83,7 @@
 | 办理节点 | HandleNode | `handle` | 需要办理的任务节点 |
 | 条件分支 | BranchNodeBranchNode | `condition_branch` | 按条件路由 |
 | 并行分支 | ParallelBranchNode | `parallel_branch` | 并行执行多个分支 |
-| 路由分支 | RouterBranchNode | `router_branch` | 普通路由节点 |
+| 路由分支 | RouterNode | `router` | 普通路由节点 |
 | 包容分支 | InclusiveBranchNode | `inclusive_branch` | 包容性分支 |
 | 通知节点 | NotifyNode | `notify` | 发送通知 |
 | 延迟节点 | DelayNode | `delay` | 延迟执行 |
@@ -114,6 +114,7 @@
 
 | 动作类 | ActionType | 说明 |
 |-------|------------|------|
+| DefaultAction | `DEFAULT` | 默认动作，用于没有审批操作时配置 |
 | SaveAction | `SAVE` | 保存 |
 | PassAction | `PASS` | 通过，流程继续往下流转 |
 | RejectAction | `REJECT` | 拒绝，根据配置退回上级/指定节点或终止流程 |
@@ -245,6 +246,9 @@
 | ErrorTriggerStrategy | 异常触发策略 |
 | NodeTitleStrategy | 节点标题策略 |
 | FormFieldPermissionStrategy | 表单字段权限策略 |
+| DelayStrategy | 延迟策略 |
+| TriggerStrategy | 触发策略 |
+| SubProcessStrategy | 子流程策略 |
 
 ---
 

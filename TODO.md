@@ -6,7 +6,7 @@
 
 | 功能 | 状态 | 说明 |
 |-----|------|------|
-| 12 种节点类型 | ✅ | StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, BranchNodeBranchNode, ParallelBranchNode, RouterBranchNode, InclusiveBranchNode, SubProcessNode, DelayNode, TriggerNode |
+| 12 种节点类型 | ✅ | StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, BranchNodeBranchNode, ParallelBranchNode, RouterNode, InclusiveBranchNode, SubProcessNode, DelayNode, TriggerNode |
 | 节点生命周期管理 | ✅ | verifySession → continueTrigger → generateCurrentRecords → fillNewRecord → isDone |
 | 节点配置面板 | ✅ | 基础信息、审批人配置、策略配置 |
 
@@ -41,8 +41,6 @@
 | 退回 (RETURN) | ✅ | ReturnAction |
 | 转办 (TRANSFER) | ✅ | TransferAction |
 | 自定义 (CUSTOM) | ✅ | CustomAction，支持脚本配置 |
-| 默认操作 (DEFAULT) | ✅ | DefaultAction |
-
 ### 流程全局配置
 
 | 功能 | 状态 | 说明 |
@@ -79,6 +77,9 @@
 | ErrorTriggerStrategy | ✅ | 异常触发策略 |
 | NodeTitleStrategy | ✅ | 节点标题策略 |
 | FormFieldPermissionStrategy | ✅ | 表单字段权限策略 |
+| DelayStrategy | ✅ | 延迟策略 |
+| TriggerStrategy | ✅ | 触发策略 |
+| SubProcessStrategy | ✅ | 子流程策略 |
 
 ### 脚本系统
 
