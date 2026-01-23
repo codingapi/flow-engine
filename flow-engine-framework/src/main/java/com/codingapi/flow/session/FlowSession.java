@@ -3,7 +3,6 @@ package com.codingapi.flow.session;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
@@ -198,6 +197,7 @@ public class FlowSession {
 
     /**
      * 更新会话
+     *
      * @param currentAction 当前动作
      * @return 新的会话
      */

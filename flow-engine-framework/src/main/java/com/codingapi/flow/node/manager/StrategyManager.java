@@ -59,7 +59,7 @@ public class StrategyManager {
     /**
      * 是否按顺序执行的审批策略
      */
-    public boolean isSequenceMultiOperatorType(){
+    public boolean isSequenceMultiOperatorType() {
         List<INodeStrategy> strategies = this.strategies;
         for (INodeStrategy strategy : strategies) {
             if (strategy instanceof MultiOperatorAuditStrategy multiOperatorAuditStrategy) {

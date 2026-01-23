@@ -90,7 +90,7 @@ public abstract class BaseFlowNode implements IFlowNode {
                         currentAction.copy(action);
                     } else {
                         if (action instanceof CustomAction) {
-                            if(this.hasCustomAction()){
+                            if (this.hasCustomAction()) {
                                 this.actions.add(action);
                             }
                         }
@@ -106,7 +106,7 @@ public abstract class BaseFlowNode implements IFlowNode {
     /**
      * 是否可以包含自定义操作的节点，仅允许开始节点、审批节点、处理节点包含自定义操作
      */
-    private boolean hasCustomAction(){
+    private boolean hasCustomAction() {
         return this.getType().equals(StartNode.NODE_TYPE) || this.getType().equals(ApprovalNode.NODE_TYPE) || this.getType().equals(HandleNode.NODE_TYPE);
     }
 

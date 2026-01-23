@@ -77,10 +77,10 @@ public class PassAction extends BaseAction {
 
         // 激活下一个按顺序审批的记录数据
         StrategyManager strategyManager = currentNode.strategyManager();
-        if(strategyManager.isSequenceMultiOperatorType()){
+        if (strategyManager.isSequenceMultiOperatorType()) {
             List<FlowRecord> currentRecords = flowSession.getCurrentNodeRecords();
-            for(FlowRecord record:currentRecords){
-                if(record.getNodeOrder() == currentRecord.getNodeOrder()+1){
+            for (FlowRecord record : currentRecords) {
+                if (record.getNodeOrder() == currentRecord.getNodeOrder() + 1) {
                     record.show();
                     recordList.add(record);
                     flowEvents.add(new FlowRecordTodoEvent(record));
@@ -90,7 +90,7 @@ public class PassAction extends BaseAction {
 
         if (done) {
             // 是否委托记录
-            if(currentRecord.isDelegate()){
+            if (currentRecord.isDelegate()) {
                 FlowRecord delegateRecord = RepositoryHolderContext.getInstance().getRecordById(currentRecord.getDelegateId());
                 IFlowOperator delegateOperator = RepositoryHolderContext.getInstance().getOperatorById(delegateRecord.getCurrentOperatorId());
                 FlowRecord rebackRecord = delegateRecord.copy(flowSession.updateSession(delegateOperator));
@@ -98,7 +98,7 @@ public class PassAction extends BaseAction {
 
                 recordList.add(rebackRecord);
                 flowEvents.add(new FlowRecordTodoEvent(rebackRecord));
-            }else {
+            } else {
                 this.triggerNode(flowSession, (triggerSession) -> {
                     List<FlowRecord> records = this.generateRecords(triggerSession);
                     if (!records.isEmpty()) {

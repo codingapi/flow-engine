@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- *  自定义脚本
+ * 自定义脚本
  */
 @AllArgsConstructor
 public class CustomScript {

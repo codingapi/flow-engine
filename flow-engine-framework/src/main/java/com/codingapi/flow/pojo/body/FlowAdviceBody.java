@@ -58,8 +58,8 @@ public class FlowAdviceBody {
     }
 
 
-    public FlowAdviceBody(String actionId,long operatorId){
-        this(actionId,null,operatorId);
+    public FlowAdviceBody(String actionId, long operatorId) {
+        this(actionId, null, operatorId);
     }
 
     public void verify() {

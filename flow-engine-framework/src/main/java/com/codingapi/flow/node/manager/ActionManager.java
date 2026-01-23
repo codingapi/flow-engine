@@ -27,7 +27,6 @@ public class ActionManager {
     private final List<IFlowAction> actions;
 
 
-
     /**
      * 获取节点动作
      *
@@ -95,12 +94,12 @@ public class ActionManager {
             }
             Workflow workflow = session.getWorkflow();
             // 退回节点不能是当前节点的后续节点
-            if(workflow.isNextNode(currentNode,backNode)){
+            if (workflow.isNextNode(currentNode, backNode)) {
                 throw FlowValidationException.required("backNode");
             }
-            if(!(backNode.getType().equals(StartNode.NODE_TYPE)
+            if (!(backNode.getType().equals(StartNode.NODE_TYPE)
                     || backNode.getType().equals(ApprovalNode.NODE_TYPE)
-                    || backNode.getType().equals(HandleNode.NODE_TYPE))){
+                    || backNode.getType().equals(HandleNode.NODE_TYPE))) {
                 throw FlowValidationException.required("backNode");
             }
         }

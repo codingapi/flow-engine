@@ -37,12 +37,11 @@ public class BackNodeHelper {
     }
 
 
-
-    private void fetchBackNodes(IFlowNode targetNode){
+    private void fetchBackNodes(IFlowNode targetNode) {
         List<IFlowNode> nextNodes = workflow.nextNodes(targetNode);
-        if(!nextNodes.contains(currentNode)){
-            for (IFlowNode nextNode : nextNodes){
-                if(this.backNodeTypes.contains(nextNode.getType())){
+        if (!nextNodes.contains(currentNode)) {
+            for (IFlowNode nextNode : nextNodes) {
+                if (this.backNodeTypes.contains(nextNode.getType())) {
                     this.backNodes.add(nextNode);
                 }
                 this.fetchBackNodes(nextNode);

@@ -1,6 +1,5 @@
 package com.codingapi.flow.record;
 
-import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.node.IFlowNode;
@@ -16,7 +15,7 @@ import org.springframework.util.StringUtils;
 import java.util.Map;
 
 /**
- *  流程流转记录数据模型
+ * 流程流转记录数据模型
  */
 @Getter
 @Setter
@@ -222,6 +221,7 @@ public class FlowRecord {
 
     /**
      * 继承记录
+     *
      * @param record 传递的记录
      */
     public void extendsRecord(FlowRecord record) {
@@ -315,7 +315,7 @@ public class FlowRecord {
      * 更新记录
      *
      * @param flowSession 流程会话
-     * @param done     是否完成
+     * @param done        是否完成
      */
     public void update(FlowSession flowSession, boolean done) {
         IFlowAction flowAction = flowSession.getCurrentAction();
@@ -328,7 +328,7 @@ public class FlowRecord {
         this.updateTime = System.currentTimeMillis();
         this.recordState = done ? SATE_RECORD_DONE : SATE_RECORD_TODO;
 
-        if(flowAdvice!=null) {
+        if (flowAdvice != null) {
             this.advice = flowAdvice.getAdvice();
             this.signKey = flowAdvice.getSignKey();
         }

@@ -62,7 +62,7 @@ public class StartNode extends BaseFlowNode {
         FlowRecord currentRecord = session.getCurrentRecord();
         IFlowOperator operator = session.getCurrentOperator();
         if (currentRecord == null) {
-            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator),  0);
+            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator), 0);
             records.add(flowRecord);
         } else {
             // 获取流程创建者

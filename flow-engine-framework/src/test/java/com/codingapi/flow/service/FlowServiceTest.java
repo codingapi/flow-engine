@@ -1592,7 +1592,7 @@ class FlowServiceTest {
         userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
         assertEquals(1, userRecordList.size());
 
-        Map<String,Object> currentFormData = userRecordList.get(0).getFormData();
+        Map<String, Object> currentFormData = userRecordList.get(0).getFormData();
         assertEquals("test", currentFormData.get("reason"));
 
         userRequest = new FlowActionRequest();
@@ -1618,8 +1618,6 @@ class FlowServiceTest {
         assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
-
-
 
 
     /**
@@ -1749,7 +1747,6 @@ class FlowServiceTest {
     }
 
 
-
     /**
      * 转办测试
      */
@@ -1866,7 +1863,6 @@ class FlowServiceTest {
         assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
-
 
 
     /**
@@ -1990,7 +1986,6 @@ class FlowServiceTest {
         assertEquals(5, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
-
 
 
     /**

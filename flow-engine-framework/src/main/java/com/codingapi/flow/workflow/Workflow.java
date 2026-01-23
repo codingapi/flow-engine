@@ -336,20 +336,21 @@ public class Workflow {
 
     /**
      * 判断是否是后续的节点
+     *
      * @param currentNode 当前节点
-     * @param nextNode 退回节点
+     * @param nextNode    退回节点
      * @return 是否是后续的节点
      */
     public boolean isNextNode(IFlowNode currentNode, IFlowNode nextNode) {
         List<IFlowNode> nextNodes = nextNodes(currentNode);
-        for (IFlowNode node : nextNodes){
-           if(node.equals(nextNode)){
-               return true;
-           }else {
-               if(this.isNextNode(node,nextNode)){
-                   return true;
-               }
-           }
+        for (IFlowNode node : nextNodes) {
+            if (node.equals(nextNode)) {
+                return true;
+            } else {
+                if (this.isNextNode(node, nextNode)) {
+                    return true;
+                }
+            }
         }
         return false;
     }

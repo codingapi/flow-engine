@@ -1,7 +1,7 @@
 package com.codingapi.flow.node;
 
 /**
- *  节点类型
+ * 节点类型
  */
 public enum NodeType {
     // 审批

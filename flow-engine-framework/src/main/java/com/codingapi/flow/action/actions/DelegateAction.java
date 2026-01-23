@@ -33,7 +33,7 @@ public class DelegateAction extends BaseAction {
     private OperatorLoadScript script;
 
     public void setScript(String script) {
-        if(StringUtils.hasText(script)) {
+        if (StringUtils.hasText(script)) {
             this.script = new OperatorLoadScript(script);
         }
     }
@@ -106,7 +106,7 @@ public class DelegateAction extends BaseAction {
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> data = super.toMap();
-        if(script!=null) {
+        if (script != null) {
             data.put("script", script.getScript());
         }
         return data;

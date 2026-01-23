@@ -48,8 +48,8 @@ public class RepositoryHolderContext {
     }
 
 
-    public void verify(){
-        if(!isRegistered()){
+    public void verify() {
+        if (!isRegistered()) {
             throw new FlowConfigException(FlowConfigException.ERROR_CODE_PREFIX + "DELAY_TASK_NOT_REGISTER");
         }
     }
@@ -71,6 +71,7 @@ public class RepositoryHolderContext {
 
     /**
      * 构建延迟触发执行服务
+     *
      * @param task 延迟任务
      * @return 延迟触发执行服务
      */
@@ -85,6 +86,7 @@ public class RepositoryHolderContext {
 
     /**
      * 构建流程动作服务
+     *
      * @param flowSession 流程会话
      * @return 流程动作服务
      */
@@ -99,6 +101,7 @@ public class RepositoryHolderContext {
 
     /**
      * 构建流程服务
+     *
      * @return 流程服务
      */
     public FlowService createFlowService() {
@@ -140,7 +143,7 @@ public class RepositoryHolderContext {
         flowRecordRepository.saveAll(flowRecords);
     }
 
-    public void saveRecord(FlowRecord flowRecord){
+    public void saveRecord(FlowRecord flowRecord) {
         flowRecordRepository.save(flowRecord);
     }
 

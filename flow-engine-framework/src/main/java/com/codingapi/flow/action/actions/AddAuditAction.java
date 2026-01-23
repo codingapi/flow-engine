@@ -34,7 +34,7 @@ public class AddAuditAction extends BaseAction {
     private OperatorLoadScript script;
 
     public void setScript(String script) {
-        if(StringUtils.hasText(script)) {
+        if (StringUtils.hasText(script)) {
             this.script = new OperatorLoadScript(script);
         }
     }
@@ -92,11 +92,11 @@ public class AddAuditAction extends BaseAction {
         // 构建加签的记录
         for (IFlowOperator operator : auditOperators) {
             List<FlowRecord> records = currentNode.generateCurrentRecords(flowSession.updateSession(operator));
-            for(FlowRecord record:records){
-                StrategyManager strategyManager =  currentNode.strategyManager();
-                if(strategyManager.isSequenceMultiOperatorType()){
+            for (FlowRecord record : records) {
+                StrategyManager strategyManager = currentNode.strategyManager();
+                if (strategyManager.isSequenceMultiOperatorType()) {
                     record.resetAddAudit(fromId, ++maxNodeOrder, operator.getUserId(), true);
-                }else {
+                } else {
                     record.resetAddAudit(fromId, ++maxNodeOrder, operator.getUserId(), false);
                 }
             }
@@ -123,7 +123,7 @@ public class AddAuditAction extends BaseAction {
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> data = super.toMap();
-        if(script!=null) {
+        if (script != null) {
             data.put("script", script.getScript());
         }
         return data;

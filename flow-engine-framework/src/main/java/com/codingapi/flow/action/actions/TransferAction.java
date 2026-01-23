@@ -42,7 +42,7 @@ public class TransferAction extends BaseAction {
     }
 
     public void setScript(String script) {
-        if(StringUtils.hasText(script)) {
+        if (StringUtils.hasText(script)) {
             this.script = new OperatorLoadScript(script);
         }
     }
@@ -62,7 +62,7 @@ public class TransferAction extends BaseAction {
 
         FlowRecord currentRecord = flowSession.getCurrentRecord();
 
-        currentRecord.update(flowSession,true);
+        currentRecord.update(flowSession, true);
         recordList.add(currentRecord);
         flowEvents.add(new FlowRecordDoneEvent(currentRecord));
 
@@ -93,9 +93,6 @@ public class TransferAction extends BaseAction {
     }
 
 
-
-
-
     public static TransferAction fromMap(Map<String, Object> data) {
         TransferAction action = BaseAction.fromMap(data, TransferAction.class);
         String script = (String) data.get("script");
@@ -106,7 +103,7 @@ public class TransferAction extends BaseAction {
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> data = super.toMap();
-        if(script!=null) {
+        if (script != null) {
             data.put("script", script.getScript());
         }
         return data;

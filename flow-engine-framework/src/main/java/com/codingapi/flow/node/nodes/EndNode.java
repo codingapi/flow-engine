@@ -35,7 +35,7 @@ public class EndNode extends BaseFlowNode {
             return List.of();
         }
         // 构建结束记录
-        FlowRecord finishRecord = new FlowRecord(session,  0);
+        FlowRecord finishRecord = new FlowRecord(session, 0);
         finishRecord.finish(true);
         return List.of(finishRecord);
     }
