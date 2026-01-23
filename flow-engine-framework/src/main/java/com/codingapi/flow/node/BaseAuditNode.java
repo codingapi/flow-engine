@@ -120,7 +120,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         List<IFlowOperator> operators = operatorManager.getOperators();
         for (int order = 0; order < operators.size(); order++) {
             IFlowOperator operator = operators.get(order);
-            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator), this.id, order);
+            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator), order);
             records.add(flowRecord);
         }
         if (operators.size() > 1) {

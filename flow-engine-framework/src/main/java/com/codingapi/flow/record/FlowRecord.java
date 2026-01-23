@@ -1,5 +1,6 @@
 package com.codingapi.flow.record;
 
+import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.node.IFlowNode;
@@ -80,6 +81,12 @@ public class FlowRecord {
      * 流程动作
      */
     private String actionId;
+
+    /**
+     * 动作类型
+     */
+    private ActionType actionType;
+
     /**
      * 审批意见
      */
@@ -179,18 +186,19 @@ public class FlowRecord {
     private int parallelBranchTotal;
 
 
-    public FlowRecord(FlowSession flowSession, String actionId, int nodeOrder) {
+    public FlowRecord(FlowSession flowSession, int nodeOrder) {
+        IFlowAction action = flowSession.getCurrentAction();
         this.workCode = flowSession.getWorkCode();
         this.workBackupId = flowSession.getBackupId();
         this.nodeId = flowSession.getCurrentNodeId();
         this.nodeType = flowSession.getCurrentNodeType();
         this.formData = flowSession.getFormData().toMapData();
-        this.fromId = 0;
         this.nodeOrder = nodeOrder;
         this.processId = RandomUtils.generateStringId();
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
         this.recordState = SATE_RECORD_TODO;
-        this.actionId = actionId;
+        this.actionId = action.id();
+        this.actionType = action.type();
         this.currentOperatorId = flowSession.getCurrentOperator().getUserId();
         this.interferedOperatorId = flowSession.getCurrentOperator().entrustOperator() != null ? flowSession.getCurrentOperator().entrustOperator().getUserId() : 0;
         this.advice = flowSession.getAdvice().getAdvice();
@@ -300,14 +308,15 @@ public class FlowRecord {
     /**
      * 更新记录
      *
-     * @param formData 表单数据
-     * @param actionId 动作id
-     * @param flowAdvice  签名key
+     * @param flowSession 流程会话
      * @param done     是否完成
      */
-    public void update(Map<String, Object> formData,String actionId, FlowAdvice flowAdvice, boolean done) {
-        this.formData = formData;
-        this.actionId = actionId;
+    public void update(FlowSession flowSession, boolean done) {
+        IFlowAction flowAction = flowSession.getCurrentAction();
+        FlowAdvice flowAdvice = flowSession.getAdvice();
+        this.formData = flowSession.getFormData().toMapData();
+        this.actionId = flowAction.id();
+        this.actionType = flowAction.type();
         this.readable = true;
         this.readTime = System.currentTimeMillis();
         this.updateTime = System.currentTimeMillis();
@@ -373,5 +382,11 @@ public class FlowRecord {
         this.nodeOrder = nodeOrder;
         this.currentOperatorId = currentOperatorId;
         this.hidden = hidden;
+    }
+
+    public FlowRecord copy(FlowSession flowSession) {
+        FlowRecord flowRecord = new FlowRecord(flowSession, 0);
+        flowRecord.currentOperatorId = flowSession.getCurrentOperator().getUserId();
+        return flowRecord;
     }
 }

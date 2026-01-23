@@ -62,12 +62,12 @@ public class StartNode extends BaseFlowNode {
         IFlowOperator operator = session.getCurrentOperator();
         IFlowAction action = session.getCurrentAction();
         if (currentRecord == null) {
-            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator), action.id(), 0);
+            FlowRecord flowRecord = new FlowRecord(session.updateSession(operator),  0);
             records.add(flowRecord);
         } else {
             // 获取流程创建者
             IFlowOperator creatorOperator = GatewayContext.getInstance().getFlowOperator(currentRecord.getCreateOperatorId());
-            FlowRecord flowRecord = new FlowRecord(session.updateSession(creatorOperator), action.id(), 0);
+            FlowRecord flowRecord = new FlowRecord(session.updateSession(creatorOperator), 0);
             records.add(flowRecord);
         }
         return records;

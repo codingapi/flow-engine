@@ -1861,7 +1861,7 @@ class FlowServiceTest {
         lorneRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", lorne.getUserId()));
         flowService.action(lorneRequest);
 
-        List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(bossRecordList.get(0).getProcessId());
+        List<FlowRecord> records = flowRecordRepository.findRecordsByProcessId(lorneRecordList.get(0).getProcessId());
         assertEquals(4, records.size());
         assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
 

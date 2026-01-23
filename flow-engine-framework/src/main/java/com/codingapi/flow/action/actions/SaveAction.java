@@ -30,9 +30,8 @@ public class SaveAction extends BaseAction {
 
     @Override
     public void run(FlowSession flowSession) {
-        FormData data = flowSession.getFormData();
         FlowRecord flowRecord = flowSession.getCurrentRecord();
-        flowRecord.update(data.toMapData(), this.id, flowSession.getAdvice(), false);
+        flowRecord.update(flowSession, false);
         RepositoryHolderContext.getInstance().saveRecord(flowRecord);
     }
 }

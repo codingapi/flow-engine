@@ -15,7 +15,6 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.strategy.MultiOperatorAuditStrategy;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.springboot.framework.event.EventPusher;
 import org.springframework.util.StringUtils;
@@ -91,7 +90,7 @@ public class AddAuditAction extends BaseAction {
         long fromId = currentRecord.getFromId();
         // 构建加签的记录
         for (IFlowOperator operator : auditOperators) {
-            List<FlowRecord> records = currentNode.generateCurrentRecords(flowSession);
+            List<FlowRecord> records = currentNode.generateCurrentRecords(flowSession.updateSession(operator));
             for(FlowRecord record:records){
                 StrategyManager strategyManager =  currentNode.strategyManager();
                 if(strategyManager.isSequenceMultiOperatorType()){
