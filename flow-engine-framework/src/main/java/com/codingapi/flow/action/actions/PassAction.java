@@ -74,6 +74,20 @@ public class PassAction extends BaseAction {
         flowEvents.add(new FlowRecordDoneEvent(flowRecord));
         recordList.add(flowRecord);
 
+        // 激活下一个按顺序审批的记录数据
+        StrategyManager strategyManager = currentNode.strategyManager();
+        if(strategyManager.isSequenceMultiOperatorType()){
+            List<FlowRecord> currentRecords = flowSession.getCurrentNodeRecords();
+            FlowRecord currentRecord = flowSession.getCurrentRecord();
+            for(FlowRecord record:currentRecords){
+                if(record.getNodeOrder() == currentRecord.getNodeOrder()+1){
+                    record.show();
+                    recordList.add(record);
+                    flowEvents.add(new FlowRecordTodoEvent(record));
+                }
+            }
+        }
+
         if (done) {
             this.triggerNode(flowSession, (triggerSession) -> {
                 List<FlowRecord> records = this.generateRecords(triggerSession);

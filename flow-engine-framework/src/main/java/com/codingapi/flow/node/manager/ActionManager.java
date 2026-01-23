@@ -1,6 +1,7 @@
 package com.codingapi.flow.node.manager;
 
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.actions.AddAuditAction;
 import com.codingapi.flow.action.actions.ReturnAction;
 import com.codingapi.flow.action.actions.SaveAction;
 import com.codingapi.flow.action.actions.TransferAction;
@@ -59,6 +60,13 @@ public class ActionManager {
         if (flowAction instanceof ReturnAction) {
             if (flowAdvice.getBackNode() == null) {
                 throw FlowValidationException.required("backNode");
+            }
+        }
+
+        // 加签操作
+        if(flowAction instanceof AddAuditAction){
+            if(flowAdvice.getTransferOperators()==null || flowAdvice.getTransferOperators().isEmpty()){
+                throw FlowValidationException.required("transferOperators");
             }
         }
     }

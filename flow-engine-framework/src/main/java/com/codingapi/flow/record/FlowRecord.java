@@ -7,6 +7,7 @@ import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
@@ -18,6 +19,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
+@AllArgsConstructor
 public class FlowRecord {
 
     // 待办、已办
@@ -101,7 +103,7 @@ public class FlowRecord {
 
 
     /**
-     * 当前节点下的排序
+     * 当前节点下的排序,用于多人审批时控制节点的执行顺序
      */
     private int nodeOrder;
 
@@ -364,5 +366,12 @@ public class FlowRecord {
         IFlowAction flowAction = flowNode.actionManager().getActionById(actionId);
         flowAdvice.setAction(flowAction);
         return flowAdvice;
+    }
+
+    public void resetAddAudit(long fromId, int nodeOrder, long currentOperatorId, boolean hidden) {
+        this.fromId = fromId;
+        this.nodeOrder = nodeOrder;
+        this.currentOperatorId = currentOperatorId;
+        this.hidden = hidden;
     }
 }

@@ -38,17 +38,16 @@ public class FlowAdviceBody {
      */
     private List<Long> transferOperatorIds;
 
-    public FlowAdviceBody(String actionId, String advice, String signKey, long operatorId) {
-        this.actionId = actionId;
-        this.advice = advice;
-        this.signKey = signKey;
-        this.operatorId = operatorId;
-    }
 
     public FlowAdviceBody(String actionId, String advice, long operatorId) {
         this.actionId = actionId;
         this.advice = advice;
         this.operatorId = operatorId;
+    }
+
+
+    public FlowAdviceBody(String actionId,long operatorId){
+        this(actionId,null,operatorId);
     }
 
     public void verify() {

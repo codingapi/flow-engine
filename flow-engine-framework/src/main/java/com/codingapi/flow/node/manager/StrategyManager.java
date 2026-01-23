@@ -56,6 +56,19 @@ public class StrategyManager {
         return false;
     }
 
+    /**
+     * 是否按顺序执行的审批策略
+     */
+    public boolean isSequenceMultiOperatorType(){
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof MultiOperatorAuditStrategy multiOperatorAuditStrategy) {
+                return multiOperatorAuditStrategy.getType() == MultiOperatorAuditStrategy.Type.SEQUENCE;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * 审批意见是否必须填写

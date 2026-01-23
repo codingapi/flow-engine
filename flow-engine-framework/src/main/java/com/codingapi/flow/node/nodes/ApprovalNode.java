@@ -1,6 +1,7 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.actions.AddAuditAction;
 import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.action.actions.RejectAction;
 import com.codingapi.flow.action.actions.SaveAction;
@@ -54,6 +55,7 @@ public class ApprovalNode extends BaseAuditNode {
         actions.add(new PassAction());
         actions.add(new RejectAction());
         actions.add(new SaveAction());
+        actions.add(new AddAuditAction());
         return actions;
     }
 
