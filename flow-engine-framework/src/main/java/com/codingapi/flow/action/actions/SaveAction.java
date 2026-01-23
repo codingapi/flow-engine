@@ -3,6 +3,10 @@ package com.codingapi.flow.action.actions;
 import com.codingapi.flow.action.ActionDisplay;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.BaseAction;
+import com.codingapi.flow.context.RepositoryHolderContext;
+import com.codingapi.flow.form.FormData;
+import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.Map;
@@ -24,4 +28,11 @@ public class SaveAction extends BaseAction {
     }
 
 
+    @Override
+    public void run(FlowSession flowSession) {
+        FormData data = flowSession.getFormData();
+        FlowRecord flowRecord = flowSession.getCurrentRecord();
+        flowRecord.update(data.toMapData(), this.id, flowSession.getAdvice(), false);
+        RepositoryHolderContext.getInstance().saveRecord(flowRecord);
+    }
 }

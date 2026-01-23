@@ -300,19 +300,21 @@ public class FlowRecord {
      *
      * @param formData 表单数据
      * @param actionId 动作id
-     * @param advice   审批意见
-     * @param signKey  签名key
+     * @param flowAdvice  签名key
      * @param done     是否完成
      */
-    public void update(Map<String, Object> formData,String actionId, String advice, String signKey, boolean done) {
+    public void update(Map<String, Object> formData,String actionId, FlowAdvice flowAdvice, boolean done) {
         this.formData = formData;
         this.actionId = actionId;
-        this.advice = advice;
-        this.signKey = signKey;
         this.readable = true;
         this.readTime = System.currentTimeMillis();
         this.updateTime = System.currentTimeMillis();
         this.recordState = done ? SATE_RECORD_DONE : SATE_RECORD_TODO;
+
+        if(flowAdvice!=null) {
+            this.advice = flowAdvice.getAdvice();
+            this.signKey = flowAdvice.getSignKey();
+        }
     }
 
 

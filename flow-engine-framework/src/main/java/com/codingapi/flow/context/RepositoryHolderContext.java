@@ -119,6 +119,10 @@ public class RepositoryHolderContext {
         flowRecordRepository.saveAll(flowRecords);
     }
 
+    public void saveRecord(FlowRecord flowRecord){
+        flowRecordRepository.save(flowRecord);
+    }
+
     public List<FlowRecord> findRecordsByFromIdAndNodeId(long fromId, String nodeId) {
         return flowRecordRepository.findRecordsByFromIdAndNodeId(fromId, nodeId);
     }

@@ -2,6 +2,7 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
+import com.codingapi.flow.action.actions.SaveAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.node.BaseFlowNode;
@@ -83,6 +84,7 @@ public class StartNode extends BaseFlowNode {
     private static List<IFlowAction> defaultActions() {
         List<IFlowAction> actions = new ArrayList<>();
         actions.add(new PassAction());
+        actions.add(new SaveAction());
         return actions;
     }
 

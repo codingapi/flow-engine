@@ -69,7 +69,7 @@ public class PassAction extends BaseAction {
         FlowRecord flowRecord = flowSession.getCurrentRecord();
         IFlowNode currentNode = flowSession.getCurrentNode();
         boolean done = currentNode.isDone(flowSession);
-        flowRecord.update(flowSession.getFormData().toMapData(),this.id(), flowSession.getAdvice().getAdvice(), flowSession.getAdvice().getSignKey(), done);
+        flowRecord.update(flowSession.getFormData().toMapData(),this.id(), flowSession.getAdvice(), done);
         // 添加流程结束事件
         flowEvents.add(new FlowRecordDoneEvent(flowRecord));
         recordList.add(flowRecord);

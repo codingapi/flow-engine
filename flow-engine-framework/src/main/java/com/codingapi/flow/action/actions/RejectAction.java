@@ -88,7 +88,7 @@ public class RejectAction extends BaseAction {
 
         FlowRecord flowRecord = flowSession.getCurrentRecord();
         IFlowAction flowAction = flowSession.getCurrentAction();
-        flowRecord.update(flowSession.getFormData().toMapData(),flowAction.id(), flowSession.getAdvice().getAdvice(), flowSession.getAdvice().getSignKey(), true);
+        flowRecord.update(flowSession.getFormData().toMapData(),flowAction.id(), flowSession.getAdvice(), true);
         recordList.add(flowRecord);
 
         List<FlowRecord> records = this.generateRecords(flowSession);
