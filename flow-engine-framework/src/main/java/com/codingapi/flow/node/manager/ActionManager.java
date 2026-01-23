@@ -5,10 +5,17 @@ import com.codingapi.flow.action.actions.AddAuditAction;
 import com.codingapi.flow.action.actions.ReturnAction;
 import com.codingapi.flow.action.actions.SaveAction;
 import com.codingapi.flow.action.actions.TransferAction;
+import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.nodes.ApprovalNode;
+import com.codingapi.flow.node.nodes.EndNode;
+import com.codingapi.flow.node.nodes.HandleNode;
+import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.workflow.Workflow;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -61,11 +68,29 @@ public class ActionManager {
             if (flowAdvice.getBackNode() == null) {
                 throw FlowValidationException.required("backNode");
             }
+            if (flowAdvice.getBackNode().getType().equals(EndNode.NODE_TYPE)) {
+                throw FlowValidationException.required("backNode");
+            }
+            IFlowNode backNode = flowAdvice.getBackNode();
+            IFlowNode currentNode = session.getCurrentNode();
+            if (currentNode.equals(backNode)) {
+                throw FlowValidationException.required("backNode");
+            }
+            Workflow workflow = session.getWorkflow();
+            // 退回节点不能是当前节点的后续节点
+            if(workflow.isNextNode(currentNode,backNode)){
+                throw FlowValidationException.required("backNode");
+            }
+            if(!(backNode.getType().equals(StartNode.NODE_TYPE)
+                    || backNode.getType().equals(ApprovalNode.NODE_TYPE)
+                    || backNode.getType().equals(HandleNode.NODE_TYPE))){
+                throw FlowValidationException.required("backNode");
+            }
         }
 
         // 加签操作、转办操作
-        if(flowAction instanceof AddAuditAction || flowAction instanceof TransferAction){
-            if(flowAdvice.getTransferOperators()==null || flowAdvice.getTransferOperators().isEmpty()){
+        if (flowAction instanceof AddAuditAction || flowAction instanceof TransferAction) {
+            if (flowAdvice.getTransferOperators() == null || flowAdvice.getTransferOperators().isEmpty()) {
                 throw FlowValidationException.required("transferOperators");
             }
         }

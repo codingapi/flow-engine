@@ -233,4 +233,11 @@ public abstract class BaseFlowNode implements IFlowNode {
     }
 
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof BaseFlowNode node) {
+            return node.getId().equals(id);
+        }
+        return super.equals(obj);
+    }
 }

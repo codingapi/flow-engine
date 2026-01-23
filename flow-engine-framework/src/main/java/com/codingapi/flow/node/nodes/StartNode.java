@@ -60,7 +60,6 @@ public class StartNode extends BaseFlowNode {
         List<FlowRecord> records = new ArrayList<>();
         FlowRecord currentRecord = session.getCurrentRecord();
         IFlowOperator operator = session.getCurrentOperator();
-        IFlowAction action = session.getCurrentAction();
         if (currentRecord == null) {
             FlowRecord flowRecord = new FlowRecord(session.updateSession(operator),  0);
             records.add(flowRecord);

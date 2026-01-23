@@ -8,6 +8,7 @@ import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.factory.NodeFactory;
+import com.codingapi.flow.node.helper.BackNodeHelper;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -255,6 +256,15 @@ public class Workflow {
     }
 
 
+    /**
+     * 获取可以回退的节点列表
+     */
+    public List<IFlowNode> getNackNodes(IFlowNode node) {
+        BackNodeHelper backNodeHelper = new BackNodeHelper(this, node);
+        return backNodeHelper.getBackNodes();
+    }
+
+
     private void verifyNodes() {
         int start = 0;
         int end = 0;
@@ -323,4 +333,26 @@ public class Workflow {
         return nodes.stream().filter(node -> node instanceof EndNode)
                 .findFirst().orElse(null);
     }
+
+    /**
+     * 判断是否是后续的节点
+     * @param currentNode 当前节点
+     * @param nextNode 退回节点
+     * @return 是否是后续的节点
+     */
+    public boolean isNextNode(IFlowNode currentNode, IFlowNode nextNode) {
+        List<IFlowNode> nextNodes = nextNodes(currentNode);
+        for (IFlowNode node : nextNodes){
+           if(node.equals(nextNode)){
+               return true;
+           }else {
+               if(this.isNextNode(node,nextNode)){
+                   return true;
+               }
+           }
+        }
+        return false;
+    }
+
+
 }
