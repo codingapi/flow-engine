@@ -171,6 +171,11 @@ public class FlowRecord {
     private long interferedOperatorId;
 
     /**
+     * 委托记录id
+     */
+    private long delegateId;
+
+    /**
      * 并行id
      */
     private String parallelId;
@@ -226,6 +231,7 @@ public class FlowRecord {
             this.parallelId = record.parallelId;
             this.fromId = record.id;
             this.processId = record.processId;
+            this.delegateId = record.delegateId;
         }
     }
 
@@ -377,6 +383,9 @@ public class FlowRecord {
         return flowAdvice;
     }
 
+    /**
+     * 重置加签节点信息
+     */
     public void resetAddAudit(long fromId, int nodeOrder, long currentOperatorId, boolean hidden) {
         this.fromId = fromId;
         this.nodeOrder = nodeOrder;
@@ -388,5 +397,23 @@ public class FlowRecord {
         FlowRecord flowRecord = new FlowRecord(flowSession, 0);
         flowRecord.currentOperatorId = flowSession.getCurrentOperator().getUserId();
         return flowRecord;
+    }
+
+    /**
+     * 重置委托节点信息
+     */
+    public void resetDelegate(FlowRecord currentRecord) {
+        this.delegateId = currentRecord.id;
+    }
+
+    /**
+     * 判断是否委托
+     */
+    public boolean isDelegate() {
+        return delegateId > 0;
+    }
+
+    public void clearDelegate() {
+        this.delegateId = 0;
     }
 }

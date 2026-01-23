@@ -107,6 +107,11 @@ public class RepositoryHolderContext {
         return flowOperatorGateway.findByIds(ids);
     }
 
+    public IFlowOperator getOperatorById(long id) {
+        return flowOperatorGateway.get(id);
+    }
+
+
     public void saveDelayTask(DelayTask delayTask) {
         delayTaskRepository.save(delayTask);
     }

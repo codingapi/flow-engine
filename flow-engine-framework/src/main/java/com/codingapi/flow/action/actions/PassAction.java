@@ -10,6 +10,7 @@ import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
@@ -66,19 +67,18 @@ public class PassAction extends BaseAction {
     public void run(FlowSession flowSession) {
         List<IFlowEvent> flowEvents = new ArrayList<>();
         List<FlowRecord> recordList = new ArrayList<>();
-        FlowRecord flowRecord = flowSession.getCurrentRecord();
+        FlowRecord currentRecord = flowSession.getCurrentRecord();
         IFlowNode currentNode = flowSession.getCurrentNode();
         boolean done = currentNode.isDone(flowSession);
-        flowRecord.update(flowSession, done);
+        currentRecord.update(flowSession, done);
         // 添加流程结束事件
-        flowEvents.add(new FlowRecordDoneEvent(flowRecord));
-        recordList.add(flowRecord);
+        flowEvents.add(new FlowRecordDoneEvent(currentRecord));
+        recordList.add(currentRecord);
 
         // 激活下一个按顺序审批的记录数据
         StrategyManager strategyManager = currentNode.strategyManager();
         if(strategyManager.isSequenceMultiOperatorType()){
             List<FlowRecord> currentRecords = flowSession.getCurrentNodeRecords();
-            FlowRecord currentRecord = flowSession.getCurrentRecord();
             for(FlowRecord record:currentRecords){
                 if(record.getNodeOrder() == currentRecord.getNodeOrder()+1){
                     record.show();
@@ -89,17 +89,28 @@ public class PassAction extends BaseAction {
         }
 
         if (done) {
-            this.triggerNode(flowSession, (triggerSession) -> {
-                List<FlowRecord> records = this.generateRecords(triggerSession);
-                if (!records.isEmpty()) {
-                    for (FlowRecord record : records) {
-                        if (record.isShow()) {
-                            flowEvents.add(new FlowRecordTodoEvent(record));
+            // 是否委托记录
+            if(currentRecord.isDelegate()){
+                FlowRecord delegateRecord = RepositoryHolderContext.getInstance().getRecordById(currentRecord.getDelegateId());
+                IFlowOperator delegateOperator = RepositoryHolderContext.getInstance().getOperatorById(delegateRecord.getCurrentOperatorId());
+                FlowRecord rebackRecord = delegateRecord.copy(flowSession.updateSession(delegateOperator));
+                rebackRecord.clearDelegate();
+
+                recordList.add(rebackRecord);
+                flowEvents.add(new FlowRecordTodoEvent(rebackRecord));
+            }else {
+                this.triggerNode(flowSession, (triggerSession) -> {
+                    List<FlowRecord> records = this.generateRecords(triggerSession);
+                    if (!records.isEmpty()) {
+                        for (FlowRecord record : records) {
+                            if (record.isShow()) {
+                                flowEvents.add(new FlowRecordTodoEvent(record));
+                            }
                         }
+                        recordList.addAll(records);
                     }
-                    recordList.addAll(records);
-                }
-            });
+                });
+            }
         }
 
         RepositoryHolderContext.getInstance().saveRecords(recordList);
