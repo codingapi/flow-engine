@@ -63,8 +63,8 @@ public class ActionManager {
             }
         }
 
-        // 加签操作
-        if(flowAction instanceof AddAuditAction){
+        // 加签操作、转办操作
+        if(flowAction instanceof AddAuditAction || flowAction instanceof TransferAction){
             if(flowAdvice.getTransferOperators()==null || flowAdvice.getTransferOperators().isEmpty()){
                 throw FlowValidationException.required("transferOperators");
             }
