@@ -72,12 +72,12 @@ The workflow engine is organized into 8 layers:
    - `IFlowNode` - Interface defining node lifecycle methods
    - `BaseFlowNode` - Abstract base for all nodes, manages actions and strategies
    - `BaseAuditNode` - Abstract base for audit nodes (ApprovalNode, HandleNode)
-   - 12 node types: StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, BranchNodeBranchNode, ParallelBranchNode, RouterNode, InclusiveBranchNode, SubProcessNode, DelayNode, TriggerNode
+   - 12 node types: StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, ConditionBranchNode, ParallelBranchNode, RouterNode, InclusiveBranchNode, SubProcessNode, DelayNode, TriggerNode
 
 3. **Action Layer** (`com.codingapi.flow.action`, `com.codingapi.flow.action.actions`)
    - `IFlowAction` - Interface for node actions with `copy()` method
    - `BaseAction` - Abstract base with `triggerNode()` for recursive traversal
-   - 10 action types: DefaultAction, PassAction, RejectAction, SaveAction, ReturnAction, TransferAction, AddAuditAction, DelegateAction, CustomAction
+   - 9 action types (enum): DefaultAction, PassAction, RejectAction, SaveAction, ReturnAction, TransferAction, AddAuditAction, DelegateAction, CustomAction
 
 4. **Record Layer** (`com.codingapi.flow.record`)
    - `FlowRecord` - Execution record with states (TODO/DONE, RUNNING/FINISH/ERROR/DELETE)
@@ -99,18 +99,15 @@ The workflow engine is organized into 8 layers:
 
 8. **Script Layer** (`com.codingapi.flow.script.runtime`)
    - `ScriptRuntimeContext` - Groovy script execution with thread-safe design and auto-cleanup
-   - Script types: OperatorMatchScript, OperatorLoadScript, NodeTitleScript, ConditionScript, ErrorTriggerScript, RejectActionScript, RouterNodeScript, SubProcessScript, TriggerScript
+   - Script types: OperatorMatchScript, OperatorLoadScript, NodeTitleScript, ConditionScript, RouterNodeScript, SubProcessScript, TriggerScript, ErrorTriggerScript, RejectActionScript, CustomScript
 
 ### Supporting Architectures
 
-- **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation. Implementations are in `flow-engine-starter-infra`. Access via `RepositoryContext` singleton.
+- **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation. Implementations are in `flow-engine-starter-infra`. Access via `RepositoryHolderContext` singleton.
 - **Gateway Pattern** (`com.codingapi.flow.gateway`) - Anti-corruption layer for external system integration (operators, users). Access via `GatewayContext` singleton.
-- **Builder Pattern** (`com.codingapi.flow.builder`) - 5 builders: ActionBuilder, BaseNodeBuilder, FormFieldPermissionsBuilder, NodeMapBuilder, NodeStrategyBuilder
-- **Context Layer** (`com.codingapi.flow.context`) - GatewayContext, RepositoryHolderContext
-- **Delay Task System** (`com.codingapi.flow.delay`) - DelayTask, DelayTaskManager for deferred execution
+- **Delay Task System** (`com.codingapi.flow.delay`) - DelayTask, DelayTaskManager for deferred execution using Timer
 - **Edge System** (`com.codingapi.flow.edge`) - FlowEdge for node connections
-- **Error Handling** (`com.codingapi.flow.error`) - ErrorThrow for centralized error throwing
-- **Event System** (`com.codingapi.flow.event`) - 5 event types: FlowRecordStartEvent, FlowRecordTodoEvent, FlowRecordDoneEvent, FlowRecordFinishEvent, IFlowEvent
+- **Event System** (`com.codingapi.flow.event`) - 4 event types: FlowRecordStartEvent, FlowRecordTodoEvent, FlowRecordDoneEvent, FlowRecordFinishEvent
 - **Backup System** (`com.codingapi.flow.backup`) - WorkflowBackup for workflow versioning
 
 ### Node Lifecycle (Critical for Understanding Flow)
@@ -142,25 +139,29 @@ When encountering `ParallelBranchNode`:
 4. At convergence, `isWaitParallelRecord()` checks if all branches arrived
 5. Once all arrive, clear parallel info and continue
 
+### Delay and Trigger Nodes
+
+**DelayNode**: Uses `DelayStrategy` with time units (SECOND/MINUTE/HOUR/DAY). Creates `DelayTask` which is managed by `DelayTaskManager` using `java.util.Timer` for scheduled execution. On trigger, `FlowDelayTriggerService` resumes the flow.
+
+**TriggerNode**: Uses `TriggerStrategy` with `TriggerScript`. Executes trigger script via `ScriptRuntimeContext` when node is reached.
+
 ### Key Design Patterns
 
 - **Builder**: `WorkflowBuilder`, `BaseNodeBuilder` with singleton `builder()` method
 - **Factory**: `NodeFactory.getInstance()` (reflection + static `formMap()`), `NodeStrategyFactory`, `FlowActionFactory`
 - **Strategy**: `INodeStrategy` with `StrategyManager` - strategy-driven configuration
 - **Template Method**: `BaseFlowNode` (node lifecycle), `BaseAction` (action execution), `BaseStrategy` (strategy template)
-- **Singleton**: `NodeFactory`, `ScriptRuntimeContext`, `RepositoryContext`, `GatewayContext` (static final instance)
+- **Singleton**: `NodeFactory`, `ScriptRuntimeContext`, `RepositoryHolderContext`, `GatewayContext` (static final instance)
 - **Chain of Responsibility**: `triggerNode()` recursive traversal, `StrategyManager` strategy iteration
 - **Composite**: Nodes contain multiple strategies and actions
 - **Copy Pattern**: `INodeStrategy.copy()`, `IFlowAction.copy()`, `BaseFlowNode.setActions()`, `BaseFlowNode.setStrategies()`
-- **Repository**: Abstracts data persistence, implementations in infra layer
-- **Gateway**: Anti-corruption layer for external system integration
 
 ### Strategy-Driven Node Configuration (Critical Architecture)
 
 All node configurations are implemented through strategies:
 - **Operator loading**: `OperatorLoadStrategy` with Groovy script
 - **Node title**: `NodeTitleStrategy` with Groovy script
-- **Timeout**: `TimeoutStrategy` with timeout value
+- **Timeout**: `TimeoutStrategy` with timeout value and type
 - **Permissions**: `FormFieldPermissionStrategy` with field permissions
 - **Error handling**: `ErrorTriggerStrategy` with Groovy script
 - **Multi-person approval**: `MultiOperatorAuditStrategy` with type (SEQUENCE/MERGE/ANY/RANDOM_ONE)
@@ -189,15 +190,21 @@ Thread safety: Each execution creates independent GroovyClassLoader/GroovyShell.
 
 ### Framework Exception Hierarchy
 
-All framework exceptions extend `FlowException` (RuntimeException):
-- `FlowValidationException` - Parameter validation (required, notEmpty)
-- `FlowNotFoundException` - Resource not found (workflow, record, node, operator, action)
-- `FlowStateException` - Invalid state (recordAlreadyDone, operatorNotMatch, workflowAlreadyFinished)
-- `FlowPermissionException` - Permission issues (fieldReadOnly, fieldNotFound, accessDenied)
-- `FlowConfigException` - Configuration errors (strategiesNotNull, actionsNotNull, parallelEndNodeNotNull)
-- `FlowExecutionException` - Execution errors (scriptExecutionError, nodeExecutionError, actionExecutionError)
+All framework exceptions extend `FlowException` (RuntimeException). Exception codes follow the format `category.subcategory.errorType`.
 
-Use framework exceptions instead of generic exceptions (IllegalArgumentException, etc.) when working with flow engine code.
+**Exception types**:
+- `FlowValidationException` - Parameter validation (e.g., `validation.field.required`)
+- `FlowNotFoundException` - Resource not found (e.g., `notFound.workflow.definition`)
+- `FlowStateException` - Invalid state (e.g., `state.record.alreadyDone`)
+- `FlowPermissionException` - Permission issues (e.g., `permission.field.readOnly`)
+- `FlowConfigException` - Configuration errors (e.g., `config.node.strategies.required`)
+- `FlowExecutionException` - Execution errors (e.g., `execution.script.error`)
+
+**Critical exception rules**:
+- MUST use static factory methods: `FlowValidationException.required("fieldName")`
+- NEVER use `new FlowXXXException()` directly
+- NEVER use `ERROR_CODE_PREFIX` constants
+- All exception messages MUST be in English
 
 ## Code Conventions
 

@@ -81,7 +81,7 @@
 | 结束节点 | EndNode | `end` | 流程终点 |
 | 审批节点 | ApprovalNode | `approval` | 需要审批的任务节点 |
 | 办理节点 | HandleNode | `handle` | 需要办理的任务节点 |
-| 条件分支 | BranchNodeBranchNode | `condition_branch` | 按条件路由 |
+| 条件分支 | ConditionBranchNode | `condition_branch` | 按条件路由 |
 | 并行分支 | ParallelBranchNode | `parallel_branch` | 并行执行多个分支 |
 | 路由分支 | RouterNode | `router` | 普通路由节点 |
 | 包容分支 | InclusiveBranchNode | `inclusive_branch` | 包容性分支 |
@@ -325,8 +325,12 @@
 | OperatorLoadScript | 操作者加载脚本 |
 | NodeTitleScript | 节点标题脚本 |
 | ConditionScript | 条件判断脚本 |
+| RouterNodeScript | 路由节点脚本 |
+| SubProcessScript | 子流程脚本 |
+| TriggerScript | 触发器脚本 |
 | ErrorTriggerScript | 异常触发脚本 |
 | RejectActionScript | 拒绝动作脚本 |
+| CustomScript | 自定义动作脚本 |
 
 ---
 
@@ -770,10 +774,20 @@
 - **自动清理**: 阈值触发 + 定时清理双重机制，避免内存泄漏
 
 ### 6. 框架异常体系
+
+**异常编码规则**:
+所有框架异常使用字符串形式的错误码，格式为 `category.subcategory.errorType`
+
+**异常类型**:
 - `FlowException`: 所有框架异常的基类（RuntimeException）
-- `FlowValidationException`: 参数验证异常（required、notEmpty）
-- `FlowNotFoundException`: 资源未找到异常（workflow、record、node等）
-- `FlowStateException`: 状态异常（recordAlreadyDone、operatorNotMatch等）
-- `FlowPermissionException`: 权限异常（fieldReadOnly、accessDenied等）
-- `FlowConfigException`: 配置异常（strategiesNotNull、actionsNotNull等）
-- `FlowExecutionException`: 执行异常（scriptExecutionError、nodeExecutionError等）
+- `FlowValidationException`: 参数验证异常（`validation.field.required`、`validation.field.notEmpty`）
+- `FlowNotFoundException`: 资源未找到异常（`notFound.workflow.definition`、`notFound.record.id`）
+- `FlowStateException`: 状态异常（`state.record.alreadyDone`、`state.operator.notMatch`）
+- `FlowPermissionException`: 权限异常（`permission.field.readOnly`、`permission.access.denied`）
+- `FlowConfigException`: 配置异常（`config.node.strategies.required`、`config.edge.error`）
+- `FlowExecutionException`: 执行异常（`execution.script.error`、`execution.node.error`）
+
+**异常使用规范**:
+- 必须使用异常类的静态工厂方法创建异常，不直接使用 `new` 构造
+- 不使用 `ERROR_CODE_PREFIX` 等常量前缀
+- 所有异常信息使用英文

@@ -164,6 +164,26 @@ public class Workflow {
 - Use descriptive exceptions from appropriate libraries
 - Don't swallow exceptions without logging
 
+**Framework Exception Usage**:
+- Use static factory methods to create exceptions: `FlowValidationException.required("fieldName")`
+- Exception code format: `category.subcategory.errorType` (e.g., `notFound.workflow.definition`)
+- Never use `new FlowXXXException()` directly - always use factory methods
+- Never use `ERROR_CODE_PREFIX` constants
+- All exception messages must be in English
+
+**Exception Examples**:
+```java
+// Correct - use factory method
+throw FlowValidationException.required("workflow id");
+throw FlowNotFoundException.workflow(workflowId);
+throw FlowStateException.recordAlreadyDone();
+throw FlowExecutionException.scriptExecutionError(method, e);
+
+// Incorrect - direct construction
+throw new FlowValidationException("validation.required", "Field is required");
+throw new FlowConfigException(ERROR_CODE_PREFIX + "001", "Config error");
+```
+
 ### Enums
 
 Define enums with clear constants and comments:
