@@ -9,7 +9,7 @@ Flow Engine is an enterprise-grade workflow engine built with Java 17 and Spring
 ### Core Features
 
 - **12 Node Types** - Start, End, Approval, Handle, Notify, Condition Branch, Parallel Branch, Router, Inclusive Branch, Sub-process, Delay, Trigger nodes
-- **9 Action Types** - Pass, Reject, Save, Add Audit, Delegate, Return, Transfer, Custom, Default
+- **8 Action Types** - Pass, Reject, Save, Add Audit, Delegate, Return, Transfer, Custom
 - **Strategy-driven Configuration** - All key configurations implemented through strategies with dynamic extension support
 - **Groovy Script Extension** - Supports dynamic initiator matching, approver loading, condition evaluation, custom actions, etc.
 - **Multi-person Approval Modes** - Sequential approval, merged approval (configurable ratio), any-one approval, random approval
@@ -25,7 +25,6 @@ flow-engine
 │   └── src/main/java/com.codingapi.flow
 │       ├── action                # Action layer
 │       │   ├── actions           # Action implementations (8 classes)
-│       │   │   ├── DefaultAction # Default action (inline)
 │       │   │   ├── PassAction    # Pass action
 │       │   │   ├── RejectAction  # Reject action
 │       │   │   ├── SaveAction    # Save action
@@ -271,7 +270,6 @@ pnpm run dev:app-pc
 
 | Action Type | Description | ActionType |
 |-------------|-------------|------------|
-| DefaultAction | Default action | `DEFAULT` |
 | PassAction | Pass | `PASS` |
 | RejectAction | Reject | `REJECT` |
 | SaveAction | Save | `SAVE` |

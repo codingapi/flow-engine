@@ -77,7 +77,7 @@ The workflow engine is organized into 8 layers:
 3. **Action Layer** (`com.codingapi.flow.action`, `com.codingapi.flow.action.actions`)
    - `IFlowAction` - Interface for node actions with `copy()` method
    - `BaseAction` - Abstract base with `triggerNode()` for recursive traversal
-   - 9 action types (enum): DefaultAction, PassAction, RejectAction, SaveAction, ReturnAction, TransferAction, AddAuditAction, DelegateAction, CustomAction
+   - 8 action types (enum): PassAction, RejectAction, SaveAction, ReturnAction, TransferAction, AddAuditAction, DelegateAction, CustomAction
 
 4. **Record Layer** (`com.codingapi.flow.record`)
    - `FlowRecord` - Execution record with states (TODO/DONE, RUNNING/FINISH/ERROR/DELETE)
