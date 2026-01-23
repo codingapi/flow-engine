@@ -51,6 +51,7 @@ public class AddAuditAction extends BaseAction {
         this.title = "加签";
         this.type = ActionType.ADD_AUDIT;
         this.display = new ActionDisplay(this.title);
+        // 默认 anyone
         this.script = null;
     }
 
@@ -69,7 +70,7 @@ public class AddAuditAction extends BaseAction {
         FlowRecord currentRecord = flowSession.getCurrentRecord();
         IFlowNode currentNode = flowSession.getCurrentNode();
         List<FlowRecord> currentRecords = flowSession.getCurrentNodeRecords();
-        List<IFlowOperator> auditOperators = flowSession.getAdvice().getTransferOperators();
+        List<IFlowOperator> auditOperators = flowSession.getAdvice().getForwardOperators();
         if (script != null) {
             OperatorManager operatorManager = new OperatorManager(script.execute(flowSession));
             for (IFlowOperator auditOperator : auditOperators) {

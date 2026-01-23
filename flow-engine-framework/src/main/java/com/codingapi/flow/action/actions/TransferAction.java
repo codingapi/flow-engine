@@ -8,6 +8,8 @@ import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
+import com.codingapi.flow.exception.FlowExecutionException;
+import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.OperatorLoadScript;
@@ -26,7 +28,7 @@ import java.util.Map;
 public class TransferAction extends BaseAction {
 
     /**
-     * 可以加签的人员范围
+     * 可以转办的人员范围
      */
     private OperatorLoadScript script;
 
@@ -35,6 +37,7 @@ public class TransferAction extends BaseAction {
         this.title = "转办";
         this.type = ActionType.TRANSFER;
         this.display = new ActionDisplay(this.title);
+        // 默认 anyone
         this.script = null;
     }
 
@@ -63,7 +66,16 @@ public class TransferAction extends BaseAction {
         recordList.add(currentRecord);
         flowEvents.add(new FlowRecordDoneEvent(currentRecord));
 
-        List<IFlowOperator> operators = flowSession.getAdvice().getTransferOperators();
+        List<IFlowOperator> operators = flowSession.getAdvice().getForwardOperators();
+        if (script != null) {
+            OperatorManager operatorManager = new OperatorManager(script.execute(flowSession));
+            for (IFlowOperator auditOperator : operators) {
+                if (!operatorManager.match(auditOperator)) {
+                    throw new FlowExecutionException("transfer operator is not in the scope of the add audit action");
+                }
+            }
+        }
+
         for (IFlowOperator operator : operators) {
             FlowRecord flowRecord = currentRecord.copy(flowSession.updateSession(operator));
             recordList.add(flowRecord);

@@ -36,8 +36,8 @@ public class FlowActionRequest {
         flowAdvice.setAdvice(advice.getAdvice());
         flowAdvice.setSignKey(advice.getSignKey());
         flowAdvice.setAction(flowAction);
-        if (advice.getTransferOperatorIds() != null && !advice.getTransferOperatorIds().isEmpty()) {
-            flowAdvice.setTransferOperators(GatewayContext.getInstance().findByIds(advice.getTransferOperatorIds()));
+        if (advice.getForwardOperatorIds() != null && !advice.getForwardOperatorIds().isEmpty()) {
+            flowAdvice.setForwardOperators(GatewayContext.getInstance().findByIds(advice.getForwardOperatorIds()));
         }
         if (StringUtils.hasText(advice.getBackNodeId())) {
             flowAdvice.setBackNode(workflow.getFlowNode(advice.getBackNodeId()));

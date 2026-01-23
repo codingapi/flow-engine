@@ -36,7 +36,7 @@ public class FlowAdviceBody {
     /**
      * 转办人员
      */
-    private List<Long> transferOperatorIds;
+    private List<Long> forwardOperatorIds;
 
 
     public FlowAdviceBody(String actionId, String advice, long operatorId) {

@@ -37,7 +37,7 @@ public class FlowAdvice {
     /**
      * 转办人员
      */
-    private List<IFlowOperator> transferOperators;
+    private List<IFlowOperator> forwardOperators;
 
 
     public FlowAdvice(String advice) {

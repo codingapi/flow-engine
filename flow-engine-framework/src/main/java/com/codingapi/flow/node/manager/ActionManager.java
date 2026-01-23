@@ -1,11 +1,7 @@
 package com.codingapi.flow.node.manager;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.actions.AddAuditAction;
-import com.codingapi.flow.action.actions.ReturnAction;
-import com.codingapi.flow.action.actions.SaveAction;
-import com.codingapi.flow.action.actions.TransferAction;
-import com.codingapi.flow.exception.FlowExecutionException;
+import com.codingapi.flow.action.actions.*;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IFlowNode;
@@ -57,12 +53,14 @@ public class ActionManager {
         if (flowAction instanceof SaveAction) {
             return;
         }
-        // 转办操作
-        if (flowAction instanceof TransferAction) {
-            if (flowAdvice.getTransferOperators() == null || flowAdvice.getTransferOperators().isEmpty()) {
-                throw FlowValidationException.required("transferOperators");
+
+        // 加签操作、转办操作、委托操作
+        if (flowAction instanceof AddAuditAction || flowAction instanceof TransferAction || flowAction instanceof DelegateAction) {
+            if (flowAdvice.getForwardOperators() == null || flowAdvice.getForwardOperators().isEmpty()) {
+                throw FlowValidationException.required("forwardOperators");
             }
         }
+
         // 退回操作
         if (flowAction instanceof ReturnAction) {
             if (flowAdvice.getBackNode() == null) {
@@ -88,12 +86,7 @@ public class ActionManager {
             }
         }
 
-        // 加签操作、转办操作
-        if (flowAction instanceof AddAuditAction || flowAction instanceof TransferAction) {
-            if (flowAdvice.getTransferOperators() == null || flowAdvice.getTransferOperators().isEmpty()) {
-                throw FlowValidationException.required("transferOperators");
-            }
-        }
+
     }
 
     public IFlowAction getAction(Class<? extends IFlowAction> clazz) {

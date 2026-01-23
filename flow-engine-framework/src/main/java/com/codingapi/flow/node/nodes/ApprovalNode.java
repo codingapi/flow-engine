@@ -55,6 +55,7 @@ public class ApprovalNode extends BaseAuditNode {
         actions.add(new AddAuditAction());
         actions.add(new TransferAction());
         actions.add(new ReturnAction());
+        actions.add(new DelegateAction());
         return actions;
     }
 
