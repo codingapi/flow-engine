@@ -1,10 +1,10 @@
 package com.codingapi.flow.exception;
 
 /**
- * 流程执行异常
+ * Flow execution exception
  * <p>
- * 当流程执行过程中发生错误时抛出此异常
- * 例如：脚本执行错误、节点执行错误、动作执行错误等
+ * Thrown when an error occurs during flow execution
+ * For example: script execution error, node execution error, action execution error, etc.
  *
  * @since 1.0.0
  */
@@ -13,107 +13,124 @@ public class FlowExecutionException extends FlowException {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 错误码前缀
-     */
-    public static final String ERROR_CODE_PREFIX = "FLOW_EXECUTION_";
-
-    /**
-     * 构造函数
+     * Constructor
      *
-     * @param message 错误信息
+     * @param code    error code
+     * @param message error message
      */
-    public FlowExecutionException(String message) {
-        super(ERROR_CODE_PREFIX + "000", message);
+    public FlowExecutionException(String code, String message) {
+        super(code, message);
     }
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param message 错误信息
-     * @param cause   原因
+     * @param code    error code
+     * @param message error message
+     * @param cause   cause
      */
-    public FlowExecutionException(String message, Throwable cause) {
-        super(ERROR_CODE_PREFIX + "000", message, cause);
+    public FlowExecutionException(String code, String message, Throwable cause) {
+        super(code, message, cause);
     }
 
     /**
-     * 构造函数
+     * Script execution error
      *
-     * @param errorCode 错误码
-     * @param message   错误信息
-     */
-    public FlowExecutionException(String errorCode, String message) {
-        super(ERROR_CODE_PREFIX + errorCode, message);
-    }
-
-    /**
-     * 构造函数
-     *
-     * @param errorCode 错误码
-     * @param message   错误信息
-     * @param cause     原因
-     */
-    public FlowExecutionException(String errorCode, String message, Throwable cause) {
-        super(ERROR_CODE_PREFIX + errorCode, message, cause);
-    }
-
-    /**
-     * 脚本执行错误
-     *
-     * @param scriptType 脚本类型
-     * @param cause      原因
-     * @return 异常
+     * @param scriptType script type
+     * @param cause      cause
+     * @return exception
      */
     public static FlowExecutionException scriptExecutionError(String scriptType, Throwable cause) {
-        return new FlowExecutionException("001",
-                String.format("script execution error: %s", scriptType), cause);
+        return new FlowExecutionException("execution.script.error",
+                String.format("Script execution error: %s", scriptType), cause);
     }
 
     /**
-     * 节点执行错误
+     * Node execution error
      *
-     * @param nodeId 节点ID
-     * @param cause  原因
-     * @return 异常
+     * @param nodeId node ID
+     * @param cause  cause
+     * @return exception
      */
     public static FlowExecutionException nodeExecutionError(String nodeId, Throwable cause) {
-        return new FlowExecutionException("002",
-                String.format("node execution error: %s", nodeId), cause);
+        return new FlowExecutionException("execution.node.error",
+                String.format("Node execution error: %s", nodeId), cause);
     }
 
     /**
-     * 动作执行错误
+     * Action execution error
      *
-     * @param actionId 动作ID
-     * @param cause    原因
-     * @return 异常
+     * @param actionId action ID
+     * @param cause    cause
+     * @return exception
      */
     public static FlowExecutionException actionExecutionError(String actionId, Throwable cause) {
-        return new FlowExecutionException("003",
-                String.format("action execution error: %s", actionId), cause);
+        return new FlowExecutionException("execution.action.error",
+                String.format("Action execution error: %s", actionId), cause);
     }
 
     /**
-     * 流程执行错误
+     * Workflow execution error
      *
-     * @param processId 流程实例ID
-     * @param cause     原因
-     * @return 异常
+     * @param processId process instance ID
+     * @param cause     cause
+     * @return exception
      */
     public static FlowExecutionException workflowExecutionError(String processId, Throwable cause) {
-        return new FlowExecutionException("004",
-                String.format("workflow execution error: %s", processId), cause);
+        return new FlowExecutionException("execution.workflow.error",
+                String.format("Workflow execution error: %s", processId), cause);
     }
 
     /**
-     * 数据库操作错误
+     * Database operation error
      *
-     * @param operation 操作类型
-     * @param cause     原因
-     * @return 异常
+     * @param operation operation type
+     * @param cause     cause
+     * @return exception
      */
     public static FlowExecutionException databaseError(String operation, Throwable cause) {
-        return new FlowExecutionException("005",
-                String.format("database operation error: %s", operation), cause);
+        return new FlowExecutionException("execution.database.error",
+                String.format("Database operation error: %s", operation), cause);
+    }
+
+    /**
+     * Router node not found
+     *
+     * @param nodeId node ID
+     * @return exception
+     */
+    public static FlowExecutionException routerNodeNotFound(String nodeId) {
+        return new FlowExecutionException("execution.router.nodeNotFound",
+                String.format("Router node not found: %s", nodeId));
+    }
+
+    /**
+     * Create record size error
+     *
+     * @return exception
+     */
+    public static FlowExecutionException createRecordSizeError() {
+        return new FlowExecutionException("execution.createRecord.sizeError",
+                "Create record error: record size must be 1");
+    }
+
+    /**
+     * Operator not in scope
+     *
+     * @param actionType action type (delegate/transfer/addAudit)
+     * @return exception
+     */
+    public static FlowExecutionException operatorNotInScope(String actionType) {
+        return new FlowExecutionException("execution." + actionType + ".operatorNotInScope",
+                String.format("Operator is not in the scope of the %s action", actionType));
+    }
+
+    /**
+     * Custom action next not found
+     *
+     * @return exception
+     */
+    public static FlowExecutionException customActionNextNotFound() {
+        return new FlowExecutionException("execution.custom.action.nextNotFound", "Next action not found");
     }
 }

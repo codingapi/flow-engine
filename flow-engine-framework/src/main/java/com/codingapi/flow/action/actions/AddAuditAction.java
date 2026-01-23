@@ -75,7 +75,7 @@ public class AddAuditAction extends BaseAction {
             OperatorManager operatorManager = new OperatorManager(script.execute(flowSession));
             for (IFlowOperator auditOperator : auditOperators) {
                 if (!operatorManager.match(auditOperator)) {
-                    throw new FlowExecutionException("audit operator is not in the scope of the add audit action");
+                    throw FlowExecutionException.operatorNotInScope("addAudit");
                 }
             }
         }

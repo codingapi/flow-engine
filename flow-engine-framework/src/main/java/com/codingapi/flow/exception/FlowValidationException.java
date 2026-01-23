@@ -1,10 +1,10 @@
 package com.codingapi.flow.exception;
 
 /**
- * 流程参数验证异常
+ * Flow parameter validation exception
  * <p>
- * 当流程引擎的输入参数不符合要求时抛出此异常
- * 例如：必填参数为空、参数格式不正确等
+ * Thrown when input parameters to the flow engine do not meet requirements
+ * For example: required parameter is empty, parameter format is incorrect, etc.
  *
  * @since 1.0.0
  */
@@ -13,58 +13,56 @@ public class FlowValidationException extends FlowException {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 错误码前缀
-     */
-    public static final String ERROR_CODE_PREFIX = "FLOW_VALIDATION_";
-
-    /**
-     * 构造函数
+     * Constructor
      *
-     * @param message 错误信息
+     * @param code    error code
+     * @param message error message
      */
-    public FlowValidationException(String message) {
-        super(ERROR_CODE_PREFIX + "000", message);
-    }
-
-
-    /**
-     * 构造函数
-     *
-     * @param errorCode 错误码
-     * @param message   错误信息
-     */
-    public FlowValidationException(String errorCode, String message) {
-        super(ERROR_CODE_PREFIX + errorCode, message);
+    public FlowValidationException(String code, String message) {
+        super(code, message);
     }
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param errorCode 错误码
-     * @param message   错误信息
-     * @param cause     原因
+     * @param code    error code
+     * @param message error message
+     * @param cause   cause
      */
-    public FlowValidationException(String errorCode, String message, Throwable cause) {
-        super(ERROR_CODE_PREFIX + errorCode, message, cause);
+    public FlowValidationException(String code, String message, Throwable cause) {
+        super(code, message, cause);
     }
 
     /**
-     * 必填字段为空
+     * Required field is empty
      *
-     * @param fieldName 字段名称
-     * @return 异常
+     * @param fieldName field name
+     * @return exception
      */
     public static FlowValidationException required(String fieldName) {
-        return new FlowValidationException(fieldName, "can not be null");
+        return new FlowValidationException("validation.field.required",
+                String.format("Required field %s cannot be empty", fieldName));
     }
 
     /**
-     * 字段值不能为空
+     * Field value cannot be empty
      *
-     * @param fieldName 字段名称
-     * @return 异常
+     * @param fieldName field name
+     * @return exception
      */
     public static FlowValidationException notEmpty(String fieldName) {
-        return new FlowValidationException(fieldName, "can not be empty");
+        return new FlowValidationException("validation.field.notEmpty",
+                String.format("Field %s value cannot be empty", fieldName));
+    }
+
+    /**
+     * Max size must be positive
+     *
+     * @param fieldName field name
+     * @return exception
+     */
+    public static FlowValidationException mustBePositive(String fieldName) {
+        return new FlowValidationException("validation.value.mustBePositive",
+                String.format("%s must be positive", fieldName));
     }
 }

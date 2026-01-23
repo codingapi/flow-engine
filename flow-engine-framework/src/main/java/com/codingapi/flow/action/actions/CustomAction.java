@@ -47,7 +47,7 @@ public class CustomAction extends BaseAction {
         IFlowAction nextAction = actionManager.getActionByType(actionType);
 
         if (nextAction == null) {
-            throw new FlowExecutionException("custom.next.action.error", "next action not found");
+            throw FlowExecutionException.customActionNextNotFound();
         }
 
         FlowSession triggerSession = flowSession.updateSession(nextAction);

@@ -208,11 +208,7 @@ public class ScriptRuntimeContext {
                 return (T) runtime.invokeMethod(method, args);
             } catch (Exception e) {
                 LOGGER.error("Script execution error, method: {}, script: {}", method, script, e);
-                throw new FlowExecutionException(
-                        FlowExecutionException.scriptExecutionError(method, e).getErrorCode(),
-                        "Script execution failed: " + e.getMessage(),
-                        e
-                );
+                throw FlowExecutionException.scriptExecutionError(method, e);
             } finally {
                 // 确保 GroovyShell 和 ClassLoader 实例被释放，帮助 GC
                 shell = null;
@@ -245,7 +241,7 @@ public class ScriptRuntimeContext {
      */
     public static void setMaxLockCacheSize(int maxSize) {
         if (maxSize <= 0) {
-            throw new FlowValidationException("maxSize", "must be positive");
+            throw FlowValidationException.mustBePositive("maxSize");
         }
         maxLockCacheSize = maxSize;
         LOGGER.info("Max lock cache size set to {}", maxSize);

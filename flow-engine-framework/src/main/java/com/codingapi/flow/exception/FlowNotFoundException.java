@@ -1,10 +1,10 @@
 package com.codingapi.flow.exception;
 
 /**
- * 流程未找到异常
+ * Flow not found exception
  * <p>
- * 当请求的资源不存在时抛出此异常
- * 例如：流程定义不存在、流程记录不存在、节点不存在等
+ * Thrown when a requested resource does not exist
+ * For example: workflow definition not found, flow record not found, node not found, etc.
  *
  * @since 1.0.0
  */
@@ -13,86 +13,76 @@ public class FlowNotFoundException extends FlowException {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 错误码前缀
-     */
-    public static final String ERROR_CODE_PREFIX = "FLOW_NOT_FOUND_";
-
-    /**
-     * 构造函数
+     * Constructor
      *
-     * @param message 错误信息
+     * @param code    error code
+     * @param message error message
      */
-    public FlowNotFoundException(String message) {
-        super(ERROR_CODE_PREFIX + "000", message);
+    public FlowNotFoundException(String code, String message) {
+        super(code, message);
     }
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param resourceType 资源类型
-     * @param resourceId   资源ID
+     * @param code    error code
+     * @param message error message
+     * @param cause   cause
      */
-    public FlowNotFoundException(String resourceType, Object resourceId) {
-        super(ERROR_CODE_PREFIX + "000", String.format("%s not found: %s", resourceType, resourceId));
+    public FlowNotFoundException(String code, String message, Throwable cause) {
+        super(code, message, cause);
     }
 
     /**
-     * 构造函数
+     * Workflow definition not found
      *
-     * @param errorCode 错误码
-     * @param message   错误信息
-     */
-    public FlowNotFoundException(String errorCode, String message) {
-        super(ERROR_CODE_PREFIX + errorCode, message);
-    }
-
-    /**
-     * 流程定义不存在
-     *
-     * @param workflowId 流程ID
-     * @return 异常
+     * @param workflowId workflow ID
+     * @return exception
      */
     public static FlowNotFoundException workflow(String workflowId) {
-        return new FlowNotFoundException("Workflow", workflowId);
+        return new FlowNotFoundException("notFound.workflow.definition",
+                String.format("Workflow definition not found: %s", workflowId));
     }
 
     /**
-     * 流程记录不存在
+     * Flow record not found
      *
-     * @param recordId 记录ID
-     * @return 异常
+     * @param recordId record ID
+     * @return exception
      */
     public static FlowNotFoundException record(long recordId) {
-        return new FlowNotFoundException("FlowRecord", recordId);
+        return new FlowNotFoundException("notFound.record.id",
+                String.format("Flow record not found: %d", recordId));
     }
 
     /**
-     * 节点不存在
+     * Node not found
      *
-     * @param nodeId 节点ID
-     * @return 异常
+     * @param nodeId node ID
+     * @return exception
      */
     public static FlowNotFoundException node(String nodeId) {
-        return new FlowNotFoundException("Node", nodeId);
+        return new FlowNotFoundException("notFound.node.id", String.format("Node not found: %s", nodeId));
     }
 
     /**
-     * 操作者不存在
+     * Operator not found
      *
-     * @param operatorId 操作者ID
-     * @return 异常
+     * @param operatorId operator ID
+     * @return exception
      */
     public static FlowNotFoundException operator(long operatorId) {
-        return new FlowNotFoundException("Operator", operatorId);
+        return new FlowNotFoundException("notFound.operator.id",
+                String.format("Operator not found: %d", operatorId));
     }
 
     /**
-     * 动作不存在
+     * Action not found
      *
-     * @param actionId 动作ID
-     * @return 异常
+     * @param actionId action ID
+     * @return exception
      */
     public static FlowNotFoundException action(String actionId) {
-        return new FlowNotFoundException("Action", actionId);
+        return new FlowNotFoundException("notFound.action.id", String.format("Action not found: %s", actionId));
     }
 }

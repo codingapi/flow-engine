@@ -65,7 +65,7 @@ public class FlowCreateService {
         List<FlowRecord> flowRecords = currentNode.generateCurrentRecords(session);
 
         if (flowRecords.size() > 1) {
-            throw new FlowExecutionException("create record error,record size must be 1.");
+            throw FlowExecutionException.createRecordSizeError();
         }
 
         flowRecordRepository.saveAll(flowRecords);

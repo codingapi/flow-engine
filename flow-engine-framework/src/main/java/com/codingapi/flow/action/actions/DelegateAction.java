@@ -65,7 +65,7 @@ public class DelegateAction extends BaseAction {
             OperatorManager operatorManager = new OperatorManager(script.execute(flowSession));
             for (IFlowOperator auditOperator : operators) {
                 if (!operatorManager.match(auditOperator)) {
-                    throw new FlowExecutionException("delegate operator is not in the scope of the add audit action");
+                    throw FlowExecutionException.operatorNotInScope("delegate");
                 }
             }
         }

@@ -1,10 +1,10 @@
 package com.codingapi.flow.exception;
 
 /**
- * 流程配置异常
+ * Flow configuration exception
  * <p>
- * 当流程配置不正确时抛出此异常
- * 例如：节点配置错误、边配置错误、策略配置错误等
+ * Thrown when the flow configuration is incorrect
+ * For example: node configuration error, edge configuration error, strategy configuration error, etc.
  *
  * @since 1.0.0
  */
@@ -13,116 +13,120 @@ public class FlowConfigException extends FlowException {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 错误码前缀
-     */
-    public static final String ERROR_CODE_PREFIX = "FLOW_CONFIG_";
-
-    /**
-     * 构造函数
+     * Constructor
      *
-     * @param message 错误信息
+     * @param code    error code
+     * @param message error message
      */
-    public FlowConfigException(String message) {
-        super(ERROR_CODE_PREFIX + "000", message);
+    public FlowConfigException(String code, String message) {
+        super(code, message);
     }
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param errorCode 错误码
-     * @param message   错误信息
+     * @param code    error code
+     * @param message error message
+     * @param cause   cause
      */
-    public FlowConfigException(String errorCode, String message) {
-        super(ERROR_CODE_PREFIX + errorCode, message);
+    public FlowConfigException(String code, String message, Throwable cause) {
+        super(code, message, cause);
     }
 
     /**
-     * 构造函数
+     * Strategies cannot be null
      *
-     * @param errorCode 错误码
-     * @param message   错误信息
-     * @param cause     原因
-     */
-    public FlowConfigException(String errorCode, String message, Throwable cause) {
-        super(ERROR_CODE_PREFIX + errorCode, message, cause);
-    }
-
-    /**
-     * 策略不能为空
-     *
-     * @return 异常
+     * @return exception
      */
     public static FlowConfigException strategiesNotNull() {
-        return new FlowConfigException("001", "strategies can not be null");
+        return new FlowConfigException("config.node.strategies.required", "Strategies cannot be null");
     }
 
     /**
-     * 动作不能为空
+     * Actions cannot be null
      *
-     * @return 异常
+     * @return exception
      */
     public static FlowConfigException actionsNotNull() {
-        return new FlowConfigException("002", "actions can not be null");
+        return new FlowConfigException("config.node.actions.required", "Actions cannot be null");
     }
 
     /**
-     * 节点配置错误
+     * Node configuration error
      *
-     * @param nodeName 节点名称
-     * @param reason   原因
-     * @return 异常
+     * @param nodeName node name
+     * @param reason   reason
+     * @return exception
      */
     public static FlowConfigException nodeConfigError(String nodeName, String reason) {
-        return new FlowConfigException("003",
-                String.format("node '%s' configuration error: %s", nodeName, reason));
+        return new FlowConfigException("config.node.error",
+                String.format("Node '%s' configuration error: %s", nodeName, reason));
     }
 
     /**
-     * 边配置错误
+     * Edge configuration error
      *
-     * @param reason 原因
-     * @return 异常
+     * @param reason reason
+     * @return exception
      */
     public static FlowConfigException edgeConfigError(String reason) {
-        return new FlowConfigException("004", String.format("edge configuration error: %s", reason));
+        return new FlowConfigException("config.edge.error", String.format("Edge configuration error: %s", reason));
     }
 
     /**
-     * 表单配置错误
+     * Form configuration error
      *
-     * @param formName 表单名称
-     * @param reason   原因
-     * @return 异常
+     * @param formName form name
+     * @param reason   reason
+     * @return exception
      */
     public static FlowConfigException formConfigError(String formName, String reason) {
-        return new FlowConfigException("005",
-                String.format("form '%s' configuration error: %s", formName, reason));
+        return new FlowConfigException("config.form.error",
+                String.format("Form '%s' configuration error: %s", formName, reason));
     }
 
     /**
-     * 视图不能为空
+     * View cannot be null
      *
-     * @return 异常
+     * @return exception
      */
     public static FlowConfigException viewNotNull() {
-        return new FlowConfigException("006", "view can not be null");
+        return new FlowConfigException("config.view.required", "View cannot be null");
     }
 
     /**
-     * 并行结束节点不能为空
+     * Parallel end node cannot be null
      *
-     * @return 异常
+     * @return exception
      */
     public static FlowConfigException parallelEndNodeNotNull() {
-        return new FlowConfigException("007", "parallel end node is null");
+        return new FlowConfigException("config.parallel.endNode.required", "Parallel end node cannot be null");
     }
 
     /**
-     * 当前节点不能为空
+     * Current node cannot be null
      *
-     * @return 异常
+     * @return exception
      */
     public static FlowConfigException currentNodeNotNull() {
-        return new FlowConfigException("008", "currentNode is null");
+        return new FlowConfigException("config.node.current.required", "Current node cannot be null");
+    }
+
+    /**
+     * Router node script is null
+     *
+     * @return exception
+     */
+    public static FlowConfigException routerNodeScriptNull() {
+        return new FlowConfigException("config.router.script.required", "Router node script cannot be null");
+    }
+
+    /**
+     * Repository not registered
+     *
+     * @return exception
+     */
+    public static FlowConfigException repositoryNotRegistered() {
+        return new FlowConfigException("config.repository.notRegistered", "Flow repository components not registered");
     }
 }

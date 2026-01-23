@@ -48,7 +48,7 @@ public class RouterNode extends BaseFlowNode {
         Workflow workflow = flowSession.getWorkflow();
         IFlowNode nextNode = workflow.getFlowNode(nextNodeId);
         if (nextNode == null) {
-            throw new FlowExecutionException("can not find next node " + nextNodeId);
+            throw FlowExecutionException.routerNodeNotFound(nextNodeId);
         }
         return List.of(nextNode);
     }
@@ -70,7 +70,7 @@ public class RouterNode extends BaseFlowNode {
     public void verifyNode(FormMeta form) {
         super.verifyNode(form);
         if (routerNodeScript == null) {
-            throw new FlowConfigException("router node script is null");
+            throw FlowConfigException.routerNodeScriptNull();
         }
     }
 

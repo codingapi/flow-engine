@@ -1,10 +1,10 @@
 package com.codingapi.flow.exception;
 
 /**
- * 流程权限异常
+ * Flow permission exception
  * <p>
- * 当操作者没有权限执行当前操作时抛出此异常
- * 例如：字段只读不允许修改、无权操作该流程等
+ * Thrown when an operator does not have permission to perform the current operation
+ * For example: field is read-only and cannot be modified, no permission to operate the flow, etc.
  *
  * @since 1.0.0
  */
@@ -13,78 +13,67 @@ public class FlowPermissionException extends FlowException {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 错误码前缀
-     */
-    public static final String ERROR_CODE_PREFIX = "FLOW_PERMISSION_";
-
-    /**
-     * 构造函数
+     * Constructor
      *
-     * @param message 错误信息
+     * @param code    error code
+     * @param message error message
      */
-    public FlowPermissionException(String message) {
-        super(ERROR_CODE_PREFIX + "000", message);
+    public FlowPermissionException(String code, String message) {
+        super(code, message);
     }
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param errorCode 错误码
-     * @param message   错误信息
+     * @param code    error code
+     * @param message error message
+     * @param cause   cause
      */
-    public FlowPermissionException(String errorCode, String message) {
-        super(ERROR_CODE_PREFIX + errorCode, message);
+    public FlowPermissionException(String code, String message, Throwable cause) {
+        super(code, message, cause);
     }
 
     /**
-     * 构造函数
+     * Field is read-only
      *
-     * @param errorCode 错误码
-     * @param message   错误信息
-     * @param cause     原因
-     */
-    public FlowPermissionException(String errorCode, String message, Throwable cause) {
-        super(ERROR_CODE_PREFIX + errorCode, message, cause);
-    }
-
-    /**
-     * 字段只读
-     *
-     * @param fieldName 字段名称
-     * @return 异常
+     * @param fieldName field name
+     * @return exception
      */
     public static FlowPermissionException fieldReadOnly(String fieldName) {
-        return new FlowPermissionException("001", String.format("field '%s' is readonly", fieldName));
+        return new FlowPermissionException("permission.field.readOnly",
+                String.format("Field '%s' is read-only and cannot be modified", fieldName));
     }
 
     /**
-     * 字段不存在
+     * Field not found
      *
-     * @param fieldName 字段名称
-     * @return 异常
+     * @param fieldName field name
+     * @return exception
      */
     public static FlowPermissionException fieldNotFound(String fieldName) {
-        return new FlowPermissionException("002", String.format("field '%s' not found", fieldName));
+        return new FlowPermissionException("permission.field.notFound",
+                String.format("Field '%s' does not exist", fieldName));
     }
 
     /**
-     * 无权操作
+     * Access denied
      *
-     * @param operation 操作名称
-     * @return 异常
+     * @param operation operation name
+     * @return exception
      */
     public static FlowPermissionException accessDenied(String operation) {
-        return new FlowPermissionException("003", String.format("access denied for operation: %s", operation));
+        return new FlowPermissionException("permission.access.denied",
+                String.format("Access denied to operation: %s", operation));
     }
 
     /**
-     * 无权操作该流程
+     * No permission to operate the flow
      *
-     * @param operatorId 操作者ID
-     * @return 异常
+     * @param operatorId operator ID
+     * @return exception
      */
     public static FlowPermissionException noPermission(long operatorId) {
-        return new FlowPermissionException("004",
-                String.format("operator %d has no permission to access this resource", operatorId));
+        return new FlowPermissionException("permission.access.noPermission",
+                String.format("Operator %d has no permission to access this resource", operatorId));
     }
 }

@@ -50,7 +50,7 @@ public class RepositoryHolderContext {
 
     public void verify() {
         if (!isRegistered()) {
-            throw new FlowConfigException(FlowConfigException.ERROR_CODE_PREFIX + "DELAY_TASK_NOT_REGISTER");
+            throw FlowConfigException.repositoryNotRegistered();
         }
     }
 

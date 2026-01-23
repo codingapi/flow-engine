@@ -1,10 +1,10 @@
 package com.codingapi.flow.exception;
 
 /**
- * 流程状态异常
+ * Flow state exception
  * <p>
- * 当流程状态不允许执行当前操作时抛出此异常
- * 例如：流程已完成不允许再操作、记录已处理不允许重复处理等
+ * Thrown when the flow state does not allow the current operation
+ * For example: workflow is finished and cannot be operated, record is processed and cannot be processed again, etc.
  *
  * @since 1.0.0
  */
@@ -13,85 +13,71 @@ public class FlowStateException extends FlowException {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 错误码前缀
-     */
-    public static final String ERROR_CODE_PREFIX = "FLOW_STATE_";
-
-    /**
-     * 构造函数
+     * Constructor
      *
-     * @param message 错误信息
+     * @param code    error code
+     * @param message error message
      */
-    public FlowStateException(String message) {
-        super(ERROR_CODE_PREFIX + "000", message);
+    public FlowStateException(String code, String message) {
+        super(code, message);
     }
 
     /**
-     * 构造函数
+     * Constructor
      *
-     * @param errorCode 错误码
-     * @param message   错误信息
+     * @param code    error code
+     * @param message error message
+     * @param cause   cause
      */
-    public FlowStateException(String errorCode, String message) {
-        super(ERROR_CODE_PREFIX + errorCode, message);
+    public FlowStateException(String code, String message, Throwable cause) {
+        super(code, message, cause);
     }
 
     /**
-     * 构造函数
+     * Record is already done, operation not allowed
      *
-     * @param errorCode 错误码
-     * @param message   错误信息
-     * @param cause     原因
-     */
-    public FlowStateException(String errorCode, String message, Throwable cause) {
-        super(ERROR_CODE_PREFIX + errorCode, message, cause);
-    }
-
-    /**
-     * 记录已完成，不允许操作
-     *
-     * @return 异常
+     * @return exception
      */
     public static FlowStateException recordAlreadyDone() {
-        return new FlowStateException("001", "record has done");
+        return new FlowStateException("state.record.alreadyDone", "Flow record is already completed, duplicate operation not allowed");
     }
 
     /**
-     * 操作者不匹配
+     * Operator does not match
      *
-     * @return 异常
+     * @return exception
      */
     public static FlowStateException operatorNotMatch() {
-        return new FlowStateException("002", "currentOperator not match");
+        return new FlowStateException("state.operator.notMatch", "Current operator has no permission to process this flow record");
     }
 
     /**
-     * 流程已完成
+     * Workflow is already finished
      *
-     * @return 异常
+     * @return exception
      */
     public static FlowStateException workflowAlreadyFinished() {
-        return new FlowStateException("003", "workflow already finished");
+        return new FlowStateException("state.workflow.alreadyFinished", "Workflow is finished, further operation not allowed");
     }
 
     /**
-     * 流程已终止
+     * Workflow is already terminated
      *
-     * @return 异常
+     * @return exception
      */
     public static FlowStateException workflowAlreadyTerminated() {
-        return new FlowStateException("004", "workflow already terminated");
+        return new FlowStateException("state.workflow.alreadyTerminated", "Workflow is terminated, further operation not allowed");
     }
 
     /**
-     * 无效的状态转换
+     * Invalid state transition
      *
-     * @param fromState 当前状态
-     * @param toState   目标状态
-     * @return 异常
+     * @param fromState current state
+     * @param toState   target state
+     * @return exception
      */
     public static FlowStateException invalidStateTransition(String fromState, String toState) {
-        return new FlowStateException("005",
-                String.format("invalid state transition from '%s' to '%s'", fromState, toState));
+        return new FlowStateException("state.transition.invalid",
+                String.format("Invalid state transition: from '%s' to '%s'", fromState, toState));
     }
 }
