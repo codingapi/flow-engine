@@ -4,6 +4,7 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.node.BaseAuditNode;
+import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.strategy.*;
 import com.codingapi.flow.utils.RandomUtils;
 
@@ -16,7 +17,7 @@ import java.util.Map;
  */
 public class HandleNode extends BaseAuditNode {
 
-    public static final String NODE_TYPE = "handle";
+    public static final String NODE_TYPE = NodeType.HANDLE.name();
     public static final String DEFAULT_NAME = "办理节点";
 
     @Override

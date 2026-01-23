@@ -49,7 +49,7 @@ public class AddAuditAction extends BaseAction {
     public AddAuditAction() {
         this.id = RandomUtils.generateStringId();
         this.title = "加签";
-        this.type = ActionType.ADD_AUDIT;
+        this.type = ActionType.ADD_AUDIT.name();
         this.display = new ActionDisplay(this.title);
         // 默认 anyone
         this.script = null;

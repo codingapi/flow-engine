@@ -6,6 +6,7 @@ import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.script.node.RouterNodeScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
@@ -20,7 +21,7 @@ import java.util.Map;
  */
 public class RouterNode extends BaseFlowNode {
 
-    public static final String NODE_TYPE = "router";
+    public static final String NODE_TYPE = NodeType.ROUTER.name();
     public static final String DEFAULT_NAME = "路由节点";
 
     @Setter

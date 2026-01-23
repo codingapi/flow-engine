@@ -15,7 +15,7 @@ public interface IFlowAction {
     /**
      * 流程类型
      */
-    ActionType type();
+    String type();
 
     /**
      * 动作id

@@ -7,7 +7,9 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.service.FlowService;
+import com.codingapi.flow.service.impl.FlowActionService;
 import com.codingapi.flow.service.impl.FlowDelayTriggerService;
+import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
 
 import java.util.List;
@@ -75,6 +77,20 @@ public class RepositoryHolderContext {
     public FlowDelayTriggerService createDelayTriggerService(DelayTask task) {
         this.verify();
         return new FlowDelayTriggerService(task,
+                flowOperatorGateway,
+                flowRecordRepository,
+                workflowBackupRepository);
+    }
+
+
+    /**
+     * 构建流程动作服务
+     * @param flowSession 流程会话
+     * @return 流程动作服务
+     */
+    public FlowActionService createFlowActionService(FlowSession flowSession) {
+        this.verify();
+        return new FlowActionService(flowSession.toActionRequest(),
                 flowOperatorGateway,
                 flowRecordRepository,
                 workflowBackupRepository);

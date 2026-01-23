@@ -3,6 +3,7 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.script.node.ConditionScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
@@ -16,9 +17,9 @@ import java.util.Map;
 /**
  * 分支节点
  */
-public class BranchNodeBranchNode extends BaseFlowNode {
+public class ConditionBranchNode extends BaseFlowNode {
 
-    public static final String NODE_TYPE = "condition_branch";
+    public static final String NODE_TYPE = NodeType.CONDITION_BRANCH.name();
     public static final String DEFAULT_NAME = "分支节点";
 
     /**
@@ -32,12 +33,12 @@ public class BranchNodeBranchNode extends BaseFlowNode {
         return NODE_TYPE;
     }
 
-    public BranchNodeBranchNode(String id, String name, int order) {
+    public ConditionBranchNode(String id, String name, int order) {
         super(id, name, order);
         this.conditionScript = ConditionScript.defaultScript();
     }
 
-    public BranchNodeBranchNode() {
+    public ConditionBranchNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, 0);
     }
 
@@ -72,8 +73,8 @@ public class BranchNodeBranchNode extends BaseFlowNode {
         return map;
     }
 
-    public static BranchNodeBranchNode formMap(Map<String, Object> map) {
-        BranchNodeBranchNode branchNode = BaseFlowNode.loadFromMap(map, BranchNodeBranchNode.class);
+    public static ConditionBranchNode formMap(Map<String, Object> map) {
+        ConditionBranchNode branchNode = BaseFlowNode.loadFromMap(map, ConditionBranchNode.class);
         branchNode.conditionScript = new ConditionScript((String) map.get("script"));
         return branchNode;
     }
@@ -82,10 +83,10 @@ public class BranchNodeBranchNode extends BaseFlowNode {
         return new Builder();
     }
 
-    public static class Builder extends BaseNodeBuilder<Builder, BranchNodeBranchNode> {
+    public static class Builder extends BaseNodeBuilder<Builder, ConditionBranchNode> {
 
         public Builder() {
-            super(new BranchNodeBranchNode());
+            super(new ConditionBranchNode());
         }
 
         public Builder conditionScript(String script) {

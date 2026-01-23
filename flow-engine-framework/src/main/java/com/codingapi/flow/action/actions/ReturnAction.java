@@ -25,7 +25,7 @@ public class ReturnAction extends BaseAction {
     public ReturnAction() {
         this.id = RandomUtils.generateStringId();
         this.title = "退回";
-        this.type = ActionType.RETURN;
+        this.type = ActionType.RETURN.name();
         this.display = new ActionDisplay(this.title);
     }
 

@@ -3,7 +3,10 @@ package com.codingapi.flow.session;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.pojo.body.FlowAdviceBody;
+import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.workflow.Workflow;
@@ -102,6 +105,9 @@ public class FlowSession {
     }
 
 
+    /**
+     * 创建流程请求
+     */
     public FlowCreateRequest toCreateRequest() {
         FlowCreateRequest request = new FlowCreateRequest();
         IFlowNode startNode = workflow.getStartNode();
@@ -115,12 +121,23 @@ public class FlowSession {
 
 
     /**
+     * 创建流程动作请求
+     */
+    public FlowActionRequest toActionRequest() {
+        FlowActionRequest request = new FlowActionRequest();
+        request.setRecordId(currentRecord.getId());
+        request.setFormData(formData.toMapData());
+        request.setAdvice(new FlowAdviceBody(this));
+        return request;
+    }
+
+
+    /**
      * 获取流程开始节点
      */
     public IFlowNode getStartNode() {
         return workflow.getStartNode();
     }
-
 
     /**
      * 获取流程的创建者
@@ -175,6 +192,16 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowNode currentNode) {
+        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
+    }
+
+
+    /**
+     * 更新会话
+     * @param currentAction 当前动作
+     * @return 新的会话
+     */
+    public FlowSession updateSession(IFlowAction currentAction) {
         return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
     }
 

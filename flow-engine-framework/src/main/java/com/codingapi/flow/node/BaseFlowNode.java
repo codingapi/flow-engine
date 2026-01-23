@@ -8,6 +8,9 @@ import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.node.nodes.ApprovalNode;
+import com.codingapi.flow.node.nodes.HandleNode;
+import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.INodeStrategy;
@@ -87,7 +90,9 @@ public abstract class BaseFlowNode implements IFlowNode {
                         currentAction.copy(action);
                     } else {
                         if (action instanceof CustomAction) {
-                            this.actions.add(action);
+                            if(this.hasCustomAction()){
+                                this.actions.add(action);
+                            }
                         }
                     }
                 }
@@ -95,6 +100,14 @@ public abstract class BaseFlowNode implements IFlowNode {
                 this.actions = actions;
             }
         }
+    }
+
+
+    /**
+     * 是否可以包含自定义操作的节点，仅允许开始节点、审批节点、处理节点包含自定义操作
+     */
+    private boolean hasCustomAction(){
+        return this.getType().equals(StartNode.NODE_TYPE) || this.getType().equals(ApprovalNode.NODE_TYPE) || this.getType().equals(HandleNode.NODE_TYPE);
     }
 
 

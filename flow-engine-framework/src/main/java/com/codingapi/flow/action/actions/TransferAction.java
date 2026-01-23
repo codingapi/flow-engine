@@ -35,7 +35,7 @@ public class TransferAction extends BaseAction {
     public TransferAction() {
         this.id = RandomUtils.generateStringId();
         this.title = "转办";
-        this.type = ActionType.TRANSFER;
+        this.type = ActionType.TRANSFER.name();
         this.display = new ActionDisplay(this.title);
         // 默认 anyone
         this.script = null;

@@ -85,7 +85,7 @@ public class FlowRecord {
     /**
      * 动作类型
      */
-    private ActionType actionType;
+    private String actionType;
 
     /**
      * 审批意见

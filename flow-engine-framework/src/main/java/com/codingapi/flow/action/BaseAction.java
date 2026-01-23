@@ -17,12 +17,12 @@ import java.util.function.Consumer;
 public abstract class BaseAction implements IFlowAction {
 
     protected String id;
-    protected ActionType type;
+    protected String type;
     protected String title;
     protected ActionDisplay display;
 
     @Override
-    public ActionType type() {
+    public String type() {
         return type;
     }
 
@@ -53,7 +53,7 @@ public abstract class BaseAction implements IFlowAction {
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("id", id);
-        map.put("type", type.name());
+        map.put("type", type);
         map.put("title", title);
         map.put("display", display != null ? display.toMap() : null);
         return map;
@@ -77,7 +77,7 @@ public abstract class BaseAction implements IFlowAction {
     protected static <T extends BaseAction> T fromMap(Map<String, Object> data, Class<T> clazz) {
         T action = clazz.getDeclaredConstructor().newInstance();
         action.setId((String) data.get("id"));
-        action.setType(ActionType.valueOf((String) data.get("type")));
+        action.setType((String) data.get("type"));
         action.setTitle((String) data.get("title"));
         Map<String, Object> display = (Map<String, Object>) data.get("display");
         if (display != null) {

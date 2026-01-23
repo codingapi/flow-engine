@@ -6,6 +6,7 @@ import com.codingapi.flow.action.actions.SaveAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
@@ -26,7 +27,7 @@ import java.util.Map;
  */
 public class StartNode extends BaseFlowNode {
 
-    public static final String NODE_TYPE = "start";
+    public static final String NODE_TYPE = NodeType.START.name();
     public static final String DEFAULT_NAME = "开始节点";
 
     public static final String DEFAULT_VIEW = "default";

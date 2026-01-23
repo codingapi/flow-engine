@@ -4,6 +4,7 @@ import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.helper.ParallelNodeRelationHelper;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.ConditionScript;
@@ -20,7 +21,7 @@ import java.util.Map;
  */
 public class InclusiveBranchNode extends BaseFlowNode {
 
-    public static final String NODE_TYPE = "inclusive_branch";
+    public static final String NODE_TYPE = NodeType.INCLUSIVE_BRANCH.name();
     public static final String DEFAULT_NAME = "包容分支节点";
 
     /**

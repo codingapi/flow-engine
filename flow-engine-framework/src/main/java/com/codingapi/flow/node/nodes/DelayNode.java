@@ -5,6 +5,7 @@ import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.delay.DelayTask;
 import com.codingapi.flow.delay.DelayTaskManager;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -21,7 +22,7 @@ import java.util.Map;
  */
 public class DelayNode extends BaseFlowNode {
 
-    public static final String NODE_TYPE = "delay";
+    public static final String NODE_TYPE = NodeType.DELAY.name();
     public static final String DEFAULT_NAME = "延迟节点";
 
     @Override

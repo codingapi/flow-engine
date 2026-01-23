@@ -32,7 +32,7 @@ public class RejectAction extends BaseAction {
     public RejectAction() {
         this.id = RandomUtils.generateStringId();
         this.title = "拒绝";
-        this.type = ActionType.REJECT;
+        this.type = ActionType.REJECT.name();
         this.display = new ActionDisplay(this.title);
         this.script = RejectActionScript.startScript();
     }

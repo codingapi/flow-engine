@@ -2,6 +2,7 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.INodeStrategy;
@@ -17,7 +18,7 @@ import java.util.Map;
  */
 public class TriggerNode extends BaseFlowNode {
 
-    public static final String NODE_TYPE = "trigger";
+    public static final String NODE_TYPE = NodeType.TRIGGER.name();
     public static final String DEFAULT_NAME = "触发节点";
 
     @Override

@@ -27,6 +27,20 @@ public class ActionManager {
     private final List<IFlowAction> actions;
 
 
+
+    /**
+     * 获取节点动作
+     *
+     */
+    public IFlowAction getActionByType(String type) {
+        for (IFlowAction action : actions) {
+            if (action.type().equals(type)) {
+                return action;
+            }
+        }
+        return null;
+    }
+
     /**
      * 获取节点动作
      *
@@ -51,6 +65,11 @@ public class ActionManager {
         IFlowAction flowAction = flowAdvice.getAction();
         // 保存操作,不做检查
         if (flowAction instanceof SaveAction) {
+            return;
+        }
+
+        // 自定义的动作
+        if (flowAction instanceof CustomAction) {
             return;
         }
 

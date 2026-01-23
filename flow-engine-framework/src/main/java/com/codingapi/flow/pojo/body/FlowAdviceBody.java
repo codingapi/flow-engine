@@ -1,6 +1,8 @@
 package com.codingapi.flow.pojo.body;
 
 import com.codingapi.flow.exception.FlowValidationException;
+import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.session.FlowSession;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -43,6 +45,16 @@ public class FlowAdviceBody {
         this.actionId = actionId;
         this.advice = advice;
         this.operatorId = operatorId;
+    }
+
+
+    public FlowAdviceBody(FlowSession flowSession) {
+        this.actionId = flowSession.getCurrentAction().id();
+        this.advice = flowSession.getAdvice().getAdvice();
+        this.operatorId = flowSession.getCurrentOperator().getUserId();
+        this.signKey = flowSession.getAdvice().getSignKey();
+        this.backNodeId = flowSession.getAdvice().getBackNode() != null ? flowSession.getAdvice().getBackNode().getId() : null;
+        this.forwardOperatorIds = flowSession.getAdvice().getForwardOperators() != null ? flowSession.getAdvice().getForwardOperators().stream().map(IFlowOperator::getUserId).toList() : null;
     }
 
 

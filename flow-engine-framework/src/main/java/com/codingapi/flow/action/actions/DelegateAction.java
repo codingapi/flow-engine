@@ -41,7 +41,7 @@ public class DelegateAction extends BaseAction {
     public DelegateAction() {
         this.id = RandomUtils.generateStringId();
         this.title = "委派";
-        this.type = ActionType.DELEGATE;
+        this.type = ActionType.DELEGATE.name();
         this.display = new ActionDisplay(this.title);
         // 默认 anyone
         this.script = null;

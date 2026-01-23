@@ -4,6 +4,7 @@ import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.helper.ParallelNodeRelationHelper;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -18,7 +19,7 @@ import java.util.Map;
  */
 public class ParallelBranchNode extends BaseFlowNode {
 
-    public static final String NODE_TYPE = "parallel_branch";
+    public static final String NODE_TYPE = NodeType.PARALLEL_BRANCH.name();
     public static final String DEFAULT_NAME = "并行节点";
 
     @Override

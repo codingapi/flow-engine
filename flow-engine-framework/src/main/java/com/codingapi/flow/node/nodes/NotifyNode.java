@@ -4,6 +4,7 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.node.BaseAuditNode;
+import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -21,7 +22,7 @@ import java.util.Map;
  */
 public class NotifyNode extends BaseAuditNode {
 
-    public static final String NODE_TYPE = "notify";
+    public static final String NODE_TYPE = NodeType.NOTIFY.name();
     public static final String DEFAULT_NAME = "抄送节点";
 
     @Override
