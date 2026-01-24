@@ -29,7 +29,8 @@ public interface IFlowOperator {
 
 
     /**
-     * 委托操作者, 被委托者不能再继续委托
+     * 委托操作者
+     * TODO 在流程处理过程中要以抄送的方式给当事人发送信息
      * 当委托操作者不为空时，当前操作者将由委托操作者执行
      */
     IFlowOperator forwardOperator();

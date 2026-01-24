@@ -60,7 +60,8 @@ flow-engine
 │       │   ├── FlowRecordStartEvent      # Flow start event
 │       │   ├── FlowRecordTodoEvent       # Todo event
 │       │   ├── FlowRecordDoneEvent       # Done event
-│       │   └── FlowRecordFinishEvent     # Flow finish event
+│       │   ├── FlowRecordFinishEvent     # Flow finish event
+│       │   └── FlowRecordUrgeEvent       # Urge event
 │       ├── exception             # Exception system (6 types)
 │       │   ├── FlowException             # Exception base class
 │       │   ├── FlowValidationException   # Parameter validation exception
@@ -112,7 +113,8 @@ flow-engine
 │       │   ├── FlowRecordRepository
 │       │   ├── WorkflowBackupRepository
 │       │   ├── ParallelBranchRepository
-│       │   └── DelayTaskRepository
+│       │   ├── DelayTaskRepository
+│       │   └── UrgeIntervalRepository
 │       ├── script                # Script system
 │       │   ├── node              # Node scripts (9 types)
 │       │   │   ├── OperatorMatchScript  # Initiator matching script
@@ -139,23 +141,31 @@ flow-engine
 │       ├── session               # Session layer
 │       │   ├── FlowSession       # Execution context
 │       │   └── FlowAdvice        # Approval parameters (opinion, signature, return node, etc.)
-│       ├── strategy              # Strategy layer (13 types)
-│       │   ├── MultiOperatorAuditStrategy  # Multi-person approval strategy
-│       │   ├── TimeoutStrategy          # Timeout strategy
-│       │   ├── SameOperatorAuditStrategy # Same operator approval strategy
-│       │   ├── RecordMergeStrategy      # Record merge strategy
-│       │   ├── ResubmitStrategy         # Resubmit strategy
-│       │   ├── AdviceStrategy           # Approval opinion strategy
-│       │   ├── OperatorLoadStrategy     # Approver loading strategy
-│       │   ├── ErrorTriggerStrategy     # Error trigger strategy
-│       │   ├── NodeTitleStrategy        # Node title strategy
-│       │   ├── FormFieldPermissionStrategy # Field permission strategy
-│       │   ├── DelayStrategy            # Delay strategy
-│       │   ├── TriggerStrategy          # Trigger strategy
-│       │   ├── SubProcessStrategy       # Sub-process strategy
-│       │   ├── NodeStrategyFactory      # Strategy factory
-│       │   ├── BaseStrategy             # Strategy abstract base class
-│       │   └── INodeStrategy            # Strategy interface
+│       ├── strategy              # Strategy layer (17 types: 14 node strategies + 3 workflow strategies)
+│       │   ├── node                # Node strategies
+│       │   │   ├── MultiOperatorAuditStrategy  # Multi-person approval strategy
+│       │   │   ├── TimeoutStrategy          # Timeout strategy
+│       │   │   ├── SameOperatorAuditStrategy # Same operator approval strategy
+│       │   │   ├── RecordMergeStrategy      # Record merge strategy
+│       │   │   ├── ResubmitStrategy         # Resubmit strategy
+│       │   │   ├── AdviceStrategy           # Approval opinion strategy
+│       │   │   ├── OperatorLoadStrategy     # Approver loading strategy
+│       │   │   ├── ErrorTriggerStrategy     # Error trigger strategy
+│       │   │   ├── NodeTitleStrategy        # Node title strategy
+│       │   │   ├── FormFieldPermissionStrategy # Field permission strategy
+│       │   │   ├── DelayStrategy            # Delay strategy
+│       │   │   ├── TriggerStrategy          # Trigger strategy
+│       │   │   ├── SubProcessStrategy       # Sub-process strategy
+│       │   │   ├── RevokeStrategy           # Revoke strategy
+│       │   │   ├── NodeStrategyFactory      # Node strategy factory
+│       │   │   ├── BaseStrategy             # Node strategy abstract base class
+│       │   │   └── INodeStrategy            # Node strategy interface
+│       │   └── workflow            # Workflow strategies
+│       │       ├── InterfereStrategy        # Interfere strategy
+│       │       ├── UrgeStrategy             # Urge strategy
+│       │       ├── WorkflowStrategyFactory  # Workflow strategy factory
+│       │       ├── BaseStrategy             # Workflow strategy abstract base class
+│       │       └── IWorkflowStrategy        # Workflow strategy interface
 │       ├── utils                 # Utility classes
 │       │   ├── RandomUtils       # Random utility
 │       │   └── Sha256Utils       # SHA256 encryption utility
@@ -232,7 +242,7 @@ pnpm run dev:app-pc
 
 1. **Workflow Layer** - Workflow definition layer
 2. **Node Layer** - Node layer (12 node types)
-3. **Action Layer** - Action layer (9 action types)
+3. **Action Layer** - Action layer (8 action types)
 4. **Record Layer** - Record layer
 5. **Session Layer** - Session layer
 6. **Manager Layer** - Manager layer

@@ -95,7 +95,8 @@ The workflow engine is organized into 8 layers:
 
 7. **Strategy Layer** (`com.codingapi.flow.strategy`)
    - `INodeStrategy` - Interface with `copy()`, `getId()`, `strategyType()`
-   - 13 strategy types: MultiOperatorAuditStrategy, TimeoutStrategy, SameOperatorAuditStrategy, RecordMergeStrategy, ResubmitStrategy, AdviceStrategy, OperatorLoadStrategy, ErrorTriggerStrategy, NodeTitleStrategy, FormFieldPermissionStrategy, DelayStrategy, TriggerStrategy, SubProcessStrategy
+   - **Node strategies** (14 types): MultiOperatorAuditStrategy, TimeoutStrategy, SameOperatorAuditStrategy, RecordMergeStrategy, ResubmitStrategy, AdviceStrategy, OperatorLoadStrategy, ErrorTriggerStrategy, NodeTitleStrategy, FormFieldPermissionStrategy, DelayStrategy, TriggerStrategy, SubProcessStrategy, RevokeStrategy
+   - **Workflow strategies** (3 types): InterfereStrategy, UrgeStrategy, RevokeStrategy (node-level)
 
 8. **Script Layer** (`com.codingapi.flow.script.runtime`)
    - `ScriptRuntimeContext` - Groovy script execution with thread-safe design and auto-cleanup
@@ -106,8 +107,9 @@ The workflow engine is organized into 8 layers:
 - **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation. Implementations are in `flow-engine-starter-infra`. Access via `RepositoryHolderContext` singleton.
 - **Gateway Pattern** (`com.codingapi.flow.gateway`) - Anti-corruption layer for external system integration (operators, users). Access via `GatewayContext` singleton.
 - **Delay Task System** (`com.codingapi.flow.domain`) - DelayTask, DelayTaskManager for deferred execution using Timer
+- **Urge System** (`com.codingapi.flow.domain`) - UrgeInterval for tracking urge timing, managed by UrgeIntervalRepository
 - **Edge System** (`com.codingapi.flow.edge`) - FlowEdge for node connections
-- **Event System** (`com.codingapi.flow.event`) - 4 event types: FlowRecordStartEvent, FlowRecordTodoEvent, FlowRecordDoneEvent, FlowRecordFinishEvent
+- **Event System** (`com.codingapi.flow.event`) - 5 event types: FlowRecordStartEvent, FlowRecordTodoEvent, FlowRecordDoneEvent, FlowRecordFinishEvent, FlowRecordUrgeEvent
 - **Backup System** (`com.codingapi.flow.backup`) - WorkflowBackup for workflow versioning
 
 ### Node Lifecycle (Critical for Understanding Flow)
@@ -144,6 +146,18 @@ When encountering `ParallelBranchNode`:
 **DelayNode**: Uses `DelayStrategy` with time units (SECOND/MINUTE/HOUR/DAY). Creates `DelayTask` which is managed by `DelayTaskManager` using `java.util.Timer` for scheduled execution. On trigger, `FlowDelayTriggerService` resumes the flow.
 
 **TriggerNode**: Uses `TriggerStrategy` with `TriggerScript`. Executes trigger script via `ScriptRuntimeContext` when node is reached.
+
+### Workflow-Level Features
+
+**Urge (催办)**: `UrgeStrategy` with configurable interval (default 60 seconds). Uses `UrgeInterval` domain object to track timing. Triggers `FlowRecordUrgeEvent` when interval expires. Used for automatic reminders of pending tasks.
+
+**Interfere (干预)**: `InterfereStrategy` controls whether admin intervention is allowed in the workflow. Enable/disable at workflow level.
+
+**Revoke (撤回)**: `RevokeStrategy` at node level supports two types:
+- `REVOKE_NEXT`: Revoke subordinates, delete subsequent pending records, return to current node
+- `REVOKE_CURRENT`: Revoke to current node, restore current node to pending state
+
+Key difference from Return (退回): Return is executed by current approver to go back to previous completed nodes; Revoke is executed by approved personnel to revoke subordinates or restore current node.
 
 ### Key Design Patterns
 
@@ -219,9 +233,9 @@ All framework exceptions extend `FlowException` (RuntimeException). Exception co
 
 - **Custom Nodes**: Extend `BaseFlowNode` or `BaseAuditNode`, implement `IFlowNode`
 - **Custom Actions**: Extend `BaseAction`, implement `IFlowAction`
-- **Custom Strategies**: Extend `BaseStrategy`, implement `INodeStrategy`
+- **Custom Strategies**: Extend `BaseStrategy`, implement `INodeStrategy` for node strategies or `IWorkflowStrategy` for workflow strategies
 - **Custom Scripts**: Use `ScriptRuntimeContext` for Groovy execution
-- **Event Listeners**: Listen to `FlowRecordStartEvent`, `FlowRecordTodoEvent`, `FlowRecordDoneEvent`, `FlowRecordFinishEvent`
+- **Event Listeners**: Listen to `FlowRecordStartEvent`, `FlowRecordTodoEvent`, `FlowRecordDoneEvent`, `FlowRecordFinishEvent`, `FlowRecordUrgeEvent`
 - **Repository Implementations**: Implement repository interfaces in infra layer for persistence
 - **Gateway Implementations**: Implement gateway interfaces for system integration
 

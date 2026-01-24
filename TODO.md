@@ -48,6 +48,8 @@
 |-----|------|------|
 | 流程撤销 | ✅ | Workflow.isRevoke |
 | 流程干预 | ✅ | Workflow.isInterfere |
+| 流程催办 | ✅ | UrgeStrategy，支持催办间隔配置（默认60秒） |
+| 节点撤回 | ✅ | RevokeStrategy，支持撤回下级/撤回到当前节点 |
 | 发起人匹配 | ✅ | OperatorMatchScript |
 
 ### 委托功能
@@ -81,6 +83,9 @@
 | DelayStrategy | ✅ | 延迟策略（支持秒/分钟/小时/天） |
 | TriggerStrategy | ✅ | 触发策略 |
 | SubProcessStrategy | ✅ | 子流程策略 |
+| RevokeStrategy | ✅ | 撤回策略（撤回下级/撤回到当前节点） |
+| InterfereStrategy | ✅ | 干预策略（工作流级别） |
+| UrgeStrategy | ✅ | 催办策略（工作流级别，支持催办间隔配置） |
 
 ### 脚本系统
 
@@ -140,6 +145,7 @@
 | FlowRecordTodoEvent | ✅ | 待办事件 |
 | FlowRecordDoneEvent | ✅ | 已办事件 |
 | FlowRecordFinishEvent | ✅ | 流程完成事件 |
+| FlowRecordUrgeEvent | ✅ | 催办事件 |
 
 ### 设计模式应用
 
@@ -293,6 +299,9 @@
 - ✅ 路由节点完整实现
 - ✅ 异常体系标准化（字符串错误码格式）
 - ✅ 脚本系统完善（10种脚本类型）
+- ✅ 流程催办功能（UrgeStrategy + UrgeInterval + FlowRecordUrgeEvent）
+- ✅ 流程干预功能（InterfereStrategy）
+- ✅ 节点撤回功能（RevokeStrategy）
 - 🚧 条件分支节点增强
 - 🚧 子流程节点完善
 - 🚧 包容分支节点完善
@@ -302,7 +311,6 @@
 
 - [ ] 流程版本管理
 - [ ] 流程模拟功能
-- [ ] 流程撤回功能
 - [ ] 消息通知集成
 - [ ] 前端流程处理界面
 
