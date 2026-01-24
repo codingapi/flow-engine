@@ -3,7 +3,7 @@ package com.codingapi.flow.repository;
 import com.codingapi.flow.workflow.Workflow;
 
 /**
- *  工作流仓库
+ * 工作流仓库
  */
 public interface WorkflowRepository {
 

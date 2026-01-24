@@ -5,7 +5,7 @@ import com.codingapi.flow.record.FlowRecord;
 import java.util.List;
 
 /**
- *  流程记录
+ * 流程记录
  */
 public interface FlowRecordRepository {
 
@@ -19,6 +19,7 @@ public interface FlowRecordRepository {
 
     /**
      * 查询当前节点的记录
+     *
      * @param fromId 流程的来源记录id
      * @param nodeId 节点id
      * @return 记录列表
@@ -27,6 +28,7 @@ public interface FlowRecordRepository {
 
     /**
      * 查询当前流程的记录
+     *
      * @param processId 流程id
      * @return 记录列表
      */
@@ -34,6 +36,7 @@ public interface FlowRecordRepository {
 
     /**
      * 查询所有最新的待办记录
+     *
      * @param processId 流程id
      * @return 待办记录列表
      */
@@ -41,8 +44,9 @@ public interface FlowRecordRepository {
 
     /**
      * 查询所有后续的流程记录
+     *
      * @param processId 流程id
-     * @param fromId 开始记录id
+     * @param fromId    开始记录id
      * @return 记录列表
      */
     List<FlowRecord> findAfterRecords(String processId, long fromId);

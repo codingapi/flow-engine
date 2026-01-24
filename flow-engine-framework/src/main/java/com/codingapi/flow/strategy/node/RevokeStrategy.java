@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * 撤回策略
  */
-public class RevokeStrategy extends BaseStrategy{
+public class RevokeStrategy extends BaseStrategy {
 
 
     /**
@@ -35,7 +35,7 @@ public class RevokeStrategy extends BaseStrategy{
     }
 
 
-    public static enum Type{
+    public static enum Type {
         /**
          * 撤回下级审批
          */

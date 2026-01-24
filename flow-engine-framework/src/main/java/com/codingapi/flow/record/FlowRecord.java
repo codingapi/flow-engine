@@ -334,7 +334,7 @@ public class FlowRecord {
         this.updateTime = System.currentTimeMillis();
         this.recordState = done ? SATE_RECORD_DONE : SATE_RECORD_TODO;
 
-        if(flowSession.getCurrentOperator().getUserId() != this.currentOperatorId){
+        if (flowSession.getCurrentOperator().getUserId() != this.currentOperatorId) {
             this.interferedOperatorId = flowSession.getCurrentOperator().getUserId();
         }
 

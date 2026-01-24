@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * 催办策略
  */
-public class UrgeStrategy extends BaseStrategy{
+public class UrgeStrategy extends BaseStrategy {
 
     // 默认的催办间隔 60秒
     public static final int DEFAULT_INTERVAL = 60;

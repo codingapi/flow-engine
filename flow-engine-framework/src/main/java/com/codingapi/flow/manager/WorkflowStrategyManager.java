@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import java.util.List;
 
 /**
- *  流程策略管理
+ * 流程策略管理
  */
 @AllArgsConstructor
 public class WorkflowStrategyManager {
@@ -19,7 +19,7 @@ public class WorkflowStrategyManager {
 
     public boolean isEnableInterfere() {
         InterfereStrategy interfereStrategy = getStrategy(InterfereStrategy.class);
-        if(interfereStrategy!=null){
+        if (interfereStrategy != null) {
             return interfereStrategy.isEnable();
         }
         return false;
@@ -27,7 +27,7 @@ public class WorkflowStrategyManager {
 
     public boolean isEnableUrge() {
         InterfereStrategy interfereStrategy = getStrategy(InterfereStrategy.class);
-        if(interfereStrategy!=null){
+        if (interfereStrategy != null) {
             return interfereStrategy.isEnable();
         }
         return false;
@@ -46,16 +46,17 @@ public class WorkflowStrategyManager {
 
     /**
      * 验证操作者
-     * @param currentOperator 当前操作者
+     *
+     * @param currentOperator  当前操作者
      * @param recordOperatorId 记录操作者id
      */
     public void verifyOperator(IFlowOperator currentOperator, long recordOperatorId) {
-        if(!this.isEnableInterfere()){
+        if (!this.isEnableInterfere()) {
             if (recordOperatorId != currentOperator.getUserId()) {
                 throw FlowStateException.operatorNotMatch();
             }
-        }else {
-            if(!currentOperator.isFlowManager()){
+        } else {
+            if (!currentOperator.isFlowManager()) {
                 if (recordOperatorId != currentOperator.getUserId()) {
                     throw FlowStateException.operatorNotMatch();
                 }

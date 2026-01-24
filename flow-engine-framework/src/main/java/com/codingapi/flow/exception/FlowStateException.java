@@ -45,11 +45,13 @@ public class FlowStateException extends FlowException {
 
     /**
      * Record is already todo, operation not allowed
-     * @return  exception
+     *
+     * @return exception
      */
     public static FlowStateException recordAlreadyTodo() {
         return new FlowStateException("state.record.alreadyTodo", "Flow record is already todo, duplicate operation not allowed");
     }
+
     /**
      * Operator does not match
      *
@@ -90,8 +92,6 @@ public class FlowStateException extends FlowException {
     }
 
 
-
-
     /**
      * Record not support revoke
      *
@@ -104,6 +104,7 @@ public class FlowStateException extends FlowException {
 
     /**
      * Node not support revoke
+     *
      * @return exception
      */
     public static FlowStateException nodeNotSupportRevoke() {
@@ -112,6 +113,7 @@ public class FlowStateException extends FlowException {
 
     /**
      * Record not support urge
+     *
      * @return exception
      */
     public static FlowStateException recordNotSupportUrge() {

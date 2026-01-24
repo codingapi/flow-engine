@@ -71,6 +71,7 @@ public class FlowService {
 
     /**
      * 撤销流程
+     *
      * @param request 撤销请求
      */
     public void revoke(FlowRevokeRequest request) {
@@ -83,7 +84,7 @@ public class FlowService {
      * 催办
      */
     public void urge(FlowUrgeRequest request) {
-        FlowUrgeService flowUrgeService = new FlowUrgeService(request, flowRecordRepository,flowOperatorGateway,urgeIntervalRepository,workflowBackupRepository);
+        FlowUrgeService flowUrgeService = new FlowUrgeService(request, flowRecordRepository, flowOperatorGateway, urgeIntervalRepository, workflowBackupRepository);
         flowUrgeService.urge();
     }
 }

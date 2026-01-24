@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * 干预策略
  */
-public class InterfereStrategy extends BaseStrategy{
+public class InterfereStrategy extends BaseStrategy {
 
     @Setter
     @Getter

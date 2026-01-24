@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- *  催办间隔控制
+ * 催办间隔控制
  */
 @Getter
 @AllArgsConstructor

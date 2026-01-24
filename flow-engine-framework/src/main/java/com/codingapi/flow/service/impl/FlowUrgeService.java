@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *  催办服务
+ * 催办服务
  */
 @AllArgsConstructor
 public class FlowUrgeService {
@@ -57,13 +57,13 @@ public class FlowUrgeService {
         }
 
         UrgeInterval urgeInterval = urgeIntervalRepository.getLatest(currentRecord.getProcessId(), request.getRecordId());
-        if(urgeInterval!=null){
+        if (urgeInterval != null) {
             WorkflowBackup workflowBackup = workflowBackupRepository.get(currentRecord.getWorkBackupId());
             Workflow workflow = workflowBackup.toWorkflow();
             WorkflowStrategyManager strategyManager = workflow.strategyManager();
-            if(strategyManager.isEnableUrge()){
+            if (strategyManager.isEnableUrge()) {
                 UrgeStrategy urgeStrategy = strategyManager.getStrategy(UrgeStrategy.class);
-                if(!urgeStrategy.hasUrge(urgeInterval)){
+                if (!urgeStrategy.hasUrge(urgeInterval)) {
                     throw FlowStateException.recordNotSupportUrge();
                 }
             }
@@ -78,7 +78,7 @@ public class FlowUrgeService {
         List<IFlowEvent> flowEvents = new ArrayList<>();
 
         for (FlowRecord todoRecord : todoRecords) {
-            flowEvents.add(new FlowRecordUrgeEvent(todoRecord,currentOperator));
+            flowEvents.add(new FlowRecordUrgeEvent(todoRecord, currentOperator));
         }
 
         flowEvents.forEach(EventPusher::push);

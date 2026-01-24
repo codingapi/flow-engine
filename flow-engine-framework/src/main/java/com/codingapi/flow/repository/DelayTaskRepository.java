@@ -5,7 +5,7 @@ import com.codingapi.flow.domain.DelayTask;
 import java.util.List;
 
 /**
- *  延时任务仓库
+ * 延时任务仓库
  */
 public interface DelayTaskRepository {
 

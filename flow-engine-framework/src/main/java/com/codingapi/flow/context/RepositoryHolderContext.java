@@ -161,8 +161,8 @@ public class RepositoryHolderContext {
         return flowRecordRepository.findProcessRecords(processId);
     }
 
-    public List<FlowRecord> findAfterRecords(String processId,long currentId) {
-        return flowRecordRepository.findAfterRecords(processId,currentId);
+    public List<FlowRecord> findAfterRecords(String processId, long currentId) {
+        return flowRecordRepository.findAfterRecords(processId, currentId);
     }
 
     public int getParallelBranchTriggerCount(String parallelId) {

@@ -5,7 +5,7 @@ import com.codingapi.flow.domain.UrgeInterval;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UrgeIntervalRepositoryImpl implements UrgeIntervalRepository{
+public class UrgeIntervalRepositoryImpl implements UrgeIntervalRepository {
 
     private final Map<Long, UrgeInterval> cache = new HashMap<>();
 
@@ -13,7 +13,7 @@ public class UrgeIntervalRepositoryImpl implements UrgeIntervalRepository{
     @Override
     public UrgeInterval getLatest(String processId, long recordId) {
         return cache.values().stream()
-                .filter(urgeInterval -> urgeInterval.getProcessId().equals(processId) && urgeInterval.getRecordId() == recordId).sorted((o1, o2) -> (int)(o2.getCreateTime() - o1.getCreateTime()))
+                .filter(urgeInterval -> urgeInterval.getProcessId().equals(processId) && urgeInterval.getRecordId() == recordId).sorted((o1, o2) -> (int) (o2.getCreateTime() - o1.getCreateTime()))
                 .findFirst().orElse(null);
     }
 

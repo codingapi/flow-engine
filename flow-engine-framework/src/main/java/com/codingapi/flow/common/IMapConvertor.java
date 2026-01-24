@@ -5,11 +5,11 @@ import lombok.SneakyThrows;
 import java.util.Map;
 
 /**
- *  map 转换
+ * map 转换
  */
 public interface IMapConvertor {
 
-    Map<String,Object> toMap();
+    Map<String, Object> toMap();
 
     @SneakyThrows
     public static <T extends IMapConvertor> T fromMap(Map<String, Object> map, Class<T> clazz) {
