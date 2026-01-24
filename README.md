@@ -1,345 +1,361 @@
 # Flow Engine
 
-> Enterprise Workflow Engine - Visual Process Design, Dynamic Form Configuration, Multi-node Type Flow
+> 企业级流程引擎 - 可视化流程设计、动态表单配置、多节点类型流转
 
-## Introduction
+## 简介
 
-Flow Engine is an enterprise-grade workflow engine built with Java 17 and Spring Boot 3.5.9, providing complete workflow management capabilities including visual process design, dynamic form configuration, multi-node type flow, and script extension. It adopts a frontend-backend separation architecture, supporting both PC and mobile endpoints.
+Flow Engine 是一个基于 Java 17 和 Spring Boot 3.5.9 构建的企业级工作流引擎，提供完整的流程管理能力，包括可视化流程设计、动态表单配置、多节点类型流转和脚本扩展。采用前后端分离架构，同时支持 PC 端和移动端。
 
-### Core Features
+### 核心特性
 
-- **12 Node Types** - Start, End, Approval, Handle, Notify, Condition Branch, Parallel Branch, Router, Inclusive Branch, Sub-process, Delay, Trigger nodes
-- **8 Action Types** - Pass, Reject, Save, Add Audit, Delegate, Return, Transfer, Custom
-- **Strategy-driven Configuration** - All key configurations implemented through strategies with dynamic extension support
-- **Groovy Script Extension** - Supports dynamic initiator matching, approver loading, condition evaluation, custom actions, etc.
-- **Multi-person Approval Modes** - Sequential approval, merged approval (configurable ratio), any-one approval, random approval
-- **Thread Safety** - Script runtime uses fine-grained synchronization locks, supporting concurrent execution of different scripts
-- **Auto Resource Cleanup** - Dual cleanup mechanism (threshold-triggered + scheduled cleanup) to avoid memory leaks
-- **Comprehensive Exception System** - Framework exception hierarchy based on RuntimeException
+- **12 种节点类型** - 开始、结束、审批、办理、通知、条件分支、并行分支、路由、包容分支、子流程、延迟、触发节点
+- **8 种动作类型** - 通过、拒绝、保存、加签、委派、退回、转办、自定义
+- **策略驱动配置** - 所有关键配置通过策略实现，支持动态扩展
+- **Groovy 脚本扩展** - 支持发起人动态匹配、审批人加载、条件判断、自定义操作等
+- **多人审批模式** - 顺序审批、会签审批（可配置比例）、或签审批、随机审批
+- **线程安全** - 脚本运行时使用细粒度同步锁，支持不同脚本并发执行
+- **自动资源清理** - 双重清理机制（阈值触发 + 定时清理）避免内存泄漏
+- **完善的异常体系** - 基于 RuntimeException 的框架异常层次结构
 
-## Project Structure
+## 项目结构
 
 ```
 flow-engine
-├── flow-engine-framework         # Core workflow engine framework
-│   └── src/main/java/com.codingapi.flow
-│       ├── action                # Action layer
-│       │   ├── actions           # Action implementations (8 classes)
-│       │   │   ├── PassAction    # Pass action
-│       │   │   ├── RejectAction  # Reject action
-│       │   │   ├── SaveAction    # Save action
-│       │   │   ├── ReturnAction  # Return action
-│       │   │   ├── TransferAction # Transfer action
-│       │   │   ├── AddAuditAction # Add audit action
-│       │   │   ├── DelegateAction # Delegate action
-│       │   │   └── CustomAction  # Custom action
-│       │   ├── factory           # FlowActionFactory action factory
-│       │   ├── ActionType        # Action type enum (9 types)
-│       │   ├── BaseAction        # Action abstract base class
-│       │   └── IFlowAction       # Action interface
-│       ├── backup                # Workflow backup
-│       │   └── WorkflowBackup    # Workflow backup management
-│       ├── builder               # Builders (5 types)
-│       │   ├── ActionBuilder             # Action builder
-│       │   ├── BaseNodeBuilder            # Node builder base class
-│       │   ├── FormFieldPermissionsBuilder # Field permission builder
-│       │   ├── NodeMapBuilder             # Node map builder
-│       │   └── NodeStrategyBuilder        # Node strategy builder
-│       ├── context               # Context
-│       │   ├── GatewayContext           # Gateway context
-│       │   └── RepositoryHolderContext  # Repository holder context
-│       ├── delay                 # Delay task
-│       │   ├── DelayTask         # Delay task
-│       │   └── DelayTaskManager  # Delay task manager
-│       ├── edge                  # Node connection
-│       │   └── FlowEdge          # Flow edge
-│       ├── error                 # Error handling
-│       │   └── ErrorThrow        # Error thrower
-│       ├── event                 # Event system (5 types)
-│       │   ├── IFlowEvent                # Event interface
-│       │   ├── FlowRecordStartEvent      # Flow start event
-│       │   ├── FlowRecordTodoEvent       # Todo event
-│       │   ├── FlowRecordDoneEvent       # Done event
-│       │   ├── FlowRecordFinishEvent     # Flow finish event
-│       │   └── FlowRecordUrgeEvent       # Urge event
-│       ├── exception             # Exception system (6 types)
-│       │   ├── FlowException             # Exception base class
-│       │   ├── FlowValidationException   # Parameter validation exception
-│       │   ├── FlowNotFoundException     # Resource not found exception
-│       │   ├── FlowStateException        # State exception
-│       │   ├── FlowPermissionException   # Permission exception
-│       │   ├── FlowConfigException       # Configuration exception
-│       │   └── FlowExecutionException    # Execution exception
-│       ├── form                  # Form system
-│       │   ├── permission        # Field permissions (READ/WRITE/NONE)
-│       │   ├── FormData          # Form data
-│       │   ├── FormMeta          # Form metadata
-│       │   └── FormMetaBuilder   # Form builder
-│       ├── gateway               # Gateway interface anti-corruption layer
-│       │   └── FlowOperatorGateway # Operator gateway
-│       ├── operator              # Operator interface
-│       │   └── IFlowOperator     # Operator interface
-│       ├── node                  # Node layer
-│       │   ├── nodes             # Node implementations (12 types)
-│       │   │   ├── StartNode     # Start node
-│       │   │   ├── EndNode       # End node
-│       │   │   ├── ApprovalNode  # Approval node
-│       │   │   ├── HandleNode    # Handle node
-│       │   │   ├── NotifyNode    # Notify node
-│       │   │   ├── ConditionBranchNode # Condition branch node
-│       │   │   ├── ParallelBranchNode    # Parallel branch node
-│       │   │   ├── RouterNode    # Router node
-│       │   │   ├── InclusiveBranchNode  # Inclusive branch node
-│       │   │   ├── SubProcessNode # Sub-process node
-│       │   │   ├── DelayNode     # Delay node
-│       │   │   └── TriggerNode   # Trigger node
-│       │   ├── factory           # NodeFactory node factory
-│       │   ├── helper            # ParallelNodeRelationHelper parallel helper
-│       │   ├── manager           # Node managers
-│       │   │   ├── ActionManager     # Action manager
-│       │   │   ├── OperatorManager    # Operator manager
-│       │   │   ├── StrategyManager    # Strategy manager
-│       │   │   └── FieldPermissionManager # Field permission manager
-│       │   ├── BaseFlowNode      # Node abstract base class
-│       │   ├── BaseAuditNode     # Audit node abstract base class
-│       │   └── IFlowNode         # Node interface
-│       ├── pojo                  # Data objects
-│       │   ├── body              # FlowAdviceBody request body
-│       │   └── request           # FlowActionRequest, FlowCreateRequest
-│       ├── record                # Flow record
-│       │   └── FlowRecord        # Execution record (TODO/DONE state)
-│       ├── repository            # Repository interfaces (persistence abstraction)
+├── flow-engine-framework         # 核心流程引擎框架
+│   └── src/main/java/com/codingapi/flow
+│       ├── action                # 动作层
+│       │   ├── actions           # 动作实现（8个类）
+│       │   │   ├── PassAction    # 通过动作
+│       │   │   ├── RejectAction  # 拒绝动作
+│       │   │   ├── SaveAction    # 保存动作
+│       │   │   ├── ReturnAction  # 退回动作
+│       │   │   ├── TransferAction # 转办动作
+│       │   │   ├── AddAuditAction # 加签动作
+│       │   │   ├── DelegateAction # 委派动作
+│       │   │   └── CustomAction  # 自定义动作
+│       │   ├── factory           # FlowActionFactory 动作工厂
+│       │   ├── ActionDisplay     # 动作显示元数据
+│       │   ├── ActionType        # 动作类型枚举（8种）
+│       │   ├── BaseAction        # 动作抽象基类
+│       │   └── IFlowAction       # 动作接口
+│       ├── backup                # 流程备份
+│       │   └── WorkflowBackup    # 流程备份管理
+│       ├── builder               # 构建器（6种）
+│       │   ├── ActionBuilder             # 动作构建器
+│       │   ├── BaseNodeBuilder            # 节点构建器基类
+│       │   ├── FormFieldPermissionsBuilder # 字段权限构建器
+│       │   ├── NodeMapBuilder             # 节点映射构建器
+│       │   ├── NodeStrategyBuilder        # 节点策略构建器
+│       │   └── WorkflowStrategyBuilder    # 工作流策略构建器
+│       ├── common                # 通用接口
+│       │   ├── ICopyAbility      # 复制能力接口
+│       │   └── IMapConvertor     # Map转换接口
+│       ├── context               # 上下文
+│       │   ├── GatewayContext           # 网关上下文
+│       │   └── RepositoryHolderContext  # 仓储持有者上下文
+│       ├── domain                # 领域对象
+│       │   ├── DelayTask         # 延迟任务
+│       │   ├── DelayTaskManager  # 延迟任务管理器
+│       │   └── UrgeInterval      # 催办间隔
+│       ├── edge                  # 节点连接
+│       │   └── FlowEdge          # 流程边
+│       ├── error                 # 错误处理
+│       │   └── ErrorThrow        # 错误抛出器
+│       ├── event                 # 事件系统（5种）
+│       │   ├── IFlowEvent                # 事件接口
+│       │   ├── FlowRecordStartEvent      # 流程开始事件
+│       │   ├── FlowRecordTodoEvent       # 待办事件
+│       │   ├── FlowRecordDoneEvent       # 已办事件
+│       │   ├── FlowRecordFinishEvent     # 流程完成事件
+│       │   └── FlowRecordUrgeEvent       # 催办事件
+│       ├── exception             # 异常系统（6种）
+│       │   ├── FlowException             # 异常基类
+│       │   ├── FlowValidationException   # 参数验证异常
+│       │   ├── FlowNotFoundException     # 资源未找到异常
+│       │   ├── FlowStateException        # 状态异常
+│       │   ├── FlowPermissionException   # 权限异常
+│       │   ├── FlowConfigException       # 配置异常
+│       │   └── FlowExecutionException    # 执行异常
+│       ├── form                  # 表单系统
+│       │   ├── permission        # 字段权限
+│       │   │   ├── FormFieldPermission # 字段权限实体
+│       │   │   └── PermissionType       # 权限类型枚举
+│       │   ├── FormData          # 表单数据容器
+│       │   ├── FormFieldMeta     # 字段元数据
+│       │   ├── FormMeta          # 表单元数据
+│       │   └── FormMetaBuilder   # 表单构建器
+│       ├── gateway               # 网关接口防腐层
+│       │   └── FlowOperatorGateway # 操作者网关
+│       ├── manager               # 管理器层
+│       │   ├── ActionManager     # 动作管理器
+│       │   ├── NodeStrategyManager # 节点策略管理器
+│       │   ├── OperatorManager   # 操作者管理器
+│       │   └── WorkflowStrategyManager # 工作流策略管理器
+│       ├── node                  # 节点层
+│       │   ├── nodes             # 节点实现（12种）
+│       │   │   ├── StartNode     # 开始节点
+│       │   │   ├── EndNode       # 结束节点
+│       │   │   ├── ApprovalNode  # 审批节点
+│       │   │   ├── HandleNode    # 办理节点
+│       │   │   ├── NotifyNode    # 通知节点
+│       │   │   ├── ConditionBranchNode # 条件分支节点
+│       │   │   ├── ParallelBranchNode    # 并行分支节点
+│       │   │   ├── RouterNode    # 路由节点
+│       │   │   ├── InclusiveBranchNode  # 包容分支节点
+│       │   │   ├── SubProcessNode # 子流程节点
+│       │   │   ├── DelayNode     # 延迟节点
+│       │   │   └── TriggerNode   # 触发节点
+│       │   ├── factory           # NodeFactory 节点工厂
+│       │   ├── helper            # 节点助手
+│       │   │   ├── BackNodeHelper           # 退回节点助手
+│       │   │   └── ParallelNodeRelationHelper # 并行关系助手
+│       │   ├── BaseFlowNode      # 节点抽象基类
+│       │   ├── BaseAuditNode     # 审批节点抽象基类
+│       │   ├── IFlowNode         # 节点接口
+│       │   └── NodeType          # 节点类型枚举
+│       ├── operator              # 操作者接口
+│       │   └── IFlowOperator     # 操作者接口
+│       ├── pojo                  # 数据对象
+│       │   ├── body              # FlowAdviceBody 请求体
+│       │   └── request           # 请求对象
+│       │       ├── FlowActionRequest  # 动作请求
+│       │       ├── FlowCreateRequest  # 创建请求
+│       │       ├── FlowRevokeRequest  # 撤回请求
+│       │       └── FlowUrgeRequest    # 催办请求
+│       ├── record                # 流程记录
+│       │   └── FlowRecord        # 执行记录（TODO/DONE状态）
+│       ├── repository            # 仓储接口（持久化抽象）
 │       │   ├── WorkflowRepository
 │       │   ├── FlowRecordRepository
 │       │   ├── WorkflowBackupRepository
 │       │   ├── ParallelBranchRepository
 │       │   ├── DelayTaskRepository
 │       │   └── UrgeIntervalRepository
-│       ├── script                # Script system
-│       │   ├── node              # Node scripts (9 types)
-│       │   │   ├── OperatorMatchScript  # Initiator matching script
-│       │   │   ├── OperatorLoadScript   # Approver loading script
-│       │   │   ├── NodeTitleScript      # Node title script
-│       │   │   ├── ConditionScript      # Condition evaluation script
-│       │   │   ├── RouterNodeScript     # Router script
-│       │   │   ├── SubProcessScript     # Sub-process script
-│       │   │   ├── TriggerScript        # Trigger script
-│       │   │   └── ErrorTriggerScript   # Error trigger script
-│       │   ├── runtime           # Script runtime
-│       │   │   ├── ScriptRuntimeContext # Groovy script execution environment
-│       │   │   ├── FlowScriptContext    # Script context
-│       │   │   └── IBeanFactory         # Bean factory interface
-│       │   └── action            # Action scripts (2 types)
-│       │       ├── RejectActionScript   # Reject action script
-│       │       └── CustomScript         # Custom action script
-│       ├── service               # Service layer
-│       │   ├── impl              # Service implementations
-│       │   │   ├── FlowCreateService    # Flow creation service
-│       │   │   ├── FlowActionService    # Flow action service
-│       │   │   └── FlowDelayTriggerService # Delay trigger service
-│       │   └── FlowService       # Service interface
-│       ├── session               # Session layer
-│       │   ├── FlowSession       # Execution context
-│       │   └── FlowAdvice        # Approval parameters (opinion, signature, return node, etc.)
-│       ├── strategy              # Strategy layer (17 types: 14 node strategies + 3 workflow strategies)
-│       │   ├── node                # Node strategies
-│       │   │   ├── MultiOperatorAuditStrategy  # Multi-person approval strategy
-│       │   │   ├── TimeoutStrategy          # Timeout strategy
-│       │   │   ├── SameOperatorAuditStrategy # Same operator approval strategy
-│       │   │   ├── RecordMergeStrategy      # Record merge strategy
-│       │   │   ├── ResubmitStrategy         # Resubmit strategy
-│       │   │   ├── AdviceStrategy           # Approval opinion strategy
-│       │   │   ├── OperatorLoadStrategy     # Approver loading strategy
-│       │   │   ├── ErrorTriggerStrategy     # Error trigger strategy
-│       │   │   ├── NodeTitleStrategy        # Node title strategy
-│       │   │   ├── FormFieldPermissionStrategy # Field permission strategy
-│       │   │   ├── DelayStrategy            # Delay strategy
-│       │   │   ├── TriggerStrategy          # Trigger strategy
-│       │   │   ├── SubProcessStrategy       # Sub-process strategy
-│       │   │   ├── RevokeStrategy           # Revoke strategy
-│       │   │   ├── NodeStrategyFactory      # Node strategy factory
-│       │   │   ├── BaseStrategy             # Node strategy abstract base class
-│       │   │   └── INodeStrategy            # Node strategy interface
-│       │   └── workflow            # Workflow strategies
-│       │       ├── InterfereStrategy        # Interfere strategy
-│       │       ├── UrgeStrategy             # Urge strategy
-│       │       ├── WorkflowStrategyFactory  # Workflow strategy factory
-│       │       ├── BaseStrategy             # Workflow strategy abstract base class
-│       │       └── IWorkflowStrategy        # Workflow strategy interface
-│       ├── utils                 # Utility classes
-│       │   ├── RandomUtils       # Random utility
-│       │   └── Sha256Utils       # SHA256 encryption utility
-│       └── workflow              # Workflow layer
-│           ├── Workflow          # Workflow object
-│           └── WorkflowBuilder   # Workflow builder
-│   └── src/test/java             # Test code
-├── flow-engine-starter           # Spring Boot starter
-├── flow-engine-starter-infra     # Persistence layer starter
-├── flow-engine-example           # Example project
-└── frontend                      # Frontend project
+│       ├── script                # 脚本系统
+│       │   ├── node              # 节点脚本（8种）
+│       │   │   ├── OperatorMatchScript  # 发起人匹配脚本
+│       │   │   ├── OperatorLoadScript   # 审批人加载脚本
+│       │   │   ├── NodeTitleScript      # 节点标题脚本
+│       │   │   ├── ConditionScript      # 条件判断脚本
+│       │   │   ├── RouterNodeScript     # 路由脚本
+│       │   │   ├── SubProcessScript     # 子流程脚本
+│       │   │   ├── TriggerScript        # 触发脚本
+│       │   │   └── ErrorTriggerScript   # 异常触发脚本
+│       │   ├── runtime           # 脚本运行时
+│       │   │   ├── ScriptRuntimeContext # Groovy脚本执行环境
+│       │   │   ├── FlowScriptContext    # 脚本上下文
+│       │   │   └── IBeanFactory         # Bean工厂接口
+│       │   └── action            # 动作脚本（2种）
+│       │       ├── RejectActionScript   # 拒绝动作脚本
+│       │       └── CustomScript         # 自定义动作脚本
+│       ├── service               # 服务层
+│       │   ├── impl              # 服务实现
+│       │   │   ├── FlowCreateService    # 流程创建服务
+│       │   │   ├── FlowActionService    # 流程动作服务
+│       │   │   ├── FlowDelayTriggerService # 延迟触发服务
+│       │   │   ├── FlowRevokeService    # 流程撤回服务
+│       │   │   └── FlowUrgeService      # 流程催办服务
+│       │   └── FlowService       # 服务接口
+│       ├── session               # 会话层
+│       │   ├── FlowSession       # 执行上下文
+│       │   └── FlowAdvice        # 审批参数（意见、签名、退回节点等）
+│       ├── strategy              # 策略层（16种：14种节点策略 + 2种工作流策略）
+│       │   ├── node                # 节点策略
+│       │   │   ├── MultiOperatorAuditStrategy  # 多人审批策略
+│       │   │   ├── TimeoutStrategy          # 超时策略
+│       │   │   ├── SameOperatorAuditStrategy # 同一操作者审批策略
+│       │   │   ├── RecordMergeStrategy      # 记录合并策略
+│       │   │   ├── ResubmitStrategy         # 重新提交策略
+│       │   │   ├── AdviceStrategy           # 审批意见策略
+│       │   │   ├── OperatorLoadStrategy     # 审批人加载策略
+│       │   │   ├── ErrorTriggerStrategy     # 异常触发策略
+│       │   │   ├── NodeTitleStrategy        # 节点标题策略
+│       │   │   ├── FormFieldPermissionStrategy # 字段权限策略
+│       │   │   ├── DelayStrategy            # 延迟策略
+│       │   │   ├── TriggerStrategy          # 触发策略
+│       │   │   ├── SubProcessStrategy       # 子流程策略
+│       │   │   ├── RevokeStrategy           # 撤回策略
+│       │   │   ├── NodeStrategyFactory      # 节点策略工厂
+│       │   │   ├── BaseStrategy             # 节点策略抽象基类
+│       │   │   └── INodeStrategy            # 节点策略接口
+│       │   └── workflow            # 工作流策略
+│       │       ├── InterfereStrategy        # 干预策略
+│       │       ├── UrgeStrategy             # 催办策略
+│       │       ├── WorkflowStrategyFactory  # 工作流策略工厂
+│       │       ├── BaseStrategy             # 工作流策略抽象基类
+│       │       └── IWorkflowStrategy        # 工作流策略接口
+│       ├── utils                 # 工具类
+│       │   ├── RandomUtils       # 随机工具
+│       │   └── Sha256Utils       # SHA256加密工具
+│       └── workflow              # 流程层
+│           ├── Workflow          # 流程对象
+│           └── WorkflowBuilder   # 流程构建器
+│   └── src/test/java             # 测试代码
+├── flow-engine-starter           # Spring Boot Starter
+├── flow-engine-starter-infra     # 持久化层 Starter
+├── flow-engine-example           # 示例项目
+└── frontend                      # 前端项目
     ├── apps
-    │   ├── app-pc                # PC application
-    │   └── app-mobile            # Mobile application
+    │   └── app-pc                # PC端应用
     └── packages
-        ├── flow-design           # Flow designer
-        ├── flow-pc               # PC display components
-        └── flow-mobile           # Mobile display components
+        └── flow-design           # 流程设计器
 ```
 
-## Tech Stack
+## 技术栈
 
-### Backend
+### 后端
 
-- **Java 17** - Programming language
-- **Spring Boot 3.5.9** - Application framework
-- **Groovy** - Script engine
-- **Lombok** - Code simplification
-- **Fastjson** - JSON processing
-- **Apache Commons** - Utility library
+- **Java 17** - 编程语言
+- **Spring Boot 3.5.9** - 应用框架
+- **Groovy** - 脚本引擎
+- **Lombok** - 代码简化
+- **Fastjson** - JSON处理
+- **Apache Commons** - 工具库
 
-### Frontend
+### 前端
 
-- **React** - UI framework
-- **TypeScript** - Type safety
-- **Rsbuild** - Build tool
-- **pnpm** - Package manager
+- **React** - UI框架
+- **TypeScript** - 类型安全
+- **Rsbuild** - 构建工具
+- **pnpm** - 包管理器
 
-## Quick Start
+## 快速开始
 
-### Backend
+### 后端
 
 ```bash
-# Clone project
+# 克隆项目
 git clone https://github.com/codingapi/flow-engine.git
 cd flow-engine
 
-# Build project
+# 构建项目
 ./mvnw clean install
 
-# Run example project
+# 运行示例项目
 cd flow-engine-example
 mvn spring-boot:run
 ```
 
-### Frontend
+### 前端
 
 ```bash
 cd frontend
 
-# Install dependencies
+# 安装依赖
 pnpm install
 
-# Build design library
+# 构建设计库
 pnpm run build:flow-engine
 
-# Start PC application
+# 启动PC端应用
 pnpm run dev:app-pc
 ```
 
-## Core Architecture
+## 核心架构
 
-### Eight-layer Architecture
+### 八层架构
 
-1. **Workflow Layer** - Workflow definition layer
-2. **Node Layer** - Node layer (12 node types)
-3. **Action Layer** - Action layer (8 action types)
-4. **Record Layer** - Record layer
-5. **Session Layer** - Session layer
-6. **Manager Layer** - Manager layer
-7. **Strategy Layer** - Strategy layer
-8. **Script Layer** - Script layer
+1. **流程层** (Workflow Layer) - 流程定义层
+2. **节点层** (Node Layer) - 节点层（12种节点类型）
+3. **动作层** (Action Layer) - 动作层（8种动作类型）
+4. **记录层** (Record Layer) - 记录层
+5. **会话层** (Session Layer) - 会话层
+6. **管理器层** (Manager Layer) - 管理器层
+7. **策略层** (Strategy Layer) - 策略层
+8. **脚本层** (Script Layer) - 脚本层
 
-### Design Patterns
+### 设计模式
 
-- **Builder Pattern** - Builder pattern
-- **Factory Pattern** - Factory pattern
-- **Strategy Pattern** - Strategy pattern
-- **Template Method** - Template method pattern
-- **Singleton Pattern** - Singleton pattern
-- **Chain of Responsibility** - Chain of responsibility pattern
-- **Composite Pattern** - Composite pattern
+- **建造者模式** (Builder Pattern)
+- **工厂模式** (Factory Pattern)
+- **策略模式** (Strategy Pattern)
+- **模板方法模式** (Template Method Pattern)
+- **单例模式** (Singleton Pattern)
+- **责任链模式** (Chain of Responsibility Pattern)
+- **组合模式** (Composite Pattern)
 
-## Node Types
+## 节点类型
 
-| Node Type | Description | NODE_TYPE |
-|-----------|-------------|-----------|
-| StartNode | Start node | `start` |
-| EndNode | End node | `end` |
-| ApprovalNode | Approval node | `approval` |
-| HandleNode | Handle node | `handle` |
-| NotifyNode | Notify node | `notify` |
-| ConditionBranchNode | Condition branch | `condition_branch` |
-| ParallelBranchNode | Parallel branch | `parallel_branch` |
-| RouterNode | Router branch | `router` |
-| InclusiveBranchNode | Inclusive branch | `inclusive_branch` |
-| SubProcessNode | Sub-process node | `sub_process` |
-| DelayNode | Delay node | `delay` |
-| TriggerNode | Trigger node | `trigger` |
+| 节点类型 | 描述 | NODE_TYPE |
+|---------|------|-----------|
+| StartNode | 开始节点 | `start` |
+| EndNode | 结束节点 | `end` |
+| ApprovalNode | 审批节点 | `approval` |
+| HandleNode | 办理节点 | `handle` |
+| NotifyNode | 通知节点 | `notify` |
+| ConditionBranchNode | 条件分支 | `condition_branch` |
+| ParallelBranchNode | 并行分支 | `parallel_branch` |
+| RouterNode | 路由分支 | `router` |
+| InclusiveBranchNode | 包容分支 | `inclusive_branch` |
+| SubProcessNode | 子流程节点 | `sub_process` |
+| DelayNode | 延迟节点 | `delay` |
+| TriggerNode | 触发节点 | `trigger` |
 
-## Action Types
+## 动作类型
 
-| Action Type | Description | ActionType |
-|-------------|-------------|------------|
-| PassAction | Pass | `PASS` |
-| RejectAction | Reject | `REJECT` |
-| SaveAction | Save | `SAVE` |
-| ReturnAction | Return | `RETURN` |
-| TransferAction | Transfer | `TRANSFER` |
-| AddAuditAction | Add audit | `ADD_AUDIT` |
-| DelegateAction | Delegate | `DELEGATE` |
-| CustomAction | Custom | `CUSTOM` |
+| 动作类型 | 描述 | ActionType |
+|---------|------|------------|
+| PassAction | 通过 | `PASS` |
+| RejectAction | 拒绝 | `REJECT` |
+| SaveAction | 保存 | `SAVE` |
+| ReturnAction | 退回 | `RETURN` |
+| TransferAction | 转办 | `TRANSFER` |
+| AddAuditAction | 加签 | `ADD_AUDIT` |
+| DelegateAction | 委派 | `DELEGATE` |
+| CustomAction | 自定义 | `CUSTOM` |
 
-## Multi-person Approval Modes
+## 多人审批模式
 
-| Mode | Description | Completion Condition |
-|------|-------------|---------------------|
-| SEQUENCE | Sequential approval | All complete in sequence |
-| MERGE | Merged approval | Configured ratio of people complete |
-| ANY | Any-one approval | Any one person completes |
-| RANDOM_ONE | Random approval | Randomly selected person completes |
+| 模式 | 描述 | 完成条件 |
+|------|------|---------|
+| SEQUENCE | 顺序审批 | 按顺序全部完成 |
+| MERGE | 会签审批 | 配置比例的人员完成 |
+| ANY | 或签审批 | 任意一人完成 |
+| RANDOM_ONE | 随机审批 | 随机选中的人完成 |
 
-## Exception Code Format
+## 异常码格式
 
-All framework exceptions use string-based error codes following the pattern:
+所有框架异常使用字符串形式的错误码，格式如下：
 
 ```
 category.subcategory.errorType
 ```
 
-Examples:
-- `notFound.workflow.definition` - Workflow definition not found
-- `permission.field.readOnly` - Field is read-only
-- `state.record.alreadyDone` - Record already completed
-- `validation.field.required` - Required field is empty
-- `config.node.strategies.required` - Node strategies required
-- `execution.script.error` - Script execution error
+示例：
+- `notFound.workflow.definition` - 流程定义未找到
+- `permission.field.readOnly` - 字段只读
+- `state.record.alreadyDone` - 记录已完成
+- `validation.field.required` - 必填字段为空
+- `config.node.strategies.required` - 节点策略必填
+- `execution.script.error` - 脚本执行错误
 
-All exception messages are in English.
+所有异常消息使用英文。
 
-## Documentation
+## 文档
 
-- [PRD.md](PRD.md) - Product requirements document
-- [Design.md](Design.md) - Architecture design document
-- [AGENTS.md](AGENTS.md) - Coding standards
-- [CLAUDE.md](CLAUDE.md) - Claude Code guide
+- [PRD.md](PRD.md) - 产品需求文档
+- [Design.md](Design.md) - 架构设计文档
+- [AGENTS.md](AGENTS.md) - 编码规范
+- [CLAUDE.md](CLAUDE.md) - Claude Code 指南
+- [TODO.md](TODO.md) - 开发进度
 
-## Testing
+## 测试
 
 ```bash
-# Run all tests
+# 运行所有测试
 ./mvnw test
 
-# Run specific module tests
+# 运行指定模块测试
 ./mvnw test -pl flow-engine-framework
 
-# Run specific test class
+# 运行指定测试类
 ./mvnw test -Dtest=ScriptRuntimeContextTest
 ```
 
-## License
+## 许可证
 
 [LICENSE](LICENSE)
 
-## Contributing
+## 贡献
 
-Issues and Pull Requests are welcome!
+欢迎提交 Issue 和 Pull Request！

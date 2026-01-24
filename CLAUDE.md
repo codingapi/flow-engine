@@ -55,10 +55,9 @@ pnpm run dev:app-pc
 ### Frontend Structure
 
 - **apps/app-pc** - PC client application
-- **apps/app-mobile** - Mobile client application
-- **packages/flow-design** - Flow designer component
-- **packages/flow-pc** - PC display components
-- **packages/flow-mobile** - Mobile display components
+- **packages/flow-design** - Flow designer component library
+
+Note: `app-mobile`, `flow-pc`, and `flow-mobile` are planned but not yet implemented.
 
 ### Core Layered Architecture
 
@@ -87,16 +86,16 @@ The workflow engine is organized into 8 layers:
    - `FlowSession` - Execution context (currentOperator, workflow, currentNode, currentAction, currentRecord, formData, advice)
    - `FlowAdvice` - Approval parameters (advice, signKey, backNode, transferOperators)
 
-6. **Manager Layer** (`com.codingapi.flow.node.manager`)
+6. **Manager Layer** (`com.codingapi.flow.manager`)
    - `ActionManager` - Manages node actions, provides `getAction(Class)`, `verifySession()`
    - `OperatorManager` - Manages node operators
-   - `StrategyManager` - Manages node strategies, provides `loadOperators()`, `generateTitle()`, `verifySession()`
-   - `FieldPermissionManager` - Manages field-level permissions
+   - `NodeStrategyManager` - Manages node strategies, provides `loadOperators()`, `generateTitle()`, `verifySession()`
+   - `WorkflowStrategyManager` - Manages workflow strategies
 
 7. **Strategy Layer** (`com.codingapi.flow.strategy`)
    - `INodeStrategy` - Interface with `copy()`, `getId()`, `strategyType()`
    - **Node strategies** (14 types): MultiOperatorAuditStrategy, TimeoutStrategy, SameOperatorAuditStrategy, RecordMergeStrategy, ResubmitStrategy, AdviceStrategy, OperatorLoadStrategy, ErrorTriggerStrategy, NodeTitleStrategy, FormFieldPermissionStrategy, DelayStrategy, TriggerStrategy, SubProcessStrategy, RevokeStrategy
-   - **Workflow strategies** (3 types): InterfereStrategy, UrgeStrategy, RevokeStrategy (node-level)
+   - **Workflow strategies** (2 types): InterfereStrategy, UrgeStrategy
 
 8. **Script Layer** (`com.codingapi.flow.script.runtime`)
    - `ScriptRuntimeContext` - Groovy script execution with thread-safe design and auto-cleanup
@@ -104,10 +103,12 @@ The workflow engine is organized into 8 layers:
 
 ### Supporting Architectures
 
+- **Common Interfaces** (`com.codingapi.flow.common`)
+   - `ICopyAbility` - Interface for copy capability (used by strategies and actions)
+   - `IMapConvertor` - Interface for Map conversion (used by strategies and actions)
 - **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation. Implementations are in `flow-engine-starter-infra`. Access via `RepositoryHolderContext` singleton.
 - **Gateway Pattern** (`com.codingapi.flow.gateway`) - Anti-corruption layer for external system integration (operators, users). Access via `GatewayContext` singleton.
-- **Delay Task System** (`com.codingapi.flow.domain`) - DelayTask, DelayTaskManager for deferred execution using Timer
-- **Urge System** (`com.codingapi.flow.domain`) - UrgeInterval for tracking urge timing, managed by UrgeIntervalRepository
+- **Domain Objects** (`com.codingapi.flow.domain`) - DelayTask, DelayTaskManager, UrgeInterval
 - **Edge System** (`com.codingapi.flow.edge`) - FlowEdge for node connections
 - **Event System** (`com.codingapi.flow.event`) - 5 event types: FlowRecordStartEvent, FlowRecordTodoEvent, FlowRecordDoneEvent, FlowRecordFinishEvent, FlowRecordUrgeEvent
 - **Backup System** (`com.codingapi.flow.backup`) - WorkflowBackup for workflow versioning

@@ -2552,7 +2552,7 @@ class FlowServiceTest {
 
 
     /**
-     * 用户委托测试
+     * 用户转交审批测试
      */
     @Test
     void forwardOperator() {
