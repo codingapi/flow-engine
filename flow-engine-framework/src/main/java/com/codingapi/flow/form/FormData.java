@@ -10,6 +10,7 @@ import java.util.*;
 public class FormData {
 
     // 当前表单的元数据定义
+    @Getter
     private final FormMeta formMeta;
     // 主表单数据内容
     @Getter

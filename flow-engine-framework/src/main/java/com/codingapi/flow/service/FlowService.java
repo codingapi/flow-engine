@@ -11,12 +11,10 @@ import com.codingapi.flow.service.impl.FlowActionService;
 import com.codingapi.flow.service.impl.FlowCreateService;
 import com.codingapi.flow.service.impl.FlowRevokeService;
 import com.codingapi.flow.service.impl.FlowUrgeService;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 流程服务
  */
-@Configuration
 public class FlowService {
 
     private final WorkflowRepository workflowRepository;

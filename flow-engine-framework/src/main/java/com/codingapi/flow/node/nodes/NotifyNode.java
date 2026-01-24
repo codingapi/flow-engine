@@ -50,12 +50,7 @@ public class NotifyNode extends BaseAuditNode {
 
     @Override
     public void fillNewRecord(FlowSession session, FlowRecord flowRecord) {
-        NodeStrategyManager nodeStrategyManager = this.strategyManager();
-        flowRecord.setTitle(nodeStrategyManager.generateTitle(session));
-        flowRecord.setTimeoutTime(nodeStrategyManager.getTimeoutTime());
-        flowRecord.setMergeable(nodeStrategyManager.isMergeable());
-        flowRecord.setNotify(true);
-        flowRecord.finish(true);
+        flowRecord.notifyRecord(session);
     }
 
     @Override

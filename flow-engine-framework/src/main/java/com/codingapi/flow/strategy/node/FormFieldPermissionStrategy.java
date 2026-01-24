@@ -2,7 +2,12 @@ package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.common.IMapConvertor;
+import com.codingapi.flow.exception.FlowConfigException;
+import com.codingapi.flow.exception.FlowPermissionException;
+import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
+import com.codingapi.flow.form.permission.PermissionType;
+import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,6 +34,64 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
 
     public FormFieldPermissionStrategy(List<FormFieldPermission> fieldPermissions) {
         this.fieldPermissions = fieldPermissions;
+    }
+
+    /**
+     * 验证字段权限是否存在
+     *
+     * @param form 表单元数据
+     */
+    @Override
+    public void verifyNode(FormMeta form) {
+        Map<String, String> fieldTypes = form.getAllFieldTypeMaps();
+        for (FormFieldPermission permission : fieldPermissions) {
+            String key = permission.getFormCode() + "." + permission.getFieldName();
+            if (!fieldTypes.containsKey(key)) {
+                throw FlowPermissionException.fieldNotFound(key);
+            }
+        }
+    }
+
+    @Override
+    public void verifySession(FlowSession session) {
+        FormMeta formMeta = session.getFormData().getFormMeta();
+        Map<String, Object> currentData = session.getCurrentRecord().getFormData();
+        Map<String, Object> latestData = session.getFormData().toMapData();
+        for (FormFieldPermission permission : fieldPermissions) {
+            // 子表
+            if (formMeta.isSubForm(permission.getFormCode())) {
+                if (permission.getType() == PermissionType.READ) {
+                    List<Map<String, Object>> currentSubFormData = (List<Map<String, Object>>) currentData.get(permission.getFormCode());
+                    List<Map<String, Object>> latestSubFormData = (List<Map<String, Object>>) latestData.get(permission.getFormCode());
+                    if (currentSubFormData == null || latestSubFormData == null) {
+                        throw FlowConfigException.formConfigError(permission.getFormCode(), "is not a sub form");
+                    }
+
+                    if (currentSubFormData.size() != latestSubFormData.size()) {
+                        throw FlowConfigException.formConfigError(permission.getFormCode(), "size is not equal");
+                    }
+
+                    for (int i = 0; i < currentSubFormData.size(); i++) {
+                        Map<String, Object> currentSubFormItem = currentSubFormData.get(i);
+                        Map<String, Object> latestSubFormItem = latestSubFormData.get(i);
+                        Object currentValue = currentSubFormItem.get(permission.getFieldName());
+                        Object latestValue = latestSubFormItem.get(permission.getFieldName());
+                        if (!currentValue.equals(latestValue)) {
+                            throw FlowPermissionException.fieldReadOnly(permission.getFieldName());
+                        }
+                    }
+                }
+            } else {
+                // 在只读权限下不允许修改数据
+                if (permission.getType() == PermissionType.READ) {
+                    Object currentValue = currentData.get(permission.getFieldName());
+                    Object latestValue = latestData.get(permission.getFieldName());
+                    if (!currentValue.equals(latestValue)) {
+                        throw FlowPermissionException.fieldReadOnly(permission.getFieldName());
+                    }
+                }
+            }
+        }
     }
 
     @Override

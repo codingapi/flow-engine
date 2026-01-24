@@ -50,6 +50,7 @@ public class DelayTaskManager {
      * 添加任务队列
      */
     public void addTask(DelayTask task) {
+        RepositoryHolderContext.getInstance().saveDelayTask(task);
         this.delayJobs.add(new DelayJob(task));
     }
 

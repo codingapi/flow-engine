@@ -2650,8 +2650,8 @@ class FlowServiceTest {
         flowService.action(lorneRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(lorneRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(4, records.size());
+        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 

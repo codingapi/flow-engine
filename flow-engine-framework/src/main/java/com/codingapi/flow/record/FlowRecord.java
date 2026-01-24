@@ -2,6 +2,7 @@ package com.codingapi.flow.record;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.exception.FlowValidationException;
+import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowAdvice;
@@ -103,6 +104,11 @@ public class FlowRecord {
     private long currentOperatorId;
 
     /**
+     * 代替的审批人
+     */
+    private long forwardOperatorId;
+
+    /**
      * 有那个节点退回的
      */
     @Setter
@@ -199,6 +205,8 @@ public class FlowRecord {
 
     public FlowRecord(FlowSession flowSession, int nodeOrder) {
         IFlowAction action = flowSession.getCurrentAction();
+        IFlowOperator forwardOperator = flowSession.getCurrentOperator();
+        IFlowOperator currentOperator = forwardOperator.loadRealForwardOperator(forwardOperator);
         this.workCode = flowSession.getWorkCode();
         this.workBackupId = flowSession.getBackupId();
         this.nodeId = flowSession.getCurrentNodeId();
@@ -207,10 +215,12 @@ public class FlowRecord {
         this.nodeOrder = nodeOrder;
         this.processId = RandomUtils.generateStringId();
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
+        this.forwardOperatorId = currentOperator.equals(forwardOperator)?0:forwardOperator.getUserId();
         this.recordState = SATE_RECORD_TODO;
         this.actionId = action.id();
         this.actionType = action.type();
-        this.currentOperatorId = flowSession.getCurrentOperator().getUserId();
+        this.currentOperatorId = currentOperator.getUserId();
+        // TODO 干预人获取错误
         this.interferedOperatorId = flowSession.getCurrentOperator().forwardOperator() != null ? flowSession.getCurrentOperator().forwardOperator().getUserId() : 0;
         this.advice = flowSession.getAdvice().getAdvice();
         this.signKey = flowSession.getAdvice().getSignKey();
@@ -218,7 +228,7 @@ public class FlowRecord {
         this.createTime = System.currentTimeMillis();
         this.hidden = false;
 
-        flowSession.getCurrentNode().fillNewRecord(flowSession, this);
+        flowSession.getCurrentNode().fillNewRecord(flowSession.updateSession(currentOperator), this);
         this.extendsRecord(flowSession.getCurrentRecord());
 
         this.verify();
@@ -367,6 +377,21 @@ public class FlowRecord {
     }
 
 
+    /**
+     * 抄送记录更新
+     */
+    public void notifyRecord(FlowSession flowSession){
+        IFlowNode currentNode = flowSession.getCurrentNode();
+        NodeStrategyManager nodeStrategyManager = currentNode.strategyManager();
+        this.setTitle(nodeStrategyManager.generateTitle(flowSession));
+        this.setTimeoutTime(nodeStrategyManager.getTimeoutTime());
+        this.setMergeable(nodeStrategyManager.isMergeable());
+        this.update(flowSession, true);
+        this.notify = true;
+        this.forwardOperatorId = 0;
+    }
+
+
     public void hidden() {
         this.hidden = true;
     }
@@ -450,10 +475,19 @@ public class FlowRecord {
         this.revoked = true;
     }
 
-    /**
-     * 重置干预信息
-     */
-    public void resetInterface(IFlowOperator currentOperator) {
 
+    /**
+     *  设置为新的记录
+     */
+    public void newRecord() {
+        this.setAdvice(null);
+        this.setActionId(null);
+    }
+
+    /**
+     * 判断是否转交记录
+     */
+    public boolean isForward() {
+        return forwardOperatorId > 0;
     }
 }

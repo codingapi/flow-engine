@@ -164,7 +164,7 @@ public abstract class BaseFlowNode implements IFlowNode {
         actionManager.verify(form);
 
         NodeStrategyManager nodeStrategyManager = this.strategyManager();
-        nodeStrategyManager.verify(form);
+        nodeStrategyManager.verifyNode(form);
     }
 
     private void verifyDefaultConfig() {

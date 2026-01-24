@@ -89,6 +89,15 @@ public class PassAction extends BaseAction {
         }
 
         if (done) {
+            // 是否转交审批人的流程
+            if(currentRecord.isForward()){
+                IFlowOperator forwardOperator = RepositoryHolderContext.getInstance().getOperatorById(currentRecord.getForwardOperatorId());
+                FlowRecord notifyRecord = currentRecord.create(flowSession.updateSession(forwardOperator));
+                notifyRecord.notifyRecord(flowSession.updateSession(forwardOperator));
+                RepositoryHolderContext.getInstance().saveRecord(notifyRecord);
+                recordList.add(notifyRecord);
+            }
+
             // 是否委托记录
             if (currentRecord.isDelegate()) {
                 FlowRecord delegateRecord = RepositoryHolderContext.getInstance().getRecordById(currentRecord.getDelegateId());

@@ -15,25 +15,21 @@ public class OperatorManager {
     private final List<Long> operatorIds;
 
     public OperatorManager(List<IFlowOperator> operators) {
-        this.operators = operators.stream().map(this::fetchForwardOperator).toList();
+        this.operators = operators;
         this.operatorIds = operators.stream().map(IFlowOperator::getUserId).toList();
-    }
-
-
-    /**
-     * 获取委托之后的真正操作者
-     *
-     * @param operator 操作者
-     * @return 真正的操作者
-     */
-    private IFlowOperator fetchForwardOperator(IFlowOperator operator) {
-        if (operator.forwardOperator() != null) {
-            return fetchForwardOperator(operator.forwardOperator());
-        }
-        return operator;
     }
 
     public boolean match(IFlowOperator operator) {
         return operatorIds.contains(operator.getUserId());
+    }
+
+
+    public IFlowOperator getOperator(long userId) {
+        for (IFlowOperator operator : operators) {
+            if (operator.getUserId() == userId) {
+                return operator;
+            }
+        }
+        return null;
     }
 }

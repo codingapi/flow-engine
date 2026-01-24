@@ -137,8 +137,10 @@ public class NodeStrategyManager {
         return 0;
     }
 
-    public void verify(FormMeta form) {
-
+    public void verifyNode(FormMeta form) {
+        for (INodeStrategy strategy : strategies){
+            strategy.verifyNode(form);
+        }
     }
 
     public String generateTitle(FlowSession session) {
