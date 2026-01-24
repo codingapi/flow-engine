@@ -3,8 +3,8 @@ package com.codingapi.flow.node;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.node.manager.OperatorManager;
-import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.manager.NodeStrategyManager;
+import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -60,10 +60,10 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
 
     @Override
     public void fillNewRecord(FlowSession session, FlowRecord flowRecord) {
-        StrategyManager strategyManager = this.strategyManager();
-        flowRecord.setTitle(strategyManager.generateTitle(session));
-        flowRecord.setTimeoutTime(strategyManager.getTimeoutTime());
-        flowRecord.setMergeable(strategyManager.isMergeable());
+        NodeStrategyManager nodeStrategyManager = this.strategyManager();
+        flowRecord.setTitle(nodeStrategyManager.generateTitle(session));
+        flowRecord.setTimeoutTime(nodeStrategyManager.getTimeoutTime());
+        flowRecord.setMergeable(nodeStrategyManager.isMergeable());
         flowRecord.setAdvice(null);
         flowRecord.setActionId(null);
     }
@@ -74,8 +74,8 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         FlowRecord currentRecord = session.getCurrentRecord();
         // 多人审批
         if (currentRecords.size() > 1) {
-            StrategyManager strategyManager = this.strategyManager();
-            MultiOperatorAuditStrategy.Type multiOperatorAuditStrategyType = strategyManager.getMultiOperatorAuditStrategyType();
+            NodeStrategyManager nodeStrategyManager = this.strategyManager();
+            MultiOperatorAuditStrategy.Type multiOperatorAuditStrategyType = nodeStrategyManager.getMultiOperatorAuditStrategyType();
             // 顺序审批
             if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.SEQUENCE) {
                 int currentOrder = currentRecord.getNodeOrder();
@@ -88,7 +88,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
             }
             // 并签
             if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.MERGE) {
-                float percent = strategyManager.getMultiOperatorAuditMergePercent();
+                float percent = nodeStrategyManager.getMultiOperatorAuditMergePercent();
                 long total = currentRecords.size();
                 // 尚未办理的数量为所有待办数-1，1是当前办理的这条记录
                 long todoCount = currentRecords.stream().filter(FlowRecord::isTodo).count() - 1;
@@ -115,8 +115,8 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         }
 
         List<FlowRecord> records = new ArrayList<>();
-        StrategyManager strategyManager = this.strategyManager();
-        OperatorManager operatorManager = strategyManager.loadOperators(session);
+        NodeStrategyManager nodeStrategyManager = this.strategyManager();
+        OperatorManager operatorManager = nodeStrategyManager.loadOperators(session);
         List<IFlowOperator> operators = operatorManager.getOperators();
         for (int order = 0; order < operators.size(); order++) {
             IFlowOperator operator = operators.get(order);
@@ -124,7 +124,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
             records.add(flowRecord);
         }
         if (operators.size() > 1) {
-            MultiOperatorAuditStrategy.Type multiOperatorAuditStrategyType = strategyManager.getMultiOperatorAuditStrategyType();
+            MultiOperatorAuditStrategy.Type multiOperatorAuditStrategyType = nodeStrategyManager.getMultiOperatorAuditStrategyType();
             // 如果是顺序审批，则隐藏掉后续的人员的审批记录
             if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.SEQUENCE) {
                 for (int i = 1; i < records.size(); i++) {

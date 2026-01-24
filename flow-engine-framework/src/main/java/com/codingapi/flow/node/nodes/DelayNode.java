@@ -2,11 +2,11 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.context.RepositoryHolderContext;
-import com.codingapi.flow.delay.DelayTask;
-import com.codingapi.flow.delay.DelayTaskManager;
+import com.codingapi.flow.domain.DelayTask;
+import com.codingapi.flow.domain.DelayTaskManager;
+import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.NodeType;
-import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.DelayStrategy;
@@ -32,8 +32,8 @@ public class DelayNode extends BaseFlowNode {
 
     @Override
     public boolean handle(FlowSession session) {
-        StrategyManager strategyManager = this.strategyManager();
-        DelayStrategy delayStrategy = strategyManager.getStrategy(DelayStrategy.class);
+        NodeStrategyManager nodeStrategyManager = this.strategyManager();
+        DelayStrategy delayStrategy = nodeStrategyManager.getStrategy(DelayStrategy.class);
         if (delayStrategy != null) {
             FlowRecord currentRecord = session.getCurrentRecord();
             DelayTask delayTask = new DelayTask(delayStrategy, currentRecord, this.getId());

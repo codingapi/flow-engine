@@ -7,7 +7,7 @@ import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.NodeType;
-import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -105,8 +105,8 @@ public class StartNode extends BaseFlowNode {
 
     @Override
     public void fillNewRecord(FlowSession session, FlowRecord flowRecord) {
-        StrategyManager strategyManager = this.strategyManager();
-        flowRecord.setTitle(strategyManager.generateTitle(session));
+        NodeStrategyManager nodeStrategyManager = this.strategyManager();
+        flowRecord.setTitle(nodeStrategyManager.generateTitle(session));
     }
 
 

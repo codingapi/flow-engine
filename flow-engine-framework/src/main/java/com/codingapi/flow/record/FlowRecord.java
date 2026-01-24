@@ -3,6 +3,7 @@ package com.codingapi.flow.record;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
@@ -171,10 +172,6 @@ public class FlowRecord {
      */
     private boolean mergeable;
     /**
-     * 是否干预
-     */
-    private boolean isInterfere;
-    /**
      * 被干预的用户
      */
     private long interferedOperatorId;
@@ -214,12 +211,11 @@ public class FlowRecord {
         this.actionId = action.id();
         this.actionType = action.type();
         this.currentOperatorId = flowSession.getCurrentOperator().getUserId();
-        this.interferedOperatorId = flowSession.getCurrentOperator().entrustOperator() != null ? flowSession.getCurrentOperator().entrustOperator().getUserId() : 0;
+        this.interferedOperatorId = flowSession.getCurrentOperator().forwardOperator() != null ? flowSession.getCurrentOperator().forwardOperator().getUserId() : 0;
         this.advice = flowSession.getAdvice().getAdvice();
         this.signKey = flowSession.getAdvice().getSignKey();
         this.flowState = SATE_FLOW_RUNNING;
         this.createTime = System.currentTimeMillis();
-        this.isInterfere = false; // todo 根据策略设置
         this.hidden = false;
 
         flowSession.getCurrentNode().fillNewRecord(flowSession, this);
@@ -450,4 +446,10 @@ public class FlowRecord {
         this.revoked = true;
     }
 
+    /**
+     * 重置干预信息
+     */
+    public void resetInterface(IFlowOperator currentOperator) {
+
+    }
 }

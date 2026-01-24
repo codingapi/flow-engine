@@ -7,9 +7,9 @@ import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
+import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -45,9 +45,9 @@ public class PassAction extends BaseAction {
         if (currentRecord.isReturnRecord()) {
             // 退回后的流程重新提交
             BaseAuditNode currentNode = (BaseAuditNode) flowSession.getWorkflow().getFlowNode(currentRecord.getReturnNodeId());
-            StrategyManager strategyManager = currentNode.strategyManager();
+            NodeStrategyManager nodeStrategyManager = currentNode.strategyManager();
             // 是否退回到退回节点
-            if (strategyManager.isResume()) {
+            if (nodeStrategyManager.isResume()) {
                 FlowSession triggerSession = flowSession.updateSession(currentNode);
                 List<FlowRecord> nextRecords = currentNode.generateCurrentRecords(triggerSession.updateSession(currentNode));
                 records.addAll(nextRecords);
@@ -76,8 +76,8 @@ public class PassAction extends BaseAction {
         recordList.add(currentRecord);
 
         // 激活下一个按顺序审批的记录数据
-        StrategyManager strategyManager = currentNode.strategyManager();
-        if (strategyManager.isSequenceMultiOperatorType()) {
+        NodeStrategyManager nodeStrategyManager = currentNode.strategyManager();
+        if (nodeStrategyManager.isSequenceMultiOperatorType()) {
             List<FlowRecord> currentRecords = flowSession.getCurrentNodeRecords();
             for (FlowRecord record : currentRecords) {
                 if (record.getNodeOrder() == currentRecord.getNodeOrder() + 1) {

@@ -1,4 +1,4 @@
-package com.codingapi.flow.node.manager;
+package com.codingapi.flow.manager;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
@@ -17,13 +17,13 @@ import java.util.List;
 /**
  * 节点策略管理
  */
-public class StrategyManager {
+public class NodeStrategyManager {
 
     @Getter
     private final List<INodeStrategy> strategies;
 
 
-    public StrategyManager(List<INodeStrategy> strategies) {
+    public NodeStrategyManager(List<INodeStrategy> strategies) {
         this.strategies = strategies;
         if (this.strategies == null) {
             throw FlowConfigException.strategiesNotNull();

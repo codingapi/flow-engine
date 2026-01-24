@@ -49,7 +49,7 @@
     5. `fillNewRecord(FlowSession, FlowRecord)`: 填充新记录数据
     6. `filterBranches()`: 过滤条件分支
     7. `actionManager()`: 获取动作管理器
-    8. `strategyManager()`: 获取策略管理器
+    8. `nodeStrategyManager()`: 获取策略管理器
 
 #### BaseFlowNode
 - **位置**: `com.codingapi.flow.node.BaseFlowNode`

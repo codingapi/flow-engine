@@ -1,7 +1,7 @@
 package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.common.IMapConvertor;
-import com.codingapi.flow.node.manager.OperatorManager;
+import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
 import lombok.NoArgsConstructor;

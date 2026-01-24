@@ -3,7 +3,7 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.NodeType;
-import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.INodeStrategy;
 import com.codingapi.flow.strategy.node.SubProcessStrategy;
@@ -43,8 +43,8 @@ public class SubProcessNode extends BaseFlowNode {
 
     @Override
     public boolean handle(FlowSession session) {
-        StrategyManager strategyManager = this.strategyManager();
-        SubProcessStrategy processStrategy = strategyManager.getStrategy(SubProcessStrategy.class);
+        NodeStrategyManager nodeStrategyManager = this.strategyManager();
+        SubProcessStrategy processStrategy = nodeStrategyManager.getStrategy(SubProcessStrategy.class);
         processStrategy.execute(session);
         return true;
     }

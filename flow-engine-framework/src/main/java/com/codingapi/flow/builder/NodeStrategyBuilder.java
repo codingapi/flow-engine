@@ -7,10 +7,10 @@ import java.util.List;
 
 public class NodeStrategyBuilder {
 
-    private final List<INodeStrategy> nodeStrategies;
+    private final List<INodeStrategy> strategies;
 
     private NodeStrategyBuilder() {
-        this.nodeStrategies = new ArrayList<>();
+        this.strategies = new ArrayList<>();
     }
 
     public static NodeStrategyBuilder builder() {
@@ -18,11 +18,11 @@ public class NodeStrategyBuilder {
     }
 
     public NodeStrategyBuilder addStrategy(INodeStrategy strategy) {
-        this.nodeStrategies.add(strategy);
+        this.strategies.add(strategy);
         return this;
     }
 
     public List<INodeStrategy> build() {
-        return nodeStrategies;
+        return strategies;
     }
 }

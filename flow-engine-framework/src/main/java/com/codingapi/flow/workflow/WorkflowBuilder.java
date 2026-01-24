@@ -5,6 +5,7 @@ import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.script.node.OperatorMatchScript;
+import com.codingapi.flow.strategy.workflow.IWorkflowStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,11 @@ public class WorkflowBuilder {
 
     public WorkflowBuilder operatorCreateScript(String operatorCreateScript) {
         workflow.setOperatorCreateScript(new OperatorMatchScript(operatorCreateScript));
+        return this;
+    }
+
+    public WorkflowBuilder strategies(List<IWorkflowStrategy> strategies) {
+        workflow.setStrategies(strategies);
         return this;
     }
 

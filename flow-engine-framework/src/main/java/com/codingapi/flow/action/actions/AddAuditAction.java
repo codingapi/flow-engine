@@ -8,9 +8,9 @@ import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowExecutionException;
+import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.manager.OperatorManager;
-import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.OperatorLoadScript;
@@ -93,8 +93,8 @@ public class AddAuditAction extends BaseAction {
         for (IFlowOperator operator : auditOperators) {
             List<FlowRecord> records = currentNode.generateCurrentRecords(flowSession.updateSession(operator));
             for (FlowRecord record : records) {
-                StrategyManager strategyManager = currentNode.strategyManager();
-                if (strategyManager.isSequenceMultiOperatorType()) {
+                NodeStrategyManager nodeStrategyManager = currentNode.strategyManager();
+                if (nodeStrategyManager.isSequenceMultiOperatorType()) {
                     record.resetAddAudit(fromId, ++maxNodeOrder, operator.getUserId(), true);
                 } else {
                     record.resetAddAudit(fromId, ++maxNodeOrder, operator.getUserId(), false);

@@ -25,7 +25,7 @@ public class User implements IFlowOperator {
     }
 
     @Override
-    public IFlowOperator entrustOperator() {
+    public IFlowOperator forwardOperator() {
         return null;
     }
 

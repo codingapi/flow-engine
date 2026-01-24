@@ -7,7 +7,7 @@ import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.pojo.request.FlowRevokeRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
@@ -53,8 +53,8 @@ public class FlowRevokeService {
         }
         Workflow workflow = workflowBackup.toWorkflow();
         IFlowNode currentNode = workflow.getFlowNode(currentRecord.getNodeId());
-        StrategyManager strategyManager = currentNode.strategyManager();
-        RevokeStrategy revokeStrategy = strategyManager.getStrategy(RevokeStrategy.class);
+        NodeStrategyManager nodeStrategyManager = currentNode.strategyManager();
+        RevokeStrategy revokeStrategy = nodeStrategyManager.getStrategy(RevokeStrategy.class);
         if (revokeStrategy == null || !revokeStrategy.isEnable()) {
             throw FlowStateException.nodeNotSupportRevoke();
         }

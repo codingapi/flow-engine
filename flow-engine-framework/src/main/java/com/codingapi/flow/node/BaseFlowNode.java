@@ -7,8 +7,8 @@ import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.node.manager.ActionManager;
-import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.manager.ActionManager;
+import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.HandleNode;
 import com.codingapi.flow.node.nodes.StartNode;
@@ -68,9 +68,9 @@ public abstract class BaseFlowNode implements IFlowNode {
     public void setStrategies(List<INodeStrategy> strategies) {
         if (strategies != null && !strategies.isEmpty()) {
             if (this.strategies != null) {
-                StrategyManager strategyManager = new StrategyManager(this.strategies);
+                NodeStrategyManager nodeStrategyManager = new NodeStrategyManager(this.strategies);
                 for (INodeStrategy nodeStrategy : strategies) {
-                    INodeStrategy currentStrategy = strategyManager.getStrategy(nodeStrategy.getClass());
+                    INodeStrategy currentStrategy = nodeStrategyManager.getStrategy(nodeStrategy.getClass());
                     if (currentStrategy != null) {
                         currentStrategy.copy(nodeStrategy);
                     }
@@ -163,8 +163,8 @@ public abstract class BaseFlowNode implements IFlowNode {
         ActionManager actionManager = this.actionManager();
         actionManager.verify(form);
 
-        StrategyManager strategyManager = this.strategyManager();
-        strategyManager.verify(form);
+        NodeStrategyManager nodeStrategyManager = this.strategyManager();
+        nodeStrategyManager.verify(form);
     }
 
     private void verifyDefaultConfig() {
@@ -212,8 +212,8 @@ public abstract class BaseFlowNode implements IFlowNode {
         ActionManager actionManager = this.actionManager();
         actionManager.verifySession(session);
 
-        StrategyManager strategyManager = this.strategyManager();
-        strategyManager.verifySession(session);
+        NodeStrategyManager nodeStrategyManager = this.strategyManager();
+        nodeStrategyManager.verifySession(session);
     }
 
     @Override
@@ -242,8 +242,8 @@ public abstract class BaseFlowNode implements IFlowNode {
     }
 
     @Override
-    public StrategyManager strategyManager() {
-        return new StrategyManager(strategies);
+    public NodeStrategyManager strategyManager() {
+        return new NodeStrategyManager(strategies);
     }
 
 

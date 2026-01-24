@@ -1,6 +1,6 @@
 package com.codingapi.flow.repository;
 
-import com.codingapi.flow.delay.DelayTask;
+import com.codingapi.flow.domain.DelayTask;
 
 import java.util.HashMap;
 import java.util.List;

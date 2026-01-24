@@ -1,6 +1,6 @@
 package com.codingapi.flow.context;
 
-import com.codingapi.flow.delay.DelayTask;
+import com.codingapi.flow.domain.DelayTask;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -34,6 +34,8 @@ public class RepositoryHolderContext {
     private ParallelBranchRepository parallelBranchRepository;
     @Getter
     private DelayTaskRepository delayTaskRepository;
+    @Getter
+    private UrgeIntervalRepository urgeIntervalRepository;
 
     /**
      * 是否已经注册成功
@@ -44,7 +46,8 @@ public class RepositoryHolderContext {
                 && workflowBackupRepository != null
                 && flowRecordRepository != null
                 && flowOperatorGateway != null
-                && workflowRepository != null;
+                && workflowRepository != null
+                && urgeIntervalRepository != null;
     }
 
 
@@ -59,13 +62,15 @@ public class RepositoryHolderContext {
                          FlowRecordRepository flowRecordRepository,
                          FlowOperatorGateway flowOperatorGateway,
                          ParallelBranchRepository parallelBranchRepository,
-                         DelayTaskRepository delayTaskRepository) {
+                         DelayTaskRepository delayTaskRepository,
+                         UrgeIntervalRepository urgeIntervalRepository) {
         this.workflowRepository = workflowRepository;
         this.workflowBackupRepository = workflowBackupRepository;
         this.flowRecordRepository = flowRecordRepository;
         this.flowOperatorGateway = flowOperatorGateway;
         this.parallelBranchRepository = parallelBranchRepository;
         this.delayTaskRepository = delayTaskRepository;
+        this.urgeIntervalRepository = urgeIntervalRepository;
     }
 
 
@@ -111,7 +116,8 @@ public class RepositoryHolderContext {
                 flowRecordRepository,
                 workflowBackupRepository,
                 parallelBranchRepository,
-                delayTaskRepository);
+                delayTaskRepository,
+                urgeIntervalRepository);
     }
 
     public FlowRecord getRecordById(long id) {

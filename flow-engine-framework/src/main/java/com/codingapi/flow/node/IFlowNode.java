@@ -2,8 +2,8 @@ package com.codingapi.flow.node;
 
 import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.node.manager.ActionManager;
-import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.manager.ActionManager;
+import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 
@@ -86,7 +86,7 @@ public interface IFlowNode extends IMapConvertor {
      *
      * @return 节点策略管理器
      */
-    StrategyManager strategyManager();
+    NodeStrategyManager strategyManager();
 
     /**
      * 节点是否完成

@@ -4,6 +4,9 @@ import com.codingapi.flow.record.FlowRecord;
 
 import java.util.List;
 
+/**
+ *  流程记录
+ */
 public interface FlowRecordRepository {
 
     FlowRecord get(long id);

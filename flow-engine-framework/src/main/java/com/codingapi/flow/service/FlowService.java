@@ -23,17 +23,20 @@ public class FlowService {
     private final FlowOperatorGateway flowOperatorGateway;
     private final FlowRecordRepository flowRecordRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
+    private final UrgeIntervalRepository urgeIntervalRepository;
 
     public FlowService(WorkflowRepository workflowRepository,
                        FlowOperatorGateway flowOperatorGateway,
                        FlowRecordRepository flowRecordRepository,
                        WorkflowBackupRepository workflowBackupRepository,
                        ParallelBranchRepository parallelBranchRepository,
-                       DelayTaskRepository delayTaskRepository) {
+                       DelayTaskRepository delayTaskRepository,
+                       UrgeIntervalRepository urgeIntervalRepository) {
         this.workflowRepository = workflowRepository;
         this.flowOperatorGateway = flowOperatorGateway;
         this.flowRecordRepository = flowRecordRepository;
         this.workflowBackupRepository = workflowBackupRepository;
+        this.urgeIntervalRepository = urgeIntervalRepository;
 
         RepositoryHolderContext.getInstance()
                 .register(workflowRepository,
@@ -41,7 +44,8 @@ public class FlowService {
                         flowRecordRepository,
                         flowOperatorGateway,
                         parallelBranchRepository,
-                        delayTaskRepository);
+                        delayTaskRepository,
+                        urgeIntervalRepository);
     }
 
     /**
@@ -79,7 +83,7 @@ public class FlowService {
      * 催办
      */
     public void urge(FlowUrgeRequest request) {
-        FlowUrgeService flowUrgeService = new FlowUrgeService(request, flowRecordRepository,flowOperatorGateway);
+        FlowUrgeService flowUrgeService = new FlowUrgeService(request, flowRecordRepository,flowOperatorGateway,urgeIntervalRepository,workflowBackupRepository);
         flowUrgeService.urge();
     }
 }

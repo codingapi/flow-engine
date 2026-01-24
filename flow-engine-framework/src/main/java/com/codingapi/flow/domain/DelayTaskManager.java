@@ -1,4 +1,4 @@
-package com.codingapi.flow.delay;
+package com.codingapi.flow.domain;
 
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.service.impl.FlowDelayTriggerService;

@@ -105,7 +105,7 @@ The workflow engine is organized into 8 layers:
 
 - **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation. Implementations are in `flow-engine-starter-infra`. Access via `RepositoryHolderContext` singleton.
 - **Gateway Pattern** (`com.codingapi.flow.gateway`) - Anti-corruption layer for external system integration (operators, users). Access via `GatewayContext` singleton.
-- **Delay Task System** (`com.codingapi.flow.delay`) - DelayTask, DelayTaskManager for deferred execution using Timer
+- **Delay Task System** (`com.codingapi.flow.domain`) - DelayTask, DelayTaskManager for deferred execution using Timer
 - **Edge System** (`com.codingapi.flow.edge`) - FlowEdge for node connections
 - **Event System** (`com.codingapi.flow.event`) - 4 event types: FlowRecordStartEvent, FlowRecordTodoEvent, FlowRecordDoneEvent, FlowRecordFinishEvent
 - **Backup System** (`com.codingapi.flow.backup`) - WorkflowBackup for workflow versioning

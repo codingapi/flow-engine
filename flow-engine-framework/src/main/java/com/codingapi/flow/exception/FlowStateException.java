@@ -109,4 +109,12 @@ public class FlowStateException extends FlowException {
     public static FlowStateException nodeNotSupportRevoke() {
         return new FlowStateException("node.notSupportRevoke", "Node not support revoke");
     }
+
+    /**
+     * Record not support urge
+     * @return exception
+     */
+    public static FlowStateException recordNotSupportUrge() {
+        return new FlowStateException("record.notSupportUrge", "record not support urge");
+    }
 }

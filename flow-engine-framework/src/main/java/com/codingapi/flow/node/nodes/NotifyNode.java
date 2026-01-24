@@ -3,10 +3,10 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.context.RepositoryHolderContext;
+import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.NodeType;
-import com.codingapi.flow.node.manager.OperatorManager;
-import com.codingapi.flow.node.manager.StrategyManager;
+import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -50,10 +50,10 @@ public class NotifyNode extends BaseAuditNode {
 
     @Override
     public void fillNewRecord(FlowSession session, FlowRecord flowRecord) {
-        StrategyManager strategyManager = this.strategyManager();
-        flowRecord.setTitle(strategyManager.generateTitle(session));
-        flowRecord.setTimeoutTime(strategyManager.getTimeoutTime());
-        flowRecord.setMergeable(strategyManager.isMergeable());
+        NodeStrategyManager nodeStrategyManager = this.strategyManager();
+        flowRecord.setTitle(nodeStrategyManager.generateTitle(session));
+        flowRecord.setTimeoutTime(nodeStrategyManager.getTimeoutTime());
+        flowRecord.setMergeable(nodeStrategyManager.isMergeable());
         flowRecord.setNotify(true);
         flowRecord.finish(true);
     }
@@ -72,8 +72,8 @@ public class NotifyNode extends BaseAuditNode {
     @Override
     public List<FlowRecord> generateCurrentRecords(FlowSession session) {
         List<FlowRecord> records = new ArrayList<>();
-        StrategyManager strategyManager = this.strategyManager();
-        OperatorManager operatorManager = strategyManager.loadOperators(session);
+        NodeStrategyManager nodeStrategyManager = this.strategyManager();
+        OperatorManager operatorManager = nodeStrategyManager.loadOperators(session);
         List<IFlowOperator> operators = operatorManager.getOperators();
         for (int order = 0; order < operators.size(); order++) {
             IFlowOperator operator = operators.get(order);

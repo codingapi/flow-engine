@@ -42,7 +42,8 @@ class FlowServiceTest {
     private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
     private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
     private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
-    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository, parallelBranchRepository, delayTaskRepository);
+    private final UrgeIntervalRepository urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
+    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository, parallelBranchRepository, delayTaskRepository,urgeIntervalRepository);
 
     @Test
     void create() {

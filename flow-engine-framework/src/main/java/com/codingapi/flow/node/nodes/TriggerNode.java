@@ -1,9 +1,9 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.NodeType;
-import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.INodeStrategy;
 import com.codingapi.flow.strategy.node.TriggerStrategy;
@@ -43,8 +43,8 @@ public class TriggerNode extends BaseFlowNode {
 
     @Override
     public boolean handle(FlowSession session) {
-        StrategyManager strategyManager = this.strategyManager();
-        TriggerStrategy triggerStrategy = strategyManager.getStrategy(TriggerStrategy.class);
+        NodeStrategyManager nodeStrategyManager = this.strategyManager();
+        TriggerStrategy triggerStrategy = nodeStrategyManager.getStrategy(TriggerStrategy.class);
         triggerStrategy.execute(session);
         return true;
     }

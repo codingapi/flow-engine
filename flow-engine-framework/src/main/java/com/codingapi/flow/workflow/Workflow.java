@@ -6,14 +6,20 @@ import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.manager.WorkflowStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.node.helper.BackNodeHelper;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.OperatorMatchScript;
+import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.workflow.IWorkflowStrategy;
+import com.codingapi.flow.strategy.workflow.InterfereStrategy;
+import com.codingapi.flow.strategy.workflow.UrgeStrategy;
+import com.codingapi.flow.strategy.workflow.WorkflowStrategyFactory;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -92,7 +98,16 @@ public class Workflow {
         this.operatorCreateScript = OperatorMatchScript.any();
         this.nodes = new ArrayList<>();
         this.edges = new ArrayList<>();
+        this.strategies = defaultStrategies();
     }
+
+    private List<IWorkflowStrategy> defaultStrategies() {
+        List<IWorkflowStrategy> strategyList = new ArrayList<>();
+        strategyList.add(InterfereStrategy.defaultStrategy());
+        strategyList.add(UrgeStrategy.defaultStrategy());
+        return strategyList;
+    }
+
 
     protected void setId(String id) {
         this.id = id;
@@ -134,6 +149,10 @@ public class Workflow {
         this.createdTime = createdTime;
     }
 
+    protected void setStrategies(List<IWorkflowStrategy> strategies) {
+        this.strategies = strategies;
+    }
+
 
     /**
      * 转换为json
@@ -152,6 +171,7 @@ public class Workflow {
         map.put("edges", edges);
         map.put("createdTime", String.valueOf(createdTime));
         map.put("schema", hasSchema ? schema : null);
+        map.put("strategies", strategies.stream().map(IWorkflowStrategy::toMap).toList());
         return JSON.toJSONString(map);
     }
 
@@ -190,7 +210,21 @@ public class Workflow {
             workflow.setEdges(edgeList);
         }
 
+        List<Map<String, Object>> strategies = (List<Map<String, Object>>) data.get("strategies");
+        if (strategies != null) {
+            List<IWorkflowStrategy> strategyList = new ArrayList<>();
+            for (Map<String, Object> item : strategies) {
+                IWorkflowStrategy strategy = WorkflowStrategyFactory.getInstance().createStrategy(item);
+                strategyList.add(strategy);
+            }
+            workflow.setStrategies(strategyList);
+        }
+
         return workflow;
+    }
+
+    public WorkflowStrategyManager strategyManager() {
+        return new WorkflowStrategyManager(strategies);
     }
 
 
@@ -339,6 +373,5 @@ public class Workflow {
         }
         return false;
     }
-
 
 }
