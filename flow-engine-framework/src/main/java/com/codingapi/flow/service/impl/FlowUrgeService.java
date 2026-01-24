@@ -72,6 +72,8 @@ public class FlowUrgeService {
         IFlowOperator currentOperator = flowOperatorGateway.get(currentOperatorId);
 
         List<FlowRecord> todoRecords = flowRecordRepository.findTodoRecords(currentRecord.getProcessId());
+        // 保存催办记录
+        urgeIntervalRepository.save(new UrgeInterval(currentRecord));
 
         List<IFlowEvent> flowEvents = new ArrayList<>();
 
