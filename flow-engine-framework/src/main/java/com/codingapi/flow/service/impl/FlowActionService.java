@@ -48,8 +48,10 @@ public class FlowActionService {
         }
 
         long currentOperatorId = flowRecord.getCurrentOperatorId();
-        if (currentOperatorId != currentOperator.getUserId()) {
-            throw FlowStateException.operatorNotMatch();
+        if(!currentOperator.isFlowManager()){
+            if (currentOperatorId != currentOperator.getUserId()) {
+                throw FlowStateException.operatorNotMatch();
+            }
         }
 
         WorkflowBackup workflowBackup = workflowBackupRepository.get(flowRecord.getWorkBackupId());
