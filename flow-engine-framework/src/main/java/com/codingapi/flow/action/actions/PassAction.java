@@ -104,7 +104,11 @@ public class PassAction extends BaseAction {
                     if (!records.isEmpty()) {
                         for (FlowRecord record : records) {
                             if (record.isShow()) {
-                                flowEvents.add(new FlowRecordTodoEvent(record));
+                                if (record.isNotify()) {
+                                    flowEvents.add(new FlowRecordDoneEvent(record));
+                                } else {
+                                    flowEvents.add(new FlowRecordTodoEvent(record));
+                                }
                             }
                         }
                         recordList.addAll(records);

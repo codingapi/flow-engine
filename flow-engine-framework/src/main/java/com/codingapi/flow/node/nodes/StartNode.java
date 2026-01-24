@@ -14,6 +14,7 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.INodeStrategy;
 import com.codingapi.flow.strategy.NodeTitleStrategy;
+import com.codingapi.flow.strategy.RevokeStrategy;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -78,6 +79,7 @@ public class StartNode extends BaseFlowNode {
         List<INodeStrategy> strategies = new ArrayList<>();
         strategies.add(NodeTitleStrategy.defaultStrategy());
         strategies.add(FormFieldPermissionStrategy.defaultStrategy());
+        strategies.add(RevokeStrategy.defaultStrategy());
         return strategies;
     }
 

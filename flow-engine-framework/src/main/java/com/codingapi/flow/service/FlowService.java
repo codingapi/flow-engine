@@ -4,9 +4,11 @@ import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
+import com.codingapi.flow.pojo.request.FlowRevokeRequest;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.service.impl.FlowActionService;
 import com.codingapi.flow.service.impl.FlowCreateService;
+import com.codingapi.flow.service.impl.FlowRevokeService;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -51,8 +53,22 @@ public class FlowService {
         return flowCreateService.create();
     }
 
+    /**
+     * 流程审批
+     *
+     * @param request 审批请求
+     */
     public void action(FlowActionRequest request) {
         FlowActionService flowActionService = new FlowActionService(request, flowOperatorGateway, flowRecordRepository, workflowBackupRepository);
         flowActionService.action();
+    }
+
+    /**
+     * 撤销流程
+     * @param request 撤销请求
+     */
+    public void revoke(FlowRevokeRequest request) {
+        FlowRevokeService flowRevokeService = new FlowRevokeService(request, flowRecordRepository, workflowBackupRepository);
+        flowRevokeService.revoke();
     }
 }

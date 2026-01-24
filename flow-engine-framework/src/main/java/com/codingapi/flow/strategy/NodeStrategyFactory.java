@@ -34,7 +34,7 @@ public class NodeStrategyFactory {
         strategyClasses.put(DelayStrategy.class.getSimpleName(), DelayStrategy.class);
         strategyClasses.put(TriggerStrategy.class.getSimpleName(), TriggerStrategy.class);
         strategyClasses.put(SubProcessStrategy.class.getSimpleName(), SubProcessStrategy.class);
-
+        strategyClasses.put(RevokeStrategy.class.getSimpleName(), RevokeStrategy.class);
     }
 
 

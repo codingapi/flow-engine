@@ -14,8 +14,27 @@ public interface FlowRecordRepository {
 
     void delete(FlowRecord flowRecord);
 
-    List<FlowRecord> findRecordsByFromIdAndNodeId(long fromId, String nodeId);
+    /**
+     * 查询当前节点的记录
+     * @param fromId 流程的来源记录id
+     * @param nodeId 节点id
+     * @return 记录列表
+     */
+    List<FlowRecord> findCurrentNodeRecords(long fromId, String nodeId);
 
-    List<FlowRecord> findRecordsByProcessId(String processId);
+    /**
+     * 查询当前流程的记录
+     * @param processId 流程id
+     * @return 记录列表
+     */
+    List<FlowRecord> findProcessRecords(String processId);
+
+    /**
+     * 查询所有后续的流程记录
+     * @param processId 流程id
+     * @param fromId 开始记录id
+     * @return 记录列表
+     */
+    List<FlowRecord> findAfterRecords(String processId, long fromId);
 
 }

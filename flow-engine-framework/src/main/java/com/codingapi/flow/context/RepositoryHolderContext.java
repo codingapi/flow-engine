@@ -147,12 +147,16 @@ public class RepositoryHolderContext {
         flowRecordRepository.save(flowRecord);
     }
 
-    public List<FlowRecord> findRecordsByFromIdAndNodeId(long fromId, String nodeId) {
-        return flowRecordRepository.findRecordsByFromIdAndNodeId(fromId, nodeId);
+    public List<FlowRecord> findCurrentNodeRecords(long fromId, String nodeId) {
+        return flowRecordRepository.findCurrentNodeRecords(fromId, nodeId);
     }
 
-    public List<FlowRecord> findRecordsByProcessId(String processId) {
-        return flowRecordRepository.findRecordsByProcessId(processId);
+    public List<FlowRecord> findProcessRecords(String processId) {
+        return flowRecordRepository.findProcessRecords(processId);
+    }
+
+    public List<FlowRecord> findAfterRecords(String processId,long currentId) {
+        return flowRecordRepository.findAfterRecords(processId,currentId);
     }
 
     public int getParallelBranchTriggerCount(String parallelId) {

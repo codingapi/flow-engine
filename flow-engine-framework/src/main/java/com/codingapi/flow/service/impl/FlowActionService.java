@@ -20,6 +20,9 @@ import lombok.AllArgsConstructor;
 
 import java.util.List;
 
+/**
+ * 节点动作服务
+ */
 @AllArgsConstructor
 public class FlowActionService {
 
@@ -69,7 +72,7 @@ public class FlowActionService {
         formData.reset(request.getFormData());
         FlowAdvice flowAdvice = request.toFlowAdvice(workflow, flowAction);
 
-        List<FlowRecord> currentRecords = RepositoryHolderContext.getInstance().findRecordsByFromIdAndNodeId(flowRecord.getFromId(), flowRecord.getNodeId());
+        List<FlowRecord> currentRecords = RepositoryHolderContext.getInstance().findCurrentNodeRecords(flowRecord.getFromId(), flowRecord.getNodeId());
         FlowSession session = new FlowSession(currentOperator, workflow, currentNode, flowAction, formData, flowRecord, currentRecords, workflowBackup.getId(), flowAdvice);
         // 验证会话
         currentNode.verifySession(session);

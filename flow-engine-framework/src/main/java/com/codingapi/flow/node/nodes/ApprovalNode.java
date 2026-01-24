@@ -45,6 +45,7 @@ public class ApprovalNode extends BaseAuditNode {
         strategies.add(NodeTitleStrategy.defaultStrategy());
         strategies.add(FormFieldPermissionStrategy.defaultStrategy());
         strategies.add(OperatorLoadStrategy.defaultStrategy());
+        strategies.add(RevokeStrategy.defaultStrategy());
         return strategies;
     }
 

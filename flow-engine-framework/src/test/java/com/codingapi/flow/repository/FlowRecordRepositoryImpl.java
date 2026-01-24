@@ -20,6 +20,10 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
         return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId && flowRecord.isTodo()).toList();
     }
 
+    public List<FlowRecord> findDoneByOperator(long operatorId) {
+        return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId && !flowRecord.isTodo()).toList();
+    }
+
 
     @Override
     public void save(FlowRecord flowRecord) {
@@ -45,17 +49,24 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
     }
 
     @Override
-    public List<FlowRecord> findRecordsByFromIdAndNodeId(long fromId, String nodeId) {
+    public List<FlowRecord> findCurrentNodeRecords(long fromId, String nodeId) {
         return cache.values().stream().filter(flowRecord ->
                         flowRecord.getFromId() == fromId
                                 && flowRecord.getNodeId().equals(nodeId)
+                                && !flowRecord.isRevoked()
                 )
                 .toList();
     }
 
     @Override
-    public List<FlowRecord> findRecordsByProcessId(String processId) {
+    public List<FlowRecord> findProcessRecords(String processId) {
         return cache.values().stream().filter(flowRecord -> flowRecord.getProcessId().equals(processId)).toList();
     }
 
+    @Override
+    public List<FlowRecord> findAfterRecords(String processId, long fromId) {
+        return cache.values().stream().filter(flowRecord ->
+                flowRecord.getProcessId().equals(processId) && flowRecord.getFromId() >= fromId
+        ).toList();
+    }
 }

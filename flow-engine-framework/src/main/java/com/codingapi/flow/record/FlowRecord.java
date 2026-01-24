@@ -119,6 +119,16 @@ public class FlowRecord {
     private boolean hidden;
 
     /**
+     * 是否被撤销，撤销的数据不能当作待办记录
+     */
+    private boolean revoked;
+
+    /**
+     * 是否抄送
+     */
+    private boolean notify;
+
+    /**
      * 节点状态 | 待办、已办
      */
     private int recordState;
@@ -290,7 +300,7 @@ public class FlowRecord {
      * @return true/false
      */
     public boolean isTodo() {
-        return recordState == SATE_RECORD_TODO && flowState == SATE_FLOW_RUNNING && !hidden;
+        return recordState == SATE_RECORD_TODO && flowState == SATE_FLOW_RUNNING && !hidden && !revoked;
     }
 
 
@@ -332,6 +342,19 @@ public class FlowRecord {
             this.advice = flowAdvice.getAdvice();
             this.signKey = flowAdvice.getSignKey();
         }
+    }
+
+
+    /**
+     * 清空已办
+     */
+    public void clearDone() {
+        this.readable = true;
+        this.readTime = System.currentTimeMillis();
+        this.updateTime = System.currentTimeMillis();
+        this.recordState = SATE_RECORD_TODO;
+        this.advice = null;
+        this.signKey = null;
     }
 
 
@@ -413,7 +436,18 @@ public class FlowRecord {
         return delegateId > 0;
     }
 
+    /**
+     * 清空委托节点信息
+     */
     public void clearDelegate() {
         this.delegateId = 0;
     }
+
+    /**
+     * 撤销
+     */
+    public void revoke() {
+        this.revoked = true;
+    }
+
 }

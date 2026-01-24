@@ -42,6 +42,14 @@ public class FlowStateException extends FlowException {
         return new FlowStateException("state.record.alreadyDone", "Flow record is already completed, duplicate operation not allowed");
     }
 
+
+    /**
+     * Record is already todo, operation not allowed
+     * @return  exception
+     */
+    public static FlowStateException recordAlreadyTodo() {
+        return new FlowStateException("state.record.alreadyTodo", "Flow record is already todo, duplicate operation not allowed");
+    }
     /**
      * Operator does not match
      *
@@ -79,5 +87,26 @@ public class FlowStateException extends FlowException {
     public static FlowStateException invalidStateTransition(String fromState, String toState) {
         return new FlowStateException("state.transition.invalid",
                 String.format("Invalid state transition: from '%s' to '%s'", fromState, toState));
+    }
+
+
+
+
+    /**
+     * Record not support revoke
+     *
+     * @return exception
+     */
+    public static FlowStateException recordNotSupportRevoke() {
+        return new FlowStateException("record.notSupportRevoke", "record not support revoke");
+    }
+
+
+    /**
+     * Node not support revoke
+     * @return exception
+     */
+    public static FlowStateException nodeNotSupportRevoke() {
+        return new FlowStateException("node.notSupportRevoke", "Node not support revoke");
     }
 }

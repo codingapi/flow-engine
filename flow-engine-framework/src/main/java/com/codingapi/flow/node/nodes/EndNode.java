@@ -49,7 +49,7 @@ public class EndNode extends BaseFlowNode {
         // 标记当前流程结束
         FlowRecord latestRecord = session.getCurrentRecord();
         // 添加历史记录到记录中
-        List<FlowRecord> historyRecords = RepositoryHolderContext.getInstance().findRecordsByProcessId(latestRecord.getProcessId());
+        List<FlowRecord> historyRecords = RepositoryHolderContext.getInstance().findProcessRecords(latestRecord.getProcessId());
         // 设置状态为完成
         historyRecords.forEach(item -> {
             item.finish(currentAction instanceof PassAction);

@@ -54,6 +54,7 @@ public class NotifyNode extends BaseAuditNode {
         flowRecord.setTitle(strategyManager.generateTitle(session));
         flowRecord.setTimeoutTime(strategyManager.getTimeoutTime());
         flowRecord.setMergeable(strategyManager.isMergeable());
+        flowRecord.setNotify(true);
         flowRecord.finish(true);
     }
 
