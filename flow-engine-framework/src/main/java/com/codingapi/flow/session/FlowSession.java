@@ -84,6 +84,20 @@ public class FlowSession {
 
 
     /**
+     * 获取转交之后的审批人
+     *
+     * @param currentOperator 当前操作者
+     * @return 转交之后的审批人
+     */
+    public IFlowOperator loadFinalForwardOperator(IFlowOperator currentOperator) {
+        if (currentOperator.forwardOperator() != null) {
+            return this.loadFinalForwardOperator(currentOperator.forwardOperator());
+        }
+        return currentOperator;
+    }
+
+
+    /**
      * 构建开始会话
      *
      * @param currentOperator 当前操作者

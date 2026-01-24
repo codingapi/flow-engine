@@ -205,8 +205,10 @@ public class FlowRecord {
 
     public FlowRecord(FlowSession flowSession, int nodeOrder) {
         IFlowAction action = flowSession.getCurrentAction();
-        IFlowOperator forwardOperator = flowSession.getCurrentOperator();
-        IFlowOperator currentOperator = forwardOperator.loadRealForwardOperator(forwardOperator);
+        // 当前操作者
+        IFlowOperator sourceOperator = flowSession.getCurrentOperator();
+        // 获取转交之后的审批人
+        IFlowOperator currentOperator = flowSession.loadFinalForwardOperator(sourceOperator);
         this.workCode = flowSession.getWorkCode();
         this.workBackupId = flowSession.getBackupId();
         this.nodeId = flowSession.getCurrentNodeId();
@@ -215,13 +217,11 @@ public class FlowRecord {
         this.nodeOrder = nodeOrder;
         this.processId = RandomUtils.generateStringId();
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
-        this.forwardOperatorId = currentOperator.equals(forwardOperator)?0:forwardOperator.getUserId();
+        this.forwardOperatorId = currentOperator.equals(sourceOperator)?0:sourceOperator.getUserId();
         this.recordState = SATE_RECORD_TODO;
         this.actionId = action.id();
         this.actionType = action.type();
         this.currentOperatorId = currentOperator.getUserId();
-        // TODO 干预人获取错误
-        this.interferedOperatorId = flowSession.getCurrentOperator().forwardOperator() != null ? flowSession.getCurrentOperator().forwardOperator().getUserId() : 0;
         this.advice = flowSession.getAdvice().getAdvice();
         this.signKey = flowSession.getAdvice().getSignKey();
         this.flowState = SATE_FLOW_RUNNING;
@@ -344,6 +344,7 @@ public class FlowRecord {
         this.updateTime = System.currentTimeMillis();
         this.recordState = done ? SATE_RECORD_DONE : SATE_RECORD_TODO;
 
+        // 设置流程干预人信息，流程干预只能由流程管理员才能操作
         if (flowSession.getCurrentOperator().getUserId() != this.currentOperatorId) {
             this.interferedOperatorId = flowSession.getCurrentOperator().getUserId();
         }

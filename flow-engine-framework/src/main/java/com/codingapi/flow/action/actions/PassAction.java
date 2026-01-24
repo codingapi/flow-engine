@@ -94,8 +94,9 @@ public class PassAction extends BaseAction {
                 IFlowOperator forwardOperator = RepositoryHolderContext.getInstance().getOperatorById(currentRecord.getForwardOperatorId());
                 FlowRecord notifyRecord = currentRecord.create(flowSession.updateSession(forwardOperator));
                 notifyRecord.notifyRecord(flowSession.updateSession(forwardOperator));
+                // 如果不存储这个记录，若下一流程是结束流程时，无法更新流程状态为结束状态。
                 RepositoryHolderContext.getInstance().saveRecord(notifyRecord);
-                recordList.add(notifyRecord);
+                flowEvents.add(new FlowRecordDoneEvent(notifyRecord));
             }
 
             // 是否委托记录
