@@ -7,5 +7,5 @@ import com.codingapi.flow.common.IMapConvertor;
  */
 public interface IWorkflowStrategy extends IMapConvertor {
 
-
+    String TYPE_KEY = "strategyType";
 }
