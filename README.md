@@ -278,18 +278,18 @@ pnpm run dev:app-pc
 
 | 节点类型 | 描述 | NODE_TYPE |
 |---------|------|-----------|
-| StartNode | 开始节点 | `start` |
-| EndNode | 结束节点 | `end` |
-| ApprovalNode | 审批节点 | `approval` |
-| HandleNode | 办理节点 | `handle` |
-| NotifyNode | 通知节点 | `notify` |
-| ConditionBranchNode | 条件分支 | `condition_branch` |
-| ParallelBranchNode | 并行分支 | `parallel_branch` |
-| RouterNode | 路由分支 | `router` |
-| InclusiveBranchNode | 包容分支 | `inclusive_branch` |
-| SubProcessNode | 子流程节点 | `sub_process` |
-| DelayNode | 延迟节点 | `delay` |
-| TriggerNode | 触发节点 | `trigger` |
+| StartNode | 开始节点 | `START` |
+| EndNode | 结束节点 | `END` |
+| ApprovalNode | 审批节点 | `APPROVAL` |
+| HandleNode | 办理节点 | `HANDLE` |
+| NotifyNode | 通知节点 | `NOTIFY` |
+| ConditionBranchNode | 条件分支 | `CONDITION_BRANCH` |
+| ParallelBranchNode | 并行分支 | `PARALLEL_BRANCH` |
+| RouterNode | 路由分支 | `ROUTER` |
+| InclusiveBranchNode | 包容分支 | `INCLUSIVE_BRANCH` |
+| SubProcessNode | 子流程节点 | `SUB_PROCESS` |
+| DelayNode | 延迟节点 | `DELAY` |
+| TriggerNode | 触发节点 | `TRIGGER` |
 
 ## 动作类型
 
