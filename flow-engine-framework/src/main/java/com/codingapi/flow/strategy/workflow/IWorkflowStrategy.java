@@ -9,4 +9,8 @@ import com.codingapi.flow.common.IMapConvertor;
 public interface IWorkflowStrategy extends IMapConvertor, ICopyAbility<IWorkflowStrategy> {
 
     String TYPE_KEY = "strategyType";
+
+    default String strategyType() {
+        return this.getClass().getSimpleName();
+    }
 }

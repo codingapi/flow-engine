@@ -41,7 +41,7 @@ public class FlowDelayTriggerService {
 
         WorkflowBackup workflowBackup = workflowBackupRepository.get(flowRecord.getWorkBackupId());
         if (workflowBackup == null) {
-            throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + "");
+            throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + " not found");
         }
 
         Workflow workflow = workflowBackup.toWorkflow();

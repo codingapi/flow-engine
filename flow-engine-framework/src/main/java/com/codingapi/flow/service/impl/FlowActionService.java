@@ -7,6 +7,7 @@ import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
+import com.codingapi.flow.manager.WorkflowStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
@@ -47,19 +48,17 @@ public class FlowActionService {
             throw FlowStateException.recordAlreadyDone();
         }
 
-        long currentOperatorId = flowRecord.getCurrentOperatorId();
-        if(!currentOperator.isFlowManager()){
-            if (currentOperatorId != currentOperator.getUserId()) {
-                throw FlowStateException.operatorNotMatch();
-            }
-        }
-
         WorkflowBackup workflowBackup = workflowBackupRepository.get(flowRecord.getWorkBackupId());
         if (workflowBackup == null) {
-            throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + "");
+            throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + " not found");
         }
 
         Workflow workflow = workflowBackup.toWorkflow();
+
+        long recordOperatorId = flowRecord.getCurrentOperatorId();
+        WorkflowStrategyManager workflowStrategyManager = workflow.strategyManager();
+        workflowStrategyManager.verifyOperator(currentOperator, recordOperatorId);
+
         IFlowNode currentNode = workflow.getFlowNode(flowRecord.getNodeId());
         if (currentNode == null) {
             throw FlowNotFoundException.node(flowRecord.getNodeId());

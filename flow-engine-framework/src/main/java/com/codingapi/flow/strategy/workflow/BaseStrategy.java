@@ -7,6 +7,8 @@ public abstract class BaseStrategy implements IWorkflowStrategy{
 
     @Override
     public Map<String, Object> toMap() {
-        return new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
+        map.put(TYPE_KEY, strategyType());
+        return map;
     }
 }
