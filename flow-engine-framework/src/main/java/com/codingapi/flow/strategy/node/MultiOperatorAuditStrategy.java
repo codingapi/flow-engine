@@ -1,5 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
+import com.codingapi.flow.convert.IMapConvertor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -45,7 +46,7 @@ public class MultiOperatorAuditStrategy extends BaseStrategy {
     }
 
     public static MultiOperatorAuditStrategy fromMap(Map<String, Object> map) {
-        MultiOperatorAuditStrategy strategy = BaseStrategy.fromMap(map, MultiOperatorAuditStrategy.class);
+        MultiOperatorAuditStrategy strategy = IMapConvertor.fromMap(map, MultiOperatorAuditStrategy.class);
         if (strategy == null) return null;
         strategy.setType(Type.valueOf((String) map.get("type")));
         strategy.setPercent(Float.parseFloat((String) map.get("percent")));

@@ -1,5 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
+import com.codingapi.flow.convert.IMapConvertor;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
@@ -50,7 +51,7 @@ public class OperatorLoadStrategy extends BaseStrategy {
     }
 
     public static OperatorLoadStrategy fromMap(Map<String, Object> map) {
-        OperatorLoadStrategy strategy = BaseStrategy.fromMap(map, OperatorLoadStrategy.class);
+        OperatorLoadStrategy strategy = IMapConvertor.fromMap(map, OperatorLoadStrategy.class);
         if (strategy == null) return null;
         strategy.setOperatorLoadScript((String) map.get("script"));
         return strategy;

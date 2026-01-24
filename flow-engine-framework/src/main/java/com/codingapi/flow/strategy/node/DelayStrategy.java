@@ -1,5 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
+import com.codingapi.flow.convert.IMapConvertor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -60,7 +61,7 @@ public class DelayStrategy extends BaseStrategy {
     }
 
     public static DelayStrategy fromMap(Map<String, Object> map) {
-        DelayStrategy delayStrategy = BaseStrategy.fromMap(map, DelayStrategy.class);
+        DelayStrategy delayStrategy = IMapConvertor.fromMap(map, DelayStrategy.class);
         if (delayStrategy == null) return null;
         delayStrategy.setType(Type.valueOf(map.get("type").toString()));
         delayStrategy.setTime(Integer.parseInt(map.get("time").toString()));

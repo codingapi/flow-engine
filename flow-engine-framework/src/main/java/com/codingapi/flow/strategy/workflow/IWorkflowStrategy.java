@@ -1,12 +1,11 @@
 package com.codingapi.flow.strategy.workflow;
 
-import java.util.Map;
+import com.codingapi.flow.convert.IMapConvertor;
 
 /**
  *  工作流策略
  */
-public interface IWorkflowStrategy {
+public interface IWorkflowStrategy extends IMapConvertor {
 
-    //todo toMap变成全局的接口
-    Map<String,Object> toMap();
+
 }

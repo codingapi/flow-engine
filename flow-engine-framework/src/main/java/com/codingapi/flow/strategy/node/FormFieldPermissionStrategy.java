@@ -1,6 +1,7 @@
 package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.builder.NodeMapBuilder;
+import com.codingapi.flow.convert.IMapConvertor;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,7 +44,7 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
     }
 
     public static FormFieldPermissionStrategy fromMap(Map<String, Object> map) {
-        FormFieldPermissionStrategy strategy = BaseStrategy.fromMap(map, FormFieldPermissionStrategy.class);
+        FormFieldPermissionStrategy strategy = IMapConvertor.fromMap(map, FormFieldPermissionStrategy.class);
         if (strategy == null) return null;
         strategy.setFieldPermissions(NodeMapBuilder.loadFormFieldPermissions(map));
         return strategy;

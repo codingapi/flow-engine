@@ -1,5 +1,6 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.convert.IMapConvertor;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.StrategyManager;
@@ -7,7 +8,6 @@ import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -21,7 +21,7 @@ import java.util.function.Consumer;
  * 6. 当{@link IFlowNode#handle(FlowSession)} 返回的是false时，则停止继续下一节点流程，开始执行当前节点的生成流程记录函数 {@link  IFlowNode#generateCurrentRecords(FlowSession)} <br/>
  * 7. 在构建出先的流程记录数据以后，在数据保存时还将会触发节点对流程记录对象的填充函数 {@link  IFlowNode#fillNewRecord(FlowSession, FlowRecord)} <br/>
  */
-public interface IFlowNode {
+public interface IFlowNode extends IMapConvertor {
 
     /**
      * 节点id
@@ -44,11 +44,6 @@ public interface IFlowNode {
      * @return 节点顺序
      */
     int getOrder();
-
-    /**
-     * 转化为map
-     */
-    Map<String, Object> toMap();
 
     /**
      * 节点验证

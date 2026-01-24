@@ -1,5 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
+import com.codingapi.flow.convert.IMapConvertor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -46,7 +47,7 @@ public class AdviceStrategy extends BaseStrategy {
     }
 
     public static AdviceStrategy fromMap(Map<String, Object> map) {
-        AdviceStrategy strategy = BaseStrategy.fromMap(map, AdviceStrategy.class);
+        AdviceStrategy strategy = IMapConvertor.fromMap(map, AdviceStrategy.class);
         if (strategy == null) return null;
         strategy.setAdviceNullable((boolean) map.get("adviceNullable"));
         strategy.setSignable((boolean) map.get("signable"));

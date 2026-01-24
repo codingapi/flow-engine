@@ -1,15 +1,13 @@
 package com.codingapi.flow.strategy.node;
 
-import java.util.Map;
+import com.codingapi.flow.convert.IMapConvertor;
 
 /**
  * 节点配置策略
  */
-public interface INodeStrategy {
+public interface INodeStrategy extends IMapConvertor {
 
     String TYPE_KEY = "strategyType";
-
-    Map<String, Object> toMap();
 
 
     default String strategyType() {

@@ -1,5 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
+import com.codingapi.flow.convert.IMapConvertor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,7 +30,7 @@ public class RecordMergeStrategy extends BaseStrategy {
     }
 
     public static RecordMergeStrategy fromMap(Map<String, Object> map) {
-        RecordMergeStrategy strategy = BaseStrategy.fromMap(map, RecordMergeStrategy.class);
+        RecordMergeStrategy strategy = IMapConvertor.fromMap(map, RecordMergeStrategy.class);
         if (strategy == null) return null;
         strategy.mergeable = (boolean) map.get("mergeable");
         return strategy;

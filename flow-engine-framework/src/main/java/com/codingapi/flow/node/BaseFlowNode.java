@@ -4,6 +4,7 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.context.RepositoryHolderContext;
+import com.codingapi.flow.convert.IMapConvertor;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.manager.ActionManager;
@@ -146,7 +147,7 @@ public abstract class BaseFlowNode implements IFlowNode {
 
     @SneakyThrows
     public static <T extends BaseFlowNode> T loadFromMap(Map<String, Object> map, Class<T> clazz) {
-        T node = clazz.getDeclaredConstructor().newInstance();
+        T node = IMapConvertor.fromMap(map, clazz);
         node.setId((String) map.get("id"));
         node.setName((String) map.get("name"));
         node.setOrder(Integer.parseInt((String) map.get("order")));

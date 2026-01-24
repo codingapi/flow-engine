@@ -1,5 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
+import com.codingapi.flow.convert.IMapConvertor;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.session.FlowSession;
@@ -32,7 +33,7 @@ public class ErrorTriggerStrategy extends BaseStrategy {
     }
 
     public static ErrorTriggerStrategy fromMap(Map<String, Object> map) {
-        ErrorTriggerStrategy strategy = BaseStrategy.fromMap(map, ErrorTriggerStrategy.class);
+        ErrorTriggerStrategy strategy = IMapConvertor.fromMap(map, ErrorTriggerStrategy.class);
         if (strategy == null) return null;
         strategy.setErrorTriggerScript((String) map.get("script"));
         return strategy;

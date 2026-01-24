@@ -1,5 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
+import com.codingapi.flow.convert.IMapConvertor;
 import com.codingapi.flow.script.node.TriggerScript;
 import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
@@ -40,7 +41,7 @@ public class TriggerStrategy extends BaseStrategy {
     }
 
     public static TriggerStrategy fromMap(Map<String, Object> map) {
-        TriggerStrategy delayStrategy = BaseStrategy.fromMap(map, TriggerStrategy.class);
+        TriggerStrategy delayStrategy = IMapConvertor.fromMap(map, TriggerStrategy.class);
         if (delayStrategy == null) return null;
         delayStrategy.triggerScript = new TriggerScript((String) map.get("script"));
         return delayStrategy;

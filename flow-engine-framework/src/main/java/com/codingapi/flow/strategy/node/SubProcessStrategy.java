@@ -1,6 +1,7 @@
 package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.context.RepositoryHolderContext;
+import com.codingapi.flow.convert.IMapConvertor;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.script.node.SubProcessScript;
 import com.codingapi.flow.service.FlowService;
@@ -45,7 +46,7 @@ public class SubProcessStrategy extends BaseStrategy {
     }
 
     public static SubProcessStrategy fromMap(Map<String, Object> map) {
-        SubProcessStrategy processStrategy = BaseStrategy.fromMap(map, SubProcessStrategy.class);
+        SubProcessStrategy processStrategy = IMapConvertor.fromMap(map, SubProcessStrategy.class);
         if (processStrategy == null) return null;
         processStrategy.subProcessScript = new SubProcessScript((String) map.get("script"));
         processStrategy.submit = (boolean) map.get("submit");

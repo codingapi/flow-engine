@@ -1,5 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
+import com.codingapi.flow.convert.IMapConvertor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -52,7 +53,7 @@ public class TimeoutStrategy extends BaseStrategy {
     }
 
     public static TimeoutStrategy fromMap(Map<String, Object> map) {
-        TimeoutStrategy timeoutStrategy = BaseStrategy.fromMap(map, TimeoutStrategy.class);
+        TimeoutStrategy timeoutStrategy = IMapConvertor.fromMap(map, TimeoutStrategy.class);
         if (timeoutStrategy == null) return null;
         timeoutStrategy.setType(Type.valueOf(map.get("type").toString()));
         timeoutStrategy.setTimeoutTime(Long.parseLong(map.get("timeoutTime").toString()));

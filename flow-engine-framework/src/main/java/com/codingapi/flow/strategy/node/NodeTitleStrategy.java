@@ -1,5 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
+import com.codingapi.flow.convert.IMapConvertor;
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.session.FlowSession;
 import lombok.NoArgsConstructor;
@@ -47,7 +48,7 @@ public class NodeTitleStrategy extends BaseStrategy {
     }
 
     public static NodeTitleStrategy fromMap(Map<String, Object> map) {
-        NodeTitleStrategy strategy = BaseStrategy.fromMap(map, NodeTitleStrategy.class);
+        NodeTitleStrategy strategy = IMapConvertor.fromMap(map, NodeTitleStrategy.class);
         if (strategy == null) return null;
         strategy.setOperatorScript((String) map.get("script"));
         return strategy;

@@ -1,5 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
+import com.codingapi.flow.convert.IMapConvertor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -53,7 +54,7 @@ public class RevokeStrategy extends BaseStrategy{
     }
 
     public static RevokeStrategy fromMap(Map<String, Object> map) {
-        RevokeStrategy strategy = BaseStrategy.fromMap(map, RevokeStrategy.class);
+        RevokeStrategy strategy = IMapConvertor.fromMap(map, RevokeStrategy.class);
         if (strategy == null) return null;
         strategy.setEnable(Boolean.parseBoolean(map.get("enable").toString()));
         strategy.setType(Type.valueOf(map.get("type").toString()));
