@@ -216,7 +216,7 @@
 ### 7. 策略层 (Strategy Layer)
 
 #### INodeStrategy
-- **位置**: `com.codingapi.flow.strategy.INodeStrategy`
+- **位置**: `com.codingapi.flow.strategy.node.INodeStrategy`
 - **职责**: 节点策略的顶层接口
 - **核心方法**:
     - `toMap()`: 转换为Map
@@ -225,7 +225,7 @@
     - `copy(INodeStrategy)`: 复制策略属性
 
 #### BaseStrategy
-- **位置**: `com.codingapi.flow.strategy.BaseStrategy`
+- **位置**: `com.codingapi.flow.strategy.node.BaseStrategy`
 - **职责**: 策略的抽象基类
 - **核心方法**:
     - `equals()`: 基于id判断相等

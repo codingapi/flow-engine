@@ -1,4 +1,4 @@
-package com.codingapi.flow.strategy;
+package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.form.permission.FormFieldPermission;

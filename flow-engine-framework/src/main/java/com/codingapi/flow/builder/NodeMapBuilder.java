@@ -3,8 +3,8 @@ package com.codingapi.flow.builder;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.factory.FlowActionFactory;
 import com.codingapi.flow.form.permission.FormFieldPermission;
-import com.codingapi.flow.strategy.INodeStrategy;
-import com.codingapi.flow.strategy.NodeStrategyFactory;
+import com.codingapi.flow.strategy.node.INodeStrategy;
+import com.codingapi.flow.strategy.node.NodeStrategyFactory;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -10,7 +10,7 @@ import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.strategy.*;
+import com.codingapi.flow.strategy.node.*;
 import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.codingapi.flow.strategy;
+package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.script.node.ErrorTriggerScript;

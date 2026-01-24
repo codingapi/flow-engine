@@ -1,6 +1,6 @@
 package com.codingapi.flow.builder;
 
-import com.codingapi.flow.strategy.INodeStrategy;
+import com.codingapi.flow.strategy.node.INodeStrategy;
 
 import java.util.ArrayList;
 import java.util.List;

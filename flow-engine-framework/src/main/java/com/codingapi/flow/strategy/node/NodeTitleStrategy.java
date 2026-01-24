@@ -1,4 +1,4 @@
-package com.codingapi.flow.strategy;
+package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.session.FlowSession;

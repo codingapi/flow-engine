@@ -1,4 +1,4 @@
-package com.codingapi.flow.strategy;
+package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.script.node.OperatorLoadScript;

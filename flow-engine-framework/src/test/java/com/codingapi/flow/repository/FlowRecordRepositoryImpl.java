@@ -64,6 +64,16 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
     }
 
     @Override
+    public List<FlowRecord> findTodoRecords(String processId) {
+        return cache.values().stream().filter(flowRecord ->
+                        flowRecord.getProcessId().equals(processId)
+                                && flowRecord.isTodo()
+                                && !flowRecord.isRevoked()
+                )
+                .toList();
+    }
+
+    @Override
     public List<FlowRecord> findAfterRecords(String processId, long fromId) {
         return cache.values().stream().filter(flowRecord ->
                 flowRecord.getProcessId().equals(processId) && flowRecord.getFromId() >= fromId

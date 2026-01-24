@@ -13,6 +13,7 @@ import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.script.node.OperatorMatchScript;
+import com.codingapi.flow.strategy.workflow.IWorkflowStrategy;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -79,14 +80,10 @@ public class Workflow {
     private String schema;
 
     /**
-     * 开启干预
+     * 流程策略
      */
-    private boolean isInterfere;
+    private List<IWorkflowStrategy> strategies;
 
-    /**
-     * 开启撤销
-     */
-    private boolean isRevoke;
 
     protected Workflow() {
         this.id = RandomUtils.generateStringId();
@@ -95,7 +92,6 @@ public class Workflow {
         this.operatorCreateScript = OperatorMatchScript.any();
         this.nodes = new ArrayList<>();
         this.edges = new ArrayList<>();
-        this.isInterfere = false;
     }
 
     protected void setId(String id) {
@@ -138,13 +134,6 @@ public class Workflow {
         this.createdTime = createdTime;
     }
 
-    protected void setIsInterfere(boolean isInterfere) {
-        this.isInterfere = isInterfere;
-    }
-
-    protected void setIsRevoke(boolean isRevoke) {
-        this.isRevoke = isRevoke;
-    }
 
     /**
      * 转换为json
@@ -163,8 +152,6 @@ public class Workflow {
         map.put("edges", edges);
         map.put("createdTime", String.valueOf(createdTime));
         map.put("schema", hasSchema ? schema : null);
-        map.put("isInterfere", isInterfere);
-        map.put("isRevoke", isRevoke);
         return JSON.toJSONString(map);
     }
 
@@ -179,8 +166,6 @@ public class Workflow {
         workflow.setCode((String) data.get("code"));
         workflow.setTitle((String) data.get("title"));
         workflow.setSchema((String) data.get("schema"));
-        workflow.setIsInterfere((boolean) data.get("isInterfere"));
-        workflow.setIsRevoke((boolean) data.get("isRevoke"));
         workflow.setCreatedTime(Long.parseLong((String) data.get("createdTime")));
         workflow.setCreatedOperator(GatewayContext.getInstance().getFlowOperator(createOperator));
         workflow.setForm(FormMeta.fromMap((Map<String, Object>) data.get("form")));

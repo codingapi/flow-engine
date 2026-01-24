@@ -2,7 +2,7 @@ package com.codingapi.flow.builder;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.node.BaseFlowNode;
-import com.codingapi.flow.strategy.INodeStrategy;
+import com.codingapi.flow.strategy.node.INodeStrategy;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.codingapi.flow.strategy;
+package com.codingapi.flow.strategy.node;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -9,8 +9,8 @@ import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.manager.StrategyManager;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.strategy.DelayStrategy;
-import com.codingapi.flow.strategy.INodeStrategy;
+import com.codingapi.flow.strategy.node.DelayStrategy;
+import com.codingapi.flow.strategy.node.INodeStrategy;
 import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;

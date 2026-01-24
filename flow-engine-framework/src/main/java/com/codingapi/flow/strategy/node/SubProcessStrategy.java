@@ -1,4 +1,4 @@
-package com.codingapi.flow.strategy;
+package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;

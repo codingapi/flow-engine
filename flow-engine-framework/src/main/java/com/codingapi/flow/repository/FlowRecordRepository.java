@@ -30,6 +30,13 @@ public interface FlowRecordRepository {
     List<FlowRecord> findProcessRecords(String processId);
 
     /**
+     * 查询所有最新的待办记录
+     * @param processId 流程id
+     * @return 待办记录列表
+     */
+    List<FlowRecord> findTodoRecords(String processId);
+
+    /**
      * 查询所有后续的流程记录
      * @param processId 流程id
      * @param fromId 开始记录id

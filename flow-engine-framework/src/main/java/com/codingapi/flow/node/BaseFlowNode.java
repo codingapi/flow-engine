@@ -13,7 +13,7 @@ import com.codingapi.flow.node.nodes.HandleNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.strategy.INodeStrategy;
+import com.codingapi.flow.strategy.node.INodeStrategy;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;

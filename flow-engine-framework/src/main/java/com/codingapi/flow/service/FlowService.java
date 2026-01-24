@@ -5,10 +5,12 @@ import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.pojo.request.FlowRevokeRequest;
+import com.codingapi.flow.pojo.request.FlowUrgeRequest;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.service.impl.FlowActionService;
 import com.codingapi.flow.service.impl.FlowCreateService;
 import com.codingapi.flow.service.impl.FlowRevokeService;
+import com.codingapi.flow.service.impl.FlowUrgeService;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -70,5 +72,14 @@ public class FlowService {
     public void revoke(FlowRevokeRequest request) {
         FlowRevokeService flowRevokeService = new FlowRevokeService(request, flowRecordRepository, workflowBackupRepository);
         flowRevokeService.revoke();
+    }
+
+
+    /**
+     * 催办
+     */
+    public void urge(FlowUrgeRequest request) {
+        FlowUrgeService flowUrgeService = new FlowUrgeService(request, flowRecordRepository,flowOperatorGateway);
+        flowUrgeService.urge();
     }
 }

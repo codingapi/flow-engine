@@ -6,15 +6,13 @@ import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
-import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.manager.StrategyManager;
-import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowRevokeRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.repository.WorkflowBackupRepository;
-import com.codingapi.flow.strategy.RevokeStrategy;
+import com.codingapi.flow.strategy.node.RevokeStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.springboot.framework.event.EventPusher;
 import lombok.AllArgsConstructor;
@@ -51,7 +49,7 @@ public class FlowRevokeService {
         }
         WorkflowBackup workflowBackup = workflowBackupRepository.get(currentRecord.getWorkBackupId());
         if (workflowBackup == null) {
-            throw FlowNotFoundException.workflow(currentRecord.getWorkBackupId() + "");
+            throw FlowNotFoundException.workflow(currentRecord.getWorkBackupId() + " not found");
         }
         Workflow workflow = workflowBackup.toWorkflow();
         IFlowNode currentNode = workflow.getFlowNode(currentRecord.getNodeId());

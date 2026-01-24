@@ -219,7 +219,7 @@ public class FlowRecord {
         this.signKey = flowSession.getAdvice().getSignKey();
         this.flowState = SATE_FLOW_RUNNING;
         this.createTime = System.currentTimeMillis();
-        this.isInterfere = flowSession.getWorkflow().isInterfere();
+        this.isInterfere = false; // todo 根据策略设置
         this.hidden = false;
 
         flowSession.getCurrentNode().fillNewRecord(flowSession, this);

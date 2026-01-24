@@ -12,8 +12,8 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
-import com.codingapi.flow.strategy.FormFieldPermissionStrategy;
-import com.codingapi.flow.strategy.OperatorLoadStrategy;
+import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
+import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.user.User;
 import org.junit.jupiter.api.Test;
 

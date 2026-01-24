@@ -1,7 +1,7 @@
 package com.codingapi.flow.delay;
 
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.strategy.DelayStrategy;
+import com.codingapi.flow.strategy.node.DelayStrategy;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 
