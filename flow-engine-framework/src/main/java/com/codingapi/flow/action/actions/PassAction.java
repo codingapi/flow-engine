@@ -90,7 +90,7 @@ public class PassAction extends BaseAction {
 
         if (done) {
             // 是否转交审批人的流程
-            if(currentRecord.isForward()){
+            if (currentRecord.isForward()) {
                 IFlowOperator forwardOperator = RepositoryHolderContext.getInstance().getOperatorById(currentRecord.getForwardOperatorId());
                 FlowRecord notifyRecord = currentRecord.create(flowSession.updateSession(forwardOperator));
                 notifyRecord.notifyRecord(flowSession.updateSession(forwardOperator));

@@ -217,7 +217,7 @@ public class FlowRecord {
         this.nodeOrder = nodeOrder;
         this.processId = RandomUtils.generateStringId();
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
-        this.forwardOperatorId = currentOperator.equals(sourceOperator)?0:sourceOperator.getUserId();
+        this.forwardOperatorId = currentOperator.equals(sourceOperator) ? 0 : sourceOperator.getUserId();
         this.recordState = SATE_RECORD_TODO;
         this.actionId = action.id();
         this.actionType = action.type();
@@ -381,7 +381,7 @@ public class FlowRecord {
     /**
      * 抄送记录更新
      */
-    public void notifyRecord(FlowSession flowSession){
+    public void notifyRecord(FlowSession flowSession) {
         IFlowNode currentNode = flowSession.getCurrentNode();
         NodeStrategyManager nodeStrategyManager = currentNode.strategyManager();
         this.setTitle(nodeStrategyManager.generateTitle(flowSession));
@@ -478,7 +478,7 @@ public class FlowRecord {
 
 
     /**
-     *  设置为新的记录
+     * 设置为新的记录
      */
     public void newRecord() {
         this.setAdvice(null);

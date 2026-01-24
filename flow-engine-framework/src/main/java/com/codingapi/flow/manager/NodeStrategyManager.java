@@ -138,7 +138,7 @@ public class NodeStrategyManager {
     }
 
     public void verifyNode(FormMeta form) {
-        for (INodeStrategy strategy : strategies){
+        for (INodeStrategy strategy : strategies) {
             strategy.verifyNode(form);
         }
     }
