@@ -50,7 +50,7 @@ public class SubProcessNode extends BaseFlowNode {
     }
 
     public static SubProcessNode formMap(Map<String, Object> map) {
-        return BaseFlowNode.loadFromMap(map, SubProcessNode.class);
+        return BaseFlowNode.fromMap(map, SubProcessNode.class);
     }
 
     public static Builder builder() {

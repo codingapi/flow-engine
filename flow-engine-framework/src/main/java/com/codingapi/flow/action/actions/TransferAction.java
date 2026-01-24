@@ -77,7 +77,7 @@ public class TransferAction extends BaseAction {
         }
 
         for (IFlowOperator operator : operators) {
-            FlowRecord flowRecord = currentRecord.copy(flowSession.updateSession(operator));
+            FlowRecord flowRecord = currentRecord.create(flowSession.updateSession(operator));
             recordList.add(flowRecord);
             flowEvents.add(new FlowRecordTodoEvent(flowRecord));
         }

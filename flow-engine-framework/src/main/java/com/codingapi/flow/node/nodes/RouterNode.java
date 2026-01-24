@@ -61,7 +61,7 @@ public class RouterNode extends BaseFlowNode {
     }
 
     public static RouterNode formMap(Map<String, Object> map) {
-        RouterNode routerNode = BaseFlowNode.loadFromMap(map, RouterNode.class);
+        RouterNode routerNode = BaseFlowNode.fromMap(map, RouterNode.class);
         routerNode.routerNodeScript = new RouterNodeScript((String) map.get("script"));
         return routerNode;
     }

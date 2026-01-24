@@ -1,5 +1,6 @@
 package com.codingapi.flow.action;
 
+import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -75,7 +76,7 @@ public abstract class BaseAction implements IFlowAction {
     @SneakyThrows
     @SuppressWarnings("unchecked")
     protected static <T extends BaseAction> T fromMap(Map<String, Object> data, Class<T> clazz) {
-        T action = clazz.getDeclaredConstructor().newInstance();
+        T action = IMapConvertor.fromMap(data, clazz);
         action.setId((String) data.get("id"));
         action.setType((String) data.get("type"));
         action.setTitle((String) data.get("title"));

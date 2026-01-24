@@ -91,7 +91,7 @@ public class StartNode extends BaseFlowNode {
     }
 
     public static StartNode formMap(Map<String, Object> map) {
-        StartNode startNode = BaseFlowNode.loadFromMap(map, StartNode.class);
+        StartNode startNode = BaseFlowNode.fromMap(map, StartNode.class);
         startNode.setView((String) map.get("view"));
         return startNode;
     }

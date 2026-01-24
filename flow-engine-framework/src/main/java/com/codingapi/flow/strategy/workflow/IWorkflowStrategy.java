@@ -1,6 +1,6 @@
 package com.codingapi.flow.strategy.workflow;
 
-import com.codingapi.flow.convert.IMapConvertor;
+import com.codingapi.flow.common.IMapConvertor;
 
 /**
  *  工作流策略

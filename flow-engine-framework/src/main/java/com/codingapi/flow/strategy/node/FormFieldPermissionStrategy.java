@@ -1,7 +1,7 @@
 package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.builder.NodeMapBuilder;
-import com.codingapi.flow.convert.IMapConvertor;
+import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import lombok.Getter;
 import lombok.Setter;

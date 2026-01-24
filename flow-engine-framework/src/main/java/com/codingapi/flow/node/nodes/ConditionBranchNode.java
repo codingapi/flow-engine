@@ -74,7 +74,7 @@ public class ConditionBranchNode extends BaseFlowNode {
     }
 
     public static ConditionBranchNode formMap(Map<String, Object> map) {
-        ConditionBranchNode branchNode = BaseFlowNode.loadFromMap(map, ConditionBranchNode.class);
+        ConditionBranchNode branchNode = BaseFlowNode.fromMap(map, ConditionBranchNode.class);
         branchNode.conditionScript = new ConditionScript((String) map.get("script"));
         return branchNode;
     }

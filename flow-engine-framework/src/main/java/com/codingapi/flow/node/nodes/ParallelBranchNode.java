@@ -60,7 +60,7 @@ public class ParallelBranchNode extends BaseFlowNode {
 
 
     public static ParallelBranchNode formMap(Map<String, Object> map) {
-        return BaseFlowNode.loadFromMap(map, ParallelBranchNode.class);
+        return BaseFlowNode.fromMap(map, ParallelBranchNode.class);
     }
 
     public static Builder builder() {

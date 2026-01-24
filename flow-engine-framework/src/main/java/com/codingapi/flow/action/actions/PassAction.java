@@ -93,7 +93,7 @@ public class PassAction extends BaseAction {
             if (currentRecord.isDelegate()) {
                 FlowRecord delegateRecord = RepositoryHolderContext.getInstance().getRecordById(currentRecord.getDelegateId());
                 IFlowOperator delegateOperator = RepositoryHolderContext.getInstance().getOperatorById(delegateRecord.getCurrentOperatorId());
-                FlowRecord rebackRecord = delegateRecord.copy(flowSession.updateSession(delegateOperator));
+                FlowRecord rebackRecord = delegateRecord.create(flowSession.updateSession(delegateOperator));
                 rebackRecord.clearDelegate();
 
                 recordList.add(rebackRecord);

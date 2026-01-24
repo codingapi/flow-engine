@@ -416,7 +416,7 @@ public class FlowRecord {
         this.hidden = hidden;
     }
 
-    public FlowRecord copy(FlowSession flowSession) {
+    public FlowRecord create(FlowSession flowSession) {
         FlowRecord flowRecord = new FlowRecord(flowSession, 0);
         flowRecord.currentOperatorId = flowSession.getCurrentOperator().getUserId();
         return flowRecord;

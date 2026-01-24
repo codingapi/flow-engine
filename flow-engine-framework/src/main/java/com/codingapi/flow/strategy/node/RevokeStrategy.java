@@ -1,6 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
-import com.codingapi.flow.convert.IMapConvertor;
+import com.codingapi.flow.common.IMapConvertor;
 import lombok.Getter;
 import lombok.Setter;
 

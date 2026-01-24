@@ -60,7 +60,7 @@ public class DelayNode extends BaseFlowNode {
     }
 
     public static DelayNode formMap(Map<String, Object> map) {
-        return BaseFlowNode.loadFromMap(map, DelayNode.class);
+        return BaseFlowNode.fromMap(map, DelayNode.class);
     }
 
     public static Builder builder() {

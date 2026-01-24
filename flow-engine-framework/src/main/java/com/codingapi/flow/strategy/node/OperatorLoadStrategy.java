@@ -1,6 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
-import com.codingapi.flow.convert.IMapConvertor;
+import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.node.manager.OperatorManager;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;

@@ -1,16 +1,17 @@
 package com.codingapi.flow.action;
 
 
+import com.codingapi.flow.common.ICopyAbility;
+import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 节点动作
  */
-public interface IFlowAction {
+public interface IFlowAction extends IMapConvertor, ICopyAbility<IFlowAction> {
 
     /**
      * 流程类型
@@ -37,11 +38,6 @@ public interface IFlowAction {
      */
     List<FlowRecord> generateRecords(FlowSession flowSession);
 
-    /**
-     * 转换为map
-     */
-    Map<String, Object> toMap();
-
 
     /**
      * 执行动作
@@ -50,11 +46,5 @@ public interface IFlowAction {
      * @param flowSession 会话
      */
     void run(FlowSession flowSession);
-
-
-    /**
-     * 复制动作
-     */
-    void copy(IFlowAction action);
 
 }

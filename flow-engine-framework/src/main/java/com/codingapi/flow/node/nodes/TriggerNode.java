@@ -50,7 +50,7 @@ public class TriggerNode extends BaseFlowNode {
     }
 
     public static TriggerNode formMap(Map<String, Object> map) {
-        return BaseFlowNode.loadFromMap(map, TriggerNode.class);
+        return BaseFlowNode.fromMap(map, TriggerNode.class);
     }
 
     public static Builder builder() {

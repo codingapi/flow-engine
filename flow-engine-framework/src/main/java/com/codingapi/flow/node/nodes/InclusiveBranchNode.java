@@ -62,7 +62,7 @@ public class InclusiveBranchNode extends BaseFlowNode {
     }
 
     public static InclusiveBranchNode formMap(Map<String, Object> map) {
-        InclusiveBranchNode branchNode = BaseFlowNode.loadFromMap(map, InclusiveBranchNode.class);
+        InclusiveBranchNode branchNode = BaseFlowNode.fromMap(map, InclusiveBranchNode.class);
         branchNode.conditionScript = new ConditionScript((String) map.get("script"));
         return branchNode;
     }

@@ -1,11 +1,12 @@
 package com.codingapi.flow.strategy.node;
 
-import com.codingapi.flow.convert.IMapConvertor;
+import com.codingapi.flow.common.ICopyAbility;
+import com.codingapi.flow.common.IMapConvertor;
 
 /**
  * 节点配置策略
  */
-public interface INodeStrategy extends IMapConvertor {
+public interface INodeStrategy extends IMapConvertor, ICopyAbility<INodeStrategy> {
 
     String TYPE_KEY = "strategyType";
 
@@ -13,7 +14,5 @@ public interface INodeStrategy extends IMapConvertor {
     default String strategyType() {
         return this.getClass().getSimpleName();
     }
-
-    void copy(INodeStrategy target);
 
 }

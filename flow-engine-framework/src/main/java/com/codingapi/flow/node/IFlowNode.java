@@ -1,6 +1,6 @@
 package com.codingapi.flow.node;
 
-import com.codingapi.flow.convert.IMapConvertor;
+import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.manager.ActionManager;
 import com.codingapi.flow.node.manager.StrategyManager;

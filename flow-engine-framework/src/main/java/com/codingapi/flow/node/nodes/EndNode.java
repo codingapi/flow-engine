@@ -73,7 +73,7 @@ public class EndNode extends BaseFlowNode {
     }
 
     public static EndNode formMap(Map<String, Object> map) {
-        return BaseFlowNode.loadFromMap(map, EndNode.class);
+        return BaseFlowNode.fromMap(map, EndNode.class);
     }
 
     public static Builder builder() {
