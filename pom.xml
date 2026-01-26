@@ -19,6 +19,8 @@
         <module>flow-engine-starter-infra</module>
         <module>flow-engine-example</module>
         <module>flow-engine-framework</module>
+        <module>flow-engine-starter-api</module>
+        <module>flow-engine-starter-query</module>
     </modules>
 
     <properties>
@@ -81,6 +83,18 @@
             <dependency>
                 <groupId>com.codingapi.flow</groupId>
                 <artifactId>flow-engine-starter-infra</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.codingapi.flow</groupId>
+                <artifactId>flow-engine-starter-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.codingapi.flow</groupId>
+                <artifactId>flow-engine-starter-query</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

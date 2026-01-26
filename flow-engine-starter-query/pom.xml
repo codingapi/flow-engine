@@ -9,34 +9,23 @@
         <version>0.0.1</version>
     </parent>
 
-    <artifactId>flow-engine-starter</artifactId>
+    <artifactId>flow-engine-starter-query</artifactId>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-
     <dependencies>
+
         <dependency>
-            <groupId>com.codingapi.flow</groupId>
-            <artifactId>flow-engine-framework</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.codingapi.flow</groupId>
             <artifactId>flow-engine-starter-infra</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.codingapi.flow</groupId>
-            <artifactId>flow-engine-starter-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.codingapi.flow</groupId>
-            <artifactId>flow-engine-starter-query</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>
