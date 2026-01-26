@@ -23,5 +23,9 @@
   "dependencies": {
     "@flow-engine/flow-core": "workspace:*",
     "@flow-engine/flow-types": "workspace:*"
+  },
+  "devDependencies":{
+    "@flow-engine/flow-core": "workspace:*",
+    "@flow-engine/flow-types": "workspace:*"
   }
 }

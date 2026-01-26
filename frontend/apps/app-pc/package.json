@@ -19,6 +19,7 @@
     "react-router-dom": "^7.13.0"
   },
   "devDependencies":{
-    "@flow-engine/flow-core": "workspace:*"
+    "@flow-engine/flow-core": "workspace:*",
+    "@flow-engine/flow-types": "workspace:*"
   }
 }

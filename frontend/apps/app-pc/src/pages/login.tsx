@@ -23,10 +23,11 @@ const LoginPage: React.FC = () => {
                             if (res.success) {
                                 const token = res.data.token;
                                 localStorage.setItem('token', token);
-                                navigate('/')
+                                message.success('login success');
+                                navigate('/');
+                            }else{
+                                message.error(res.errMessage);
                             }
-                        }).catch(e=>{
-                            message.error(e)
                         })   
                     }}>
                     <Form.Item name={"username"} label="username:">
