@@ -1,6 +1,8 @@
 import { ParamRequest, Result } from "../table";
 
 export interface State {
+    pageVersion: number;
+    editable: boolean;
 }
 
 

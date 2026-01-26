@@ -1,5 +1,5 @@
 import React from "react";
-import { Table as AntdTable, TableProps as AntdTableProps } from "antd";
+import { Table as AntdTable, TableProps as AntdTableProps,Flex,Space,Card } from "antd";
 
 
 export interface Result<T> {
@@ -23,6 +23,7 @@ export interface ParamRequest {
 export interface TableProps<RecordType> extends AntdTableProps<RecordType> {
     actionType?: React.Ref<ActionType>;
     request?(params: ParamRequest): Promise<Result<any>>;
+    toolBarRender?():React.ReactElement[]
 }
 
 export function Table<RecordType extends object = any>(props: TableProps<RecordType>) {
@@ -70,25 +71,37 @@ export function Table<RecordType extends object = any>(props: TableProps<RecordT
     }, []);
 
     return (
-        <AntdTable<RecordType>
-            dataSource={dataSource}
-            pagination={
-                {
-                    pageSize: pageSize,
-                    current: current,
-                    total: total,
-                    defaultCurrent: defaultCurrent,
-                    defaultPageSize: defaultPageSize,
-                    onChange: (pageSize, current) => {
-                        requestData({
-                            current,
-                            pageSize
-                        });
-                    },
-                    ...props.pagination
-                }
-            }
-            {...props}
-        />
+        <div>
+           <Card>
+               <Flex justify={"end"} style={{
+                   paddingLeft: 20,
+                   marginBottom:10
+               }}>
+                   <Space>
+                       {props.toolBarRender && props.toolBarRender()}
+                   </Space>
+               </Flex>
+               <AntdTable<RecordType>
+                   dataSource={dataSource}
+                   pagination={
+                       {
+                           pageSize: pageSize,
+                           current: current,
+                           total: total,
+                           defaultCurrent: defaultCurrent,
+                           defaultPageSize: defaultPageSize,
+                           onChange: (pageSize, current) => {
+                               requestData({
+                                   current,
+                                   pageSize
+                               });
+                           },
+                           ...props.pagination
+                       }
+                   }
+                   {...props}
+               />
+           </Card>
+        </div>
     );
 }

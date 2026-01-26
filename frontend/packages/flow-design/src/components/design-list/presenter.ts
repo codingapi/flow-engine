@@ -1,6 +1,6 @@
-import { type Dispatch } from "@flow-engine/flow-core";
-import { DesignListApi, State } from "./types";
-import { ParamRequest } from "../table";
+import {type Dispatch} from "@flow-engine/flow-core";
+import {DesignListApi, State} from "./types";
+import {ParamRequest} from "../table";
 
 
 export class Presenter {
@@ -9,9 +9,9 @@ export class Presenter {
     private readonly dispatch: Dispatch<State>;
     private state: State;
 
-    public constructor(state: State, dispath: Dispatch<State>, api: DesignListApi) {
+    public constructor(state: State, dispatch: Dispatch<State>, api: DesignListApi) {
         this.api = api;
-        this.dispatch = dispath;
+        this.dispatch = dispatch;
         this.state = state;
     }
 
@@ -23,6 +23,36 @@ export class Presenter {
     public request(request: ParamRequest) {
         return this.api.request(request);
     }
+
+
+    public reload() {
+        this.dispatch(preState => {
+            return {
+                ...preState,
+                pageVersion: this.state.pageVersion + 1,
+            }
+        })
+    }
+
+    public closeEditable() {
+        this.dispatch(preState => {
+            return {
+                ...preState,
+                editable: false
+            }
+        })
+    }
+
+    public showEditable() {
+        this.dispatch(preState => {
+            return {
+                ...preState,
+                editable: true
+            }
+        })
+    }
+
+
 
 
 }
