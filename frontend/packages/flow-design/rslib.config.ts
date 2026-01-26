@@ -5,7 +5,7 @@ import * as path from 'node:path';
 export default defineConfig({
   source: {
     entry: {
-      index: './src/index.ts',
+      index: './src/**',
     },
   },
   resolve: {
@@ -15,7 +15,7 @@ export default defineConfig({
   },
   lib: [
     {
-      bundle: true,
+      bundle: false,
       dts: true,
       format: 'esm',
     },

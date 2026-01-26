@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/api/workflow/cmd")
+@RequestMapping("/api/cmd/workflow")
 @AllArgsConstructor
 public class WorkflowController {
 

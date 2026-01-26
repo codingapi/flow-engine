@@ -21,6 +21,12 @@
     "react-dom": ">=18"
   },
   "dependencies": {
+    "@ant-design/icons": "~6.1.0",
+    "@flow-engine/flow-core": "workspace:*",
+    "@flow-engine/flow-types": "workspace:*",
+    "antd": "^6.2.1"
+  },
+  "devDependencies":{
     "@flow-engine/flow-core": "workspace:*",
     "@flow-engine/flow-types": "workspace:*"
   }

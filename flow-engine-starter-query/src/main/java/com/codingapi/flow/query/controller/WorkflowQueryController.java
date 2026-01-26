@@ -1,6 +1,7 @@
 package com.codingapi.flow.query.controller;
 
 import com.codingapi.flow.infra.convert.WorkflowConvertor;
+import com.codingapi.flow.infra.entity.WorkflowEntity;
 import com.codingapi.flow.infra.jpa.WorkflowEntityRepository;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.springboot.framework.dto.request.SearchRequest;
@@ -19,8 +20,8 @@ public class WorkflowQueryController {
     private final WorkflowEntityRepository workflowEntityRepository;
 
     @GetMapping("/list")
-    public MultiResponse<Workflow> list(SearchRequest searchRequest) {
-        return MultiResponse.of(workflowEntityRepository.searchRequest(searchRequest).stream().map(WorkflowConvertor::convert).toList());
+    public MultiResponse<WorkflowEntity> list(SearchRequest searchRequest) {
+        return MultiResponse.of(workflowEntityRepository.searchRequest(searchRequest));
     }
 
 }

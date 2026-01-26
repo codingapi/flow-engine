@@ -32,9 +32,15 @@ importers:
 
   apps/app-mobile:
     dependencies:
-      '@flow-engine/flow-design':
+      '@flow-engine/flow-core':
         specifier: workspace:*
-        version: link:../../packages/flow-design
+        version: link:../../packages/flow-core
+      '@flow-engine/flow-types':
+        specifier: workspace:*
+        version: link:../../packages/flow-types
+      antd:
+        specifier: ^6.2.1
+        version: 6.2.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -74,22 +80,6 @@ importers:
       react-router-dom:
         specifier: ^7.13.0
         version: 7.13.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-    devDependencies:
-      '@rsbuild/core':
-        specifier: ^1.1.11
-        version: 1.7.2
-      '@rsbuild/plugin-react':
-        specifier: ^1.1.0
-        version: 1.4.2(@rsbuild/core@1.7.2)
-      '@types/react':
-        specifier: ^18.3.12
-        version: 18.3.27
-      '@types/react-dom':
-        specifier: ^18.3.1
-        version: 18.3.7(@types/react@18.3.27)
-      typescript:
-        specifier: ^5.7.3
-        version: 5.9.3
 
   packages/flow-core:
     dependencies:
@@ -99,12 +89,18 @@ importers:
 
   packages/flow-design:
     dependencies:
+      '@ant-design/icons':
+        specifier: ~6.1.0
+        version: 6.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@flow-engine/flow-core':
         specifier: workspace:*
         version: link:../flow-core
       '@flow-engine/flow-types':
         specifier: workspace:*
         version: link:../flow-types
+      antd:
+        specifier: ^6.2.1
+        version: 6.2.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: '>=18'
         version: 18.3.1
