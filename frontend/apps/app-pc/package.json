@@ -20,6 +20,7 @@
   },
   "devDependencies":{
     "@flow-engine/flow-core": "workspace:*",
-    "@flow-engine/flow-types": "workspace:*"
+    "@flow-engine/flow-types": "workspace:*",
+    "@flow-engine/flow-design": "workspace:*"
   }
 }

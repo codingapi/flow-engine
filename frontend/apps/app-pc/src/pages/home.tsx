@@ -1,19 +1,30 @@
 import React from "react";
 import { useNavigate } from "react-router";
-import { Button, Space } from "antd";
+import { Button, Flex, Space } from "antd";
 
 const HomePage: React.FC = () => {
 
     const navigate = useNavigate();
 
     return (
-        <Space>
-            <Button onClick={() => {
-                navigate("/login")
-            }}>login</Button>
-            <Button>desion</Button>
-            <Button>todo</Button>
-        </Space>
+        <div>
+            <Flex justify="center"><h1>Home Page</h1></Flex>
+            <Space>
+                <Button
+                    onClick={() => {
+                        navigate("/login")
+                    }}>login</Button>
+                <Button
+                    onClick={() => {
+                        navigate("/design")
+                    }}>design</Button>
+                <Button
+                    onClick={() => {
+                        navigate('/todo');
+                    }}
+                >todo</Button>
+            </Space>
+        </div>
     )
 }
 
