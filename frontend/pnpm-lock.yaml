@@ -30,6 +30,15 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  apps/app-mobile:
+    dependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+
   apps/app-pc:
     dependencies:
       '@flow-engine/flow-design':
@@ -42,14 +51,28 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
 
+  packages/flow-core: {}
+
   packages/flow-design:
     dependencies:
+      '@flow-engine/flow-core':
+        specifier: workspace:*
+        version: link:../flow-core
+      '@flow-engine/flow-types':
+        specifier: workspace:*
+        version: link:../flow-types
       react:
         specifier: '>=16.9.0'
         version: 19.2.3
       react-dom:
         specifier: '>=16.9.0'
         version: 18.3.1(react@19.2.3)
+
+  packages/flow-types:
+    dependencies:
+      '@flow-engine/flow-core':
+        specifier: workspace:*
+        version: link:../flow-core
 
 packages:
 

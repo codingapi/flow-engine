@@ -1,5 +1,5 @@
 {
-  "name": "@flow-engine/flow-design",
+  "name": "@flow-engine/flow-types",
   "version": "1.0.0",
   "type": "module",
   "exports": {
@@ -16,12 +16,7 @@
     "build": "rslib build",
     "dev": "rslib build --watch"
   },
-  "peerDependencies": {
-    "react": ">=16.9.0",
-    "react-dom": ">=16.9.0"
-  },
   "dependencies": {
-    "@flow-engine/flow-core": "workspace:*",
-    "@flow-engine/flow-types": "workspace:*"
+    "@flow-engine/flow-core": "workspace:*"
   }
 }
