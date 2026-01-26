@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import { RouterProvider } from 'react-router';
+import { hashRouters } from './config/routers';
 
 const rootEl = document.getElementById('root');
 if (rootEl) {
   const root = ReactDOM.createRoot(rootEl);
   root.render(
     <React.StrictMode>
-      <App />
+      <RouterProvider router={hashRouters}/>
     </React.StrictMode>,
   );
 }
