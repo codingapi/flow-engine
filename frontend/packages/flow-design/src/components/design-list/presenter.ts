@@ -17,7 +17,7 @@ export class Presenter extends BasePresenter<State, DesignListApi> {
         })
     }
 
-    public closeEditable() {
+    public hideEditable() {
         this.dispatch(preState => {
             return {
                 ...preState,
