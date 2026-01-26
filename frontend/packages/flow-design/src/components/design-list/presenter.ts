@@ -1,29 +1,12 @@
-import {type Dispatch} from "@flow-engine/flow-core";
 import {DesignListApi, State} from "./types";
 import {ParamRequest} from "../table";
+import {BasePresenter} from "@flow-engine/flow-core";
 
-
-export class Presenter {
-
-    private readonly api: DesignListApi;
-    private readonly dispatch: Dispatch<State>;
-    private state: State;
-
-    public constructor(state: State, dispatch: Dispatch<State>, api: DesignListApi) {
-        this.api = api;
-        this.dispatch = dispatch;
-        this.state = state;
-    }
-
-    public syncState(state: State) {
-        this.state = state;
-    }
-
+export class Presenter extends BasePresenter<State, DesignListApi> {
 
     public request(request: ParamRequest) {
-        return this.api.request(request);
+        return this.model.request(request);
     }
-
 
     public reload() {
         this.dispatch(preState => {
@@ -51,8 +34,5 @@ export class Presenter {
             }
         })
     }
-
-
-
 
 }

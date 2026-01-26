@@ -3,27 +3,17 @@ import {State} from "../types"
 import {Presenter} from "../presenter";
 import {DesignListApiImpl} from "../model";
 import {ActionType} from "@/components/table";
+import {PresenterHooks} from "@flow-engine/flow-core";
 
 
-const initStata: State = {
+const initState: State = {
     pageVersion: 0,
     editable: false
 }
 
 export const usePresenter = (actionType: React.RefObject<ActionType>) => {
 
-    const [state, dispatch] = React.useState<State>(initStata);
-
-    const ref = React.useRef<Presenter | null>(null);
-
-
-    if (!ref.current) {
-        ref.current = new Presenter(state, dispatch, new DesignListApiImpl());
-    }
-
-    React.useEffect(() => {
-        ref.current?.syncState(state);
-    }, [state]);
+    const {state, presenter} = PresenterHooks.create(Presenter, initState, new DesignListApiImpl());
 
     React.useEffect(() => {
         if (state.pageVersion) {
@@ -31,9 +21,8 @@ export const usePresenter = (actionType: React.RefObject<ActionType>) => {
         }
     }, [state.pageVersion]);
 
-
     return {
         state,
-        presenter: ref.current
+        presenter
     }
 }
