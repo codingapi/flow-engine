@@ -1,6 +1,8 @@
 import React from "react";
 import {Button, Space, Tabs} from "antd";
 import {PanelTabType} from "@/components/design-panel/types";
+import {DesignPanelContext} from "./context";
+import {createContext} from "./hooks/use-context";
 
 const Left = () => {
     return (
@@ -75,9 +77,15 @@ interface PanelBodyProps {
 }
 
 export const PanelBody: React.FC<PanelBodyProps> = (props) => {
+
+    const context = createContext();
+
     return (
         <>
-            <Header onClose={props.onClose}/>
+            <DesignPanelContext.Provider value={context}>
+                <Header onClose={props.onClose}/>
+                {context.state.value}
+            </DesignPanelContext.Provider>
         </>
     )
 }

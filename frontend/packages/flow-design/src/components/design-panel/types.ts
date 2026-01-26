@@ -8,6 +8,11 @@ export interface DesignPanelProps {
 
 
 export interface State{
+    value:number;
+}
+
+export const initState: State = {
+    value:100,
 }
 
 
