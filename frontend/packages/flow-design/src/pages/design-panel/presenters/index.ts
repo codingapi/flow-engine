@@ -1,22 +1,25 @@
-import {BasePresenter} from "@flow-engine/flow-core";
 import {DesignPanelApi, PanelTabType, State} from "../types";
 
-export class Presenter extends BasePresenter<State, DesignPanelApi>{
+export class Presenter {
 
-    close() {
+    private state: State;
+    private readonly dispatch: (state: State) => void;
+    private readonly api: DesignPanelApi;
+
+    constructor(state: State,dispatch: (state: State) => void, api: DesignPanelApi) {
+        this.api = api;
+        this.dispatch = dispatch;
+        this.state = state;
     }
 
-
-    save(){
-
+    public syncState(state: State) {
+        this.state = state;
     }
 
     switchPanelTab(tab:PanelTabType){
-        this.dispatch(preState=>{
-            return {
-                ...preState,
-                panelTab: tab
-            }
+        this.dispatch({
+            ...this.state,
+            panelTab: tab
         })
     }
 }

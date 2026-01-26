@@ -41,7 +41,7 @@ interface HeaderProps {
 
 export const PanelHeader: React.FC<HeaderProps> = (props) => {
 
-    const context = useContext();
+    const {context} = useContext();
 
     const presenter = context.getPresenter();
 

@@ -1,7 +1,7 @@
 import React from "react";
 import {DesignPanelProps} from "./types";
 import {Drawer} from "@/components/drawer";
-import {PanelBody} from "@/pages/design-panel/body";
+import {PanelBody} from "@/pages/design-panel/components/body";
 
 export const DesignPanel:React.FC<DesignPanelProps>  = (props) =>{
 

@@ -12,7 +12,7 @@ export interface State{
     panelTab:PanelTabType;
 }
 
-export const initState: State = {
+export const initStateData: State = {
     value:100,
     panelTab:'base',
 }

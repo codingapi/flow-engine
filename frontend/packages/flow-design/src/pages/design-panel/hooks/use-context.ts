@@ -1,25 +1,49 @@
 import React from "react";
-import {PresenterHooks} from "@flow-engine/flow-core";
 import {DesignPanelContext, DesignPanelContextScope} from "../context";
+import {useDispatch, useSelector} from "react-redux";
+import {DesignReduxState, updateState} from "../store";
 import {Presenter} from "../presenters";
-import {DesignPanelApiImpl} from "../model";
-import {initState} from "../types";
+import {DesignPanelApiImpl} from "@/pages/design-panel/model";
 
 export const useContext = () => {
     const context = React.useContext(DesignPanelContext);
-    if(!context){
+    const state = useSelector((state: DesignReduxState) => state.design);
+    if (!context) {
         throw new Error("DesignPanelContext must be used within useContext");
     }
-    return context;
+    return {
+        state,
+        context,
+    };
 }
 
 export const createContext = () => {
-    const ref = React.useRef<DesignPanelContextScope|undefined>();
+    const ref = React.useRef<DesignPanelContextScope | undefined>();
 
-    const {state, presenter} = PresenterHooks.create(Presenter, initState, new DesignPanelApiImpl());
+    const dispatch = useDispatch();
 
-    if(!ref.current) {
-        ref.current = new DesignPanelContextScope(state,presenter);
+    const state = useSelector((state: DesignReduxState) => state.design);
+
+    if (!ref.current) {
+        const presenter = new Presenter(
+            state,
+            (preState ) => {
+                dispatch(updateState({
+                    ...preState,
+                }));
+                return preState;
+            },
+            new DesignPanelApiImpl()
+        );
+        ref.current = new DesignPanelContextScope(state, presenter);
     }
-    return ref.current;
+
+    React.useEffect(() => {
+        ref.current?.syncState(state);
+    }, [state]);
+
+    return {
+        state,
+        context: ref.current,
+    }
 }

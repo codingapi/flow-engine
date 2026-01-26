@@ -5,19 +5,22 @@ import {Presenter} from "../presenters";
 
 export class DesignPanelContextScope {
 
-    public readonly state:State;
+    public state:State;
     private readonly presenter:Presenter;
 
     constructor(state:State,presenter:Presenter) {
-        this.presenter = presenter;
         this.state = state;
+        this.presenter = presenter;
     }
 
-    public getPresenter(){
+    public syncState(state:State) {
+        this.state = state;
+        this.presenter.syncState(state);
+    }
+
+    public getPresenter() {
         return this.presenter;
     }
-
-
 }
 
 
