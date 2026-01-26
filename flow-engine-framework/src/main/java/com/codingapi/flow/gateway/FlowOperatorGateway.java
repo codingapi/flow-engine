@@ -10,5 +10,4 @@ public interface FlowOperatorGateway {
 
     List<IFlowOperator> findByIds(List<Long> ids);
 
-    List<IFlowOperator> findByIds(long... ids);
 }

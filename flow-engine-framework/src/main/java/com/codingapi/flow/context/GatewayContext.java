@@ -27,7 +27,4 @@ public class GatewayContext {
         return flowOperatorGateway.findByIds(ids);
     }
 
-    public List<IFlowOperator> findByIds(long... ids) {
-        return flowOperatorGateway.findByIds(ids);
-    }
 }

@@ -1,6 +1,7 @@
 package com.codingapi.flow.backup;
 
 import com.codingapi.flow.workflow.Workflow;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,6 +9,7 @@ import lombok.Setter;
  * 流程备份
  */
 @Getter
+@AllArgsConstructor
 public class WorkflowBackup {
 
     @Setter

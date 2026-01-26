@@ -3,12 +3,14 @@ package com.codingapi.flow.domain;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.strategy.node.DelayStrategy;
 import com.codingapi.flow.utils.RandomUtils;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
  * 延迟任务
  */
 @Getter
+@AllArgsConstructor
 public class DelayTask {
 
     private final String id;

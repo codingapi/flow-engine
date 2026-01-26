@@ -128,9 +128,6 @@ public class RepositoryHolderContext {
         return flowOperatorGateway.findByIds(ids);
     }
 
-    public List<IFlowOperator> findOperatorByIds(long... ids) {
-        return flowOperatorGateway.findByIds(ids);
-    }
 
     public IFlowOperator getOperatorById(long id) {
         return flowOperatorGateway.get(id);

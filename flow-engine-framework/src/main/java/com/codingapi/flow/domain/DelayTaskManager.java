@@ -5,6 +5,7 @@ import com.codingapi.flow.service.impl.FlowDelayTriggerService;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * 延迟任务上下文管理对象
@@ -12,6 +13,8 @@ import java.util.*;
  * 在分布式模式若都在启动延迟任务时，会导致延迟任务重复执行
  */
 public class DelayTaskManager {
+
+    private final Logger logger = Logger.getLogger(DelayTaskManager.class.getName());
 
     @Getter
     private final static DelayTaskManager instance = new DelayTaskManager();
@@ -26,6 +29,7 @@ public class DelayTaskManager {
      * 加载任务并执行
      */
     public void start() {
+        logger.info("delay task start...");
         RepositoryHolderContext.getInstance().verify();
         List<DelayTask> delayTasks = RepositoryHolderContext.getInstance().findDelayTasks();
         if (delayTasks != null && !delayTasks.isEmpty()) {

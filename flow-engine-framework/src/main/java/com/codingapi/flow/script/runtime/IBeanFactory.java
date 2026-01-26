@@ -28,9 +28,6 @@ public interface IBeanFactory {
         return GatewayContext.getInstance().getFlowOperator(userId);
     }
 
-    default List<IFlowOperator> findOperatorsByIds(long... ids) {
-        return GatewayContext.getInstance().findByIds(ids);
-    }
 
     default List<IFlowOperator> findOperatorsByIds(List<Long> ids) {
         return GatewayContext.getInstance().findByIds(ids);
