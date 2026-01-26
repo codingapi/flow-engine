@@ -11,4 +11,6 @@ public interface UserRepository extends FastRepository<User,Long> {
 
     List<User> findUserByIdIn(List<Long> ids);
 
+    User getUserByAccount(String account);
+
 }
