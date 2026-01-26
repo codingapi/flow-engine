@@ -12,6 +12,12 @@ export class DesignPanelContextScope {
         this.presenter = presenter;
         this.state = state;
     }
+
+    public getPresenter(){
+        return this.presenter;
+    }
+
+
 }
 
 

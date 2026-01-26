@@ -9,10 +9,12 @@ export interface DesignPanelProps {
 
 export interface State{
     value:number;
+    panelTab:PanelTabType;
 }
 
 export const initState: State = {
     value:100,
+    panelTab:'base',
 }
 
 

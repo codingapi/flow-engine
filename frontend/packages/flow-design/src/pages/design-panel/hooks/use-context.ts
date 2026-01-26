@@ -6,7 +6,11 @@ import {DesignPanelApiImpl} from "../model";
 import {initState} from "../types";
 
 export const useContext = () => {
-    return React.useContext(DesignPanelContext);
+    const context = React.useContext(DesignPanelContext);
+    if(!context){
+        throw new Error("DesignPanelContext must be used within useContext");
+    }
+    return context;
 }
 
 export const createContext = () => {

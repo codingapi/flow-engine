@@ -1,3 +1,2 @@
-export * from '@/components/design-list';
-export * from '@/components/design-panel';
-export * from '@/components/table';
+export * from '@/pages/design-list';
+export * from '@/pages/design-panel';

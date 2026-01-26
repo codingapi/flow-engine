@@ -1,11 +1,10 @@
 import React from "react";
 import {Drawer as AntdDrawer} from "antd";
-import {PanelBody} from "./body";
 
 interface DrawerProps {
     open: boolean;
     onClose?: () => void;
-    onSave?: () => void;
+    children?:React.ReactNode;
 }
 
 
@@ -18,7 +17,7 @@ export const Drawer: React.FC<DrawerProps> = (props) => {
             closeIcon={false}
             onClose={props.onClose}
         >
-           <PanelBody onClose={props.onClose} />
+            {props.children}
         </AntdDrawer>
     )
 }

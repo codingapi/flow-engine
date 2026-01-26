@@ -1,10 +1,9 @@
 import React from "react"
+import {ActionType} from "@/components/table";
+import {PresenterHooks} from "@flow-engine/flow-core";
 import {State} from "../types"
 import {Presenter} from "../presenter";
 import {DesignListApiImpl} from "../model";
-import {ActionType} from "@/components/table";
-import {PresenterHooks} from "@flow-engine/flow-core";
-
 
 const initState: State = {
     pageVersion: 0,

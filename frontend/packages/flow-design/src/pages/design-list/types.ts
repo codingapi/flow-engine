@@ -1,4 +1,4 @@
-import { ParamRequest, Result } from "../table";
+import { ParamRequest, Result } from "@/components/table";
 
 export interface State {
     pageVersion: number;

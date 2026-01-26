@@ -1,4 +1,4 @@
-import { ParamRequest, Result } from "../table";
+import { ParamRequest, Result } from "@/components/table";
 import { DataType, DesignListApi } from "./types";
 import { list } from "@/api/workflow";
 

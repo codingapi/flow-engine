@@ -3,7 +3,7 @@ import React from "react";
 import {DataType, DesignListProps} from "./types";
 import {usePresenter} from "./hooks/use-presenter";
 import {Button} from "antd";
-import {DesignPanel} from "@/components/design-panel";
+import {DesignPanel} from "@/pages/design-panel";
 
 export const DesignList: React.FC<DesignListProps> = (props) => {
 

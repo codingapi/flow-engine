@@ -1,22 +1,26 @@
 import React from "react";
+import {PanelTabType} from "@/pages/design-panel/types";
 import {Button, Space, Tabs} from "antd";
-import {PanelTabType} from "@/components/design-panel/types";
-import {DesignPanelContext} from "./context";
-import {createContext} from "./hooks/use-context";
+import {useContext} from "@/pages/design-panel/hooks/use-context";
 
 const Left = () => {
     return (
-        <div>流程设计面板</div>
+        <div style={{
+            width: 150,
+        }}>流程设计面板</div>
     )
 }
 
 interface RightProps {
     onClose?: () => void;
+    onSave?: () => void;
 }
 
 const Right: React.FC<RightProps> = (props) => {
     return (
-        <Space>
+        <Space style={{
+            width: 150,
+        }}>
             <Button
                 type="primary"
                 onClick={() => {
@@ -32,10 +36,15 @@ const Right: React.FC<RightProps> = (props) => {
 
 interface HeaderProps {
     onClose?: () => void;
-    onSwitch?: (type:PanelTabType) => void;
+    onSave?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = (props) => {
+export const PanelHeader: React.FC<HeaderProps> = (props) => {
+
+    const context = useContext();
+
+    const presenter = context.getPresenter();
+
     return (
         <Tabs
             style={{
@@ -60,32 +69,14 @@ const Header: React.FC<HeaderProps> = (props) => {
                     label: '更多参数',
                 },
             ]}
-            defaultActiveKey="base"
-            onChange={(key)=>{
-                props.onSwitch?.(key as PanelTabType);
+            defaultActiveKey={context.state.panelTab}
+            onChange={(key) => {
+                presenter.switchPanelTab(key as PanelTabType);
             }}
             tabBarExtraContent={{
                 left: <Left/>,
-                right: <Right onClose={props.onClose}/>,
+                right: <Right {...props} />,
             }}
         />
-    )
-}
-
-interface PanelBodyProps {
-    onClose?: () => void;
-}
-
-export const PanelBody: React.FC<PanelBodyProps> = (props) => {
-
-    const context = createContext();
-
-    return (
-        <>
-            <DesignPanelContext.Provider value={context}>
-                <Header onClose={props.onClose}/>
-                {context.state.value}
-            </DesignPanelContext.Provider>
-        </>
     )
 }
