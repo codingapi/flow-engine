@@ -1,11 +1,25 @@
 import { defineConfig } from '@rslib/core';
+import * as path from 'node:path';
 
 export default defineConfig({
+  source: {
+    entry: {
+      index: './src/index.ts',
+    },
+  },
+  resolve: {
+    alias: {
+      "@/": path.resolve(__dirname, "src"),
+    }
+  },
   lib: [
     {
-      format: 'esm',
-      syntax: ['node 18'],
+      bundle: true,
       dts: true,
+      format: 'esm',
     },
   ],
+  output: {
+    target: 'web',
+  },
 });
