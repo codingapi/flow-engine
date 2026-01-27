@@ -10,6 +10,7 @@ export const Panel: React.FC<PanelProps> = (props) => {
     return (
         <Flex
             justify='center'
+            vertical={true}
             style={{
                 marginLeft: '20%',
                 marginRight: '20%',

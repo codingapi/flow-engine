@@ -28,7 +28,7 @@ public class FormMetaBuilder {
         field.setName(name);
         field.setCode(code);
         field.setType(type);
-        field.setNullable(true);
+        field.setRequired(true);
         field.setDefaultValue(null);
         return this.addField(field);
     }

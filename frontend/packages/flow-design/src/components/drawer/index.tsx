@@ -1,8 +1,8 @@
 import React from "react";
-import {Drawer as AntdDrawer} from "antd";
+import {Drawer as AntdDrawer,DrawerProps as AntdDrawerProps} from "antd";
 
-interface DrawerProps {
-    open: boolean;
+interface DrawerProps extends AntdDrawerProps {
+    open?: boolean;
     onClose?: () => void;
     children?:React.ReactNode;
 }
@@ -16,6 +16,7 @@ export const Drawer: React.FC<DrawerProps> = (props) => {
             size={"100%"}
             closeIcon={false}
             onClose={props.onClose}
+            {...props}
         >
             {props.children}
         </AntdDrawer>

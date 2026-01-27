@@ -1,13 +1,13 @@
 import React from "react";
-import {Card,Form, FormInstance, FormItemProps} from "antd";
+import {Card, Form, FormInstance, FormItemProps} from "antd";
 
 interface CardFormProps {
-    form?:FormInstance;
+    form?: FormInstance;
     title: string;
-    children?:React.ReactNode;
+    children?: React.ReactNode;
 }
 
-const CardFormComponent:React.FC<CardFormProps> = (props)=>{
+const CardFormComponent: React.FC<CardFormProps> = (props) => {
     const {form} = props;
 
     return (
@@ -16,6 +16,7 @@ const CardFormComponent:React.FC<CardFormProps> = (props)=>{
             variant={'borderless'}
             style={{
                 width: '100%',
+                margin: 5
             }}
         >
             <Form
@@ -28,7 +29,7 @@ const CardFormComponent:React.FC<CardFormProps> = (props)=>{
     )
 }
 
-const CardFormItem:React.FC<FormItemProps> =(props)=>{
+const CardFormItem: React.FC<FormItemProps> = (props) => {
     return (
         <Form.Item
             labelCol={{
@@ -46,7 +47,7 @@ const CardFormItem:React.FC<FormItemProps> =(props)=>{
 type FormType = typeof CardFormComponent;
 type CardFormComponentType = FormType & {
     Item: typeof CardFormItem;
-    useForm:()=> [FormInstance];
+    useForm: () => [FormInstance];
 };
 
 export const CardForm = CardFormComponent as CardFormComponentType;

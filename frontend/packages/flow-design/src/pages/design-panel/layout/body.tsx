@@ -1,5 +1,4 @@
 import React from "react";
-import {Panel} from "@/components/panel";
 import {useContext} from "../hooks/use-context";
 import {TabForm} from "@/pages/design-panel/tabs/form";
 import {TabSetting} from "@/pages/design-panel/tabs/setting";

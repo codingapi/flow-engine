@@ -74,7 +74,7 @@ public class FormMeta {
             fieldMeta.setName((String) field.get("name"));
             fieldMeta.setCode((String) field.get("code"));
             fieldMeta.setType((String) field.get("type"));
-            fieldMeta.setNullable(Boolean.TRUE.equals(field.get("nullable")));
+            fieldMeta.setRequired(Boolean.TRUE.equals(field.get("required")));
             fieldMeta.setDefaultValue((String) field.get("defaultValue"));
             fieldList.add(fieldMeta);
         }

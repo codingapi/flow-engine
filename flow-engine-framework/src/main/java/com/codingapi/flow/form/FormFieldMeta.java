@@ -8,10 +8,15 @@ import lombok.Data;
 @Data
 public class FormFieldMeta {
 
+    // 字段名称
     private String name;
+    // 字段编号
     private String code;
+    // 字段类型
     private String type;
-    private boolean nullable;
+    // 是否必填
+    private boolean required;
+    // 默认值
     private String defaultValue;
 
 }
