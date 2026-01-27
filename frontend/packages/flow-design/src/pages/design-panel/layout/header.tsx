@@ -1,6 +1,6 @@
 import React from "react";
 import {Button, Space, Tabs} from "antd";
-import {PanelTabType} from "../types";
+import {LayoutHeaderHeight, PanelTabType} from "../types";
 import {useContext} from "../hooks/use-context";
 
 const Left = () => {
@@ -40,6 +40,7 @@ export const Header = () => {
         <Tabs
             style={{
                 width: "100%",
+                height: LayoutHeaderHeight,
             }}
             centered={true}
             items={[
