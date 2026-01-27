@@ -3,7 +3,7 @@ import {initStateData, State} from "./types";
 
 
 export type DesignStoreAction = {
-    updateState: (state: State, action: PayloadAction<Partial<State>>) => void;
+    updateState: (state: State, action: PayloadAction<Partial<State> | ((prev: State) => Partial<State>)>) => void;
 }
 
 export const designSlice = createSlice<State, DesignStoreAction, "design", {}>({
@@ -13,7 +13,11 @@ export const designSlice = createSlice<State, DesignStoreAction, "design", {}>({
     },
     reducers: {
         updateState: (state, action) => {
-            Object.assign(state, action.payload);
+            if(typeof action.payload === 'function') {
+                Object.assign(state, action.payload(state));
+            }else {
+                Object.assign(state, action.payload);
+            }
         },
     },
 });

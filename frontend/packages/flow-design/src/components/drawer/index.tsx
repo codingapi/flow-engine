@@ -15,6 +15,7 @@ export const Drawer: React.FC<DrawerProps> = (props) => {
             open={props.open}
             size={"100%"}
             closeIcon={false}
+            destroyOnHidden={true}
             onClose={props.onClose}
             {...props}
         >

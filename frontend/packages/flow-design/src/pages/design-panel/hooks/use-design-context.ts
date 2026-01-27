@@ -19,7 +19,7 @@ export const useDesignContext = () => {
 }
 
 export const createDesignContext = (props: DesignPanelProps) => {
-    const ref = React.useRef<DesignPanelContextScope | undefined>();
+    const ref = React.useRef<DesignPanelContextScope | undefined>(undefined);
 
     const dispatch = useDispatch();
 
@@ -28,15 +28,13 @@ export const createDesignContext = (props: DesignPanelProps) => {
     if (!ref.current) {
         const presenter = new Presenter(
             state,
-            (preState) => {
-                dispatch(updateState({
-                    ...preState,
-                }));
-                return preState;
+            (prevState) => {
+                dispatch(updateState(prevState));
+                return prevState;
             },
             new DesignPanelApiImpl()
         );
-        ref.current = new DesignPanelContextScope(state, presenter, props);
+        ref.current = new DesignPanelContextScope(presenter, props);
     }
 
     React.useEffect(() => {

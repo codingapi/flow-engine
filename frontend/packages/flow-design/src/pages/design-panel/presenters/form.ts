@@ -15,9 +15,10 @@ export class FormActionContext {
     }
 
     public save() {
-        const value = {};
+        let value = {};
         for (const form of this.formActions) {
-            Object.assign(value, form.save());
+            const data = form.save();
+            value = Object.assign(value, data);
         }
         return value;
     }

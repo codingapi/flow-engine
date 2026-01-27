@@ -13,6 +13,7 @@ const Left = () => {
 
 const Right= () => {
     const {context} = useDesignContext();
+
     return (
         <Space style={{
             width: 150,
@@ -32,7 +33,7 @@ const Right= () => {
 
 export const Header = () => {
 
-    const {context} = useDesignContext();
+    const {state,context} = useDesignContext();
 
 
     return (
@@ -60,9 +61,9 @@ export const Header = () => {
                     label: '更多参数',
                 },
             ]}
-            defaultActiveKey={context.state.view.tabPanel}
+            defaultActiveKey={state.view.tabPanel}
             onChange={(key) => {
-                context.updateViewPanelTab(key as TabPanelType);
+                context.getPresenter().updateViewPanelTab(key as TabPanelType);
             }}
             tabBarExtraContent={{
                 left: <Left/>,

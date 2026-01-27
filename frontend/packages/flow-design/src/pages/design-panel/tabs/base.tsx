@@ -11,10 +11,12 @@ export const TabBase = ()=>{
     const [operatorForm] = CardForm.useForm();
     const {state,context} = useDesignContext();
 
-    const formActionContext = context.getFormActionContext();
+    const formActionContext = context.getPresenter().getFormActionContext();
 
     React.useEffect(()=>{
+        baseForm.resetFields();
         baseForm.setFieldsValue(state.workflow);
+        operatorForm.resetFields();
         operatorForm.setFieldsValue(state.workflow);
     },[]);
 
