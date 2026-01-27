@@ -1,13 +1,13 @@
 import React from "react";
-import {useContext} from "../hooks/use-context";
+import {useDesignContext} from "../hooks/use-design-context";
 import {TabForm} from "@/pages/design-panel/tabs/form";
 import {TabSetting} from "@/pages/design-panel/tabs/setting";
 import {TabBase} from "@/pages/design-panel/tabs/base";
 import {TabFlow} from "@/pages/design-panel/tabs/flow";
 
 export const Body = ()=>{
-    const {state} = useContext();
-    const tabPanelType = state.panelTab;
+    const {state} = useDesignContext();
+    const tabPanelType = state.view.tabPanel;
     return (
         <>
             {tabPanelType ==='form' && (

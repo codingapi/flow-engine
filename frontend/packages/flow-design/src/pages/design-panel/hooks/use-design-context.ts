@@ -6,7 +6,7 @@ import {Presenter} from "../presenters";
 import {DesignPanelApiImpl} from "../model";
 import {DesignPanelProps} from "../types";
 
-export const useContext = () => {
+export const useDesignContext = () => {
     const context = React.useContext(DesignPanelContext);
     const state = useSelector((state: DesignReduxState) => state.design);
     if (!context) {
@@ -18,7 +18,7 @@ export const useContext = () => {
     };
 }
 
-export const createContext = (props:DesignPanelProps) => {
+export const createDesignContext = (props: DesignPanelProps) => {
     const ref = React.useRef<DesignPanelContextScope | undefined>();
 
     const dispatch = useDispatch();
@@ -28,7 +28,7 @@ export const createContext = (props:DesignPanelProps) => {
     if (!ref.current) {
         const presenter = new Presenter(
             state,
-            (preState ) => {
+            (preState) => {
                 dispatch(updateState({
                     ...preState,
                 }));
@@ -36,12 +36,21 @@ export const createContext = (props:DesignPanelProps) => {
             },
             new DesignPanelApiImpl()
         );
-        ref.current = new DesignPanelContextScope(state, presenter,props);
+        ref.current = new DesignPanelContextScope(state, presenter, props);
     }
 
     React.useEffect(() => {
         ref.current?.syncState(state);
     }, [state]);
+
+
+    React.useEffect(() => {
+        return () => {
+            if (ref.current) {
+                ref.current = undefined;
+            }
+        }
+    }, []);
 
     return {
         state,

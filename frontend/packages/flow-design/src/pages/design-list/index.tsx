@@ -32,6 +32,7 @@ export const DesignList: React.FC<DesignListProps> = (props) => {
     return (
         <div>
             <Table<DataType>
+                key={"id"}
                 actionType={actionType}
                 toolBarRender={() => {
                     return [

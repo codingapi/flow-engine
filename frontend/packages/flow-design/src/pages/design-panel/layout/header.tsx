@@ -1,7 +1,7 @@
 import React from "react";
 import {Button, Space, Tabs} from "antd";
-import {LayoutHeaderHeight, PanelTabType} from "../types";
-import {useContext} from "../hooks/use-context";
+import {LayoutHeaderHeight, TabPanelType} from "../types";
+import {useDesignContext} from "../hooks/use-design-context";
 
 const Left = () => {
     return (
@@ -12,7 +12,7 @@ const Left = () => {
 }
 
 const Right= () => {
-    const {context} = useContext();
+    const {context} = useDesignContext();
     return (
         <Space style={{
             width: 150,
@@ -32,9 +32,8 @@ const Right= () => {
 
 export const Header = () => {
 
-    const {context} = useContext();
+    const {context} = useDesignContext();
 
-    const presenter = context.getPresenter();
 
     return (
         <Tabs
@@ -61,9 +60,9 @@ export const Header = () => {
                     label: '更多参数',
                 },
             ]}
-            defaultActiveKey={context.state.panelTab}
+            defaultActiveKey={context.state.view.tabPanel}
             onChange={(key) => {
-                presenter.switchPanelTab(key as PanelTabType);
+                context.updateViewPanelTab(key as TabPanelType);
             }}
             tabBarExtraContent={{
                 left: <Left/>,

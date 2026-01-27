@@ -1,7 +1,7 @@
 import React from "react";
 import {Provider} from "react-redux";
 import {DesignPanelContext} from "../context";
-import {createContext} from "../hooks/use-context";
+import {createDesignContext} from "../hooks/use-design-context";
 import {designStore} from "../store";
 import {Header} from "./header";
 import {Footer} from "./footer";
@@ -10,7 +10,7 @@ import {DesignPanelProps} from "../types";
 
 
 const ContentScope: React.FC<DesignPanelProps> = (props) => {
-    const {context} = createContext(props);
+    const {context} = createDesignContext(props);
     return (
         <DesignPanelContext.Provider value={context}>
             <Header/>

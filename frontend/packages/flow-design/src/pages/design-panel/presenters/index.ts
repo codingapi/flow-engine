@@ -1,4 +1,4 @@
-import {DesignPanelApi, PanelTabType, State} from "../types";
+import {DesignPanelApi, TabPanelType, State} from "../types";
 
 export class Presenter {
 
@@ -16,10 +16,25 @@ export class Presenter {
         this.state = state;
     }
 
-    switchPanelTab(tab:PanelTabType){
+    public updateViewPanelTab(tab:TabPanelType){
         this.dispatch({
             ...this.state,
-            panelTab: tab
+            view:{
+                ...this.state.view,
+                tabPanel: tab,
+            }
         })
     }
+
+    public updateWorkflow(data:any) {
+        this.dispatch({
+            ...this.state,
+            workflow:{
+                ...this.state.workflow,
+                ...data
+            }
+        });
+    }
+
+
 }

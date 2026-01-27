@@ -2,9 +2,10 @@ import React, {useState} from "react";
 import {Panel} from "@/components/panel";
 import {CardForm} from "@/components/form/card";
 import {Table, TableProps} from "@/components/table";
-import {Button, Flex, Form, Input,Switch,Select, Modal, Tabs} from "antd";
+import {Button, Flex, Form, Input, Switch, Select, Modal, Tabs, Space,Popconfirm} from "antd";
 import {FormFieldOptions} from "@/pages/design-panel/types";
-
+import { CloseOutlined } from "@ant-design/icons";
+import {useDesignContext} from "@/pages/design-panel/hooks/use-design-context";
 
 interface FormTableProps {
     title: string;
@@ -85,6 +86,61 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
     )
 }
 
+interface SubFormModalProps {
+    open: boolean;
+    onClose: () => void;
+}
+
+const SubFormModal = (props: SubFormModalProps) => {
+
+    const [form] = Form.useForm();
+
+    return (
+        <Modal
+            title={"添加子表"}
+            width={"60%"}
+            open={props.open}
+            onCancel={props.onClose}
+            onOk={() => {
+                form.submit();
+            }}
+        >
+            <Form
+                form={form}
+                layout="vertical"
+            >
+                <Form.Item
+                    name={"name"}
+                    label={"子表名称"}
+                    rules={[
+                        {
+                            required: true,
+                            message: '子表名称不能为空'
+                        }
+                    ]}
+                >
+                    <Input placeholder={"添加子表名称"}/>
+
+                </Form.Item>
+
+                <Form.Item
+                    name={"code"}
+                    label={"子表编码"}
+                    rules={[
+                        {
+                            required: true,
+                            message: '子表编码不能为空'
+                        }
+                    ]}
+                >
+                    <Input placeholder={"添加子表编码"}/>
+
+                </Form.Item>
+            </Form>
+        </Modal>
+    )
+}
+
 const FormTable: React.FC<FormTableProps> = (props) => {
 
     const title = props.title;
@@ -116,6 +172,7 @@ const FormTable: React.FC<FormTableProps> = (props) => {
         <>
             <Table
                 columns={columns}
+                key={"code"}
                 title={() => {
                     return (
                         <Flex
@@ -144,6 +201,8 @@ export const TabForm = () => {
 
     const [form] = CardForm.useForm();
 
+    const [subFormVisible, setSubFormVisible] = useState(false);
+
     return (
         <Panel>
             <FormTable title={"主表字段"}/>
@@ -151,12 +210,33 @@ export const TabForm = () => {
                 items={[
                     {
                         key: 'name',
-                        label: '子表',
+                        label: (
+                            <Space>
+                                子表
+                                <Popconfirm
+                                    title={"确认要删除子表吗？"}
+                                    onConfirm={()=>{
+
+                                    }}
+                                >
+                                    <CloseOutlined/>
+                                </Popconfirm>
+                            </Space>
+                        ),
                         children: <FormTable title={"子表字段"}/>
                     }
                 ]}
                 tabBarExtraContent={{
-                    right: <Button>添加子表</Button>
+                    right: <Button onClick={() => {
+                        setSubFormVisible(true)
+                    }}>添加子表</Button>
+                }}
+            />
+
+            <SubFormModal
+                open={subFormVisible}
+                onClose={() => {
+                    setSubFormVisible(false)
                 }}
             />
         </Panel>

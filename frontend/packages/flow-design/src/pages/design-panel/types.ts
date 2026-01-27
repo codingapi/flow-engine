@@ -1,4 +1,5 @@
-export type PanelTabType = 'base' | 'form' | 'flow' | 'setting';
+// Tab布局类型
+export type TabPanelType = 'base' | 'form' | 'flow' | 'setting';
 
 // 布局顶部高度
 export const LayoutHeaderHeight = 50;
@@ -29,12 +30,55 @@ export interface DesignPanelProps {
     onClose?: () => void;
 }
 
-export interface State {
-    panelTab: PanelTabType;
+// 表单字段
+interface FormField{
+    name: string;
+    code: string;
+    type: string;
+    required: boolean;
+    defaultValue: string;
 }
 
+// 流程表单
+interface FlowForm {
+    name:string;
+    code:string;
+    fields:FormField[];
+    subForms:FlowForm[];
+}
+// 流程配置
+interface Workflow {
+    id: string;
+    title: string;
+    code: string;
+    form: FlowForm;
+}
+
+
+// 全局状态
+export interface State {
+    view:{
+        tabPanel: TabPanelType;
+    },
+    workflow:Workflow
+}
+
+// 初始化数据
 export const initStateData: State = {
-    panelTab: 'base',
+    view:{
+        tabPanel:'base'
+    },
+    workflow:{
+        id:'',
+        title:'',
+        code:'',
+        form:{
+            code:'123',
+            name:'123',
+            fields:[],
+            subForms:[]
+        }
+    }
 }
 
 
