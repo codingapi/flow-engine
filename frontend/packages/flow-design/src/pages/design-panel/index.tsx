@@ -1,7 +1,7 @@
 import React from "react";
 import {DesignPanelProps} from "./types";
 import {Drawer} from "@/components/drawer";
-import {PanelBody} from "@/pages/design-panel/components/body";
+import {Content} from "@/pages/design-panel/layout/content";
 
 export const DesignPanel:React.FC<DesignPanelProps>  = (props) =>{
 
@@ -10,7 +10,7 @@ export const DesignPanel:React.FC<DesignPanelProps>  = (props) =>{
             open={props.open}
             onClose={props.onClose}
         >
-            <PanelBody {...props}/>
+            <Content {...props}/>
         </Drawer>
     )
 }

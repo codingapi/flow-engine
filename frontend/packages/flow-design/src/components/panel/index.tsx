@@ -1,7 +1,6 @@
 import {Flex} from "antd";
 import React, {ReactNode} from "react";
 
-
 interface PanelProps {
     children?: ReactNode;
 }

@@ -1,9 +1,10 @@
 import React from "react";
-import {DesignPanelContext, DesignPanelContextScope} from "../context";
 import {useDispatch, useSelector} from "react-redux";
+import {DesignPanelContext, DesignPanelContextScope} from "../context";
 import {DesignReduxState, updateState} from "../store";
 import {Presenter} from "../presenters";
-import {DesignPanelApiImpl} from "@/pages/design-panel/model";
+import {DesignPanelApiImpl} from "../model";
+import {DesignPanelProps} from "../types";
 
 export const useContext = () => {
     const context = React.useContext(DesignPanelContext);
@@ -17,7 +18,7 @@ export const useContext = () => {
     };
 }
 
-export const createContext = () => {
+export const createContext = (props:DesignPanelProps) => {
     const ref = React.useRef<DesignPanelContextScope | undefined>();
 
     const dispatch = useDispatch();
@@ -35,7 +36,7 @@ export const createContext = () => {
             },
             new DesignPanelApiImpl()
         );
-        ref.current = new DesignPanelContextScope(state, presenter);
+        ref.current = new DesignPanelContextScope(state, presenter,props);
     }
 
     React.useEffect(() => {

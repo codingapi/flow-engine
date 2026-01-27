@@ -1,7 +1,7 @@
 import React from "react";
-import {PanelTabType} from "@/pages/design-panel/types";
 import {Button, Space, Tabs} from "antd";
-import {useContext} from "@/pages/design-panel/hooks/use-context";
+import {PanelTabType} from "../types";
+import {useContext} from "../hooks/use-context";
 
 const Left = () => {
     return (
@@ -11,12 +11,8 @@ const Left = () => {
     )
 }
 
-interface RightProps {
-    onClose?: () => void;
-    onSave?: () => void;
-}
-
-const Right: React.FC<RightProps> = (props) => {
+const Right= () => {
+    const {context} = useContext();
     return (
         <Space style={{
             width: 150,
@@ -24,22 +20,17 @@ const Right: React.FC<RightProps> = (props) => {
             <Button
                 type="primary"
                 onClick={() => {
-                    props.onClose?.();
+                    context.save();
                 }}
             >保存</Button>
             <Button onClick={() => {
-                props.onClose?.();
+                context.close();
             }}>关闭</Button>
         </Space>
     )
 }
 
-interface HeaderProps {
-    onClose?: () => void;
-    onSave?: () => void;
-}
-
-export const PanelHeader: React.FC<HeaderProps> = (props) => {
+export const Header = () => {
 
     const {context} = useContext();
 
@@ -75,7 +66,7 @@ export const PanelHeader: React.FC<HeaderProps> = (props) => {
             }}
             tabBarExtraContent={{
                 left: <Left/>,
-                right: <Right {...props} />,
+                right: <Right/>,
             }}
         />
     )
