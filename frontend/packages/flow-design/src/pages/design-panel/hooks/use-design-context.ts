@@ -12,6 +12,7 @@ export const useDesignContext = () => {
     if (!context) {
         throw new Error("DesignPanelContext must be used within useContext");
     }
+    console.log('useDesignContext state', state);
     return {
         state,
         context,

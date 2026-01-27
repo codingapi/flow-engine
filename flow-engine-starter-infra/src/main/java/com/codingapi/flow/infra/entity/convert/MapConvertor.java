@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import jakarta.persistence.AttributeConverter;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class MapConvertor implements AttributeConverter<Map<String,Object>,String> {
@@ -19,7 +20,7 @@ public class MapConvertor implements AttributeConverter<Map<String,Object>,Strin
     @Override
     public Map<String, Object> convertToEntityAttribute(String dbData) {
         if(!StringUtils.hasText(dbData)){
-            return null;
+            return new HashMap<>();
         }
         return JSON.parseObject(dbData);
     }

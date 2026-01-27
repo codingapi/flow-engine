@@ -14,8 +14,10 @@ export class WorkflowStrategyManager {
         let value = {};
         for (const key in this.strategies){
            const currentValue = this.strategies[key];
-           value = Object.assign(value,{
-               [key]:currentValue,
+           value = Object.assign(value, {
+               [currentValue[WorkflowStrategyManager.TYPE_KEY]]:{
+                   ...currentValue
+               },
            });
         }
         value = {

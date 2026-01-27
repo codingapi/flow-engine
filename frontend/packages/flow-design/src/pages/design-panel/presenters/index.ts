@@ -93,7 +93,7 @@ export class Presenter {
                 ...values
             }
         };
-        await this.api.save(values);
+        await this.api.save(latest.workflow);
         console.log('save latest:', latest);
     }
 

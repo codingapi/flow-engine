@@ -9,6 +9,7 @@ import com.codingapi.springboot.framework.dto.request.IdRequest;
 import com.codingapi.springboot.framework.dto.response.Response;
 import com.codingapi.springboot.framework.dto.response.SingleResponse;
 import com.codingapi.springboot.framework.user.UserContext;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/cmd/workflow")
 @AllArgsConstructor
+@Transactional
 public class WorkflowController {
 
     private final WorkflowRepository workflowRepository;
@@ -38,11 +40,11 @@ public class WorkflowController {
     @PostMapping("/save")
     public Response save(@RequestBody JSONObject request) {
         IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
-        if(current!=null){
-            request.put("createdOperator",String.valueOf(current.getUserId()));
+        if (current != null) {
+            request.put("createdOperator", String.valueOf(current.getUserId()));
         }
-        Workflow workflow =  Workflow.formJson(request.toJSONString());
-        System.out.println(workflow);
+        Workflow workflow = Workflow.formJson(request.toJSONString());
+        workflowRepository.save(workflow);
         return Response.buildSuccess();
     }
 

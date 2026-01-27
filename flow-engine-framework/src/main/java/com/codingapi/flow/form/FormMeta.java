@@ -69,14 +69,16 @@ public class FormMeta {
         FormMeta form = new FormMeta();
         List<Map<String, Object>> fields = (List<Map<String, Object>>) map.get("fields");
         List<FormFieldMeta> fieldList = new ArrayList<>();
-        for (Map<String, Object> field : fields) {
-            FormFieldMeta fieldMeta = new FormFieldMeta();
-            fieldMeta.setName((String) field.get("name"));
-            fieldMeta.setCode((String) field.get("code"));
-            fieldMeta.setType((String) field.get("type"));
-            fieldMeta.setRequired(Boolean.TRUE.equals(field.get("required")));
-            fieldMeta.setDefaultValue((String) field.get("defaultValue"));
-            fieldList.add(fieldMeta);
+        if(fields!=null && !fields.isEmpty()) {
+            for (Map<String, Object> field : fields) {
+                FormFieldMeta fieldMeta = new FormFieldMeta();
+                fieldMeta.setName((String) field.get("name"));
+                fieldMeta.setCode((String) field.get("code"));
+                fieldMeta.setType((String) field.get("type"));
+                fieldMeta.setRequired(Boolean.TRUE.equals(field.get("required")));
+                fieldMeta.setDefaultValue((String) field.get("defaultValue"));
+                fieldList.add(fieldMeta);
+            }
         }
         form.setName((String) map.get("name"));
         form.setCode((String) map.get("code"));
