@@ -7,6 +7,7 @@ interface CardFormProps {
     children?: React.ReactNode;
     onChange?: (value: any) => void;
     onFinish?: (value:any) => void;
+    initialValue?: any;
 }
 
 const CardFormComponent: React.FC<CardFormProps> = (props) => {
@@ -26,6 +27,7 @@ const CardFormComponent: React.FC<CardFormProps> = (props) => {
                 layout="horizontal"
                 onValuesChange={props.onChange}
                 onFinish={props.onFinish}
+                initialValues={props.initialValue}
             >
                 {props.children}
             </Form>
