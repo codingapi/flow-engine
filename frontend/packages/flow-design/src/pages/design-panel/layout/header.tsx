@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Space, Tabs} from "antd";
+import {Button, Space, Tabs,message} from "antd";
 import {LayoutHeaderHeight, TabPanelType} from "../types";
 import {useDesignContext} from "../hooks/use-design-context";
 
@@ -21,7 +21,9 @@ const Right= () => {
             <Button
                 type="primary"
                 onClick={() => {
-                    context.save();
+                    context.save().then(()=>{
+                        message.success("流程已经保存.");
+                    });
                 }}
             >保存</Button>
             <Button onClick={() => {

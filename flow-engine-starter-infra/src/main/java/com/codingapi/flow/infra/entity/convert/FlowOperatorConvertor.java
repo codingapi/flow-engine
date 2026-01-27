@@ -16,7 +16,7 @@ public class FlowOperatorConvertor implements AttributeConverter<IFlowOperator,L
 
     @Override
     public IFlowOperator convertToEntityAttribute(Long dbData) {
-        if(dbData<=0){
+        if(dbData==null || dbData<=0){
             return null;
         }
         return GatewayContext.getInstance().getFlowOperator(dbData);

@@ -46,9 +46,6 @@ export const TabBase = ()=>{
             <CardForm
                 form={baseForm}
                 title="基本信息"
-                onFinish={(values)=>{
-                    console.log(values);
-                }}
             >
                 <CardForm.Item
                     name={"title"}
@@ -110,12 +107,9 @@ export const TabBase = ()=>{
             <CardForm
                 form={operatorForm}
                 title="发起配置"
-                onFinish={(values)=>{
-                    console.log(values);
-                }}
             >
                 <CardForm.Item
-                    name={"createdOperator"}
+                    name={"operatorCreateScript"}
                     label={"发起人范围"}
                     rules={[
                         {

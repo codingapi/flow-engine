@@ -7,7 +7,8 @@ import {DesignListApiImpl} from "../model";
 
 const initState: State = {
     pageVersion: 0,
-    editable: false
+    editable: false,
+    currentId:''
 }
 
 export const usePresenter = (actionType: React.RefObject<ActionType>) => {

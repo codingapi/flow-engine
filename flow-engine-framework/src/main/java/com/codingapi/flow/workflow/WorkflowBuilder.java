@@ -87,9 +87,15 @@ public class WorkflowBuilder {
         return this;
     }
 
-    public Workflow build() {
-        workflow.verify();
+    public Workflow build(boolean verify) {
+        if(verify) {
+            workflow.verify();
+        }
         return workflow;
+    }
+
+    public Workflow build() {
+        return this.build(true);
     }
 
 }

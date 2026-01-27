@@ -3,6 +3,7 @@ import { ParamRequest, Result } from "@/components/table";
 export interface State {
     pageVersion: number;
     editable: boolean;
+    currentId: string;
 }
 
 
@@ -15,7 +16,11 @@ export interface DataType {
 
 
 export interface DesignListApi {
+
     request: (request: ParamRequest) => Promise<Result<DataType>>;
+
+    delete: (id: string) => Promise<void>;
+
 }
 
 export interface DesignListProps {

@@ -17,13 +17,21 @@ export class DesignPanelContextScope {
         this.props.onClose?.();
     }
 
-    public save() {
-        this.presenter.save();
-        // this.close();
+    public async save() {
+        await this.presenter.save();
+        this.close();
     }
 
     public syncState(state: State) {
         this.presenter.syncState(state);
+    }
+
+    public initState() {
+        if(this.props.id){
+            this.presenter.loadDesign(this.props.id);
+        }else{
+            this.presenter.createDesign();
+        }
     }
 
     public getPresenter() {

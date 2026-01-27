@@ -26,6 +26,7 @@
     "@flow-engine/flow-types": "workspace:*",
     "@reduxjs/toolkit": "^2.11.2",
     "antd": "^6.2.1",
+    "dayjs": "^1.11.19",
     "react-redux": "^9.2.0"
   },
   "devDependencies": {

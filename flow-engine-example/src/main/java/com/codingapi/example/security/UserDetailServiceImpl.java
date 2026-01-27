@@ -2,6 +2,7 @@ package com.codingapi.example.security;
 
 import com.codingapi.example.entity.User;
 import com.codingapi.example.repository.UserRepository;
+import com.codingapi.springboot.security.gateway.TokenContext;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +22,8 @@ public class UserDetailServiceImpl implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("can't fond username " + username + " account");
         }
+
+        TokenContext.pushExtra(String.valueOf(user.getUserId()));
 
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getAccount())

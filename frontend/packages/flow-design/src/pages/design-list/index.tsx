@@ -2,8 +2,9 @@ import {ActionType, Table, TableProps} from "@/components/table";
 import React from "react";
 import {DataType, DesignListProps} from "./types";
 import {usePresenter} from "./hooks/use-presenter";
-import {Button} from "antd";
+import {Button,Space,Popconfirm,message} from "antd";
 import {DesignPanel} from "@/pages/design-panel";
+import dayjs from "dayjs";
 
 export const DesignList: React.FC<DesignListProps> = (props) => {
 
@@ -16,7 +17,7 @@ export const DesignList: React.FC<DesignListProps> = (props) => {
             hidden: true,
         },
         {
-            dataIndex: 'workCode',
+            dataIndex: 'code',
             title: '编码',
         },
         {
@@ -24,8 +25,35 @@ export const DesignList: React.FC<DesignListProps> = (props) => {
             title: '名称',
         },
         {
-            dataIndex: 'createTime',
+            dataIndex: 'createdTime',
             title: '创建时间',
+            render: (value, record) => {
+                return dayjs(value).format("YYYY-MM-DD HH:mm:ss");
+            }
+        },
+        {
+            dataIndex: 'option',
+            title: '操作',
+            render: (value, record) => {
+                return (
+                    <Space>
+                        <a onClick={()=>{
+                            presenter.editCurrent(record.id);
+                        }}>编辑</a>
+                        <Popconfirm
+                            title={"确认要删除该流程吗？"}
+                            onConfirm={()=>{
+                                presenter.deleteRecord(record.id).then(()=>{
+                                    message.success('流程已删除.')
+                                });
+                            }}
+                        >
+                            <a>删除</a>
+                        </Popconfirm>
+
+                    </Space>
+                )
+            }
         }
     ];
 
@@ -48,9 +76,11 @@ export const DesignList: React.FC<DesignListProps> = (props) => {
             />
 
             <DesignPanel
+                id={state.currentId}
                 open={state.editable}
                 onClose={() => {
                     presenter.hideEditable();
+                    presenter.reload();
                 }}/>
         </div>
     )

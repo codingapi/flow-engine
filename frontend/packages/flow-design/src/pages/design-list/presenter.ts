@@ -17,6 +17,12 @@ export class Presenter extends BasePresenter<State, DesignListApi> {
         })
     }
 
+    public async deleteRecord(id: string) {
+        await this.model.delete(id).then(result => {
+            this.reload();
+        });
+    }
+
     public hideEditable() {
         this.dispatch(preState => {
             return {
@@ -34,5 +40,17 @@ export class Presenter extends BasePresenter<State, DesignListApi> {
             }
         })
     }
+
+    public editCurrent(id: string) {
+        this.dispatch(preState => {
+            return {
+                ...preState,
+                currentId: id,
+                editable: true
+            }
+        })
+    }
+
+
 
 }

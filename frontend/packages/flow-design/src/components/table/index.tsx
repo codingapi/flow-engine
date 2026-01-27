@@ -3,10 +3,8 @@ import { Table as AntdTable, TableProps as AntdTableProps,Flex,Space,Card } from
 
 
 export interface Result<T> {
-    data:{
-        total: number;
-        list: T[];
-    }
+    data:T[]
+    total: number;
     success: boolean
 }
 
@@ -57,8 +55,8 @@ export function Table<RecordType extends object = any>(props: TableProps<RecordT
             if (res.success) {
                 setCurrent(request.current);
                 setPageSize(request.pageSize);
-                setTotal(res.data.total);
-                setDataSource(res.data.list);
+                setTotal(res.total);
+                setDataSource(res.data);
             }
         })
     };
@@ -88,6 +86,8 @@ export function Table<RecordType extends object = any>(props: TableProps<RecordT
                            pageSize: pageSize,
                            current: current,
                            total: total,
+                           showSizeChanger: true,
+                           showQuickJumper: true,
                            defaultCurrent: defaultCurrent,
                            defaultPageSize: defaultPageSize,
                            onChange: (pageSize, current) => {

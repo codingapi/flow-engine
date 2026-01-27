@@ -26,6 +26,8 @@ export const FormFieldOptions = [
 
 
 export interface DesignPanelProps {
+    // 流程编码
+    id?:string
     open: boolean;
     onClose?: () => void;
 }
@@ -86,4 +88,9 @@ export const initStateData: State = {
 
 export interface DesignPanelApi {
 
+    create():Promise<Workflow>;
+
+    load(id:string): Promise<Workflow>;
+
+    save(body:any): Promise<void>;
 }

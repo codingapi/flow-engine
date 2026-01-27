@@ -83,7 +83,7 @@ export class Presenter {
         this.updateWorkflowForm(form);
     }
 
-    public save() {
+    public async save() {
         const values = this.formActionContext.save();
         this.updateWorkflow(values);
         const latest = {
@@ -93,6 +93,7 @@ export class Presenter {
                 ...values
             }
         };
+        await this.api.save(values);
         console.log('save latest:', latest);
     }
 
@@ -111,5 +112,19 @@ export class Presenter {
 
     public initState() {
         this.dispatch(initStateData);
+    }
+
+    public loadDesign(id: string) {
+        console.log('load design...',id);
+        this.api.load(id).then(result => {
+            this.updateWorkflow(result);
+        });
+    }
+
+    public createDesign() {
+        console.log('create design...');
+        this.api.create().then(result => {
+            this.updateWorkflow(result);
+        });
     }
 }

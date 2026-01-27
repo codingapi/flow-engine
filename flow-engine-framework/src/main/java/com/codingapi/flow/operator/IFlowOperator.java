@@ -1,9 +1,11 @@
 package com.codingapi.flow.operator;
 
+import com.codingapi.springboot.framework.user.IUser;
+
 /**
  * 流程参与用户
  */
-public interface IFlowOperator {
+public interface IFlowOperator extends IUser {
 
     /**
      * 获取用户ID

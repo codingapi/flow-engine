@@ -162,8 +162,12 @@ public class Workflow {
         map.put("id", id);
         map.put("code", code);
         map.put("title", title);
-        map.put("createdOperator", String.valueOf(createdOperator.getUserId()));
-        map.put("form", form.toMap());
+        if(createdOperator!=null) {
+            map.put("createdOperator", String.valueOf(createdOperator.getUserId()));
+        }
+        if(form!=null) {
+            map.put("form", form.toMap());
+        }
         map.put("operatorCreateScript", operatorCreateScript.getScript());
         map.put("nodes", nodes.stream().map(IFlowNode::toMap).toList());
         map.put("edges", edges);

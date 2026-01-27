@@ -35,20 +35,12 @@ export const createDesignContext = (props: DesignPanelProps) => {
             new DesignPanelApiImpl()
         );
         ref.current = new DesignPanelContextScope(presenter, props);
+        ref.current.initState();
     }
 
     React.useEffect(() => {
         ref.current?.syncState(state);
     }, [state]);
-
-
-    React.useEffect(() => {
-        return () => {
-            if (ref.current) {
-                ref.current = undefined;
-            }
-        }
-    }, []);
 
     return {
         state,
