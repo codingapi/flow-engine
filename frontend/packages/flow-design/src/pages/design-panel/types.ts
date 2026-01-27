@@ -31,7 +31,7 @@ export interface DesignPanelProps {
 }
 
 // 表单字段
-interface FormField{
+export interface FormField{
     name: string;
     code: string;
     type: string;
@@ -40,14 +40,14 @@ interface FormField{
 }
 
 // 流程表单
-interface FlowForm {
+export interface FlowForm {
     name:string;
     code:string;
     fields:FormField[];
     subForms:FlowForm[];
 }
 // 流程配置
-interface Workflow {
+export interface Workflow {
     id: string;
     title: string;
     code: string;

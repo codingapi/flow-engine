@@ -1,24 +1,27 @@
 import React, {useState} from "react";
 import {Panel} from "@/components/panel";
-import {CardForm} from "@/components/form/card";
 import {Table, TableProps} from "@/components/table";
-import {Button, Flex, Form, Input, Switch, Select, Modal, Tabs, Space,Popconfirm} from "antd";
+import {Button, Flex, Form, FormInstance, Input, Modal, Popconfirm, Select, Space, Switch, Tabs,Empty} from "antd";
 import {FormFieldOptions} from "@/pages/design-panel/types";
-import { CloseOutlined } from "@ant-design/icons";
 import {useDesignContext} from "@/pages/design-panel/hooks/use-design-context";
+import {WorkflowFormManager} from "@/pages/design-panel/manager/workflow/form";
 
 interface FormTableProps {
-    title: string;
+    name: string;
+    code: string;
+    delete: boolean;
 }
 
 interface FormFieldModalProps {
     open: boolean;
     onClose: () => void;
+    onFinish?: (values: any) => void;
+    form: FormInstance;
 }
 
 const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
 
-    const [form] = Form.useForm();
+    const form = props.form;
 
     const labelCol = {
         style: {
@@ -32,11 +35,18 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
             title={"编辑字段"}
             width={"60%"}
             onCancel={props.onClose}
+            onOk={() => {
+                form.submit();
+            }}
         >
             <Form
                 form={form}
                 title={"编辑字段"}
                 layout="vertical"
+                onFinish={(values: any) => {
+                    props.onFinish?.(values);
+                    props.onClose?.();
+                }}
             >
                 <Form.Item
                     name={"name"}
@@ -89,11 +99,13 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
 interface SubFormModalProps {
     open: boolean;
     onClose: () => void;
+    onFinish?: (values: any) => void;
+    form: FormInstance;
 }
 
 const SubFormModal = (props: SubFormModalProps) => {
 
-    const [form] = Form.useForm();
+    const form = props.form;
 
     return (
         <Modal
@@ -108,6 +120,10 @@ const SubFormModal = (props: SubFormModalProps) => {
             <Form
                 form={form}
                 layout="vertical"
+                onFinish={(values: any) => {
+                    props.onFinish?.(values);
+                    props.onClose();
+                }}
             >
                 <Form.Item
                     name={"name"}
@@ -143,7 +159,14 @@ const SubFormModal = (props: SubFormModalProps) => {
 
 const FormTable: React.FC<FormTableProps> = (props) => {
 
-    const title = props.title;
+    const name = props.name;
+    const {state, context} = useDesignContext();
+    const workflowFormManager = new WorkflowFormManager(state.workflow.form);
+    const presenter = context.getPresenter();
+    const [fieldForm] = Form.useForm();
+    const [editable, setEditable] = useState(false);
+    const [datasource, setDatasource] = useState<any[]>([]);
+
     const columns: TableProps<any>['columns'] = [
         {
             dataIndex: 'name',
@@ -158,38 +181,88 @@ const FormTable: React.FC<FormTableProps> = (props) => {
             title: '字段类型'
         },
         {
-            dataIndex: 'nullable',
-            title: '是否为空'
+            dataIndex: 'required',
+            title: '是否为空',
+            render: (value) => {
+                return value ? '必填' : '非必填'
+            }
         },
         {
             dataIndex: 'defaultValue',
             title: '默认值'
-        }
+        },
+        {
+            dataIndex: 'option',
+            title: '操作',
+            render: (_, record) => {
+                return (
+                    <Space>
+                        <a onClick={() => {
+                            fieldForm.setFieldsValue(record);
+                            setEditable(true);
+                        }}>编辑</a>
+                        <Popconfirm
+                            title={"确认要删除该字段吗？"}
+                            onConfirm={() => {
+                                presenter.removeWorkflowFormField(props.code, record.code);
+                            }}
+                        >
+                            <a>删除</a>
+                        </Popconfirm>
+                    </Space>
+                )
+            }
+        },
     ];
-    const [editable, setEditable] = useState(false);
+
+    React.useEffect(() => {
+        setDatasource(workflowFormManager.getFormFields(props.code));
+    }, [state.workflow.form]);
 
     return (
         <>
             <Table
                 columns={columns}
                 key={"code"}
+                dataSource={datasource}
                 title={() => {
                     return (
                         <Flex
                             justify={'space-between'}
                             align={'center'}
                         >
-                            <div>{title}</div>
-                            <Button onClick={() => {
-                                setEditable(true);
-                            }}>添加字段</Button>
+                            <Space>
+                                {name}
+                            </Space>
+                            <Space>
+                                {props.delete && (
+                                    <Popconfirm
+                                        title={"确认要删除子表吗？"}
+                                        onConfirm={() => {
+                                            presenter.removeWorkflowSubForm(props.code);
+                                        }}
+                                    >
+                                        <Button color={'danger'} type={'dashed'} variant="solid">删除子表</Button>
+                                    </Popconfirm>
+                                )}
+                                <Button onClick={() => {
+                                    fieldForm.resetFields();
+                                    setEditable(true);
+                                }}>添加字段</Button>
+                            </Space>
+
                         </Flex>
                     )
                 }}
             />
             <FormFieldModal
                 open={editable}
+                form={fieldForm}
                 onClose={() => {
+                    setEditable(false);
+                }}
+                onFinish={(values) => {
+                    presenter.updateWorkflowFormField(props.code, values);
                     setEditable(false);
                 }}
             />
@@ -199,42 +272,59 @@ const FormTable: React.FC<FormTableProps> = (props) => {
 
 export const TabForm = () => {
 
-    const [form] = CardForm.useForm();
-
     const [subFormVisible, setSubFormVisible] = useState(false);
+    const [subForm] = Form.useForm();
+    const {state, context} = useDesignContext();
+
+    const presenter = context.getPresenter();
+
+    const mainCode = state.workflow.form.code;
+    const mainName = state.workflow.form.name;
+
+    const subForms = state.workflow.form.subForms || [];
+
+    const items = subForms.map(item => {
+        const title = `子表:${item.name}`;
+        return {
+            key: item.code,
+            label: title,
+            children: <FormTable name={title} code={item.code} delete={true}/>
+        }
+    });
+
+    if(!mainCode){
+        return (
+            <Empty description={"请先在基本信息中添加表单的定义配置."}/>
+        )
+    }
 
     return (
         <Panel>
-            <FormTable title={"主表字段"}/>
+            <FormTable name={`主表:${mainName}`} code={mainCode} delete={false}/>
             <Tabs
-                items={[
-                    {
-                        key: 'name',
-                        label: (
-                            <Space>
-                                子表
-                                <Popconfirm
-                                    title={"确认要删除子表吗？"}
-                                    onConfirm={()=>{
-
-                                    }}
-                                >
-                                    <CloseOutlined/>
-                                </Popconfirm>
-                            </Space>
-                        ),
-                        children: <FormTable title={"子表字段"}/>
-                    }
-                ]}
+                style={{
+                    marginTop:20
+                }}
+                items={items}
                 tabBarExtraContent={{
-                    right: <Button onClick={() => {
-                        setSubFormVisible(true)
-                    }}>添加子表</Button>
+                    right: (
+                        <Button
+                            onClick={() => {
+                                subForm.resetFields();
+                                setSubFormVisible(true)
+                            }}>
+                            添加子表
+                        </Button>
+                    )
                 }}
             />
 
             <SubFormModal
+                form={subForm}
                 open={subFormVisible}
+                onFinish={(values) => {
+                    presenter.addWorkflowSubForm(values);
+                }}
                 onClose={() => {
                     setSubFormVisible(false)
                 }}

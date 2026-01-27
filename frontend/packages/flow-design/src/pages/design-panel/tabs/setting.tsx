@@ -4,7 +4,7 @@ import {InterferePanel} from "@/pages/design-panel/panels/workflow/interfere";
 import {UrgePanel} from "@/pages/design-panel/panels/workflow/urge";
 import {CardForm} from "@/components/form/card";
 import {useDesignContext} from "@/pages/design-panel/hooks/use-design-context";
-import {WorkflowStrategyManager} from "@/pages/design-panel/manager/workflow";
+import {WorkflowStrategyManager} from "@/pages/design-panel/manager/workflow/strategy";
 
 
 export const TabSetting = () => {
