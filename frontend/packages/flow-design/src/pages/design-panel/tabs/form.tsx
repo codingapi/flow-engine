@@ -49,6 +49,13 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
                 }}
             >
                 <Form.Item
+                    name={"id"}
+                    hidden={true}
+                >
+                    <Input/>
+                </Form.Item>
+
+                <Form.Item
                     name={"name"}
                     label={"字段名称"}
                     labelCol={labelCol}
@@ -186,6 +193,11 @@ const FormTable: React.FC<FormTableProps> = (props) => {
 
     const columns: TableProps<any>['columns'] = [
         {
+            dataIndex: 'id',
+            title: 'id',
+            hidden: true,
+        },
+        {
             dataIndex: 'name',
             title: '字段名称',
         },
@@ -246,7 +258,7 @@ const FormTable: React.FC<FormTableProps> = (props) => {
         <>
             <Table
                 columns={columns}
-                rowKey={"code"}
+                rowKey={"id"}
                 dataSource={workflowFormManager.getFormFields(props.code)}
                 title={() => {
                     return (

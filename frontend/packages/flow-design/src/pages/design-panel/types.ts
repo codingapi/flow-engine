@@ -34,6 +34,7 @@ export interface DesignPanelProps {
 
 // 表单字段
 export interface FormField{
+    id:string;
     name: string;
     code: string;
     type: string;

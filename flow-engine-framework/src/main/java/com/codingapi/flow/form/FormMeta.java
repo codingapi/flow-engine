@@ -72,6 +72,7 @@ public class FormMeta {
         if(fields!=null && !fields.isEmpty()) {
             for (Map<String, Object> field : fields) {
                 FormFieldMeta fieldMeta = new FormFieldMeta();
+                fieldMeta.setId((String) field.get("id"));
                 fieldMeta.setName((String) field.get("name"));
                 fieldMeta.setCode((String) field.get("code"));
                 fieldMeta.setType((String) field.get("type"));

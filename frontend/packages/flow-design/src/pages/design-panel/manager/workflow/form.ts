@@ -13,15 +13,15 @@ export class WorkflowFormManager {
 
     private loadFormList(): void {
         this.formList.push(this.form);
-        if(this.form.subForms && this.form.subForms.length>0) {
+        if (this.form.subForms && this.form.subForms.length > 0) {
             for (const subForm of this.form.subForms) {
                 this.formList.push(subForm);
             }
         }
     }
 
-    public getFormFields(code:string){
-        let result:FormField[] = [];
+    public getFormFields(code: string) {
+        let result: FormField[] = [];
         for (const subForm of this.formList) {
             if (subForm.code == code) {
                 result = subForm.fields || [];
@@ -30,56 +30,59 @@ export class WorkflowFormManager {
         return result;
     }
 
-    public removeSubForm(code:string){
+    public removeSubForm(code: string) {
         const currentSubForms = this.form.subForms || [];
         const subForms = currentSubForms.filter(subForm => subForm.code !== code);
         return {
             ...this.form,
-            subForms:subForms
+            subForms: subForms
         }
     }
 
-    public addSubForm(values:any){
+    public addSubForm(values: any) {
         const subForms = [...this.form.subForms || []];
         subForms.push(values);
         return {
             ...this.form,
-            subForms:subForms
+            subForms: subForms
         }
     }
 
-    public mergeValue(code: string, values: any):FlowForm {
+    public updateFieldValue(code: string, values: any): FlowForm {
         const currentFields = this.getFormFields(code);
-        const currentFieldCode = values['code'];
-        const list:FormField[] = [];
+        const currentFieldId = values['id'];
+        const list: FormField[] = [];
         let exist = false;
         for (const field of currentFields) {
-            if(field.code === currentFieldCode) {
+            if (field.id === currentFieldId) {
                 list.push(values);
                 exist = true;
-            }else {
+            } else {
                 list.push(field);
             }
         }
-        if(!exist){
-            list.push(values);
+        if (!exist) {
+            list.push({
+                ...values,
+                id:crypto.randomUUID(),
+            });
         }
         const mainCode = this.form.code;
-        if(code===mainCode){
+        if (code === mainCode) {
             return {
                 ...this.form,
-                fields:list,
+                fields: list,
             }
-        }else {
+        } else {
             return {
                 ...this.form,
-                subForms:this.form.subForms.map(item=>{
-                    if(item.code===code){
+                subForms: this.form.subForms.map(item => {
+                    if (item.code === code) {
                         return {
                             ...item,
-                            fields:list
+                            fields: list
                         }
-                    }else {
+                    } else {
                         return item;
                     }
                 }),
@@ -92,22 +95,22 @@ export class WorkflowFormManager {
         const fields = [...currentFields];
         const list = fields.filter(file => file.code !== fieldCode);
         const mainCode = this.form.code;
-        if(formCode==mainCode){
+        if (formCode == mainCode) {
             return {
                 ...this.form,
-                fields:list,
+                fields: list,
             }
-        }else {
+        } else {
             return {
                 ...this.form,
-                fields:list,
-                subForms:this.form.subForms.map(item=>{
-                    if(item.code===formCode){
+                fields: list,
+                subForms: this.form.subForms.map(item => {
+                    if (item.code === formCode) {
                         return {
                             ...item,
-                            fields:list
+                            fields: list
                         }
-                    }else {
+                    } else {
                         return item;
                     }
                 }),

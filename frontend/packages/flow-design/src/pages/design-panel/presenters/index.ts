@@ -97,7 +97,7 @@ export class Presenter {
 
     public updateWorkflowFormField(code: string, values: any) {
         const workflowFormManager = new WorkflowFormManager(this.state.workflow.form);
-        const form = workflowFormManager.mergeValue(code, values);
+        const form = workflowFormManager.updateFieldValue(code, values);
         this.updateWorkflowForm(form);
     }
 

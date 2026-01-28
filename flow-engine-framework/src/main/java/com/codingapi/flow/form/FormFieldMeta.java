@@ -1,5 +1,6 @@
 package com.codingapi.flow.form;
 
+import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
 
 /**
@@ -8,6 +9,8 @@ import lombok.Data;
 @Data
 public class FormFieldMeta {
 
+    // 字段编号
+    private String id;
     // 字段名称
     private String name;
     // 字段编号
@@ -18,5 +21,9 @@ public class FormFieldMeta {
     private boolean required;
     // 默认值
     private String defaultValue;
+
+    public FormFieldMeta() {
+        this.id = RandomUtils.generateStringId();
+    }
 
 }
