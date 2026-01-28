@@ -9,6 +9,7 @@ import { nodeRegistries } from '../nodes/node-registries';
 import { initialData } from '../initial-data';
 import { Adder } from '../nodes/adder';
 import { createDownloadPlugin } from "@flowgram.ai/export-plugin";
+import {debounce} from "lodash-es";
 
 export function useEditorProps(): FixedLayoutProps {
     return useMemo<FixedLayoutProps>(
@@ -46,6 +47,18 @@ export function useEditorProps(): FixedLayoutProps {
             ],
             nodeRegistries,
             initialData,
+            /**
+             * Redo/Undo enable
+             */
+            history: {
+                enable: true,
+                enableChangeNode: true, // Listen Node engine data change
+                onApply: debounce((ctx:any, opt:any) => {
+                    if (ctx.document.disposed) return;
+                    // Listen change to trigger auto save
+                    console.log('auto save: ', ctx.document.toJSON());
+                }, 100),
+            },
             onAllLayersRendered: (ctx) => {
                 setTimeout(() => {
                     ctx.playground.config.fitView(ctx.document.root.bounds.pad(30));

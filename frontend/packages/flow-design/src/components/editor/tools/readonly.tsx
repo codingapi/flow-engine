@@ -9,6 +9,8 @@ export const Readonly = () => {
         playground.config.readonly = !playground.config.readonly;
     }, [playground]);
 
+    console.log('Readonly', playground.config.readonly );
+
     return playground.config.readonly ? (
         <Button icon={<LockOutlined />} onClick={toggleReadonly}/>
     ) : (
