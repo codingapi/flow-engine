@@ -98,11 +98,11 @@ public class Workflow {
         this.id = RandomUtils.generateStringId();
         this.code = RandomUtils.generateWorkflowCode();
         this.createdTime = System.currentTimeMillis();
-        this.updatedTime = System.currentTimeMillis();
         this.operatorCreateScript = OperatorMatchScript.any();
         this.nodes = new ArrayList<>();
         this.edges = new ArrayList<>();
         this.strategies = defaultStrategies();
+        this.updateTime();
     }
 
     private List<IWorkflowStrategy> defaultStrategies() {
