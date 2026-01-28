@@ -16,7 +16,7 @@ export const TabSetting = () => {
 
     const resetFieldsValue = ()=>{
         const workflowStrategyManager = new WorkflowStrategyManager();
-        const formData = workflowStrategyManager.toForm(state.workflow.strategies);
+        const formData = workflowStrategyManager.toForm(state.workflow.strategies as any[]);
         form.setFieldsValue(formData);
     }
 

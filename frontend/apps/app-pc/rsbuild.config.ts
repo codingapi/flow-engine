@@ -1,20 +1,43 @@
-import { defineConfig } from '@rsbuild/core';
-import { pluginReact } from '@rsbuild/plugin-react';
+import {defineConfig} from '@rsbuild/core';
+import {pluginReact} from '@rsbuild/plugin-react';
+import {pluginLess} from '@rsbuild/plugin-less';
+import {pluginSass} from '@rsbuild/plugin-sass';
 import * as path from "path";
 
 // Docs: https://rsbuild.rs/config/
 export default defineConfig({
-  plugins: [pluginReact()],
-  resolve: {
-    alias: {
-      "@/": path.resolve(__dirname, "src"),
-    }
-  },
-  server: {
-    proxy: {
-      '/api': 'http://127.0.0.1:8090',
-      '/open': 'http://127.0.0.1:8090',
-      '/user': 'http://127.0.0.1:8090',
-    }
-  }
+    plugins: [pluginReact(), pluginLess(), pluginSass()],
+    resolve: {
+        alias: {
+            "@/": path.resolve(__dirname, "src"),
+        }
+    },
+
+    source: {
+        entry: {
+            index: ['./src/index.tsx'],
+        },
+
+        /**
+         * support inversify @injectable() and @inject decorators
+         */
+        decorators: {
+            version: 'legacy',
+        },
+    },
+    server: {
+        proxy: {
+            '/api': 'http://127.0.0.1:8090',
+            '/open': 'http://127.0.0.1:8090',
+            '/user': 'http://127.0.0.1:8090',
+        }
+    },
+    tools: {
+        rspack: {
+            /**
+             * ignore warnings from @coze-editor/editor/language-typescript
+             */
+            ignoreWarnings: [/Critical dependency: the request of a dependency is an expression/],
+        },
+    },
 });
