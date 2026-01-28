@@ -104,6 +104,9 @@ importers:
       '@flow-engine/flow-types':
         specifier: workspace:*
         version: link:../flow-types
+      '@flowgram.ai/export-plugin':
+        specifier: 1.0.7
+        version: 1.0.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@flowgram.ai/fixed-layout-editor':
         specifier: 1.0.7
         version: 1.0.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
