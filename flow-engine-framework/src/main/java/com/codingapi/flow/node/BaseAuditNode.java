@@ -1,6 +1,7 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.manager.NodeStrategyManager;
@@ -116,6 +117,20 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         List<FlowRecord> records = new ArrayList<>();
         NodeStrategyManager nodeStrategyManager = this.strategyManager();
         OperatorManager operatorManager = nodeStrategyManager.loadOperators(session);
+        // 执行异常节点配置
+        if(operatorManager.isEmpty()){
+            ErrorThrow errorThrow =  nodeStrategyManager.errorTrigger(session);
+            if(errorThrow==null){
+                throw FlowConfigException.errorThrowNotNull();
+            }
+            if(errorThrow.isNode()){
+                IFlowNode errorNode = errorThrow.getNode();
+                FlowSession errorSession = session.updateSession(errorNode);
+                return errorNode.generateCurrentRecords(errorSession);
+            }else {
+                operatorManager = new OperatorManager(errorThrow.getOperators());
+            }
+        }
         List<IFlowOperator> operators = operatorManager.getOperators();
         for (int order = 0; order < operators.size(); order++) {
             IFlowOperator operator = operators.get(order);

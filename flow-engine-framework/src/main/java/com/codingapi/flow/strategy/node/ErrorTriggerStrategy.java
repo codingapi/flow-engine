@@ -16,6 +16,10 @@ public class ErrorTriggerStrategy extends BaseStrategy {
 
     private ErrorTriggerScript errorTriggerScript;
 
+    public ErrorTriggerStrategy(String script) {
+        this.errorTriggerScript = new ErrorTriggerScript(script);
+    }
+
     public void setErrorTriggerScript(String script) {
         this.errorTriggerScript = new ErrorTriggerScript(script);
     }

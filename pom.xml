@@ -12,16 +12,11 @@
 	<artifactId>flow-engine-parent</artifactId>
 	<version>0.0.1</version>
     <packaging>pom</packaging>
+
+    <url>https://github.com/codingapi/flow-engine</url>
 	<name>flow-engine-parent</name>
 	<description>FlowEngine project for Spring Boot</description>
-    <modules>
-        <module>flow-engine-starter</module>
-        <module>flow-engine-starter-infra</module>
-        <module>flow-engine-example</module>
-        <module>flow-engine-framework</module>
-        <module>flow-engine-starter-api</module>
-        <module>flow-engine-starter-query</module>
-    </modules>
+
 
     <properties>
         <!-- maven properties-->
@@ -167,6 +162,39 @@
         </dependencies>
     </dependencyManagement>
 
+
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
+
+    <scm>
+        <connection>scm:git:https://github.com/codingapi/flow-engine.git</connection>
+        <developerConnection>scm:git:https://github.com/codingapi/flow-engine.git</developerConnection>
+        <url>https://github.com/codingapi/flow-engine</url>
+        <tag>v${project.version}</tag>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>lorne</name>
+            <email>wangliang@codingapi.com</email>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+
     <build>
         <plugins>
             <plugin>
@@ -196,5 +224,152 @@
             </plugin>
         </plugins>
     </build>
+
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>flow-engine-starter</module>
+                <module>flow-engine-starter-infra</module>
+                <module>flow-engine-example</module>
+                <module>flow-engine-framework</module>
+                <module>flow-engine-starter-api</module>
+                <module>flow-engine-starter-query</module>
+            </modules>
+        </profile>
+        <!-- mvn clean test -P travis-->
+        <profile>
+            <id>travis</id>
+
+            <modules>
+                <module>flow-engine-starter</module>
+                <module>flow-engine-starter-infra</module>
+                <module>flow-engine-framework</module>
+                <module>flow-engine-starter-api</module>
+                <module>flow-engine-starter-query</module>
+            </modules>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                        <version>0.8.12</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>prepare-agent</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>report</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>report</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.openclover</groupId>
+                        <artifactId>clover-maven-plugin</artifactId>
+                        <version>4.5.2</version>
+                        <configuration>
+                            <generateHtml>true</generateHtml>
+                            <generateXml>true</generateXml>
+                        </configuration>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- mvn clean deploy -P ossrh  -->
+            <!-- mvn clean deploy -P ossrh -Dgpg.passphrase="你的GPG密码" -->
+            <!-- gpg: signing failed: Inappropriate ioctl for device -->
+            <!-- fix command : export GPG_TTY=$(tty)  -->
+            <!-- https://github.com/keybase/keybase-issues/issues/2798 -->
+            <id>ossrh</id>
+
+            <modules>
+                <module>flow-engine-starter</module>
+                <module>flow-engine-starter-infra</module>
+                <module>flow-engine-framework</module>
+                <module>flow-engine-starter-api</module>
+                <module>flow-engine-starter-query</module>
+            </modules>
+
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.8.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
+                        </configuration>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <additionalOptions>
+                                <additionalOption>-Xdoclint:none</additionalOption>
+                            </additionalOptions>
+                        </configuration>
+                    </plugin>
+
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

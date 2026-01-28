@@ -13,21 +13,9 @@ import lombok.Getter;
 public class ErrorTriggerScript {
 
 
-    public static final String SCRIPT_NODE_DEFAULT = """
-            def run(request){
-                return com.codingapi.flow.error.ErrorThrow.builder()
-                                                          .node(request.getStartNode())
-                                                          .build();
-            }
-            """;
+    public static final String SCRIPT_NODE_DEFAULT = "def run(request){ return $bind.createErrorThrow(request.getStartNode()); }";
 
-    public static final String SCRIPT_OPERATOR_DEFAULT = """
-            def run(request){
-                return com.codingapi.flow.error.ErrorThrow.builder()
-                                                          .operators(request.getCreatedOperator())
-                                                          .build();
-            }
-            """;
+    public static final String SCRIPT_OPERATOR_DEFAULT = "def run(request){ return $bind.createErrorThrow(request.getCreatedOperator()); }";
 
     @Getter
     private final String script;

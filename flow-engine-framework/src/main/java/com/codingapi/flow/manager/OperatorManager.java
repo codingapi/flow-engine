@@ -3,7 +3,9 @@ package com.codingapi.flow.manager;
 import com.codingapi.flow.operator.IFlowOperator;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 节点操作者管理
@@ -15,8 +17,20 @@ public class OperatorManager {
     private final List<Long> operatorIds;
 
     public OperatorManager(List<IFlowOperator> operators) {
-        this.operators = operators;
-        this.operatorIds = operators.stream().map(IFlowOperator::getUserId).toList();
+        if(operators!=null && !operators.isEmpty()) {
+            this.operators = operators.stream().filter(Objects::nonNull).toList();
+        }else {
+            this.operators = new ArrayList<>();
+        }
+        if(!this.operators.isEmpty()) {
+            this.operatorIds = this.operators.stream().map(IFlowOperator::getUserId).toList();
+        }else {
+            this.operatorIds = new ArrayList<>();
+        }
+    }
+
+    public boolean isEmpty() {
+        return operators.isEmpty();
     }
 
     public boolean match(IFlowOperator operator) {

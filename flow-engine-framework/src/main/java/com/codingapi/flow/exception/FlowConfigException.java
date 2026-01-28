@@ -129,4 +129,13 @@ public class FlowConfigException extends FlowException {
     public static FlowConfigException repositoryNotRegistered() {
         return new FlowConfigException("config.repository.notRegistered", "Flow repository components not registered");
     }
+
+    /**
+     * Error throw cannot be null
+     *
+     * @return exception
+     */
+    public static FlowConfigException errorThrowNotNull() {
+        return new FlowConfigException("config.errorThrow.required", "Error throw cannot be null");
+    }
 }

@@ -2,6 +2,7 @@ package com.codingapi.flow.manager;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
+import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
@@ -188,6 +189,21 @@ public class NodeStrategyManager {
         for (INodeStrategy strategy : strategies) {
             if (strategy.getClass() == clazz) {
                 return (T) strategy;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 错误触发(没有匹配到人时执行的逻辑)
+     * @param session 触发会话
+     * @return 错误触发
+     */
+    public ErrorThrow errorTrigger(FlowSession session) {
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof ErrorTriggerStrategy) {
+                return ((ErrorTriggerStrategy) strategy).errorTrigger(session);
             }
         }
         return null;
