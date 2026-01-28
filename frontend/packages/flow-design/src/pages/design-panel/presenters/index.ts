@@ -37,34 +37,35 @@ export class Presenter {
                 },
                 workflow: {
                     ...prevState.workflow,
-                    ...values
+                    ...values,
+                    form: {
+                        ...prevState.workflow.form,
+                        ...values,
+                    }
                 }
             }
         });
     }
 
-    public removeWorkflowFormField(formCode:string,fieldCode:string){
+    public removeWorkflowFormField(formCode: string, fieldCode: string) {
         const workflowFormManager = new WorkflowFormManager(this.state.workflow.form);
         const form = workflowFormManager.removeField(formCode, fieldCode);
-        console.log(form);
         this.updateWorkflowForm(form);
     }
 
     public removeWorkflowSubForm(code: string) {
         const workflowFormManager = new WorkflowFormManager(this.state.workflow.form);
         const form = workflowFormManager.removeSubForm(code);
-        console.log(form);
         this.updateWorkflowForm(form);
     }
 
-    public addWorkflowSubForm(values:any){
+    public addWorkflowSubForm(values: any) {
         const workflowFormManager = new WorkflowFormManager(this.state.workflow.form);
         const form = workflowFormManager.addSubForm(values);
-        console.log(form);
         this.updateWorkflowForm(form);
     }
 
-    private updateWorkflowForm(form:any) {
+    private updateWorkflowForm(form: any) {
         this.dispatch((prevState: State) => {
             return {
                 ...prevState,
@@ -76,10 +77,9 @@ export class Presenter {
         });
     }
 
-    public updateWorkflowFormField(code:string,values:any){
+    public updateWorkflowFormField(code: string, values: any) {
         const workflowFormManager = new WorkflowFormManager(this.state.workflow.form);
-        const form = workflowFormManager.mergeValue(code,values);
-        console.log(form);
+        const form = workflowFormManager.mergeValue(code, values);
         this.updateWorkflowForm(form);
     }
 
@@ -115,14 +115,12 @@ export class Presenter {
     }
 
     public loadDesign(id: string) {
-        console.log('load design...',id);
         this.api.load(id).then(result => {
             this.updateWorkflow(result);
         });
     }
 
     public createDesign() {
-        console.log('create design...');
         this.api.create().then(result => {
             this.updateWorkflow(result);
         });

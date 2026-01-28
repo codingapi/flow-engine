@@ -1,6 +1,6 @@
 import {configureStore, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import {initStateData, State} from "./types";
-
+import { original } from 'immer';
 
 export type DesignStoreAction = {
     updateState: (state: State, action: PayloadAction<Partial<State> | ((prev: State) => Partial<State>)>) => void;
@@ -14,7 +14,8 @@ export const designSlice = createSlice<State, DesignStoreAction, "design", {}>({
     reducers: {
         updateState: (state, action) => {
             if(typeof action.payload === 'function') {
-                Object.assign(state, action.payload(state));
+                const currentState = original(state) as State;
+                Object.assign(state, action.payload(currentState));
             }else {
                 Object.assign(state, action.payload);
             }

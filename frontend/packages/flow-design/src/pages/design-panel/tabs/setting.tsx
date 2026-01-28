@@ -14,25 +14,25 @@ export const TabSetting = () => {
 
     const formActionContext = context.getPresenter().getFormActionContext();
 
+    const resetFieldsValue = ()=>{
+        const workflowStrategyManager = new WorkflowStrategyManager();
+        const formData = workflowStrategyManager.toForm(state.workflow.strategies);
+        form.setFieldsValue(formData);
+    }
 
     React.useEffect(() => {
-        form.resetFields();
-        const workflowStrategyManager = new WorkflowStrategyManager(state.workflow.strategies);
-        const formData = workflowStrategyManager.toForm();
-        form.setFieldsValue(formData);
-    }, []);
-
-    React.useEffect(() => {
-        const workflowStrategyManager = new WorkflowStrategyManager(state.workflow.strategies);
-        const formData = workflowStrategyManager.toForm();
-        form.setFieldsValue(formData);
+        resetFieldsValue();
     }, [state.workflow.strategies]);
 
     // 注册form行为
     React.useEffect(() => {
+        form.resetFields();
+        resetFieldsValue();
+
         formActionContext.addAction({
             save() {
-                return form.getFieldsValue()
+                const workflowStrategyManager = new WorkflowStrategyManager();
+                return workflowStrategyManager.toList(form.getFieldsValue());
             }
         });
     }, []);

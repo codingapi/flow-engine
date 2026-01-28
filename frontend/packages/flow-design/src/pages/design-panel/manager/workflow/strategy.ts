@@ -1,19 +1,16 @@
+import {ObjectUtils} from "@flow-engine/flow-core";
+
 export class WorkflowStrategyManager {
-    private readonly strategies:any[];
 
     public static TYPE_KEY = 'strategyType';
 
-    public static KEY_INTERFERE_STRATEGY = 'InterfereStrategy';
-    public static KEY_URGE_STRATEGY = 'UrgeStrategy';
-
-    constructor(strategies:any[]) {
-        this.strategies = strategies;
+    constructor() {
     }
 
-    public toForm(){
+    public toForm(strategies: any[]): any {
         let value = {};
-        for (const key in this.strategies){
-           const currentValue = this.strategies[key];
+        for (const key in strategies){
+           const currentValue = strategies[key];
            value = Object.assign(value, {
                [currentValue[WorkflowStrategyManager.TYPE_KEY]]:{
                    ...currentValue
@@ -26,15 +23,21 @@ export class WorkflowStrategyManager {
         return value;
     }
 
-    public getStrategy(key: string): any {
-        const strategies:any[] = this.strategies;
-        for(const strategy of strategies){
-            if(strategy[key]){
-                return strategy;
-            }
+
+    public toList(values: any) {
+        if(ObjectUtils.isEmptyObject(values)){
+            return null;
         }
-        return null;
+        const strategies:any[] = [];
+        for (const key in values.strategies){
+            const item = values.strategies[key];
+            strategies.push({
+                [WorkflowStrategyManager.TYPE_KEY]:key,
+                ...item,
+            });
+        }
+        return {
+            strategies: strategies
+        };
     }
-
-
 }

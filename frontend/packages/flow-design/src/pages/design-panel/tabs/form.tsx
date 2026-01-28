@@ -165,7 +165,6 @@ const FormTable: React.FC<FormTableProps> = (props) => {
     const presenter = context.getPresenter();
     const [fieldForm] = Form.useForm();
     const [editable, setEditable] = useState(false);
-    const [datasource, setDatasource] = useState<any[]>([]);
 
     const columns: TableProps<any>['columns'] = [
         {
@@ -215,16 +214,13 @@ const FormTable: React.FC<FormTableProps> = (props) => {
         },
     ];
 
-    React.useEffect(() => {
-        setDatasource(workflowFormManager.getFormFields(props.code));
-    }, [state.workflow.form]);
 
     return (
         <>
             <Table
                 columns={columns}
-                key={"code"}
-                dataSource={datasource}
+                rowKey={"code"}
+                dataSource={workflowFormManager.getFormFields(props.code)}
                 title={() => {
                     return (
                         <Flex

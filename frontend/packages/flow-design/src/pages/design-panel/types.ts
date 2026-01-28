@@ -54,7 +54,7 @@ export interface Workflow {
     title: string;
     code: string;
     form: FlowForm;
-    strategies:any[];
+    strategies?:any[];
 }
 
 
@@ -80,8 +80,7 @@ export const initStateData: State = {
             name:'',
             fields:[],
             subForms:[]
-        },
-        strategies:[]
+        }
     }
 }
 

@@ -8,6 +8,7 @@ import {TabFlow} from "@/pages/design-panel/tabs/flow";
 export const Body = ()=>{
     const {state} = useDesignContext();
     const tabPanelType = state.view.tabPanel;
+
     return (
         <>
             {tabPanelType ==='form' && (

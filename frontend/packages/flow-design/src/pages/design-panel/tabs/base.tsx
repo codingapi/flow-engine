@@ -20,7 +20,6 @@ export const TabBase = ()=>{
         operatorForm.setFieldsValue(state.workflow);
     },[]);
 
-
     // 注册form行为
     React.useEffect(()=>{
         formActionContext.addAction({

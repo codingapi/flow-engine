@@ -2,7 +2,7 @@ import {ActionType, Table, TableProps} from "@/components/table";
 import React from "react";
 import {DataType, DesignListProps} from "./types";
 import {usePresenter} from "./hooks/use-presenter";
-import {Button,Space,Popconfirm,message} from "antd";
+import {Button, Space, Popconfirm, message} from "antd";
 import {DesignPanel} from "@/pages/design-panel";
 import dayjs from "dayjs";
 
@@ -37,20 +37,19 @@ export const DesignList: React.FC<DesignListProps> = (props) => {
             render: (value, record) => {
                 return (
                     <Space>
-                        <a onClick={()=>{
+                        <a onClick={() => {
                             presenter.editCurrent(record.id);
                         }}>编辑</a>
                         <Popconfirm
                             title={"确认要删除该流程吗？"}
-                            onConfirm={()=>{
-                                presenter.deleteRecord(record.id).then(()=>{
+                            onConfirm={() => {
+                                presenter.deleteRecord(record.id).then(() => {
                                     message.success('流程已删除.')
                                 });
                             }}
                         >
                             <a>删除</a>
                         </Popconfirm>
-
                     </Space>
                 )
             }
@@ -60,13 +59,17 @@ export const DesignList: React.FC<DesignListProps> = (props) => {
     return (
         <div>
             <Table<DataType>
-                key={"id"}
+                rowKey={"id"}
                 actionType={actionType}
                 toolBarRender={() => {
                     return [
-                        <Button type={'primary'} onClick={() => {
-                            presenter.showEditable();
-                        }}>创建流程</Button>
+                        <Button
+                            key={"create"}
+                            type={'primary'}
+                            onClick={() => {
+                                presenter.clearCurrent();
+                                presenter.showEditable();
+                            }}>创建流程</Button>
                     ]
                 }}
                 columns={columns}

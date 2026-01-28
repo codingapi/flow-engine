@@ -41,6 +41,15 @@ export class Presenter extends BasePresenter<State, DesignListApi> {
         })
     }
 
+    public clearCurrent() {
+        this.dispatch(preState => {
+            return {
+                ...preState,
+                currentId: '',
+            }
+        })
+    }
+
     public editCurrent(id: string) {
         this.dispatch(preState => {
             return {

@@ -21,12 +21,13 @@ export class WorkflowFormManager {
     }
 
     public getFormFields(code:string){
+        let result:FormField[] = [];
         for (const subForm of this.formList) {
             if (subForm.code == code) {
-                return subForm.fields || [];
+                result = subForm.fields || [];
             }
         }
-        return [];
+        return result;
     }
 
     public removeSubForm(code:string){
