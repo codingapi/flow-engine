@@ -38,6 +38,8 @@
   },
   "devDependencies": {
     "@flow-engine/flow-core": "workspace:*",
-    "@flow-engine/flow-types": "workspace:*"
+    "@flow-engine/flow-types": "workspace:*",
+    "@types/lodash-es": "^4.17.12",
+    "@types/styled-components": "^5.1.36"
   }
 }
