@@ -104,9 +104,15 @@ importers:
       '@flow-engine/flow-types':
         specifier: workspace:*
         version: link:../flow-types
-      '@flow-engine/flowgram':
-        specifier: workspace:*
-        version: link:../flowgram
+      '@flowgram.ai/fixed-layout-editor':
+        specifier: 1.0.7
+        version: 1.0.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@flowgram.ai/fixed-semi-materials':
+        specifier: 1.0.7
+        version: 1.0.7(@floating-ui/dom@1.7.5)(@tiptap/suggestion@3.17.1(@tiptap/core@3.17.1(@tiptap/pm@3.17.1))(@tiptap/pm@3.17.1))(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(styled-components@5.3.11(@babel/core@7.28.6)(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1))
+      '@flowgram.ai/minimap-plugin':
+        specifier: 1.0.7
+        version: 1.0.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@reduxjs/toolkit':
         specifier: ^2.11.2
         version: 2.11.2(react-redux@9.2.0(@types/react@18.3.27)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
@@ -128,6 +134,9 @@ importers:
       react-redux:
         specifier: ^9.2.0
         version: 9.2.0(@types/react@18.3.27)(react@18.3.1)(redux@5.0.1)
+      styled-components:
+        specifier: ^5.3.11
+        version: 5.3.11(@babel/core@7.28.6)(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1)
 
   packages/flow-types:
     dependencies:

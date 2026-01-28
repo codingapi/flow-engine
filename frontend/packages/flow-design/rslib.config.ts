@@ -1,7 +1,7 @@
 import { pluginReact } from '@rsbuild/plugin-react';
 import { defineConfig } from '@rslib/core';
-import { pluginLess } from '@rsbuild/plugin-less';
 import {pluginSass} from '@rsbuild/plugin-sass';
+import {pluginLess} from '@rsbuild/plugin-less';
 import * as path from 'node:path';
 
 export default defineConfig({
@@ -25,5 +25,5 @@ export default defineConfig({
   output: {
     target: 'web',
   },
-  plugins: [pluginReact(),pluginLess(),pluginSass()],
+  plugins: [pluginReact(),pluginSass(),pluginLess()],
 });
