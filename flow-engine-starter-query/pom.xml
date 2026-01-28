@@ -9,6 +9,7 @@
         <version>0.0.1</version>
     </parent>
 
+    <name>flow-engine-starter-query</name>
     <artifactId>flow-engine-starter-query</artifactId>
 
     <properties>

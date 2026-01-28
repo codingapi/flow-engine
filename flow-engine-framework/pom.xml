@@ -9,6 +9,7 @@
         <version>0.0.1</version>
     </parent>
 
+    <name>flow-engine-framework</name>
     <artifactId>flow-engine-framework</artifactId>
 
     <properties>
