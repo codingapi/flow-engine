@@ -26,8 +26,19 @@ export class Presenter {
         this.state = state;
     }
 
+    private mergeWorkflow(prevWorkflow: any, currentWorkflow: any) {
+        return {
+            ...prevWorkflow,
+            ...currentWorkflow,
+            form: {
+                ...prevWorkflow.form,
+                ...currentWorkflow.form,
+            }
+        }
+    }
+
     public updateViewPanelTab(tab: TabPanelType) {
-        const values = this.formActionContext.save();
+        const values = this.formActionContext.save() as any;
         this.dispatch((prevState: State) => {
             return {
                 ...prevState,
@@ -35,17 +46,35 @@ export class Presenter {
                     ...prevState.view,
                     tabPanel: tab,
                 },
+                workflow: this.mergeWorkflow(prevState.workflow, values),
+            }
+        });
+    }
+
+    private updateWorkflowForm(form: any) {
+        this.dispatch((prevState: State) => {
+            return {
+                ...prevState,
                 workflow: {
                     ...prevState.workflow,
-                    ...values,
                     form: {
                         ...prevState.workflow.form,
-                        ...values,
+                        ...form,
                     }
                 }
             }
         });
     }
+
+    public updateWorkflow(data: any) {
+        this.dispatch((prevState: State) => {
+            return {
+                ...prevState,
+                workflow: this.mergeWorkflow(prevState.workflow, data),
+            }
+        });
+    }
+
 
     public removeWorkflowFormField(formCode: string, fieldCode: string) {
         const workflowFormManager = new WorkflowFormManager(this.state.workflow.form);
@@ -65,17 +94,6 @@ export class Presenter {
         this.updateWorkflowForm(form);
     }
 
-    private updateWorkflowForm(form: any) {
-        this.dispatch((prevState: State) => {
-            return {
-                ...prevState,
-                workflow: {
-                    ...prevState.workflow,
-                    form
-                }
-            }
-        });
-    }
 
     public updateWorkflowFormField(code: string, values: any) {
         const workflowFormManager = new WorkflowFormManager(this.state.workflow.form);
@@ -84,29 +102,14 @@ export class Presenter {
     }
 
     public async save() {
-        const values = this.formActionContext.save();
+        const values = this.formActionContext.save() as any;
         this.updateWorkflow(values);
         const latest = {
             ...this.state,
-            workflow: {
-                ...this.state.workflow,
-                ...values
-            }
+            workflow: this.mergeWorkflow(this.state.workflow, values),
         };
         await this.api.save(latest.workflow);
         console.log('save latest:', latest);
-    }
-
-    public updateWorkflow(data: any) {
-        this.dispatch((prevState: State) => {
-            return {
-                ...prevState,
-                workflow: {
-                    ...prevState.workflow,
-                    ...data
-                }
-            }
-        });
     }
 
 

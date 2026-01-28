@@ -50,11 +50,11 @@ export class WorkflowFormManager {
 
     public mergeValue(code: string, values: any):FlowForm {
         const currentFields = this.getFormFields(code);
-        const currentCode = values['code'];
+        const currentFieldCode = values['code'];
         const list:FormField[] = [];
         let exist = false;
         for (const field of currentFields) {
-            if(field.code == currentCode) {
+            if(field.code === currentFieldCode) {
                 list.push(values);
                 exist = true;
             }else {
@@ -65,7 +65,7 @@ export class WorkflowFormManager {
             list.push(values);
         }
         const mainCode = this.form.code;
-        if(code==mainCode){
+        if(code===mainCode){
             return {
                 ...this.form,
                 fields:list,
@@ -73,7 +73,6 @@ export class WorkflowFormManager {
         }else {
             return {
                 ...this.form,
-                fields:list,
                 subForms:this.form.subForms.map(item=>{
                     if(item.code===code){
                         return {

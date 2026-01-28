@@ -48,15 +48,15 @@ export const TabBase = ()=>{
             >
                 <CardForm.Item
                     name={"title"}
-                    label={"流程名称"}
+                    label={"流程标题"}
                     rules={[
                         {
                             required: true,
-                            message: '请输入流程名称'
+                            message: '请输入流程标题'
                         }
                     ]}
                 >
-                    <Input placeholder={"请输入流程名称"}/>
+                    <Input placeholder={"请输入流程标题"}/>
                 </CardForm.Item>
 
 

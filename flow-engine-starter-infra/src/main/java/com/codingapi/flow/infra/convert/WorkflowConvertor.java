@@ -26,6 +26,7 @@ public class WorkflowConvertor {
 
         entity.setCreatedOperator(flowOperatorConvertor.convertToDatabaseColumn(workflow.getCreatedOperator()));
         entity.setCreatedTime(workflow.getCreatedTime());
+        entity.setUpdatedTime(workflow.getUpdatedTime());
         entity.setForm(formMetaConvertor.convertToDatabaseColumn(workflow.getForm()));
         entity.setOperatorCreateScript(operatorMatchScriptConvertor.convertToDatabaseColumn(workflow.getOperatorCreateScript()));
         entity.setNodes(flowNodeListConvertor.convertToDatabaseColumn(workflow.getNodes()));
@@ -44,6 +45,7 @@ public class WorkflowConvertor {
                 entity.getTitle(),
                 flowOperatorConvertor.convertToEntityAttribute(entity.getCreatedOperator()),
                 entity.getCreatedTime(),
+                entity.getUpdatedTime(),
                 formMetaConvertor.convertToEntityAttribute(entity.getForm()),
                 operatorMatchScriptConvertor.convertToEntityAttribute(entity.getOperatorCreateScript()),
                 flowNodeListConvertor.convertToEntityAttribute(entity.getNodes()),

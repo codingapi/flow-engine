@@ -59,6 +59,11 @@ public class Workflow {
     private long createdTime;
 
     /**
+     * 更新时间
+     */
+    private long updatedTime;
+
+    /**
      * 流程表单
      */
     private FormMeta form;
@@ -93,6 +98,7 @@ public class Workflow {
         this.id = RandomUtils.generateStringId();
         this.code = RandomUtils.generateWorkflowCode();
         this.createdTime = System.currentTimeMillis();
+        this.updatedTime = System.currentTimeMillis();
         this.operatorCreateScript = OperatorMatchScript.any();
         this.nodes = new ArrayList<>();
         this.edges = new ArrayList<>();
@@ -147,6 +153,10 @@ public class Workflow {
         this.createdTime = createdTime;
     }
 
+    protected void setUpdatedTime(long updatedTime) {
+        this.updatedTime = updatedTime;
+    }
+
     protected void setStrategies(List<IWorkflowStrategy> strategies) {
         this.strategies = strategies;
     }
@@ -172,6 +182,7 @@ public class Workflow {
         map.put("nodes", nodes.stream().map(IFlowNode::toMap).toList());
         map.put("edges", edges);
         map.put("createdTime", String.valueOf(createdTime));
+        map.put("updatedTime", String.valueOf(updatedTime));
         map.put("schema", hasSchema ? schema : null);
         map.put("strategies", strategies.stream().map(IWorkflowStrategy::toMap).toList());
         return JSON.toJSONString(map);
@@ -189,6 +200,7 @@ public class Workflow {
         workflow.setTitle((String) data.get("title"));
         workflow.setSchema((String) data.get("schema"));
         workflow.setCreatedTime(Long.parseLong((String) data.get("createdTime")));
+        workflow.setUpdatedTime(Long.parseLong((String) data.get("updatedTime")));
         workflow.setCreatedOperator(GatewayContext.getInstance().getFlowOperator(createOperator));
         workflow.setForm(FormMeta.fromMap((Map<String, Object>) data.get("form")));
         workflow.setOperatorCreateScript(new OperatorMatchScript((String) data.get("operatorCreateScript")));
@@ -376,4 +388,7 @@ public class Workflow {
         return false;
     }
 
+    public void updateTime() {
+        this.updatedTime = System.currentTimeMillis();
+    }
 }

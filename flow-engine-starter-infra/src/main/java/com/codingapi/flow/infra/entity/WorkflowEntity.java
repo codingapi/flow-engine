@@ -35,6 +35,12 @@ public class WorkflowEntity {
      */
     private Long createdTime;
 
+
+    /**
+     * 更新时间
+     */
+    private Long updatedTime;
+
     /**
      * 流程表单
      */

@@ -44,6 +44,7 @@ public class WorkflowController {
             request.put("createdOperator", String.valueOf(current.getUserId()));
         }
         Workflow workflow = Workflow.formJson(request.toJSONString());
+        workflow.updateTime();
         workflowRepository.save(workflow);
         return Response.buildSuccess();
     }

@@ -17,16 +17,23 @@ export const DesignList: React.FC<DesignListProps> = (props) => {
             hidden: true,
         },
         {
-            dataIndex: 'code',
-            title: '编码',
+            dataIndex: 'title',
+            title: '流程标题',
         },
         {
-            dataIndex: 'title',
-            title: '名称',
+            dataIndex: 'code',
+            title: '流程编码',
         },
         {
             dataIndex: 'createdTime',
             title: '创建时间',
+            render: (value, record) => {
+                return dayjs(value).format("YYYY-MM-DD HH:mm:ss");
+            }
+        },
+        {
+            dataIndex: 'updatedTime',
+            title: '更新时间',
             render: (value, record) => {
                 return dayjs(value).format("YYYY-MM-DD HH:mm:ss");
             }

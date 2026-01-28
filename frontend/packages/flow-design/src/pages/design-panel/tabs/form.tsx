@@ -52,6 +52,12 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
                     name={"name"}
                     label={"字段名称"}
                     labelCol={labelCol}
+                    rules={[
+                        {
+                            required: true,
+                            message: '字段名称不能为空'
+                        }
+                    ]}
                 >
                     <Input placeholder={"请输入字段名称"}/>
                 </Form.Item>
@@ -60,6 +66,12 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
                     name={"code"}
                     label={"字段编码"}
                     labelCol={labelCol}
+                    rules={[
+                        {
+                            required: true,
+                            message: '字段编码不能为空'
+                        }
+                    ]}
                 >
                     <Input placeholder={"请输入字段编码"}/>
                 </Form.Item>
@@ -68,6 +80,12 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
                     name={"type"}
                     label={"字段类型"}
                     labelCol={labelCol}
+                    rules={[
+                        {
+                            required: true,
+                            message: '字段类型不能为空'
+                        }
+                    ]}
                 >
                     <Select
                         placeholder={"请输入字段类型"}
@@ -177,7 +195,16 @@ const FormTable: React.FC<FormTableProps> = (props) => {
         },
         {
             dataIndex: 'type',
-            title: '字段类型'
+            title: '字段类型',
+            render: (value, record) => {
+                let label = '';
+                for(const option of FormFieldOptions) {
+                    if(option.value == value){
+                        label = option.label;
+                    }
+                }
+                return label
+            }
         },
         {
             dataIndex: 'required',
