@@ -12,6 +12,7 @@ export const Redo = ()=>{
     return (
         <Tooltip title="Redo">
             <Button
+                type="text"
                 icon={<RedoOutlined />}
                 disabled={!tools.canRedo || playground.config.readonly}
                 onClick={() => tools.redo()}

@@ -1,23 +1,19 @@
-import { useEffect, useState, type FC } from 'react';
-import { usePlayground, useService } from '@flowgram.ai/fixed-layout-editor';
-import { FlowDownloadFormat, FlowDownloadService } from '@flowgram.ai/export-plugin';
-import { Button, Dropdown, MenuProps, message, Tooltip } from "antd";
-import { DownloadOutlined } from "@ant-design/icons";
+import {type FC, useEffect, useState} from 'react';
+import {useService} from '@flowgram.ai/fixed-layout-editor';
+import {FlowDownloadFormat, FlowDownloadService} from '@flowgram.ai/export-plugin';
+import {Button, Dropdown, MenuProps, message, Tooltip} from "antd";
+import {DownloadOutlined} from "@ant-design/icons";
 
 
 export const DownloadTool: FC = () => {
     const [downloading, setDownloading] = useState<boolean>(false);
-    const [visible, setVisible] = useState(false);
-    const playground = usePlayground();
-    const { readonly } = playground.config;
+    const [visible, setVisible] = useState<boolean>(false);
     const downloadService = useService(FlowDownloadService);
-
 
     const items: MenuProps['items'] = [
         {
             label: 'PNG',
             key: 'png',
-            disabled:downloading || readonly,
             onClick: async () => {
                  await handleDownload(FlowDownloadFormat.PNG);
             }
@@ -25,7 +21,6 @@ export const DownloadTool: FC = () => {
         {
             label: 'JPEG',
             key: 'jpeg',
-            disabled:downloading || readonly,
             onClick: async () => {
                 await handleDownload(FlowDownloadFormat.JPEG);
             }
@@ -33,7 +28,6 @@ export const DownloadTool: FC = () => {
     ];
 
     const handleDownload = async (format: FlowDownloadFormat) => {
-        setVisible(false);
         await downloadService.download({
             format,
         });
@@ -51,29 +45,25 @@ export const DownloadTool: FC = () => {
         };
     }, [downloadService]);
 
-
-
-    const button = (
-        <Button
-            className={visible ? '!coz-mg-secondary-pressed' : undefined}
-            icon={<DownloadOutlined />}
-            loading={downloading}
-            onClick={() => setVisible(true)}
-        />
-    );
-
     return (
         <Dropdown
             menu={{items}}
             trigger={['click']}
+            onOpenChange={(open)=>{
+                setVisible(open);
+            }}
         >
-            {visible ? (
-                button
-            ) : (
-                <div>
-                    <Tooltip title="Download">{button}</Tooltip>
-                </div>
-            )}
+            <Tooltip
+                title={visible?null:"Download"}
+                trigger={"hover"}
+                open={visible?false:undefined}
+            >
+                <Button
+                    type="text"
+                    icon={<DownloadOutlined />}
+                    loading={downloading}
+                />
+            </Tooltip>
         </Dropdown>
     );
 };

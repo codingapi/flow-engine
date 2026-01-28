@@ -1,8 +1,7 @@
+import React from "react";
 import { UndoOutlined } from "@ant-design/icons";
 import {usePlayground, usePlaygroundTools } from "@flowgram.ai/fixed-layout-editor";
 import {Button, Tooltip } from "antd";
-import React from "react";
-
 
 export const Undo = ()=>{
 
@@ -12,6 +11,7 @@ export const Undo = ()=>{
     return (
         <Tooltip title="Undo">
             <Button
+                type="text"
                 icon={<UndoOutlined />}
                 disabled={!tools.canUndo || playground.config.readonly}
                 onClick={() => tools.undo()}

@@ -1,6 +1,6 @@
+import {Dropdown, MenuProps} from "antd";
 import {usePlaygroundTools} from '@flowgram.ai/fixed-layout-editor';
 import {SelectZoom} from '../styles';
-import {Dropdown, MenuProps} from "antd";
 
 export const ZoomSelect = () => {
     const tools = usePlaygroundTools({ maxZoom: 2, minZoom: 0.25 });
@@ -8,14 +8,14 @@ export const ZoomSelect = () => {
     const items: MenuProps['items'] = [
         {
             label: 'Zoomin',
-            key: 'Zoomin',
+            key: 'in',
             onClick:()=>{
                 tools.zoomin()
             }
         },
         {
             label: 'Zoomout',
-            key: 'Zoomout',
+            key: 'out',
             onClick:()=>{
                 tools.zoomout()
             }

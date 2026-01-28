@@ -4,6 +4,7 @@ import {Button, Tooltip } from "antd";
 export const FitView = (props: { fitView: () => void }) => (
     <Tooltip title="FitView">
         <Button
+            type="text"
             icon={<ArrowsAltOutlined />}
             onClick={() => props.fitView()}
         />

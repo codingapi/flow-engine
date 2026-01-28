@@ -10,6 +10,7 @@ export const MinimapSwitch = (props: {
     return (
         <Tooltip title="Minimap">
             <Button
+                type="text"
                 icon={
                     <InsertRowBelowOutlined
                         style={{

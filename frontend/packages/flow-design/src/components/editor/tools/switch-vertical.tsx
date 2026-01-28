@@ -1,5 +1,5 @@
 import {usePlaygroundTools} from '@flowgram.ai/fixed-layout-editor';
-import {SwapOutlined} from "@ant-design/icons";
+import {RetweetOutlined} from "@ant-design/icons";
 import {Button, Tooltip} from "antd";
 
 export const SwitchVertical = () => {
@@ -7,10 +7,10 @@ export const SwitchVertical = () => {
     return (
         <Tooltip title={!tools.isVertical ? 'Vertical Layout' : 'Horizontal Layout'}>
             <Button
-                size="small"
+                type="text"
                 onClick={() => tools.changeLayout()}
                 icon={
-                    <SwapOutlined
+                    <RetweetOutlined
                        size={10}
                         style={{
                             transform: !tools.isVertical ? '' : 'rotate(90deg)',
