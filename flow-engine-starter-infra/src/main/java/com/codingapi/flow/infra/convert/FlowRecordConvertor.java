@@ -1,23 +1,53 @@
 package com.codingapi.flow.infra.convert;
 
 import com.codingapi.flow.infra.entity.FlowRecordEntity;
+import com.codingapi.flow.infra.entity.convert.MapConvertor;
 import com.codingapi.flow.record.FlowRecord;
 
 public class FlowRecordConvertor {
 
+    private final static MapConvertor mapConvertor = new MapConvertor();
 
     public static FlowRecord convert(FlowRecordEntity entity) {
         if (entity == null) {
             return null;
         }
-        return new FlowRecord(entity.getId(), entity.getWorkBackupId(), entity.getWorkCode(), entity.getNodeId(), entity.getNodeType(),
-                entity.getFromId(), entity.getFormData(), entity.getTitle(), entity.getReadTime(), entity.getProcessId(), entity.getActionId(),
-                entity.getActionType(), entity.getAdvice(), entity.getSignKey(), entity.getCurrentOperatorId(),
-                entity.getForwardOperatorId(), entity.getReturnNodeId(), entity.getNodeOrder(), entity.getHidden(), entity.getRevoked(),
-                entity.getNotify(), entity.getRecordState(), entity.getFlowState(), entity.getUpdateTime(), entity.getCreateTime(),
-                entity.getFinishTime(), entity.getReadable(), entity.getCreateOperatorId(), entity.getErrMessage(),
-                entity.getTimeoutTime(), entity.getMergeable(), entity.getInterferedOperatorId(), entity.getDelegateId(),
-                entity.getParallelId(), entity.getParallelBranchNodeId(), entity.getParallelBranchTotal());
+        return new FlowRecord(entity.getId(),
+                entity.getWorkBackupId(),
+                entity.getWorkCode(),
+                entity.getNodeId(),
+                entity.getNodeType(),
+                entity.getFromId(),
+                mapConvertor.convertToEntityAttribute(entity.getFormData()),
+                entity.getTitle(),
+                entity.getReadTime(),
+                entity.getProcessId(),
+                entity.getActionId(),
+                entity.getActionType(),
+                entity.getAdvice(),
+                entity.getSignKey(),
+                entity.getCurrentOperatorId(),
+                entity.getForwardOperatorId(),
+                entity.getReturnNodeId(),
+                entity.getNodeOrder(),
+                entity.getHidden(),
+                entity.getRevoked(),
+                entity.getNotify(),
+                entity.getRecordState(),
+                entity.getFlowState(),
+                entity.getUpdateTime(),
+                entity.getCreateTime(),
+                entity.getFinishTime(),
+                entity.getReadable(),
+                entity.getCreateOperatorId(),
+                entity.getErrMessage(),
+                entity.getTimeoutTime(),
+                entity.getMergeable(),
+                entity.getInterferedOperatorId(),
+                entity.getDelegateId(),
+                entity.getParallelId(),
+                entity.getParallelBranchNodeId(),
+                entity.getParallelBranchTotal());
     }
 
     public static FlowRecordEntity convert(FlowRecord record) {
@@ -31,7 +61,7 @@ public class FlowRecordConvertor {
         entity.setNodeId(record.getNodeId());
         entity.setNodeType(record.getNodeType());
         entity.setFromId(record.getFromId());
-        entity.setFormData(record.getFormData());
+        entity.setFormData(mapConvertor.convertToDatabaseColumn(record.getFormData()));
         entity.setTitle(record.getTitle());
         entity.setReadTime(record.getReadTime());
         entity.setProcessId(record.getProcessId());

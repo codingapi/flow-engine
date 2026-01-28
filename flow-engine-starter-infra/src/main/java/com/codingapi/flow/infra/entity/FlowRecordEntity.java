@@ -1,10 +1,7 @@
 package com.codingapi.flow.infra.entity;
 
-import com.codingapi.flow.infra.entity.convert.MapConvertor;
 import jakarta.persistence.*;
 import lombok.Data;
-
-import java.util.Map;
 
 @Data
 @Entity
@@ -40,8 +37,7 @@ public class FlowRecordEntity {
      * 表单数据
      */
     @Lob
-    @Convert(converter = MapConvertor.class)
-    private Map<String, Object> formData;
+    private String formData;
     /**
      * 消息标题
      */

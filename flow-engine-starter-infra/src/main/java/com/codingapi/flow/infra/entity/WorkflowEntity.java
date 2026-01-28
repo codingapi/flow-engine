@@ -1,17 +1,8 @@
 package com.codingapi.flow.infra.entity;
 
-import com.codingapi.flow.edge.FlowEdge;
-import com.codingapi.flow.infra.entity.convert.*;
-import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.script.node.OperatorMatchScript;
-import com.codingapi.flow.strategy.workflow.IWorkflowStrategy;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
-
-import java.util.List;
 
 @Data
 @Entity
@@ -37,8 +28,7 @@ public class WorkflowEntity {
     /**
      * 创建者
      */
-    @Convert(converter = FlowOperatorConvertor.class)
-    private IFlowOperator createdOperator;
+    private Long createdOperator;
 
     /**
      * 创建时间
@@ -49,29 +39,25 @@ public class WorkflowEntity {
      * 流程表单
      */
     @Lob
-    @Convert(converter = FormMetaConvertor.class)
-    private FormMeta form;
+    private String form;
 
     /**
      * 创建者脚本
      */
     @Lob
-    @Convert(converter = OperatorMatchScriptConvertor.class)
-    private OperatorMatchScript operatorCreateScript;
+    private String operatorCreateScript;
 
     /**
      * 流程节点
      */
     @Lob
-    @Convert(converter = FlowNodeListConvertor.class)
-    private List<IFlowNode> nodes;
+    private String nodes;
 
     /**
      * 流程关系
      */
     @Lob
-    @Convert(converter = FlowEdgeListConvertor.class)
-    private List<FlowEdge> edges;
+    private String edges;
 
     /**
      * 流程设计
@@ -83,6 +69,5 @@ public class WorkflowEntity {
      * 流程策略
      */
     @Lob
-    @Convert(converter = WorkflowStrategyListConvertor.class)
-    private List<IWorkflowStrategy> strategies;
+    private String strategies;
 }

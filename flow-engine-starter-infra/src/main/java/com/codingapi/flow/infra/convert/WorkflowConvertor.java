@@ -1,9 +1,18 @@
 package com.codingapi.flow.infra.convert;
 
 import com.codingapi.flow.infra.entity.WorkflowEntity;
+import com.codingapi.flow.infra.entity.convert.*;
 import com.codingapi.flow.workflow.Workflow;
 
 public class WorkflowConvertor {
+
+    private final static FlowOperatorConvertor flowOperatorConvertor = new FlowOperatorConvertor();
+    private final static FlowNodeListConvertor flowNodeListConvertor = new FlowNodeListConvertor();
+    private final static OperatorMatchScriptConvertor operatorMatchScriptConvertor = new OperatorMatchScriptConvertor();
+    private final static WorkflowStrategyListConvertor workflowStrategyListConvertor = new WorkflowStrategyListConvertor();
+    private final static FormMetaConvertor formMetaConvertor = new FormMetaConvertor();
+    private final static FlowEdgeListConvertor flowEdgeListConvertor = new FlowEdgeListConvertor();
+
 
     public static WorkflowEntity convert(Workflow workflow){
         if(workflow==null){
@@ -14,14 +23,15 @@ public class WorkflowConvertor {
         entity.setId(workflow.getId());
         entity.setCode(workflow.getCode());
         entity.setTitle(workflow.getTitle());
-        entity.setCreatedOperator(workflow.getCreatedOperator());
+
+        entity.setCreatedOperator(flowOperatorConvertor.convertToDatabaseColumn(workflow.getCreatedOperator()));
         entity.setCreatedTime(workflow.getCreatedTime());
-        entity.setForm(workflow.getForm());
-        entity.setOperatorCreateScript(workflow.getOperatorCreateScript());
-        entity.setNodes(workflow.getNodes());
-        entity.setEdges(workflow.getEdges());
+        entity.setForm(formMetaConvertor.convertToDatabaseColumn(workflow.getForm()));
+        entity.setOperatorCreateScript(operatorMatchScriptConvertor.convertToDatabaseColumn(workflow.getOperatorCreateScript()));
+        entity.setNodes(flowNodeListConvertor.convertToDatabaseColumn(workflow.getNodes()));
+        entity.setEdges(flowEdgeListConvertor.convertToDatabaseColumn(workflow.getEdges()));
         entity.setSchema(workflow.getSchema());
-        entity.setStrategies(workflow.getStrategies());
+        entity.setStrategies(workflowStrategyListConvertor.convertToDatabaseColumn(workflow.getStrategies()));
         return entity;
     }
 
@@ -29,6 +39,16 @@ public class WorkflowConvertor {
         if(entity==null){
             return null;
         }
-        return new Workflow(entity.getId(), entity.getCode(), entity.getTitle(), entity.getCreatedOperator(), entity.getCreatedTime(), entity.getForm(), entity.getOperatorCreateScript(), entity.getNodes(), entity.getEdges(), entity.getSchema(), entity.getStrategies());
+        return new Workflow(entity.getId(),
+                entity.getCode(),
+                entity.getTitle(),
+                flowOperatorConvertor.convertToEntityAttribute(entity.getCreatedOperator()),
+                entity.getCreatedTime(),
+                formMetaConvertor.convertToEntityAttribute(entity.getForm()),
+                operatorMatchScriptConvertor.convertToEntityAttribute(entity.getOperatorCreateScript()),
+                flowNodeListConvertor.convertToEntityAttribute(entity.getNodes()),
+                flowEdgeListConvertor.convertToEntityAttribute(entity.getEdges()),
+                entity.getSchema(),
+                workflowStrategyListConvertor.convertToEntityAttribute(entity.getStrategies()));
     }
 }
