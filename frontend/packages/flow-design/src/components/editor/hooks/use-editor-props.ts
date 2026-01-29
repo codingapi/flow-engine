@@ -6,11 +6,11 @@ import {ConstantKeys, FixedLayoutProps, FlowLayoutDefault, FlowRendererKey} from
 import {createDownloadPlugin} from "@flowgram.ai/export-plugin";
 import {createPanelManagerPlugin} from "@flowgram.ai/panel-manager-plugin";
 import {initialData} from '../initial-data';
-import {Adder} from '../nodes/adder';
 import {nodeFormPanelFactory} from "../components/sidebar";
 import {BaseNode} from "@/components/editor/components/base-node";
 import {debounce} from "lodash-es";
 import {FlowNodeRegistry} from "@/components/editor/typings";
+import {Adder} from "@/components/editor/components/node-adder";
 
 export function useEditorProps(nodeRegistries:FlowNodeRegistry[]): FixedLayoutProps {
     return useMemo<FixedLayoutProps>(
