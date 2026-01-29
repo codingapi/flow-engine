@@ -4,12 +4,15 @@ import {Field, FieldRenderProps, FormMeta, FormRenderProps, ValidateTrigger,} fr
 import {FlowNodeJSON, JsonSchema} from '../../typings';
 import {useIsSidebar} from '../../hooks';
 import {Input} from "antd";
+import {NodeHeader} from "@/components/editor/node-components/header";
+import {NodePanel} from "@/components/editor/node-components/panel";
 
 export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
   if (isSidebar) {
     return (
-      <>
+      <NodePanel>
+          <NodeHeader/>
           sidebar start
           <Field
               name="value"
@@ -17,13 +20,14 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
                   <Input value={value as any} onChange={onChange} />
               )}
           />
-      </>
+      </NodePanel>
     );
   }
   return (
-    <div>
+    <NodePanel>
+        <NodeHeader/>
        start
-    </div>
+    </NodePanel>
   );
 };
 

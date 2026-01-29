@@ -67,7 +67,9 @@ export const Adder: FC<{
                 cursor: 'pointer',
             }}
             onClick={() => {
-                handleAdd({ type: 'custom', id: `custom_${Date.now()}` }, from);
+                handleAdd({ type: 'custom', id: `custom_${Date.now()}`,data:{
+                     title:'自定义节点'
+                    } }, from);
             }}
         >
             {hoverActivated ? (

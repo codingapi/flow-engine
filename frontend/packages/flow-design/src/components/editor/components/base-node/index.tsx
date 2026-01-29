@@ -1,8 +1,5 @@
-import { useCallback } from 'react';
-
 import { usePanelManager } from '@flowgram.ai/panel-manager-plugin';
 import { FlowNodeEntity, useNodeRender } from '@flowgram.ai/fixed-layout-editor';
-import { ConfigProvider } from '@douyinfe/semi-ui';
 
 import { NodeRenderContext } from '../../context';
 import { BaseNodeStyle, ErrorIcon } from './styles';
@@ -20,16 +17,10 @@ export const BaseNode = ({ node }: { node: FlowNodeEntity }) => {
      */
     const form = nodeRender.form;
 
-    /**
-     * Used to make the Tooltip scale with the node, which can be implemented by itself depending on the UI library
-     * 用于让 Tooltip 跟随节点缩放, 这个可以根据不同的 ui 库自己实现
-     */
-    const getPopupContainer = useCallback(() => node.renderData.node || document.body, []);
-
     const panelManager = usePanelManager();
 
     return (
-        <ConfigProvider getPopupContainer={getPopupContainer}>
+        <div>
             {form?.state.invalid && <ErrorIcon />}
             <BaseNodeStyle
                 /*
@@ -64,6 +55,6 @@ export const BaseNode = ({ node }: { node: FlowNodeEntity }) => {
             >
                 <NodeRenderContext.Provider value={nodeRender}>{form?.render()}</NodeRenderContext.Provider>
             </BaseNodeStyle>
-        </ConfigProvider>
+        </div>
     );
 };

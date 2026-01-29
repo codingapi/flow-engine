@@ -5,12 +5,10 @@ import { formMeta } from './form-meta';
 export const EndNodeRegistry: FlowNodeRegistry = {
   type: 'end',
   meta: {
-    isStart: true, // Mark as start
-    deleteDisable: true, // Start node cannot delete
-    selectable: false, // Start node cannot select
-    copyDisable: true, // Start node cannot copy
-    expandable: false, // disable expanded
-    addDisable: true, // Start Node cannot be added
+      isNodeEnd: true, // Mark as end
+      selectable: false, // End node cannot select
+      copyDisable: true, // End node canot copy
+      expandable: false, // disable expanded
   },
   info: {
     icon: iconEnd,

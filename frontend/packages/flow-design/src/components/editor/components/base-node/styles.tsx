@@ -11,7 +11,7 @@ export const BaseNodeStyle = styled.div`
   flex-direction: column;
   justify-content: center;
   position: relative;
-  width: 360px;
+  width: 260px;
   cursor: default;
   &.activated {
     border: 1px solid #82a7fc;

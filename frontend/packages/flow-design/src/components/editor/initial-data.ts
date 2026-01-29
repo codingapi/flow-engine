@@ -3,10 +3,10 @@ import type { FlowDocumentJSON } from '@flowgram.ai/fixed-layout-editor';
 export const initialData: FlowDocumentJSON = {
     nodes: [
         {
-            id: 'start_0',
+            id: 'start',
             type: 'start',
             data:{
-                title:'start-title',
+                title:'开始节点',
                 value:'start-value'
             }
         },
@@ -14,15 +14,15 @@ export const initialData: FlowDocumentJSON = {
             id: 'custom_1',
             type: 'custom',
             data:{
-                title:'custom-title',
+                title:'自定义节点',
                 value:'custom-value'
             }
         },
         {
-            id: 'end_2',
+            id: 'end',
             type: 'end',
             data:{
-                title:'end-title',
+                title:'结束节点',
                 value:'end-value'
             }
         },
