@@ -1,9 +1,10 @@
 import {type FlowNodeEntity, useClientContext} from '@flowgram.ai/fixed-layout-editor';
-
-import {ConditionBranchNodeRegistry} from '../../nodes/condition-branch';
 import {Container} from './styles';
 import {PlusOutlined} from "@ant-design/icons";
 import React from "react";
+import {ConditionBranchNodeRegistry} from '../../nodes/condition-branch';
+import {PARALLELBranchNodeRegistry} from "@/components/editor/nodes/parallel-branch";
+import {InclusiveBranchNodeRegistry} from "@/components/editor/nodes/inclusive-branch";
 
 interface BranchAdderPropsType {
     activated?: boolean;
@@ -24,6 +25,24 @@ export const BranchAdder: React.FC<BranchAdderPropsType> = (props: BranchAdderPr
             block = operation.addBlock(
                 node,
                 ConditionBranchNodeRegistry.onAdd!(ctx, node),
+                {
+                    index: 0,
+                }
+            )
+        }
+        if (nodeType === 'PARALLEL') {
+            block = operation.addBlock(
+                node,
+                PARALLELBranchNodeRegistry.onAdd!(ctx, node),
+                {
+                    index: 0,
+                }
+            )
+        }
+        if (nodeType === 'INCLUSIVE') {
+            block = operation.addBlock(
+                node,
+                InclusiveBranchNodeRegistry.onAdd!(ctx, node),
                 {
                     index: 0,
                 }

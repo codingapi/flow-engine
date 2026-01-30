@@ -2,16 +2,16 @@ import {FlowNodeRegistry} from '../../typings';
 import {formMeta} from './form-meta';
 import {nanoid} from "nanoid";
 
-export const ConditionBranchNodeRegistry: FlowNodeRegistry = {
-    type: 'CONDITION_BRANCH',
+export const InclusiveBranchNodeRegistry: FlowNodeRegistry = {
+    type: 'INCLUSIVE_BRANCH',
     extend: 'block',
     meta: {
         copyDisable: true,
         addDisable: true,
     },
     info: {
-        icon: 'CONDITION_BRANCH',
-        description: '分支节点',
+        icon: 'INCLUSIVE_BRANCH',
+        description: '包容分支',
     },
     /**
      * Render node via formMeta
@@ -19,11 +19,11 @@ export const ConditionBranchNodeRegistry: FlowNodeRegistry = {
     formMeta,
     onAdd(ctx, from) {
         return {
-            id: `condition_branch_${nanoid(5)}`,
-            type: 'CONDITION_BRANCH',
+            id: `inclusive_branch_${nanoid(5)}`,
+            type: 'INCLUSIVE_BRANCH',
             data: {
-                title: `branch title`,
-                value: 'branch Value'
+                title: `INCLUSIVE_BRANCH title`,
+                value: 'INCLUSIVE_BRANCH Value'
             },
         };
     }

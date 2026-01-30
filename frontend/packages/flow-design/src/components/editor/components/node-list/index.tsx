@@ -3,6 +3,8 @@ import React from "react";
 import {FlowNodeRegistry} from "@/components/editor/typings";
 import styled from 'styled-components';
 import {FlowNodeRegistries} from "@/components/editor/nodes";
+import {NodeIcon} from "@/components/editor/components/node-icon";
+import {NodeType} from "@/components/editor/typings/node-type";
 
 const NodesWrap = styled.div`
   max-height: 500px;
@@ -62,8 +64,8 @@ export const NodeList:React.FC<NodeListProps> = (props) =>{
                 <Node
                     key={registry.type}
                     disabled={!(registry.canAdd?.(context, props.from) ?? true)}
-                    icon={<img style={{ width: 10, height: 10, borderRadius: 4 }} src={registry.info.icon} />}
-                    label={registry.type as string}
+                    icon={<NodeIcon type={registry.type as NodeType}/>}
+                    label={registry.info.description as string}
                     onClick={() => handleClick(registry)}
                 />
             ))}

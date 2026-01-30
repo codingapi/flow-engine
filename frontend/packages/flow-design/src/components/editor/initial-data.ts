@@ -11,6 +11,14 @@ export const initialData: FlowDocumentJSON = {
             }
         },
         {
+            id: 'approval_1',
+            type: 'APPROVAL',
+            data:{
+                title:'审批节点',
+                value:'APPROVAL value'
+            },
+        },
+        {
             id: 'condition_1',
             type: 'CONDITION',
             data:{

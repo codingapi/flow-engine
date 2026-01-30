@@ -2,16 +2,16 @@ import {FlowNodeRegistry} from '../../typings';
 import {formMeta} from './form-meta';
 import {nanoid} from "nanoid";
 
-export const ConditionBranchNodeRegistry: FlowNodeRegistry = {
-    type: 'CONDITION_BRANCH',
+export const PARALLELBranchNodeRegistry: FlowNodeRegistry = {
+    type: 'PARALLEL_BRANCH',
     extend: 'block',
     meta: {
         copyDisable: true,
         addDisable: true,
     },
     info: {
-        icon: 'CONDITION_BRANCH',
-        description: '分支节点',
+        icon: 'PARALLEL_BRANCH',
+        description: '并行分支',
     },
     /**
      * Render node via formMeta
@@ -19,8 +19,8 @@ export const ConditionBranchNodeRegistry: FlowNodeRegistry = {
     formMeta,
     onAdd(ctx, from) {
         return {
-            id: `condition_branch_${nanoid(5)}`,
-            type: 'CONDITION_BRANCH',
+            id: `parallel_branch_${nanoid(5)}`,
+            type: 'PARALLEL_BRANCH',
             data: {
                 title: `branch title`,
                 value: 'branch Value'
