@@ -12,6 +12,7 @@ import {debounce} from "lodash-es";
 import {FlowNodeRegistry} from "@/components/editor/typings";
 import {Adder} from "@/components/editor/components/node-adder";
 import {BranchAdder} from "@/components/editor/components/branch-adder";
+import { Collapse } from "../components/collapse";
 
 export function useEditorProps(nodeRegistries:FlowNodeRegistry[]): FixedLayoutProps {
     return useMemo<FixedLayoutProps>(
@@ -169,6 +170,7 @@ export function useEditorProps(nodeRegistries:FlowNodeRegistry[]): FixedLayoutPr
                     ...defaultFixedSemiMaterials,
                     [FlowRendererKey.ADDER]: Adder, // Node Add Button
                     [FlowRendererKey.BRANCH_ADDER]: BranchAdder, // Branch Add Button
+                    [FlowRendererKey.COLLAPSE]: Collapse,
                 },
                 renderDefaultNode: BaseNode, // node render
                 renderTexts: {
