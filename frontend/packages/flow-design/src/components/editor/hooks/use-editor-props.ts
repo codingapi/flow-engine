@@ -1,5 +1,6 @@
 import '@flowgram.ai/fixed-layout-editor/index.css';
 import {useMemo} from 'react';
+import {theme} from "antd";
 import {createMinimapPlugin} from '@flowgram.ai/minimap-plugin';
 import {defaultFixedSemiMaterials} from '@flowgram.ai/fixed-semi-materials';
 import {ConstantKeys, FixedLayoutProps, FlowLayoutDefault, FlowRendererKey} from '@flowgram.ai/fixed-layout-editor';
@@ -12,9 +13,12 @@ import {debounce} from "lodash-es";
 import {FlowNodeRegistry} from "@/components/editor/typings";
 import {Adder} from "@/components/editor/components/node-adder";
 import {BranchAdder} from "@/components/editor/components/branch-adder";
-import { Collapse } from "../components/collapse";
+import {Collapse} from "../components/collapse";
 
-export function useEditorProps(nodeRegistries:FlowNodeRegistry[]): FixedLayoutProps {
+export function useEditorProps(nodeRegistries: FlowNodeRegistry[]): FixedLayoutProps {
+
+    const {token} = theme.useToken();
+
     return useMemo<FixedLayoutProps>(
         () => ({
             /**
@@ -100,7 +104,7 @@ export function useEditorProps(nodeRegistries:FlowNodeRegistry[]): FixedLayoutPr
                 // [ConstantKeys.INLINE_BLOCKS_PADDING_BOTTOM]: 30,
                 // [ConstantKeys.COLLAPSED_SPACING]: 10,
                 [ConstantKeys.BASE_COLOR]: '#B8BCC1',
-                [ConstantKeys.BASE_ACTIVATED_COLOR]: '#82A7FC',
+                [ConstantKeys.BASE_ACTIVATED_COLOR]: token.colorPrimary,
             },
             /**
              * SelectBox config
@@ -173,18 +177,11 @@ export function useEditorProps(nodeRegistries:FlowNodeRegistry[]): FixedLayoutPr
                     [FlowRendererKey.COLLAPSE]: Collapse,
                 },
                 renderDefaultNode: BaseNode, // node render
-                renderTexts: {
-                    'loop-end-text': 'Loop End',
-                    'loop-traverse-text': 'Loop',
-                    'try-start-text': 'Try Start',
-                    'try-end-text': 'Try End',
-                    'catch-text': 'Catch Error',
-                },
             },
             /**
              * Bind condition service
              */
-            onBind: ({ bind }) => {
+            onBind: ({bind}) => {
                 // bind(CustomService).toSelf().inSingletonScope();
             },
             scroll: {

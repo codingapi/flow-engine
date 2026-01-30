@@ -1,14 +1,14 @@
-import React, { useCallback, useContext, useMemo, useState } from "react";
-import { useIsSidebar } from "@/components/editor/hooks";
-import { Button, Flex, Input, Space, theme } from "antd";
-import { nodeFormPanelFactory } from "@/components/editor/components/sidebar";
-import { usePanelManager } from "@flowgram.ai/panel-manager-plugin";
-import { NodeRenderContext } from "@/components/editor/context";
-import { Field, FieldRenderProps, useClientContext } from "@flowgram.ai/fixed-layout-editor";
-import { CloseCircleOutlined, CloseOutlined, EditOutlined } from "@ant-design/icons";
-import { NodeIcon } from "@/components/editor/components/node-icon";
-import { NodeType } from "@/components/editor/typings/node-type";
-import { FlowNodeRegistry } from "@/components/editor/typings";
+import React, {useCallback, useContext, useMemo, useState} from "react";
+import {useIsSidebar} from "@/components/editor/hooks";
+import {Button, Flex, Input, Space, theme} from "antd";
+import {nodeFormPanelFactory} from "@/components/editor/components/sidebar";
+import {usePanelManager} from "@flowgram.ai/panel-manager-plugin";
+import {NodeRenderContext} from "@/components/editor/context";
+import {Field, FieldRenderProps} from "@flowgram.ai/fixed-layout-editor";
+import {CloseOutlined, EditOutlined} from "@ant-design/icons";
+import {NodeIcon} from "@/components/editor/components/node-icon";
+import {NodeType} from "@/components/editor/typings/node-type";
+import {FlowNodeRegistry} from "@/components/editor/typings";
 
 interface HeaderTitleProps {
     title: string;
@@ -70,34 +70,16 @@ const HeaderTitle: React.FC<HeaderTitleProps> = ({ title, onChange, readonly }) 
 };
 
 export const NodeHeader: React.FC = () => {
-    const { node, deleteNode } = useContext(NodeRenderContext);
+    const { node } = useContext(NodeRenderContext);
     const isSidebar = useIsSidebar();
     const panelManager = usePanelManager();
-    const clientContext = useClientContext();
     const { token } = theme.useToken();
-    const [isHovered, setIsHovered] = useState(false);
 
     const nodeType = node.getNodeRegistry<FlowNodeRegistry>().type as NodeType;
-    const registry = node.getNodeRegistry<FlowNodeRegistry>();
 
     const handleClose = useCallback(() => {
         panelManager.close(nodeFormPanelFactory.key);
     }, [panelManager]);
-
-    const deleteDisabled = useMemo(() => {
-        const { canDelete, meta } = registry;
-
-        if (typeof canDelete === 'function') {
-            return !canDelete(clientContext, node);
-        }
-
-        return meta?.deleteDisable ?? false;
-    }, [registry, clientContext, node]);
-
-    const handleDelete = useCallback((e: React.MouseEvent) => {
-        e.stopPropagation();
-        deleteNode();
-    }, [deleteNode]);
 
     const headerStyle: React.CSSProperties = {
         width: "100%",
@@ -107,24 +89,11 @@ export const NodeHeader: React.FC = () => {
         position: "relative",
     };
 
-    // 或者使用 marginTop 方案（根据原代码）
-    const deleteButtonStyleV2: React.CSSProperties = {
-        marginRight: -10,
-        marginTop: -42,
-        cursor: "pointer",
-        opacity: isHovered ? 1 : 0,
-        visibility: isHovered ? "visible" : "hidden",
-        transition: "opacity 0.2s ease, visibility 0.2s ease",
-        zIndex: 10,
-    };
-
     return (
         <Flex
             style={headerStyle}
             justify="space-between"
             align="center"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
         >
             <Space>
                 <NodeIcon type={nodeType} />
@@ -138,23 +107,12 @@ export const NodeHeader: React.FC = () => {
                 </Field>
             </Space>
 
-            {isSidebar ? (
+            {isSidebar && (
                 <Button
                     type="text"
                     icon={<CloseOutlined style={{ color: token.colorPrimary }} />}
                     onClick={handleClose}
                 />
-            ) : !deleteDisabled && (
-                <div style={deleteButtonStyleV2}>
-                    <CloseCircleOutlined
-                        style={{
-                            color: token.colorPrimary,
-                            transition: "transform 0.2s ease",
-                            transform: isHovered ? "scale(1.1)" : "scale(1)",
-                        }}
-                        onClick={handleDelete}
-                    />
-                </div>
             )}
         </Flex>
     );

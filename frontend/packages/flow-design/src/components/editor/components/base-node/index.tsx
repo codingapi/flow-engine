@@ -1,11 +1,12 @@
-import { usePanelManager } from '@flowgram.ai/panel-manager-plugin';
-import { FlowNodeEntity, useNodeRender } from '@flowgram.ai/fixed-layout-editor';
+import {usePanelManager} from '@flowgram.ai/panel-manager-plugin';
+import {FlowNodeEntity, useNodeRender} from '@flowgram.ai/fixed-layout-editor';
 
-import { NodeRenderContext } from '../../context';
-import { BaseNodeStyle, ErrorIcon } from './styles';
-import { nodeFormPanelFactory } from '../sidebar';
+import {theme} from "antd";
+import {NodeRenderContext} from '../../context';
+import {BaseNodeStyle, ErrorIcon} from './styles';
+import {nodeFormPanelFactory} from '../sidebar';
 
-export const BaseNode = ({ node }: { node: FlowNodeEntity }) => {
+export const BaseNode = ({node}: { node: FlowNodeEntity }) => {
     /**
      * Provides methods related to node rendering
      * 提供节点渲染相关的方法
@@ -17,12 +18,15 @@ export const BaseNode = ({ node }: { node: FlowNodeEntity }) => {
      */
     const form = nodeRender.form;
 
+    const {token} = theme.useToken();
+
     const panelManager = usePanelManager();
 
     return (
         <div>
-            {form?.state.invalid && <ErrorIcon />}
+            {form?.state.invalid && <ErrorIcon/>}
             <BaseNodeStyle
+                primaryColor={token.colorPrimary}
                 /*
                  * onMouseEnter is added to a fixed layout node primarily to listen for hover highlighting of branch lines
                  * onMouseEnter 加到固定布局节点主要是为了监听 分支线条的 hover 高亮
