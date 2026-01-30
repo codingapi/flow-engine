@@ -27,7 +27,24 @@ export const ConditionNodeRegistry: FlowNodeRegistry = {
                 title: `CONDITION Node`,
                 value: 'CONDITION Value'
             },
-            blocks: []
+            blocks: [
+                {
+                    id: `condition_branch_${nanoid(5)}`,
+                    type: 'CONDITION_BRANCH',
+                    data: {
+                        title: `branch title`,
+                        value: 'branch Value'
+                    },
+                },
+                {
+                    id: `condition_branch_${nanoid(5)}`,
+                    type: 'CONDITION_BRANCH',
+                    data: {
+                        title: `branch title`,
+                        value: 'branch Value'
+                    },
+                }
+            ]
         }
     }
 };

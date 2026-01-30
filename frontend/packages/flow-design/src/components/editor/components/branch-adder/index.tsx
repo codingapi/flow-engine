@@ -48,12 +48,12 @@ export const BranchAdder: React.FC<BranchAdderPropsType> = (props: BranchAdderPr
                 }
             )
         }
-        setTimeout(() => {
-            playground.scrollToView({
-                bounds: block.bounds,
-                scrollToCenter: true,
-            });
-        }, 10);
+        // setTimeout(() => {
+        //     playground.scrollToView({
+        //         bounds: block.bounds,
+        //         scrollToCenter: true,
+        //     });
+        // }, 10);
     }
 
     if (playground.config.readonlyOrDisabled) return null;

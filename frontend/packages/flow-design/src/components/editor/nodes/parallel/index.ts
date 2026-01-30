@@ -27,7 +27,24 @@ export const ParallelNodeRegistry: FlowNodeRegistry = {
                 title: `PARALLEL Node`,
                 value: 'PARALLEL Value'
             },
-            blocks: []
+            blocks: [
+                {
+                    id: `parallel_branch_${nanoid(5)}`,
+                    type: 'PARALLEL_BRANCH',
+                    data: {
+                        title: `branch title`,
+                        value: 'branch Value'
+                    },
+                },
+                {
+                    id: `parallel_branch_${nanoid(5)}`,
+                    type: 'PARALLEL_BRANCH',
+                    data: {
+                        title: `branch title`,
+                        value: 'branch Value'
+                    },
+                }
+            ]
         }
     }
 };
