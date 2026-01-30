@@ -1,87 +1,90 @@
-import '@flowgram.ai/fixed-layout-editor/index.css';
-import { FC } from 'react';
+import React, {useState} from 'react';
+import {Popover} from "antd";
+import {type FlowNodeEntity, useClientContext} from '@flowgram.ai/fixed-layout-editor';
+import {generateNodeId} from "@/components/editor/utils";
 
-import {
-    FlowNodeEntity,
-    FlowNodeJSON,
-    FlowOperationService,
-    usePlayground,
-    useService,
-} from '@flowgram.ai/fixed-layout-editor';
+import {NodeList} from '../node-list';
+import {Wrap} from './styles';
+import {PlusCircleOutlined} from "@ant-design/icons";
 
-const useAddNode = () => {
-    const playground = usePlayground();
-    const flowOperationService = useService(FlowOperationService) as FlowOperationService;
 
-    const handleAdd = (addProps: FlowNodeJSON, dropNode: FlowNodeEntity) => {
+const generateNewIdForChildren = (n: FlowNodeEntity): FlowNodeEntity => {
+    if (n.blocks) {
+        return {
+            ...n,
+            id: generateNodeId(n),
+            blocks: n.blocks.map((b) => generateNewIdForChildren(b)),
+        } as FlowNodeEntity;
+    } else {
+        return {
+            ...n,
+            id: generateNodeId(n),
+        } as FlowNodeEntity;
+    }
+};
+
+interface AdderProps {
+    from: FlowNodeEntity;
+    to?: FlowNodeEntity;
+    hoverActivated: boolean;
+}
+
+export const Adder:React.FC<AdderProps> =(props)=> {
+    const {from} = props;
+    const [visible, setVisible] = useState(false);
+    const {playground, operation, clipboard} = useClientContext();
+
+    const add = (addProps: any) => {
         const blocks = addProps.blocks ? addProps.blocks : undefined;
-        const entity = flowOperationService.addFromNode(dropNode, {
+        const block = operation.addFromNode(from, {
             ...addProps,
             blocks,
         });
         setTimeout(() => {
             playground.scrollToView({
-                bounds: entity.bounds,
+                bounds: block.bounds,
                 scrollToCenter: true,
             });
         }, 10);
-        return entity;
+        setVisible(false);
     };
 
-    const handleAddBranch = (addProps: FlowNodeJSON, dropNode: FlowNodeEntity) => {
-        const index = dropNode.index + 1;
-        const entity = flowOperationService.addBlock(dropNode.originParent!, addProps, {
-            index,
-        });
-        return entity;
-    };
-
-    return {
-        handleAdd,
-        handleAddBranch,
-    };
-};
-
-export const Adder: FC<{
-    from: FlowNodeEntity;
-    to?: FlowNodeEntity;
-    hoverActivated: boolean;
-}> = ({ from, hoverActivated }) => {
-    const playground = usePlayground();
-
-    const { handleAdd } = useAddNode();
-
-    if (playground.config.readonlyOrDisabled) return null;
+    if (playground.config.readonly) return null;
 
     return (
-        <div
-            style={{
-                width: hoverActivated ? 15 : 6,
-                height: hoverActivated ? 15 : 6,
-                backgroundColor: hoverActivated ? '#fff' : 'rgb(143, 149, 158)',
-                color: '#fff',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-            }}
-            onClick={() => {
-                handleAdd({ type: 'custom', id: `custom_${Date.now()}`,data:{
-                     title:'自定义节点'
-                    } }, from);
-            }}
+        <Popover
+            open={visible}
+            onOpenChange={setVisible}
+            content={<NodeList onSelect={add} from={from}/>}
+            placement="right"
+            trigger="click"
         >
-            {hoverActivated ? (
-                <span
-                    style={{
-                        color: '#3370ff',
-                        fontSize: 12,
-                    }}
-                >
-          +
-        </span>
-            ) : null}
-        </div>
+            <Wrap
+                style={
+                    props.hoverActivated
+                        ? {
+                            width: 15,
+                            height: 15,
+                        }
+                        : {}
+                }
+                onMouseDown={(e: any) => e.stopPropagation()}
+            >
+                {props.hoverActivated ? (
+                    <PlusCircleOutlined
+                        onClick={() => {
+                            setVisible(true);
+                        }}
+                        style={{
+                            backgroundColor: '#fff',
+                            color: '#3370ff',
+                            borderRadius: 15,
+                        }}
+                    />
+                ) : (
+                    ''
+                )}
+            </Wrap>
+        </Popover>
     );
-};
+}

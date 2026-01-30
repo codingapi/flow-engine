@@ -11,6 +11,7 @@ import {BaseNode} from "@/components/editor/components/base-node";
 import {debounce} from "lodash-es";
 import {FlowNodeRegistry} from "@/components/editor/typings";
 import {Adder} from "@/components/editor/components/node-adder";
+import {BranchAdder} from "@/components/editor/components/branch-adder";
 
 export function useEditorProps(nodeRegistries:FlowNodeRegistry[]): FixedLayoutProps {
     return useMemo<FixedLayoutProps>(
@@ -167,6 +168,7 @@ export function useEditorProps(nodeRegistries:FlowNodeRegistry[]): FixedLayoutPr
                 components: {
                     ...defaultFixedSemiMaterials,
                     [FlowRendererKey.ADDER]: Adder, // Node Add Button
+                    [FlowRendererKey.BRANCH_ADDER]: BranchAdder, // Branch Add Button
                 },
                 renderDefaultNode: BaseNode, // node render
                 renderTexts: {
@@ -178,7 +180,7 @@ export function useEditorProps(nodeRegistries:FlowNodeRegistry[]): FixedLayoutPr
                 },
             },
             /**
-             * Bind custom service
+             * Bind switch service
              */
             onBind: ({ bind }) => {
                 // bind(CustomService).toSelf().inSingletonScope();

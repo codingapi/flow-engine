@@ -11,12 +11,30 @@ export const initialData: FlowDocumentJSON = {
             }
         },
         {
-            id: 'custom_1',
-            type: 'custom',
+            id: 'switch_1',
+            type: 'switch',
             data:{
-                title:'自定义节点',
-                value:'custom-value'
-            }
+                title:'switch节点',
+                value:'switch-value'
+            },
+            blocks:[
+                {
+                    id: 'case_1',
+                    type: 'case',
+                    data:{
+                        title:'条件节点A',
+                        value:'case-value-a'
+                    },
+                },
+                {
+                    id: 'case_2',
+                    type: 'case',
+                    data:{
+                        title:'条件节点B',
+                        value:'case-value-b'
+                    },
+                }
+            ]
         },
         {
             id: 'end',
