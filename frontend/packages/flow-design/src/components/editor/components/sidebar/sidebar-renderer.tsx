@@ -1,4 +1,4 @@
-import { useCallback, useEffect, startTransition } from 'react';
+import React,{ useCallback, useEffect, startTransition } from 'react';
 
 import { type PanelFactory, usePanelManager } from '@flowgram.ai/panel-manager-plugin';
 import {
@@ -66,7 +66,7 @@ export const SidebarRenderer: React.FC<NodeFormPanelProps> = ({ nodeId }) => {
     return () => {};
   }, [node]);
 
-  if (!node || node.getNodeMeta<FlowNodeMeta>().sidebarDisabled === true) {
+  if (!node || node.getNodeMeta<FlowNodeMeta>().sidebarDisable === true) {
     return null;
   }
 
