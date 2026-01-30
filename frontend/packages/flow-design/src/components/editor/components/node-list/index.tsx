@@ -53,7 +53,6 @@ export const NodeList:React.FC<NodeListProps> = (props) =>{
     const context = useClientContext();
     const handleClick = (registry: FlowNodeRegistry) => {
         const addProps = registry.onAdd?.(context, props.from);
-        console.log('addProps:',addProps);
         props.onSelect?.(addProps);
     };
 

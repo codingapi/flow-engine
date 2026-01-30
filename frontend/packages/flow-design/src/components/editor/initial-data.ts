@@ -4,41 +4,41 @@ export const initialData: FlowDocumentJSON = {
     nodes: [
         {
             id: 'start',
-            type: 'start',
+            type: 'START',
             data:{
                 title:'开始节点',
                 value:'start-value'
             }
         },
         {
-            id: 'switch_1',
-            type: 'switch',
+            id: 'condition_1',
+            type: 'CONDITION',
             data:{
-                title:'switch节点',
-                value:'switch-value'
+                title:'分支控制',
+                value:'condition value'
             },
             blocks:[
                 {
                     id: 'case_1',
-                    type: 'case',
+                    type: 'CONDITION_BRANCH',
                     data:{
                         title:'条件节点A',
-                        value:'case-value-a'
+                        value:'condition-branch-value-a'
                     },
                 },
                 {
                     id: 'case_2',
-                    type: 'case',
+                    type: 'CONDITION_BRANCH',
                     data:{
                         title:'条件节点B',
-                        value:'case-value-b'
+                        value:'condition-branch-value-b'
                     },
                 }
             ]
         },
         {
             id: 'end',
-            type: 'end',
+            type: 'END',
             data:{
                 title:'结束节点',
                 value:'end-value'

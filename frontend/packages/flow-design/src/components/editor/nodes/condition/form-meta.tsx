@@ -13,7 +13,7 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
     return (
       <NodePanel>
           <NodeHeader/>
-          sidebar case
+          sidebar condition
           <Field
               name="value"
               render={({ field: { value, onChange } }: FieldRenderProps<JsonSchema>) => (
@@ -26,7 +26,7 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
   return (
     <NodePanel>
         <NodeHeader/>
-        case
+        condition
     </NodePanel>
   );
 };

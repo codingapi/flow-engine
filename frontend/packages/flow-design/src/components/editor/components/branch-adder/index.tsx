@@ -1,6 +1,6 @@
 import {type FlowNodeEntity, useClientContext} from '@flowgram.ai/fixed-layout-editor';
 
-import {CaseNodeRegistry} from '../../nodes/case';
+import {ConditionBranchNodeRegistry} from '../../nodes/condition-branch';
 import {Container} from './styles';
 import {PlusOutlined} from "@ant-design/icons";
 import React from "react";
@@ -20,10 +20,10 @@ export const BranchAdder: React.FC<BranchAdderPropsType> = (props: BranchAdderPr
     function addBranch() {
         const nodeType = node.flowNodeType;
         let block: FlowNodeEntity;
-        if (nodeType === 'switch') {
+        if (nodeType === 'CONDITION') {
             block = operation.addBlock(
                 node,
-                CaseNodeRegistry.onAdd!(ctx, node),
+                ConditionBranchNodeRegistry.onAdd!(ctx, node),
                 {
                     index: 0,
                 }

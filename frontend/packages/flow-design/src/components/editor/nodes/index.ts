@@ -1,12 +1,12 @@
 import {type FlowNodeRegistry} from '../typings';
 import {StartNodeRegistry} from './start';
 import {EndNodeRegistry} from './end';
-import {SwitchNodeRegistry} from "@/components/editor/nodes/switch";
-import {CaseNodeRegistry} from "@/components/editor/nodes/case";
+import {ConditionNodeRegistry} from "@/components/editor/nodes/condition";
+import {ConditionBranchNodeRegistry} from "@/components/editor/nodes/condition-branch";
 
 export const FlowNodeRegistries: FlowNodeRegistry[] = [
     StartNodeRegistry,
     EndNodeRegistry,
-    SwitchNodeRegistry,
-    CaseNodeRegistry,
+    ConditionNodeRegistry,
+    ConditionBranchNodeRegistry,
 ];

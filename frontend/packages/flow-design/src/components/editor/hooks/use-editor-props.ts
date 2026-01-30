@@ -182,7 +182,7 @@ export function useEditorProps(nodeRegistries:FlowNodeRegistry[]): FixedLayoutPr
                 },
             },
             /**
-             * Bind switch service
+             * Bind condition service
              */
             onBind: ({ bind }) => {
                 // bind(CustomService).toSelf().inSingletonScope();

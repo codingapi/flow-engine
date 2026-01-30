@@ -1,19 +1,17 @@
 import {FlowNodeRegistry} from '../../typings';
-import iconStart from '@/assets/icon-start.jpg';
 import {formMeta} from './form-meta';
 import {nanoid} from "nanoid";
 
-export const CaseNodeRegistry: FlowNodeRegistry = {
-    type: 'case',
+export const ConditionBranchNodeRegistry: FlowNodeRegistry = {
+    type: 'CONDITION_BRANCH',
     extend: 'block',
     meta: {
         copyDisable: true,
         addDisable: true,
     },
     info: {
-        icon: iconStart,
-        description:
-            'The starting node of the workflow, used to set the information needed to initiate the workflow.',
+        icon: 'CONDITION_BRANCH',
+        description: '分支节点',
     },
     /**
      * Render node via formMeta
@@ -22,10 +20,10 @@ export const CaseNodeRegistry: FlowNodeRegistry = {
     onAdd(ctx, from) {
         return {
             id: `Case_${nanoid(5)}`,
-            type: 'case',
+            type: 'CONDITION_BRANCH',
             data: {
-                title: `Case_title`,
-                value: 'Case Value'
+                title: `branch title`,
+                value: 'branch Value'
             },
         };
     }
