@@ -22,7 +22,7 @@ export const DelayNodeRegistry: FlowNodeRegistry = {
             id: `delay_${nanoid()}`,
             type: 'DELAY',
             data: {
-                title: `DELAY Node`,
+                title: `延迟节点`,
                 value: 'DELAY Value'
             },
         }

@@ -10,11 +10,16 @@ export const ConditionNodeRegistry: FlowNodeRegistry = {
         copyDisable: true,
         addDisable: false,
         expandable: false, // disable expanded
+        sidebarDisable: true, // End Node cannot be added from sidebar
+        style:{
+            width: '100%',
+        }
     },
     info: {
         icon: 'CONDITION',
-        description: '分支控制',
+        description: '条件控制',
     },
+
     /**
      * Render node via formMeta
      */
@@ -24,15 +29,14 @@ export const ConditionNodeRegistry: FlowNodeRegistry = {
             id: `condition_${nanoid()}`,
             type: 'CONDITION',
             data: {
-                title: `CONDITION Node`,
-                value: 'CONDITION Value'
+                title: `条件控制`,
             },
             blocks: [
                 {
                     id: `condition_branch_${nanoid(5)}`,
                     type: 'CONDITION_BRANCH',
                     data: {
-                        title: `branch title`,
+                        title: `条件分支节点`,
                         value: 'branch Value'
                     },
                 },
@@ -40,7 +44,7 @@ export const ConditionNodeRegistry: FlowNodeRegistry = {
                     id: `condition_branch_${nanoid(5)}`,
                     type: 'CONDITION_BRANCH',
                     data: {
-                        title: `branch title`,
+                        title: `条件分支节点`,
                         value: 'branch Value'
                     },
                 }

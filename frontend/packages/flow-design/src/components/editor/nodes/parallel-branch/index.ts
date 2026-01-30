@@ -2,7 +2,7 @@ import {FlowNodeRegistry} from '../../typings';
 import {formMeta} from './form-meta';
 import {nanoid} from "nanoid";
 
-export const PARALLELBranchNodeRegistry: FlowNodeRegistry = {
+export const ParallelBranchNodeRegistry: FlowNodeRegistry = {
     type: 'PARALLEL_BRANCH',
     extend: 'block',
     meta: {
@@ -22,7 +22,7 @@ export const PARALLELBranchNodeRegistry: FlowNodeRegistry = {
             id: `parallel_branch_${nanoid(5)}`,
             type: 'PARALLEL_BRANCH',
             data: {
-                title: `branch title`,
+                title: `并行分支节点`,
                 value: 'branch Value'
             },
         };

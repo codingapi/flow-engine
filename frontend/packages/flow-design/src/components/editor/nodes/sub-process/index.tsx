@@ -22,7 +22,7 @@ export const SubProcessNodeRegistry: FlowNodeRegistry = {
             id: `sub_process_${nanoid()}`,
             type: 'SUB_PROCESS',
             data: {
-                title: `SUB_PROCESS Node`,
+                title: `子流程节点`,
                 value: 'SUB_PROCESS Value'
             },
         }

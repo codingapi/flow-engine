@@ -22,7 +22,7 @@ export const HandleNodeRegistry: FlowNodeRegistry = {
             id: `handle_${nanoid()}`,
             type: 'HANDLE',
             data: {
-                title: `HANDLE Node`,
+                title: `办理节点`,
                 value: 'HANDLE Value'
             },
         }

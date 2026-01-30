@@ -1,44 +1,28 @@
 import {provideJsonSchemaOutputs, syncVariableTitle,} from '@flowgram.ai/form-materials';
-import {Field, FieldRenderProps, FormMeta, FormRenderProps, ValidateTrigger,} from '@flowgram.ai/fixed-layout-editor';
+import {FormMeta, FormRenderProps, ValidateTrigger,} from '@flowgram.ai/fixed-layout-editor';
 
-import {FlowNodeJSON, JsonSchema} from '../../typings';
-import {useIsSidebar} from '../../hooks';
-import {Input} from "antd";
-import {NodeHeader} from "@/components/editor/node-components/header";
-import {NodePanel} from "@/components/editor/node-components/panel";
+import {FlowNodeJSON} from '../../typings';
+import {ConditionBranchNodeRegistry} from "@/components/editor/nodes/condition-branch";
+import {BranchAdderRender} from "@/components/editor/components/branch-adder";
 
-export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
-  const isSidebar = useIsSidebar();
-  if (isSidebar) {
+export const renderForm = ({form}: FormRenderProps<FlowNodeJSON['data']>) => {
+
     return (
-      <NodePanel>
-          <NodeHeader/>
-          sidebar condition
-          <Field
-              name="value"
-              render={({ field: { value, onChange } }: FieldRenderProps<JsonSchema>) => (
-                  <Input value={value as any} onChange={onChange} />
-              )}
-          />
-      </NodePanel>
+        <BranchAdderRender
+            buttonText={'添加条件分支'}
+            onAdd={ConditionBranchNodeRegistry.onAdd}
+        />
     );
-  }
-  return (
-    <NodePanel>
-        <NodeHeader/>
-        condition
-    </NodePanel>
-  );
 };
 
 export const formMeta: FormMeta<FlowNodeJSON['data']> = {
-  render: renderForm,
-  validateTrigger: ValidateTrigger.onChange,
-  validate: {
-    title: ({ value }: { value: string }) => (value ? undefined : 'Title is required'),
-  },
-  effect: {
-    title: syncVariableTitle,
-    outputs: provideJsonSchemaOutputs,
-  },
+    render: renderForm,
+    validateTrigger: ValidateTrigger.onChange,
+    validate: {
+        title: ({value}: { value: string }) => (value ? undefined : 'Title is required'),
+    },
+    effect: {
+        title: syncVariableTitle,
+        outputs: provideJsonSchemaOutputs,
+    },
 };

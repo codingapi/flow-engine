@@ -22,7 +22,7 @@ export const TriggerNodeRegistry: FlowNodeRegistry = {
             id: `trigger_${nanoid()}`,
             type: 'TRIGGER',
             data: {
-                title: `TRIGGER Node`,
+                title: `触发节点`,
                 value: 'TRIGGER Value'
             },
         }

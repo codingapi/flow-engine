@@ -33,7 +33,8 @@ export const RouterNodeRegistry: FlowNodeRegistry = {
             id: `router_${nanoid()}`,
             type: 'ROUTER',
             data: {
-                title: 'ROUTER',
+                title: '路由节点',
+                value: 'ROUTER Value'
             },
         };
     },

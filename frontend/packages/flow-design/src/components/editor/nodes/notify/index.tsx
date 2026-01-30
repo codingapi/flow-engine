@@ -22,7 +22,7 @@ export const NotifyNodeRegistry: FlowNodeRegistry = {
             id: `notify_${nanoid()}`,
             type: 'NOTIFY',
             data: {
-                title: `NOTIFY Node`,
+                title: `抄送节点`,
                 value: 'NOTIFY Value'
             },
         }

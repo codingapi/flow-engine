@@ -4,6 +4,7 @@ import {CloseCircleOutlined} from "@ant-design/icons";
 import {NodeRenderContext} from "@/components/editor/context";
 import {FlowNodeRegistry} from "@/components/editor/typings";
 import {useClientContext} from "@flowgram.ai/fixed-layout-editor";
+import {useIsSidebar} from "@/components/editor/hooks";
 
 interface NodePanelProps {
     children?: React.ReactNode;
@@ -14,10 +15,14 @@ export const NodePanel: React.FC<NodePanelProps> = (props) => {
     const {node, deleteNode} = useContext(NodeRenderContext);
     const clientContext = useClientContext();
     const registry = node.getNodeRegistry<FlowNodeRegistry>();
-
+    const isSidebar = useIsSidebar();
+    const ctx = useClientContext();
+    const {playground} = ctx;
     const {token} = theme.useToken();
-    // 或者使用 marginTop 方案（根据原代码）
-    const deleteButtonStyleV2: React.CSSProperties = {
+
+    const canDeleteNode = playground.config.readonlyOrDisabled;
+
+    const deleteButtonStyle: React.CSSProperties = {
         right: -10,
         top: -12,
         cursor: "pointer",
@@ -43,6 +48,25 @@ export const NodePanel: React.FC<NodePanelProps> = (props) => {
         deleteNode();
     }, [deleteNode]);
 
+    if(isSidebar || canDeleteNode){
+        return (
+            <div
+                style={{
+                    width: '100%',
+                    padding: 3
+                }}
+            >
+                <Flex
+                    vertical={true}
+                    justify="center"
+                    align="center"
+                >
+                    {props.children}
+                </Flex>
+            </div>
+        )
+    }
+
     return (
         <div
             style={{
@@ -53,7 +77,7 @@ export const NodePanel: React.FC<NodePanelProps> = (props) => {
             onMouseLeave={() => setIsHovered(false)}
         >
             {!deleteDisabled && (
-                <div style={deleteButtonStyleV2}>
+                <div style={deleteButtonStyle}>
                     <CloseCircleOutlined
                         style={{
                             color: token.colorPrimary,

@@ -10,6 +10,10 @@ export const InclusiveNodeRegistry: FlowNodeRegistry = {
         copyDisable: true,
         addDisable: false,
         expandable: false, // disable expanded
+        sidebarDisable: true, // End Node cannot be added from sidebar
+        style:{
+            width: '100%',
+        }
     },
     info: {
         icon: 'INCLUSIVE',
@@ -24,15 +28,14 @@ export const InclusiveNodeRegistry: FlowNodeRegistry = {
             id: `inclusive_${nanoid()}`,
             type: 'INCLUSIVE',
             data: {
-                title: `INCLUSIVE Node`,
-                value: 'INCLUSIVE Value'
+                title: `包容分支`,
             },
             blocks:[
                 {
                     id: `inclusive_branch_${nanoid(5)}`,
                     type: 'INCLUSIVE_BRANCH',
                     data: {
-                        title: `INCLUSIVE_BRANCH title`,
+                        title: `包容分支节点`,
                         value: 'INCLUSIVE_BRANCH Value'
                     },
                 },
@@ -40,7 +43,7 @@ export const InclusiveNodeRegistry: FlowNodeRegistry = {
                     id: `inclusive_branch_${nanoid(5)}`,
                     type: 'INCLUSIVE_BRANCH',
                     data: {
-                        title: `INCLUSIVE_BRANCH title`,
+                        title: `包容分支节点`,
                         value: 'INCLUSIVE_BRANCH Value'
                     },
                 }

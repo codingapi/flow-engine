@@ -69,11 +69,17 @@ const HeaderTitle: React.FC<HeaderTitleProps> = ({ title, onChange, readonly }) 
     );
 };
 
-export const NodeHeader: React.FC = () => {
+interface NodeHeaderProps{
+    style?: React.CSSProperties;
+    iconEnable?: boolean;
+}
+
+export const NodeHeader: React.FC<NodeHeaderProps> = (props) => {
     const { node } = useContext(NodeRenderContext);
     const isSidebar = useIsSidebar();
     const panelManager = usePanelManager();
     const { token } = theme.useToken();
+    const iconEnable = props.iconEnable ?? true;
 
     const nodeType = node.getNodeRegistry<FlowNodeRegistry>().type as NodeType;
 
@@ -87,6 +93,7 @@ export const NodeHeader: React.FC = () => {
         borderBottom: "1px solid #f0f0f0",
         marginBottom: 8,
         position: "relative",
+        ...props.style,
     };
 
     return (
@@ -96,7 +103,7 @@ export const NodeHeader: React.FC = () => {
             align="center"
         >
             <Space>
-                <NodeIcon type={nodeType} />
+                {iconEnable && <NodeIcon type={nodeType} />}
                 <Field name="title">
                     {({ field: { value, onChange } }: FieldRenderProps<string>) => (
                         <HeaderTitle

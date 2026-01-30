@@ -1,10 +1,12 @@
-import {type FlowNodeEntity, useClientContext} from '@flowgram.ai/fixed-layout-editor';
-import {Container} from './styles';
-import {PlusOutlined} from "@ant-design/icons";
-import React from "react";
-import {ConditionBranchNodeRegistry} from '../../nodes/condition-branch';
-import {PARALLELBranchNodeRegistry} from "@/components/editor/nodes/parallel-branch";
-import {InclusiveBranchNodeRegistry} from "@/components/editor/nodes/inclusive-branch";
+import {FixedLayoutPluginContext, type FlowNodeEntity, useClientContext} from '@flowgram.ai/fixed-layout-editor';
+import React, {useCallback, useContext} from "react";
+import {FlowNodeJSON} from "@/components/editor/typings";
+import {NodeRenderContext} from "@/components/editor/context";
+import {NodePanel} from "@/components/editor/node-components/panel";
+import {NodeHeader} from "@/components/editor/node-components/header";
+import {Button} from "antd";
+import {nodeFormPanelFactory} from "@/components/editor/components/sidebar";
+import { usePanelManager } from "@flowgram.ai/panel-manager-plugin";
 
 interface BranchAdderPropsType {
     activated?: boolean;
@@ -12,68 +14,49 @@ interface BranchAdderPropsType {
 }
 
 export const BranchAdder: React.FC<BranchAdderPropsType> = (props: BranchAdderPropsType) => {
-    const {activated, node} = props;
-    const nodeData = node.firstChild!.renderData;
+    return null;
+}
+
+interface BranchAdderProps {
+    buttonText: string;
+    onAdd?: (ctx: FixedLayoutPluginContext, from: FlowNodeEntity) => FlowNodeJSON;
+}
+
+export const BranchAdderRender:React.FC<BranchAdderProps> = (props) => {
+
+    const {node} = useContext(NodeRenderContext);
     const ctx = useClientContext();
     const {operation, playground} = ctx;
-    const {isVertical} = node;
+    const panelManager = usePanelManager();
 
-    function addBranch() {
-        const nodeType = node.flowNodeType;
-        let block: FlowNodeEntity;
-        if (nodeType === 'CONDITION') {
-            block = operation.addBlock(
-                node,
-                ConditionBranchNodeRegistry.onAdd!(ctx, node),
-                {
-                    index: 0,
-                }
-            )
-        }
-        if (nodeType === 'PARALLEL') {
-            block = operation.addBlock(
-                node,
-                PARALLELBranchNodeRegistry.onAdd!(ctx, node),
-                {
-                    index: 0,
-                }
-            )
-        }
-        if (nodeType === 'INCLUSIVE') {
-            block = operation.addBlock(
-                node,
-                InclusiveBranchNodeRegistry.onAdd!(ctx, node),
-                {
-                    index: 0,
-                }
-            )
-        }
-        // setTimeout(() => {
-        //     playground.scrollToView({
-        //         bounds: block.bounds,
-        //         scrollToCenter: true,
-        //     });
-        // }, 10);
+    const handleAddBranch = () => {
+        operation.addBlock(
+            node,
+            props.onAdd!(ctx, node),
+            {
+                index: 0,
+            }
+        );
+
+        setTimeout(()=>{
+            handleClose();
+        },10)
     }
 
-    if (playground.config.readonlyOrDisabled) return null;
+    const handleClose = useCallback(() => {
+        panelManager.close(nodeFormPanelFactory.key);
+    }, [panelManager]);
+
+    const canAddBranch = playground.config.readonlyOrDisabled;
 
     return (
-        <Container
-            isVertical={isVertical}
-            activated={activated}
-            onMouseEnter={() => nodeData?.toggleMouseEnter()}
-            onMouseLeave={() => nodeData?.toggleMouseLeave()}
-        >
-            <div
-                onClick={() => {
-                    addBranch();
-                }}
-                aria-hidden="true"
-                style={{flexGrow: 1, textAlign: 'center'}}
-            >
-                <PlusOutlined/>
-            </div>
-        </Container>
+        <NodePanel>
+            <NodeHeader
+                iconEnable={true}
+                style={{
+                    width: 120
+                }}/>
+            <Button type={'link'} disabled={canAddBranch} onClick={handleAddBranch}>{props.buttonText}</Button>
+        </NodePanel>
     );
-}
+};

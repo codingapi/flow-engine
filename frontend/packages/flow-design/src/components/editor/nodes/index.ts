@@ -10,7 +10,7 @@ import {InclusiveNodeRegistry} from "@/components/editor/nodes/inclusive";
 import {InclusiveBranchNodeRegistry} from "@/components/editor/nodes/inclusive-branch";
 import {NotifyNodeRegistry} from "@/components/editor/nodes/notify";
 import {ParallelNodeRegistry} from "@/components/editor/nodes/parallel";
-import {PARALLELBranchNodeRegistry} from "@/components/editor/nodes/parallel-branch";
+import {ParallelBranchNodeRegistry} from "@/components/editor/nodes/parallel-branch";
 import {RouterNodeRegistry} from "@/components/editor/nodes/router";
 import {SubProcessNodeRegistry} from "@/components/editor/nodes/sub-process";
 import {TriggerNodeRegistry} from "@/components/editor/nodes/trigger";
@@ -26,7 +26,7 @@ export const FlowNodeRegistries: FlowNodeRegistry[] = [
     InclusiveBranchNodeRegistry,
     NotifyNodeRegistry,
     ParallelNodeRegistry,
-    PARALLELBranchNodeRegistry,
+    ParallelBranchNodeRegistry,
     RouterNodeRegistry,
     StartNodeRegistry,
     SubProcessNodeRegistry,

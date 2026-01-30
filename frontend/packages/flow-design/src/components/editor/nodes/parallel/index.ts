@@ -10,6 +10,10 @@ export const ParallelNodeRegistry: FlowNodeRegistry = {
         copyDisable: true,
         addDisable: false,
         expandable: false, // disable expanded
+        sidebarDisable: true, // End Node cannot be added from sidebar
+        style:{
+            width: '100%',
+        }
     },
     info: {
         icon: 'PARALLEL',
@@ -24,15 +28,14 @@ export const ParallelNodeRegistry: FlowNodeRegistry = {
             id: `parallel_${nanoid()}`,
             type: 'PARALLEL',
             data: {
-                title: `PARALLEL Node`,
-                value: 'PARALLEL Value'
+                title: `并行分支`,
             },
             blocks: [
                 {
                     id: `parallel_branch_${nanoid(5)}`,
                     type: 'PARALLEL_BRANCH',
                     data: {
-                        title: `branch title`,
+                        title: `并行分支节点`,
                         value: 'branch Value'
                     },
                 },
@@ -40,7 +43,7 @@ export const ParallelNodeRegistry: FlowNodeRegistry = {
                     id: `parallel_branch_${nanoid(5)}`,
                     type: 'PARALLEL_BRANCH',
                     data: {
-                        title: `branch title`,
+                        title: `并行分支节点`,
                         value: 'branch Value'
                     },
                 }

@@ -3,6 +3,7 @@ import {EditorRenderer, FixedLayoutEditorProvider } from "@flowgram.ai/fixed-lay
 import { useEditorProps } from './hooks/use-editor-props';
 import {EditorTools} from "@/components/editor/tools";
 import { FlowNodeRegistries } from './nodes';
+import "./index.scss";
 
 export const FlowEditor = ()=>{
     const editorProps = useEditorProps(FlowNodeRegistries);

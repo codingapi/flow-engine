@@ -1,6 +1,5 @@
-import { useNodeRender, FlowNodeEntity } from '@flowgram.ai/fixed-layout-editor';
-
-import { NodeRenderContext } from '../../context';
+import {FlowNodeEntity, useNodeRender} from '@flowgram.ai/fixed-layout-editor';
+import {NodeRenderContext} from '../../context';
 
 export function SidebarNodeRenderer(props: { node: FlowNodeEntity }) {
   const { node } = props;

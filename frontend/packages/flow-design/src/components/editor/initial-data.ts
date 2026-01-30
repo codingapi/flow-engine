@@ -22,8 +22,7 @@ export const initialData: FlowDocumentJSON = {
             id: 'condition_1',
             type: 'CONDITION',
             data:{
-                title:'分支控制',
-                value:'condition value'
+                title:'条件控制',
             },
             blocks:[
                 {

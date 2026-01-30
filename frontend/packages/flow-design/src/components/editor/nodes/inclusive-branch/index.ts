@@ -22,7 +22,7 @@ export const InclusiveBranchNodeRegistry: FlowNodeRegistry = {
             id: `inclusive_branch_${nanoid(5)}`,
             type: 'INCLUSIVE_BRANCH',
             data: {
-                title: `INCLUSIVE_BRANCH title`,
+                title: `包容分支节点`,
                 value: 'INCLUSIVE_BRANCH Value'
             },
         };

@@ -22,7 +22,7 @@ export const ConditionBranchNodeRegistry: FlowNodeRegistry = {
             id: `condition_branch_${nanoid(5)}`,
             type: 'CONDITION_BRANCH',
             data: {
-                title: `branch title`,
+                title: `条件分支节点`,
                 value: 'branch Value'
             },
         };

@@ -22,7 +22,7 @@ export const ApprovalNodeRegistry: FlowNodeRegistry = {
             id: `approval_${nanoid()}`,
             type: 'APPROVAL',
             data: {
-                title: `APPROVAL Node`,
+                title: `审批节点`,
                 value: 'APPROVAL Value'
             },
         }
