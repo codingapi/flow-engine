@@ -7,7 +7,20 @@ export const ApprovalNodeRegistry: FlowNodeRegistry = {
     meta: {
         copyDisable: true,
         addDisable: false,
-        expandable: false, // disable expanded
+        expandable: false, // disable expanded,
+        strategies:[
+            'TimeoutStrategy',
+            'MultiOperatorAuditStrategy',
+            'SameOperatorAuditStrategy',
+            'RecordMergeStrategy',
+            'ResubmitStrategy',
+            'AdviceStrategy',
+            'ErrorTriggerStrategy',
+            'NodeTitleStrategy',
+            'FormFieldPermissionStrategy',
+            'OperatorLoadStrategy',
+            'RevokeStrategy'
+        ]
     },
     info: {
         icon: 'APPROVAL',

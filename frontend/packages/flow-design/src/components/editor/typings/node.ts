@@ -1,40 +1,43 @@
-import { IFlowValue } from '@flowgram.ai/form-materials';
+import {IFlowValue} from '@flowgram.ai/form-materials';
 import {
-  FlowNodeJSON as FlowNodeJSONDefault,
-  FlowNodeRegistry as FlowNodeRegistryDefault,
-  FixedLayoutPluginContext,
-  FlowNodeEntity,
-  FlowNodeMeta as FlowNodeMetaDefault,
+    FixedLayoutPluginContext,
+    FlowNodeEntity,
+    FlowNodeJSON as FlowNodeJSONDefault,
+    FlowNodeMeta as FlowNodeMetaDefault,
+    FlowNodeRegistry as FlowNodeRegistryDefault,
 } from '@flowgram.ai/fixed-layout-editor';
 
-import { type JsonSchema } from './json-schema';
+import {type JsonSchema} from './json-schema';
+import {NodeStrategyType} from "@/components/editor/typings/node-type";
 
 export interface FlowNodeJSON extends FlowNodeJSONDefault {
-  data: {
-    title?: string;
-    inputsValues?: Record<string, IFlowValue>;
-    inputs?: JsonSchema;
-    outputs?: JsonSchema;
-    [key: string]: any;
-  };
+    data: {
+        title?: string;
+        inputsValues?: Record<string, IFlowValue>;
+        inputs?: JsonSchema;
+        outputs?: JsonSchema;
+        [key: string]: any;
+    };
 }
 
 export interface FlowNodeMeta extends FlowNodeMetaDefault {
-  sidebarDisable?: boolean;
-  style?: React.CSSProperties;
+    sidebarDisable?: boolean;
+    style?: React.CSSProperties;
+    editTitleDisable?: boolean
+    strategies?: NodeStrategyType[]
 }
 
 export interface FlowNodeRegistry extends FlowNodeRegistryDefault {
-  meta?: FlowNodeMeta;
-  info: {
-    icon: string;
-    description: string;
-  };
-  canAdd?: (ctx: FixedLayoutPluginContext, from: FlowNodeEntity) => boolean;
-  canDelete?: (ctx: FixedLayoutPluginContext, from: FlowNodeEntity) => boolean;
-  onAdd?: (ctx: FixedLayoutPluginContext, from: FlowNodeEntity) => FlowNodeJSON;
+    meta?: FlowNodeMeta;
+    info: {
+        icon: string;
+        description: string;
+    };
+    canAdd?: (ctx: FixedLayoutPluginContext, from: FlowNodeEntity) => boolean;
+    canDelete?: (ctx: FixedLayoutPluginContext, from: FlowNodeEntity) => boolean;
+    onAdd?: (ctx: FixedLayoutPluginContext, from: FlowNodeEntity) => FlowNodeJSON;
 }
 
 export type FlowDocumentJSON = {
-  nodes: FlowNodeJSON[];
+    nodes: FlowNodeJSON[];
 };

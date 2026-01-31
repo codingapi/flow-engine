@@ -1,11 +1,11 @@
 import {provideJsonSchemaOutputs, syncVariableTitle,} from '@flowgram.ai/form-materials';
-import {Field, FieldRenderProps, FormMeta, FormRenderProps, ValidateTrigger,} from '@flowgram.ai/fixed-layout-editor';
+import {FormMeta, FormRenderProps, ValidateTrigger,} from '@flowgram.ai/fixed-layout-editor';
 
-import {FlowNodeJSON, JsonSchema} from '../../typings';
+import {FlowNodeJSON} from '../../typings';
 import {useIsSidebar} from '../../hooks';
-import {Input} from "antd";
 import {NodeHeader} from "@/components/editor/node-components/header";
 import {NodePanel} from "@/components/editor/node-components/panel";
+import {NodeLayout} from "@/components/editor/node-components/layout";
 
 export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
@@ -13,13 +13,7 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
     return (
       <NodePanel>
           <NodeHeader/>
-          sidebar sub process
-          <Field
-              name="value"
-              render={({ field: { value, onChange } }: FieldRenderProps<JsonSchema>) => (
-                  <Input value={value as any} onChange={onChange} />
-              )}
-          />
+          <NodeLayout type={'fall'}/>
       </NodePanel>
     );
   }

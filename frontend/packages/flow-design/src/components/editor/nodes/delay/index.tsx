@@ -8,6 +8,9 @@ export const DelayNodeRegistry: FlowNodeRegistry = {
         copyDisable: true,
         addDisable: false,
         expandable: false, // disable expanded
+        strategies:[
+            'DelayStrategy'
+        ]
     },
     info: {
         icon: 'DELAY',

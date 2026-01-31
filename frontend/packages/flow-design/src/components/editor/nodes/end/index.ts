@@ -12,6 +12,9 @@ export const EndNodeRegistry: FlowNodeRegistry = {
         expandable: false, // disable expanded
         addDisable: true, // End Node cannot be added,
         sidebarDisable: true, // End Node cannot be added from sidebar
+        style:{
+            width: '100%',
+        }
     },
     info: {
         icon: 'END',

@@ -7,7 +7,19 @@ export const HandleNodeRegistry: FlowNodeRegistry = {
     meta: {
         copyDisable: true,
         addDisable: false,
-        expandable: false, // disable expanded
+        expandable: false, // disable expanded,
+        strategies:[
+            'TimeoutStrategy',
+            'MultiOperatorAuditStrategy',
+            'SameOperatorAuditStrategy',
+            'RecordMergeStrategy',
+            'ResubmitStrategy',
+            'AdviceStrategy',
+            'ErrorTriggerStrategy',
+            'NodeTitleStrategy',
+            'FormFieldPermissionStrategy',
+            'OperatorLoadStrategy',
+        ]
     },
     info: {
         icon: 'HANDLE',

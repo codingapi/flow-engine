@@ -8,6 +8,11 @@ export const NotifyNodeRegistry: FlowNodeRegistry = {
         copyDisable: true,
         addDisable: false,
         expandable: false, // disable expanded
+        strategies:[
+            'ErrorTriggerStrategy',
+            'NodeTitleStrategy',
+            'OperatorLoadStrategy'
+        ]
     },
     info: {
         icon: 'NOTIFY',

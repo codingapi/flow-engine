@@ -8,6 +8,9 @@ export const SubProcessNodeRegistry: FlowNodeRegistry = {
         copyDisable: true,
         addDisable: false,
         expandable: false, // disable expanded
+        strategies:[
+            'SubProcessStrategy'
+        ]
     },
     info: {
         icon: 'SUB_PROCESS',

@@ -24,6 +24,7 @@ import com.codingapi.flow.script.runtime.IBeanFactory;
 import com.codingapi.flow.strategy.node.ErrorTriggerStrategy;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
+import com.codingapi.flow.strategy.node.RouterStrategy;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
@@ -1083,7 +1084,9 @@ class FlowServiceTest {
 
         RouterNode routerNode = RouterNode.builder()
                 .name("路由节点")
-                .routerNodeScript(String.format("def run(request){return '%s'}", bossNode.getId()))
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new RouterStrategy(String.format("def run(request){return '%s'}", bossNode.getId())))
+                        .build())
                 .build();
 
         ApprovalNode departNode = ApprovalNode.builder()

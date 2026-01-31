@@ -8,6 +8,9 @@ export const TriggerNodeRegistry: FlowNodeRegistry = {
         copyDisable: true,
         addDisable: false,
         expandable: false, // disable expanded
+        strategies:[
+            'TriggerStrategy'
+        ]
     },
     info: {
         icon: 'TRIGGER',
