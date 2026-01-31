@@ -6,6 +6,8 @@ import React from "react";
  */
 export const RecordMergeStrategy:React.FC = () => {
     return (
-        <>node operator</>
+        <div>
+            record merge strategy
+        </div>
     )
 }

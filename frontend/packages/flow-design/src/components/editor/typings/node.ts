@@ -8,7 +8,7 @@ import {
 } from '@flowgram.ai/fixed-layout-editor';
 
 import {type JsonSchema} from './json-schema';
-import {NodeStrategyType} from "@/components/editor/typings/node-type";
+import {ActionType, NodeStrategyType} from "@/components/editor/typings/node-type";
 
 export interface FlowNodeJSON extends FlowNodeJSONDefault {
     data: {
@@ -25,6 +25,7 @@ export interface FlowNodeMeta extends FlowNodeMetaDefault {
     style?: React.CSSProperties;
     editTitleDisable?: boolean
     strategies?: NodeStrategyType[]
+    actions?:ActionType[]
 }
 
 export interface FlowNodeRegistry extends FlowNodeRegistryDefault {

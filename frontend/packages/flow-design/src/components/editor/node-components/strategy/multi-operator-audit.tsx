@@ -7,8 +7,8 @@ import React from "react";
 export const MultiOperatorAuditStrategy: React.FC = () => {
 
     return (
-        <>
-            策略标题
-        </>
+        <div>
+            multi operator audit strategy
+        </div>
     )
 }

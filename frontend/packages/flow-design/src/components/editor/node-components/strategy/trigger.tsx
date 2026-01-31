@@ -6,6 +6,8 @@ import React from "react";
  */
 export const TriggerStrategy:React.FC = () => {
     return (
-        <>node operator</>
+        <div>
+            trigger strategy
+        </div>
     )
 }

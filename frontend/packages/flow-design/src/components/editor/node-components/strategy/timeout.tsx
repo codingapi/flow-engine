@@ -6,6 +6,8 @@ import React from "react";
  */
 export const TimeoutStrategy:React.FC = () => {
     return (
-        <>node operator</>
+        <div>
+            timeout strategy
+        </div>
     )
 }

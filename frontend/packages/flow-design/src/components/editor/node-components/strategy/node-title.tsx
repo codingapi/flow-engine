@@ -7,8 +7,8 @@ import React from "react";
 export const NodeTitleStrategy: React.FC = () => {
 
     return (
-        <>
-            策略标题
-        </>
+        <div>
+            node title strategy
+        </div>
     )
 }

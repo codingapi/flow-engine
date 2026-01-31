@@ -7,8 +7,8 @@ import React from "react";
 export const AdviceStrategy: React.FC = () => {
 
     return (
-        <>
-            节点审批意见策略
-        </>
+        <div>
+            advice strategy
+        </div>
     )
 }

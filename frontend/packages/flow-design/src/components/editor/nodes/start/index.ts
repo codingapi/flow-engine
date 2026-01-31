@@ -15,6 +15,11 @@ export const StartNodeRegistry: FlowNodeRegistry = {
             'NodeTitleStrategy',
             'FormFieldPermissionStrategy',
             'RevokeStrategy'
+        ],
+        actions:[
+            'PASS',
+            'SAVE',
+            'CUSTOM'
         ]
     },
     info: {

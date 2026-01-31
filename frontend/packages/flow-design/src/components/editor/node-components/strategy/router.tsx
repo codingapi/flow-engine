@@ -6,6 +6,8 @@ import React from "react";
  */
 export const RouterStrategy:React.FC = () => {
     return (
-        <>router operator</>
+        <div>
+            router strategy
+        </div>
     )
 }

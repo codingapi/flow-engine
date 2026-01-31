@@ -19,6 +19,9 @@ export const HandleNodeRegistry: FlowNodeRegistry = {
             'NodeTitleStrategy',
             'FormFieldPermissionStrategy',
             'OperatorLoadStrategy',
+        ],
+        actions:[
+            'PASS',
         ]
     },
     info: {

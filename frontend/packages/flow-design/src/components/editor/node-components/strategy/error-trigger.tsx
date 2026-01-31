@@ -7,8 +7,8 @@ import React from "react";
 export const ErrorTriggerStrategy: React.FC = () => {
 
     return (
-        <>
-            策略标题
-        </>
+        <div>
+           error trigger strategy
+        </div>
     )
 }

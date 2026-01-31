@@ -11,7 +11,8 @@ export const NotifyNodeRegistry: FlowNodeRegistry = {
         strategies:[
             'ErrorTriggerStrategy',
             'NodeTitleStrategy',
-            'OperatorLoadStrategy'
+            'OperatorLoadStrategy',
+            'FormFieldPermissionStrategy'
         ]
     },
     info: {

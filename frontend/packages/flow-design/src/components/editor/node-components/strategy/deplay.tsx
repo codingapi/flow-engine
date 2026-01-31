@@ -7,8 +7,8 @@ import React from "react";
 export const DelayStrategy: React.FC = () => {
 
     return (
-        <>
-            策略标题
-        </>
+        <div>
+            delay strategy
+        </div>
     )
 }

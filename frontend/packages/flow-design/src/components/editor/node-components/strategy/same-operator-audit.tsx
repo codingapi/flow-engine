@@ -6,6 +6,8 @@ import React from "react";
  */
 export const SameOperatorAuditStrategy:React.FC = () => {
     return (
-        <>node operator</>
+        <div>
+            same operator audit strategy
+        </div>
     )
 }

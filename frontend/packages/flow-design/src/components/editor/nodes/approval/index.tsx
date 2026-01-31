@@ -20,6 +20,16 @@ export const ApprovalNodeRegistry: FlowNodeRegistry = {
             'FormFieldPermissionStrategy',
             'OperatorLoadStrategy',
             'RevokeStrategy'
+        ],
+        actions:[
+            'PASS',
+            'REJECT',
+            'SAVE',
+            'ADD_AUDIT',
+            'TRANSFER',
+            'RETURN',
+            'DELEGATE',
+            'CUSTOM'
         ]
     },
     info: {

@@ -6,6 +6,8 @@ import React from "react";
  */
 export const RevokeStrategy:React.FC = () => {
     return (
-        <>node operator</>
+        <div>
+            revoke strategy
+        </div>
     )
 }

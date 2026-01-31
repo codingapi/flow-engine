@@ -6,6 +6,8 @@ import React from "react";
  */
 export const ResubmitStrategy:React.FC = () => {
     return (
-        <>node operator</>
+        <div>
+            resubmit strategy
+        </div>
     )
 }

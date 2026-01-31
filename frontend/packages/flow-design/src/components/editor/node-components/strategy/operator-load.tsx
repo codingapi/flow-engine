@@ -6,6 +6,8 @@ import React from "react";
  */
 export const OperatorLoadStrategy:React.FC = () => {
     return (
-        <>node operator</>
+        <div>
+           operator load strategy
+        </div>
     )
 }

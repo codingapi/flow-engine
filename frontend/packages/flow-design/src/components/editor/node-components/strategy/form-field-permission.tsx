@@ -7,8 +7,8 @@ import React from "react";
 export const FormFieldPermissionStrategy: React.FC = () => {
 
     return (
-        <>
-            策略标题
-        </>
+        <div>
+            form field permission strategy
+        </div>
     )
 }

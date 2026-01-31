@@ -12,13 +12,26 @@ export const TabBase:React.FC = () => {
     return (
         <Flex
             justify="center"
+            vertical={true}
+            align={"center"}
             style={{
                 width: "100%",
             }}
         >
-            {strategyManager().render('Operator')}
-            {strategyManager().render('CustomTitle')}
-            {strategyManager().render('Trigger')}
+            {strategyManager().render('OperatorLoadStrategy')}
+            {strategyManager().render('NodeTitleStrategy')}
+            {strategyManager().render('MultiOperatorAuditStrategy')}
+            {strategyManager().render('SameOperatorAuditStrategy')}
+            {strategyManager().render('ErrorTriggerStrategy')}
+            {strategyManager().render('DelayStrategy')}
+            {strategyManager().render('ResubmitStrategy')}
+            {strategyManager().render('AdviceStrategy')}
+            {strategyManager().render('TimeoutStrategy')}
+            {strategyManager().render('RevokeStrategy')}
+            {strategyManager().render('TriggerStrategy')}
+            {strategyManager().render('RecordMergeStrategy')}
+            {strategyManager().render('SubProcessStrategy')}
+
         </Flex>
     )
 }

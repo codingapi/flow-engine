@@ -6,6 +6,8 @@ import React from "react";
  */
 export const SubProcessStrategy:React.FC = () => {
     return (
-        <>node operator</>
+        <div>
+            sub-process strategy
+        </div>
     )
 }
