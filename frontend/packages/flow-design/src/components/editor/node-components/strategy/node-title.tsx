@@ -20,11 +20,11 @@ export const NodeTitleStrategy: React.FC = () => {
         >
             <Form.Item
                 label={"标题表达式"}
-                name={"script"}
+                name={["NodeTitleStrategy","script"]}
                 tooltip={"支持使用变量"}
             >
                <Field
-                   name="script"
+                   name={"NodeTitleStrategy.script"}
                    render={({ field: { value, onChange } }: FieldRenderProps<any>) => (
                        <>
                            <Input value={value} onChange={onChange} />

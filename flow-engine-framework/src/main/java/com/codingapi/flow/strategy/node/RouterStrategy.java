@@ -5,7 +5,6 @@ import com.codingapi.flow.script.node.RouterNodeScript;
 import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.Map;
 

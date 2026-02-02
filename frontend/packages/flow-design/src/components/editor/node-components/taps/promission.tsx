@@ -1,25 +1,20 @@
-import React, {useContext} from "react";
-import {Flex} from "antd";
-import {NodeRenderContext} from "@/components/editor/context";
-import {StrategyManager} from "@/components/editor/node-components/strategy";
+import React from "react";
+import {Field, FieldRenderProps} from "@flowgram.ai/fixed-layout-editor";
+import {PromissionTable} from "@/components/editor/node-components/promission/table";
 
-export const TabPromission:React.FC = () => {
-    const {node} = useContext(NodeRenderContext);
-    const strategies = node.getNodeRegistry()?.meta.strategies || [];
-    const strategyManager = React.useCallback(()=>{
-        return new StrategyManager(strategies);
-    },[strategies]);
+export const TabPromission: React.FC = () => {
+
     return (
-        <Flex
-            justify="center"
-            vertical={true}
-            align={"center"}
-            style={{
-                width: "100%",
-                padding: 8,
+        <Field
+            name="promissions"
+            render={({field: {value, onChange}}: FieldRenderProps<any>) => {
+                return (
+                    <PromissionTable
+                        value={value}
+                        onChange={onChange}
+                    />
+                );
             }}
-        >
-            {strategyManager().render('FormFieldPermissionStrategy')}
-        </Flex>
+        />
     )
 }

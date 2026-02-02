@@ -69,7 +69,9 @@ export function Table<RecordType extends object = any>(props: TableProps<RecordT
     }, []);
 
     return (
-        <div>
+        <div style={{
+            width: '100%'
+        }}>
            <Card>
                <Flex justify={"end"} style={{
                    paddingLeft: 20,

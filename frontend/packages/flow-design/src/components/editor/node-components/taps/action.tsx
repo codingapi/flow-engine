@@ -1,32 +1,20 @@
-import React, {useContext} from "react";
-import {Flex} from "antd";
-import {NodeRenderContext} from "@/components/editor/context";
-import {ActionManager} from "@/components/editor/node-components/action";
+import React from "react";
+import {Field, FieldRenderProps} from "@flowgram.ai/fixed-layout-editor";
+import {ActionTable} from "@/components/editor/node-components/action/table";
 
-export const TabAction:React.FC = () => {
-    const {node} = useContext(NodeRenderContext);
-    const actions = node.getNodeRegistry()?.meta.actions || [];
-    const actionManager = React.useCallback(()=>{
-        return new ActionManager(actions);
-    },[actions]);
+export const TabAction: React.FC = () => {
+
     return (
-        <Flex
-            justify="center"
-            vertical={true}
-            align={"center"}
-            style={{
-                width: "100%",
-                padding: 8,
+        <Field
+            name="actions"
+            render={({field: {value, onChange}}: FieldRenderProps<any>) => {
+                return (
+                    <ActionTable
+                        value={value}
+                        onChange={onChange}
+                    />
+                );
             }}
-        >
-            {actionManager().render('SAVE')}
-            {actionManager().render('PASS')}
-            {actionManager().render('REJECT')}
-            {actionManager().render('ADD_AUDIT')}
-            {actionManager().render('RETURN')}
-            {actionManager().render('TRANSFER')}
-            {actionManager().render('DELEGATE')}
-            {actionManager().render('CUSTOM')}
-        </Flex>
+        />
     )
 }

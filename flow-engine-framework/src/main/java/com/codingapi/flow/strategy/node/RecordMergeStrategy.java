@@ -15,30 +15,30 @@ import java.util.Map;
 @NoArgsConstructor
 public class RecordMergeStrategy extends BaseStrategy {
 
-    private boolean mergeable;
+    private boolean enable;
 
     @Override
     public void copy(INodeStrategy target) {
-        this.mergeable = ((RecordMergeStrategy) target).mergeable;
+        this.enable = ((RecordMergeStrategy) target).enable;
     }
 
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
-        map.put("mergeable", mergeable);
+        map.put("enable", enable);
         return map;
     }
 
     public static RecordMergeStrategy fromMap(Map<String, Object> map) {
         RecordMergeStrategy strategy = IMapConvertor.fromMap(map, RecordMergeStrategy.class);
         if (strategy == null) return null;
-        strategy.mergeable = (boolean) map.get("mergeable");
+        strategy.enable = (boolean) map.get("enable");
         return strategy;
     }
 
     public static RecordMergeStrategy defaultStrategy() {
         RecordMergeStrategy strategy = new RecordMergeStrategy();
-        strategy.setMergeable(false);
+        strategy.setEnable(false);
         return strategy;
     }
 }

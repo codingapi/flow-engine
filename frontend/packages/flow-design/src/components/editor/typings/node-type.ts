@@ -93,3 +93,15 @@ export type ActionType =
     'TRANSFER'|
     // 自定义，自定义按钮，需要配置脚本
     'CUSTOM';
+
+
+export const actionOptions = [
+    {label: '保存', value: 'SAVE'},
+    {label: '通过', value: 'PASS'},
+    {label: '拒绝', value: 'REJECT'},
+    {label: '加签', value: 'ADD_AUDIT'},
+    {label: '委派', value: 'DELEGATE'},
+    {label: '退回', value: 'RETURN'},
+    {label: '转办', value: 'TRANSFER'},
+    {label: '自定义', value: 'CUSTOM'},
+]
