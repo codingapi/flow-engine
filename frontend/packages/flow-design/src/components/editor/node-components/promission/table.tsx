@@ -19,6 +19,8 @@ const FormPromissionTable: React.FC<FormPromissionTableProps> = (props) => {
     const code = props.code;
     const promissionManager = props.promissionManager;
     const datasource = promissionManager.getDatasource(code);
+
+    console.log('load datasource',datasource);
     const columns = [
         {
             title: 'id',
@@ -27,25 +29,14 @@ const FormPromissionTable: React.FC<FormPromissionTableProps> = (props) => {
             hidden: true,
         },
         {
-            title: '字段',
-            dataIndex: 'name',
-            key: 'name',
+            title: '名称',
+            dataIndex: 'fieldName',
+            key: 'fieldName',
         },
         {
-            title: '只读',
-            dataIndex: 'readable',
-            key: 'readable',
-            render: (_: any, record: any) => {
-                return (
-                    <Switch
-                        size="small"
-                        checked={record.readable}
-                        onChange={(value) => {
-                            promissionManager.changeReadable(code, record.id, value);
-                        }}
-                    />
-                )
-            }
+            title: '编码',
+            dataIndex: 'fieldCode',
+            key: 'fieldCode',
         },
         {
             title: '可编辑',
@@ -55,9 +46,25 @@ const FormPromissionTable: React.FC<FormPromissionTableProps> = (props) => {
                 return (
                     <Switch
                         size="small"
-                        checked={record.editable}
+                        checked={record.type==='WRITE'}
                         onChange={(value) => {
-                            promissionManager.changeEditable(code, record.id, value);
+                            promissionManager.changeEditable(code, record.fieldCode, value);
+                        }}
+                    />
+                )
+            }
+        },
+        {
+            title: '只读',
+            dataIndex: 'readable',
+            key: 'readable',
+            render: (_: any, record: any) => {
+                return (
+                    <Switch
+                        size="small"
+                        checked={record.type==='READ'}
+                        onChange={(value) => {
+                            promissionManager.changeReadable(code, record.fieldCode, value);
                         }}
                     />
                 )
@@ -71,9 +78,9 @@ const FormPromissionTable: React.FC<FormPromissionTableProps> = (props) => {
                 return (
                     <Switch
                         size="small"
-                        checked={record.hidden}
+                        checked={record.type==='HIDDEN'}
                         onChange={(value) => {
-                            promissionManager.changeHidden(code, record.id, value);
+                            promissionManager.changeHidden(code, record.fieldCode, value);
                         }}
                     />
                 )
@@ -86,6 +93,7 @@ const FormPromissionTable: React.FC<FormPromissionTableProps> = (props) => {
             title={() => {
                 return `表单：${props.title || '未选择表单'}`;
             }}
+            rowKey={"id"}
             columns={columns}
             dataSource={datasource}
             style={{
@@ -97,10 +105,10 @@ const FormPromissionTable: React.FC<FormPromissionTableProps> = (props) => {
 }
 
 export const PromissionTable: React.FC<PromissionTableProps> = (props) => {
-    const promissionManager = new PromissionManager(props.value, props.onChange);
     const {state} = useDesignContext();
     const form = state.workflow.form;
-    promissionManager.initFormPromission(form);
+    const promissionManager = new PromissionManager(form,props.value, props.onChange);
+    promissionManager.initFormPromission();
 
     const formList = form.subForms || [];
 

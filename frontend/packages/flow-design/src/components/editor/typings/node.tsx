@@ -1,4 +1,4 @@
-import {IFlowValue} from '@flowgram.ai/form-materials';
+import React from "react";
 import {
     FixedLayoutPluginContext,
     FlowNodeEntity,
@@ -6,16 +6,13 @@ import {
     FlowNodeMeta as FlowNodeMetaDefault,
     FlowNodeRegistry as FlowNodeRegistryDefault,
 } from '@flowgram.ai/fixed-layout-editor';
-
-import {type JsonSchema} from './json-schema';
 import {ActionType, NodeStrategyType} from "@/components/editor/typings/node-type";
 
 export interface FlowNodeJSON extends FlowNodeJSONDefault {
     data: {
         title?: string;
-        inputsValues?: Record<string, IFlowValue>;
-        inputs?: JsonSchema;
-        outputs?: JsonSchema;
+        actions?: any[];
+        order?:number;
         [key: string]: any;
     };
 }
@@ -25,7 +22,7 @@ export interface FlowNodeMeta extends FlowNodeMetaDefault {
     style?: React.CSSProperties;
     editTitleDisable?: boolean
     strategies?: NodeStrategyType[]
-    actions?:ActionType[]
+    actions?: ActionType[]
 }
 
 export interface FlowNodeRegistry extends FlowNodeRegistryDefault {

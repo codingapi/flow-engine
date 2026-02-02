@@ -37,7 +37,7 @@ export const NodeTaps: React.FC<NodeTapsProps> = (props) => {
         })
     }
 
-    if (strategyManager().getComponent('FormFieldPermissionStrategy')) {
+    if (strategyManager().hasKey('FormFieldPermissionStrategy')) {
         items.push({
             key: 'promission',
             label: `权限配置`,

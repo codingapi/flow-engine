@@ -6,7 +6,7 @@ export const TabPromission: React.FC = () => {
 
     return (
         <Field
-            name="promissions"
+            name="FormFieldPermissionStrategy.fieldPermissions"
             render={({field: {value, onChange}}: FieldRenderProps<any>) => {
                 return (
                     <PromissionTable

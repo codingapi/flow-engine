@@ -2,44 +2,74 @@ import {FlowForm} from "@/pages/design-panel/types";
 
 export class PromissionManager {
 
-    private data: Map<string, any[]>;
-    private readonly onChange: (data: Map<string, any[]>) => void;
+    private data: any[];
+    private readonly onChange: (data: any[]) => void;
+    private readonly form: FlowForm;
+    private readonly formList:FlowForm[];
 
-    public constructor(data: Map<string, any[]>, onChange: (data: Map<string, any[]>) => void) {
+    public constructor(form: FlowForm, data: any[], onChange: (data: any[]) => void) {
+        this.form = form;
         this.onChange = onChange;
         this.data = data;
+        this.formList =[form,...(form.subForms||[])];
     }
 
     public getDatasource(code: string) {
-        return this.data.get(code) || [];
+        const list = this.data.filter(item => item.formCode === code) || [];
+        return list.map(item => {
+            return {
+                ...item,
+                fieldName:this.getFieldName(item.formCode,item.fieldCode)
+            }
+        });
     }
 
-    public initFormPromission(form: FlowForm) {
-        if (this.data) {
+    private getFieldName(formCode:string,fieldCode:string){
+        for (const form of this.formList){
+            if(form.code == formCode){
+                const fields = form.fields || [];
+                for (const field of fields){
+                    if(field.code == fieldCode){
+                        return field.name;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public initFormPromission() {
+        if (this.data && this.data.length > 0) {
             return;
         }
 
-        const data = new Map<string, any[]>();
-        data.set(form.code, form.fields.map(field => {
+        const form = this.form;
+
+        let data: any[] = [];
+
+        const mainList = form.fields.map(field => {
             return {
                 id: field.id,
-                name: field.name,
-                readable: true,
-                editable: true,
-                hidden: false,
+                fieldName: field.name,
+                fieldCode: field.code,
+                formCode: form.code,
+                type: 'WRITE',
             }
-        }));
+        });
+        data.push(...mainList);
+
         if (form.subForms) {
             for (const subForm of form.subForms || []) {
-                data.set(subForm.code, subForm.fields.map(field => {
+                const list = subForm.fields.map(field => {
                     return {
                         id: field.id,
-                        name: field.name,
-                        readable: true,
-                        editable: true,
-                        hidden: false,
+                        formCode: subForm.code,
+                        fieldName: field.name,
+                        fieldCode: field.code,
+                        type: 'WRITE',
                     }
-                }));
+                });
+                data.push(...list);
             }
         }
 
@@ -48,41 +78,38 @@ export class PromissionManager {
     }
 
 
-    private changeFieldValue(code: string, id: any, field: string, value: boolean) {
-        const keys = Array.from(this.data.keys());
-        const newData = new Map<string, any[]>();
-        for (const formCode of keys) {
-            const list = this.data.get(formCode) || [];
-            if (formCode === code) {
-                newData.set(formCode,
-                    list.map((item: any) => {
-                        if (item.id === id) {
-                            return {
-                                ...item,
-                                [field]: value,
-                            }
-                        }else {
-                            return item;
-                        }
-                    })
-                );
+    private changeFieldValue(code: string, fieldCode: string, value: string) {
+        let newData: any[] = [];
+        for (const item of this.data) {
+            if (item['formCode'] === code && item['fieldCode'] === fieldCode) {
+                newData.push({
+                    ...item,
+                    type: value,
+                });
             } else {
-                newData.set(formCode, list);
+                newData.push(item);
             }
         }
         this.onChange(newData);
+        this.data = newData;
     }
 
-    public changeHidden(code: string, id: any, value: boolean) {
-        this.changeFieldValue(code, id, 'hidden', value);
+    public changeHidden(formCode: string, fieldCode: string, value: boolean) {
+        if (value) {
+            this.changeFieldValue(formCode, fieldCode, 'HIDDEN');
+        }
     }
 
-    public changeReadable(code: string, id: any, value: boolean) {
-        this.changeFieldValue(code, id, 'readable', value);
+    public changeReadable(formCode: string, fieldCode: string, value: boolean) {
+        if (value) {
+            this.changeFieldValue(formCode, fieldCode, 'READ');
+        }
     }
 
-    public changeEditable(code: string, id: any, value: boolean) {
-        this.changeFieldValue(code, id, 'editable', value);
+    public changeEditable(formCode: string, fieldCode: string, value: boolean) {
+        if (value) {
+            this.changeFieldValue(formCode, fieldCode, 'WRITE');
+        }
     }
 
 }

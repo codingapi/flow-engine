@@ -11,13 +11,13 @@ import java.util.Map;
 public class FormFieldPermission {
 
     private String formCode;
-    private String fieldName;
+    private String fieldCode;
     private PermissionType type;
 
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
         map.put("formCode", formCode);
-        map.put("fieldName", fieldName);
+        map.put("fieldCode", fieldCode);
         map.put("type", type.name());
         return map;
     }
@@ -25,7 +25,7 @@ public class FormFieldPermission {
     public static FormFieldPermission fromMap(Map<String, Object> map) {
         FormFieldPermission permission = new FormFieldPermission();
         permission.setFormCode((String) map.get("formCode"));
-        permission.setFieldName((String) map.get("fieldName"));
+        permission.setFieldCode((String) map.get("fieldCode"));
         permission.setType(PermissionType.valueOf((String) map.get("type")));
         return permission;
     }

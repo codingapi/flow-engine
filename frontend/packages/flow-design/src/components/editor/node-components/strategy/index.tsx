@@ -3,7 +3,6 @@ import React from "react";
 import {AdviceStrategy} from "@/components/editor/node-components/strategy/advice";
 import {DelayStrategy} from "@/components/editor/node-components/strategy/deplay";
 import {ErrorTriggerStrategy} from "@/components/editor/node-components/strategy/error-trigger";
-import {FormFieldPermissionStrategy} from "@/components/editor/node-components/strategy/form-field-permission";
 import {MultiOperatorAuditStrategy} from "@/components/editor/node-components/strategy/multi-operator-audit";
 import {NodeTitleStrategy} from "@/components/editor/node-components/strategy/node-title";
 import {OperatorLoadStrategy} from "@/components/editor/node-components/strategy/operator-load";
@@ -23,7 +22,6 @@ const strategiesMap: Map<NodeStrategyType, React.ComponentType> = new Map();
 strategiesMap.set('AdviceStrategy', AdviceStrategy);
 strategiesMap.set('DelayStrategy', DelayStrategy);
 strategiesMap.set('ErrorTriggerStrategy', ErrorTriggerStrategy);
-strategiesMap.set('FormFieldPermissionStrategy', FormFieldPermissionStrategy);
 strategiesMap.set('MultiOperatorAuditStrategy', MultiOperatorAuditStrategy);
 strategiesMap.set('NodeTitleStrategy', NodeTitleStrategy);
 strategiesMap.set('OperatorLoadStrategy', OperatorLoadStrategy);
@@ -47,6 +45,16 @@ export class StrategyManager {
     public constructor(strategies: NodeStrategyType[]) {
         this.strategies = strategies;
     }
+
+    public hasKey(type: NodeStrategyType): boolean {
+        for (const key in this.strategies) {
+            if (this.strategies[key] === type) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public getComponent(type: NodeStrategyType): React.ComponentType | undefined {
         for (const key in this.strategies) {

@@ -5,17 +5,15 @@ export const initialData: FlowDocumentJSON = {
         {
             id: 'start',
             type: 'START',
-            data:{
-                title:'开始节点',
-                value:'start-value'
+            data: {
+                title: '开始节点',
             }
         },
         {
             id: 'end',
             type: 'END',
-            data:{
-                title:'结束节点',
-                value:'end-value'
+            data: {
+                title: '结束节点',
             }
         },
     ],

@@ -45,7 +45,7 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
     public void verifyNode(FormMeta form) {
         Map<String, String> fieldTypes = form.getAllFieldTypeMaps();
         for (FormFieldPermission permission : fieldPermissions) {
-            String key = permission.getFormCode() + "." + permission.getFieldName();
+            String key = permission.getFormCode() + "." + permission.getFieldCode();
             if (!fieldTypes.containsKey(key)) {
                 throw FlowPermissionException.fieldNotFound(key);
             }
@@ -74,20 +74,20 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
                     for (int i = 0; i < currentSubFormData.size(); i++) {
                         Map<String, Object> currentSubFormItem = currentSubFormData.get(i);
                         Map<String, Object> latestSubFormItem = latestSubFormData.get(i);
-                        Object currentValue = currentSubFormItem.get(permission.getFieldName());
-                        Object latestValue = latestSubFormItem.get(permission.getFieldName());
+                        Object currentValue = currentSubFormItem.get(permission.getFieldCode());
+                        Object latestValue = latestSubFormItem.get(permission.getFieldCode());
                         if (!currentValue.equals(latestValue)) {
-                            throw FlowPermissionException.fieldReadOnly(permission.getFieldName());
+                            throw FlowPermissionException.fieldReadOnly(permission.getFieldCode());
                         }
                     }
                 }
             } else {
                 // 在只读权限下不允许修改数据
                 if (permission.getType() == PermissionType.READ) {
-                    Object currentValue = currentData.get(permission.getFieldName());
-                    Object latestValue = latestData.get(permission.getFieldName());
+                    Object currentValue = currentData.get(permission.getFieldCode());
+                    Object latestValue = latestData.get(permission.getFieldCode());
                     if (!currentValue.equals(latestValue)) {
-                        throw FlowPermissionException.fieldReadOnly(permission.getFieldName());
+                        throw FlowPermissionException.fieldReadOnly(permission.getFieldCode());
                     }
                 }
             }
