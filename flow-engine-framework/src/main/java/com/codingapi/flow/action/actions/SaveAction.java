@@ -18,6 +18,7 @@ public class SaveAction extends BaseAction {
     public SaveAction() {
         this.id = RandomUtils.generateStringId();
         this.title = "保存";
+        this.enable = true;
         this.type = ActionType.SAVE.name();
         this.display = new ActionDisplay(this.title);
     }

@@ -49,6 +49,8 @@ export interface FlowForm {
     fields:FormField[];
     subForms:FlowForm[];
 }
+
+
 // 流程配置
 export interface Workflow {
     id: string;
@@ -56,9 +58,40 @@ export interface Workflow {
     code: string;
     form: FlowForm;
     strategies?:any[];
-    nodes?:any[];
+    nodes?:FlowNode[];
+    edges?:FlowEdge[];
 }
 
+// 节点关系
+export interface FlowEdge {
+    form:string;
+    to:string;
+}
+
+// 动作展示
+export interface ActionDisplay{
+    title:string;
+    style:any;
+    icon:string;
+}
+
+// 节点动作
+export interface FlowAction{
+    id:string;
+    type:string;
+    title:string;
+    display:ActionDisplay;
+}
+
+// 流程节点
+export interface FlowNode{
+    id:string;
+    name:string;
+    type:string;
+    order:number;
+    actions:FlowAction[];
+    strategies:any[];
+}
 
 // 全局状态
 export interface State {

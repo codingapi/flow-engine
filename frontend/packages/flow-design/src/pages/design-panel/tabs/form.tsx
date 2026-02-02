@@ -4,7 +4,7 @@ import {Table, TableProps} from "@/components/table";
 import {Button, Flex, Form, FormInstance, Input, Modal, Popconfirm, Select, Space, Switch, Tabs,Empty} from "antd";
 import {FormFieldOptions} from "@/pages/design-panel/types";
 import {useDesignContext} from "@/pages/design-panel/hooks/use-design-context";
-import {WorkflowFormManager} from "@/pages/design-panel/manager/workflow/form";
+import {WorkflowFormManager} from "@/pages/design-panel/manager/form";
 
 interface FormTableProps {
     name: string;

@@ -1,7 +1,7 @@
 import {DesignPanelApi, initStateData, State, TabPanelType} from "../types";
 import {Dispatch} from "@flow-engine/flow-core";
 import {FormActionContext} from "@/pages/design-panel/presenters/form";
-import {WorkflowFormManager} from "@/pages/design-panel/manager/workflow/form";
+import {WorkflowFormManager} from "@/pages/design-panel/manager/form";
 
 export class Presenter {
 

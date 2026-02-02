@@ -1,4 +1,4 @@
-import {FlowForm, FormField} from "../../types";
+import {FlowForm, FormField} from "../types";
 
 export class WorkflowFormManager {
 

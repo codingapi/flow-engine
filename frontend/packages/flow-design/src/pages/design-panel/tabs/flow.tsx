@@ -1,6 +1,7 @@
 import React from "react";
 import {FlowEditor, FlowEditorAction} from "@/components/editor";
 import {useDesignContext} from "@/pages/design-panel/hooks/use-design-context";
+import {NodeManager} from "@/pages/design-panel/manager/node";
 
 export const TabFlow = () => {
 
@@ -9,13 +10,15 @@ export const TabFlow = () => {
 
     const actionRef = React.useRef<FlowEditorAction | null>(null);
 
+    const nodeManager = new NodeManager();
+
     // 注册form行为
     React.useEffect(() => {
         formActionContext.addAction({
             save() {
                 const data = actionRef.current?.getData();
                 return {
-                    nodes: data?.nodes || []
+                    nodes: nodeManager.toData(data?.nodes || []),
                 }
             },
             key(): string {
@@ -24,7 +27,7 @@ export const TabFlow = () => {
         });
 
         if (state.workflow.nodes) {
-            const nodes = state.workflow.nodes;
+            const nodes = nodeManager.toRender(state.workflow.nodes || []);
             actionRef.current?.resetData({
                 nodes
             } as any);
@@ -36,8 +39,7 @@ export const TabFlow = () => {
     }, []);
 
     React.useEffect(() => {
-        const nodes = state.workflow.nodes;
-        console.log('reset flow data:', nodes);
+        const nodes = nodeManager.toRender(state.workflow.nodes || []);
         actionRef.current?.resetData({
             nodes
         } as any);

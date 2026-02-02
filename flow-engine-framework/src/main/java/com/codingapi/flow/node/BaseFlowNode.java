@@ -150,7 +150,9 @@ public abstract class BaseFlowNode implements IFlowNode {
         T node = IMapConvertor.fromMap(map, clazz);
         node.setId((String) map.get("id"));
         node.setName((String) map.get("name"));
-        node.setOrder(Integer.parseInt((String) map.get("order")));
+        if(map.get("order")!=null) {
+            node.setOrder(Integer.parseInt((String) map.get("order")));
+        }
         node.setActions(NodeMapBuilder.loadActions(map));
         node.setStrategies(NodeMapBuilder.loadNodeStrategies(map));
         return node;

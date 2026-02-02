@@ -34,6 +34,11 @@ public interface IFlowAction extends IMapConvertor, ICopyAbility<IFlowAction> {
     ActionDisplay display();
 
     /**
+     * 是否可用
+     */
+    boolean enable();
+
+    /**
      * 执行动作
      */
     List<FlowRecord> generateRecords(FlowSession flowSession);

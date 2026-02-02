@@ -64,7 +64,7 @@ public class FlowActionService {
             throw FlowNotFoundException.node(flowRecord.getNodeId());
         }
         IFlowAction flowAction = currentNode.actionManager().getActionById(request.getAdvice().getActionId());
-        if (flowAction == null) {
+        if (flowAction == null || !flowAction.enable()) {
             throw FlowNotFoundException.action(request.getAdvice().getActionId());
         }
 

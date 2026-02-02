@@ -7,7 +7,7 @@ export class WorkflowStrategyManager {
     constructor() {
     }
 
-    public toForm(strategies: any[]): any {
+    public toRender(strategies: any[]): any {
         let value = {};
         for (const key in strategies){
            const currentValue = strategies[key];
@@ -24,7 +24,7 @@ export class WorkflowStrategyManager {
     }
 
 
-    public toList(values: any) {
+    public toData(values: any) {
         if(ObjectUtils.isEmptyObject(values)){
             return null;
         }

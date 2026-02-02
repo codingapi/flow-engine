@@ -25,13 +25,19 @@ export class ActionManager {
 
     public getDatasource(actions: ActionType[]): any[] {
         if (this.data) {
-            return this.data;
+            return this.data.map(item => {
+                const enable = item.enable;
+                return {
+                    ...item,
+                    enable: enable===undefined?true:enable,
+                }
+            });
         }
         const list = actions.map(type => {
             const title = actionOptions.filter(value => value.value === type)[0]?.label || '未命名操作';
             return {
                 id: nanoid(),
-                enable: type !== 'CUSTOM',
+                enable: true,
                 title: title,
                 type: type,
             }
