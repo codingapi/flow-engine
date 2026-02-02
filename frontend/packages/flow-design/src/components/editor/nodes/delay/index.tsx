@@ -1,6 +1,5 @@
 import {FlowNodeRegistry} from '../../typings';
 import {formMeta} from './form-meta';
-import {nanoid} from "nanoid";
 
 export const DelayNodeRegistry: FlowNodeRegistry = {
     type: 'DELAY',
@@ -8,9 +7,6 @@ export const DelayNodeRegistry: FlowNodeRegistry = {
         copyDisable: true,
         addDisable: false,
         expandable: false, // disable expanded
-        strategies:[
-            'DelayStrategy'
-        ]
     },
     info: {
         icon: 'DELAY',
@@ -19,15 +15,5 @@ export const DelayNodeRegistry: FlowNodeRegistry = {
     /**
      * Render node via formMeta
      */
-    formMeta,
-    onAdd: (ctx, from) => {
-        return {
-            id: `delay_${nanoid()}`,
-            type: 'DELAY',
-            data: {
-                title: `延迟节点`,
-                value: 'DELAY Value'
-            },
-        }
-    }
+    formMeta
 };

@@ -5,9 +5,6 @@ export class NodeManager {
     public static readonly STRATEGY_SUFFIX = 'Strategy';
     public static readonly STRATEGY_KEY = 'strategyType';
 
-    public constructor() {
-    }
-
     public toRender(nodes: FlowNode[]) {
         return nodes.map(node => {
             return this.toItemRender(node);
@@ -25,6 +22,7 @@ export class NodeManager {
                 title: node.name,
                 order: node.order,
                 actions: node.actions,
+                script:node.script,
                 ...this.toStrategyRender(node),
             },
             blocks: [...blocks]

@@ -1,7 +1,6 @@
 import {FlowNodeRegistry} from '../../typings';
 import {formMeta} from './form-meta';
 import {FlowNodeSplitType} from "@flowgram.ai/fixed-layout-editor";
-import {nanoid} from "nanoid";
 
 export const ParallelNodeRegistry: FlowNodeRegistry = {
     type: 'PARALLEL',
@@ -22,32 +21,5 @@ export const ParallelNodeRegistry: FlowNodeRegistry = {
     /**
      * Render node via formMeta
      */
-    formMeta,
-    onAdd: (ctx, from) => {
-        return {
-            id: `parallel_${nanoid()}`,
-            type: 'PARALLEL',
-            data: {
-                title: `并行分支`,
-            },
-            blocks: [
-                {
-                    id: `parallel_branch_${nanoid(5)}`,
-                    type: 'PARALLEL_BRANCH',
-                    data: {
-                        title: `并行分支节点`,
-                        value: 'branch Value'
-                    },
-                },
-                {
-                    id: `parallel_branch_${nanoid(5)}`,
-                    type: 'PARALLEL_BRANCH',
-                    data: {
-                        title: `并行分支节点`,
-                        value: 'branch Value'
-                    },
-                }
-            ]
-        }
-    }
+    formMeta
 };

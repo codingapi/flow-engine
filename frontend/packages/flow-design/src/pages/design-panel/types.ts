@@ -91,7 +91,8 @@ export interface FlowNode{
     order:number;
     actions:FlowAction[];
     strategies:any[];
-    blocks?:FlowNode[]
+    blocks?:FlowNode[];
+    script?:string;
 }
 
 // 全局状态

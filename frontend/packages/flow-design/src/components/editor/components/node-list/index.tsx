@@ -62,7 +62,7 @@ export const NodeList: React.FC<NodeListProps> = (props) => {
     const presenter = context.getPresenter();
     const handleClick = (registry: FlowNodeRegistry) => {
         const nodeType = registry.type;
-        presenter.createNode(nodeType as string).then(currentNode => {
+        presenter.createNode(props.from.id,nodeType as string).then(currentNode => {
             props.onSelect?.(currentNode);
         });
     };

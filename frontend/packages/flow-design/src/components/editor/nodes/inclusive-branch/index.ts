@@ -1,6 +1,5 @@
 import {FlowNodeRegistry} from '../../typings';
 import {formMeta} from './form-meta';
-import {nanoid} from "nanoid";
 
 export const InclusiveBranchNodeRegistry: FlowNodeRegistry = {
     type: 'INCLUSIVE_BRANCH',
@@ -8,9 +7,6 @@ export const InclusiveBranchNodeRegistry: FlowNodeRegistry = {
     meta: {
         copyDisable: true,
         addDisable: true,
-        strategies:[
-            'InclusiveBranchStrategy'
-        ]
     },
     info: {
         icon: 'INCLUSIVE_BRANCH',
@@ -20,14 +16,4 @@ export const InclusiveBranchNodeRegistry: FlowNodeRegistry = {
      * Render node via formMeta
      */
     formMeta,
-    onAdd(ctx, from) {
-        return {
-            id: `inclusive_branch_${nanoid(5)}`,
-            type: 'INCLUSIVE_BRANCH',
-            data: {
-                title: `包容分支节点`,
-                value: 'INCLUSIVE_BRANCH Value'
-            },
-        };
-    }
 };

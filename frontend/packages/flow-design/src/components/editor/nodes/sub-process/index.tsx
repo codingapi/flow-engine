@@ -8,9 +8,6 @@ export const SubProcessNodeRegistry: FlowNodeRegistry = {
         copyDisable: true,
         addDisable: false,
         expandable: false, // disable expanded
-        strategies:[
-            'SubProcessStrategy'
-        ]
     },
     info: {
         icon: 'SUB_PROCESS',
@@ -19,15 +16,5 @@ export const SubProcessNodeRegistry: FlowNodeRegistry = {
     /**
      * Render node via formMeta
      */
-    formMeta,
-    onAdd: (ctx, from) => {
-        return {
-            id: `sub_process_${nanoid()}`,
-            type: 'SUB_PROCESS',
-            data: {
-                title: `子流程节点`,
-                value: 'SUB_PROCESS Value'
-            },
-        }
-    }
+    formMeta
 };

@@ -148,7 +148,7 @@ export function useEditorProps(initialData:FlowDocumentJSON,nodeRegistries: Flow
                 onApply: debounce((ctx, opt) => {
                     if (ctx.document.disposed) return;
                     // Listen change to trigger auto save
-                    console.log('auto save: ', ctx.document.toJSON());
+                    console.log('flow-engine auto save: ', ctx.document.toJSON());
                 }, 100),
             },
             /**

@@ -38,23 +38,13 @@ strategiesMap.set('InclusiveBranchStrategy', InclusiveBranchStrategy);
 strategiesMap.set('ParallelBranchStrategy', ParallelBranchStrategy);
 
 
-export class StrategyManager {
+export class StrategyRenderFactory {
 
-    private readonly strategies: NodeStrategyType[] = [];
+    private readonly strategies: string[] = [];
 
-    public constructor(strategies: NodeStrategyType[]) {
+    public constructor(strategies: string[]) {
         this.strategies = strategies;
     }
-
-    public hasKey(type: NodeStrategyType): boolean {
-        for (const key in this.strategies) {
-            if (this.strategies[key] === type) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     public getComponent(type: NodeStrategyType): React.ComponentType | undefined {
         for (const key in this.strategies) {

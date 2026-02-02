@@ -1,6 +1,5 @@
 import {FlowNodeRegistry} from '../../typings';
 import {formMeta} from './form-meta';
-import {nanoid} from "nanoid";
 
 export const NotifyNodeRegistry: FlowNodeRegistry = {
     type: 'NOTIFY',
@@ -8,12 +7,6 @@ export const NotifyNodeRegistry: FlowNodeRegistry = {
         copyDisable: true,
         addDisable: false,
         expandable: false, // disable expanded
-        strategies:[
-            'ErrorTriggerStrategy',
-            'NodeTitleStrategy',
-            'OperatorLoadStrategy',
-            'FormFieldPermissionStrategy'
-        ]
     },
     info: {
         icon: 'NOTIFY',
@@ -22,15 +15,5 @@ export const NotifyNodeRegistry: FlowNodeRegistry = {
     /**
      * Render node via formMeta
      */
-    formMeta,
-    onAdd: (ctx, from) => {
-        return {
-            id: `notify_${nanoid()}`,
-            type: 'NOTIFY',
-            data: {
-                title: `抄送节点`,
-                value: 'NOTIFY Value'
-            },
-        }
-    }
+    formMeta
 };

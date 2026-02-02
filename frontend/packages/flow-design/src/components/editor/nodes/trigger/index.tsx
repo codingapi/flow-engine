@@ -1,6 +1,5 @@
 import {FlowNodeRegistry} from '../../typings';
 import {formMeta} from './form-meta';
-import {nanoid} from "nanoid";
 
 export const TriggerNodeRegistry: FlowNodeRegistry = {
     type: 'TRIGGER',
@@ -8,9 +7,6 @@ export const TriggerNodeRegistry: FlowNodeRegistry = {
         copyDisable: true,
         addDisable: false,
         expandable: false, // disable expanded
-        strategies:[
-            'TriggerStrategy'
-        ]
     },
     info: {
         icon: 'TRIGGER',
@@ -19,15 +15,5 @@ export const TriggerNodeRegistry: FlowNodeRegistry = {
     /**
      * Render node via formMeta
      */
-    formMeta,
-    onAdd: (ctx, from) => {
-        return {
-            id: `trigger_${nanoid()}`,
-            type: 'TRIGGER',
-            data: {
-                title: `触发节点`,
-                value: 'TRIGGER Value'
-            },
-        }
-    }
+    formMeta
 };

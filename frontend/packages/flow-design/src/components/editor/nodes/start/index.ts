@@ -11,16 +11,6 @@ export const StartNodeRegistry: FlowNodeRegistry = {
         expandable: false, // disable expanded
         addDisable: true, // Start Node cannot be added
         editTitleDisable: true, // Start Node title cannot be edited,
-        strategies:[
-            'NodeTitleStrategy',
-            'FormFieldPermissionStrategy',
-            'RevokeStrategy'
-        ],
-        actions:[
-            'PASS',
-            'SAVE',
-            'CUSTOM'
-        ]
     },
     info: {
         icon: 'START',

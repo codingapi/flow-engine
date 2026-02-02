@@ -1,13 +1,10 @@
-import {DesignPanelApi, initStateData, State, TabPanelType} from "../types";
+import {DesignPanelApi, FlowNode, initStateData, State, TabPanelType} from "../types";
 import {Dispatch} from "@flow-engine/flow-core";
 import {FormActionContext} from "@/pages/design-panel/presenters/form";
 import {WorkflowFormManager} from "@/pages/design-panel/manager/form";
 import {NodeManager} from "@/pages/design-panel/manager/node";
 
 export class Presenter {
-
-
-
 
     private state: State;
     private readonly dispatch: Dispatch<State>;
@@ -31,16 +28,6 @@ export class Presenter {
     }
 
     private mergeWorkflow(prevWorkflow: any, currentWorkflow: any) {
-        const nodes:any[] = [];
-
-        if(currentWorkflow.nodes && currentWorkflow.nodes.length > 0){
-            nodes.push(...currentWorkflow.nodes);
-        }else {
-            if(prevWorkflow.nodes && prevWorkflow.nodes.length > 0){
-                nodes.push(...prevWorkflow.nodes);
-            }
-        }
-
         return {
             ...prevWorkflow,
             ...currentWorkflow,
@@ -48,11 +35,9 @@ export class Presenter {
                 ...prevWorkflow.form,
                 ...currentWorkflow.form,
             },
-            nodes: [
-                ...nodes
-            ]
         }
     }
+
 
     public updateViewPanelTab(tab: TabPanelType) {
         const values = this.formActionContext.save() as any;
@@ -67,6 +52,29 @@ export class Presenter {
             }
         });
     }
+
+    private updateWorkflowNode(fromId:string,newNode: FlowNode) {
+        this.dispatch((prevState: State) => {
+            const nodes = prevState.workflow.nodes || [];
+            const list:FlowNode[] = [];
+            for (const node of nodes) {
+                if (node.id === fromId) {
+                    list.push(node);
+                    list.push(newNode);
+                }else {
+                    list.push(node);
+                }
+            }
+            return {
+                ...prevState,
+                workflow: {
+                    ...prevState.workflow,
+                    nodes: list,
+                }
+            }
+        });
+    }
+
 
     private updateWorkflowForm(form: any) {
         this.dispatch((prevState: State) => {
@@ -129,8 +137,9 @@ export class Presenter {
         console.log('save latest:', latest);
     }
 
-    public async createNode(type:string) {
+    public async createNode(form:string,type:string) {
         const flowNode = await this.api.createNode(type);
+        this.updateWorkflowNode(form,flowNode);
         const nodeManager = new NodeManager();
         return nodeManager.toItemRender(flowNode);
     }

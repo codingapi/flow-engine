@@ -34,7 +34,6 @@ export const FlowEditor: React.FC<FlowEditorProps> = (props) => {
             return initialData;
         },
         resetData: (data:FlowDocumentJSON) => {
-            console.log("reset data", data);
             if (ref.current) {
                 if(data.nodes && data.nodes.length >0){
                     ref.current.document.fromJSON(data);

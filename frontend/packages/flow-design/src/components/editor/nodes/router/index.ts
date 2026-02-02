@@ -27,15 +27,5 @@ export const RouterNodeRegistry: FlowNodeRegistry = {
     /**
      * Render node via formMeta
      */
-    formMeta,
-    onAdd(ctx, from) {
-        return {
-            id: `router_${nanoid()}`,
-            type: 'ROUTER',
-            data: {
-                title: '路由节点',
-                value: 'ROUTER Value'
-            },
-        };
-    },
+    formMeta
 };

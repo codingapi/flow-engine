@@ -1,6 +1,5 @@
 import {FlowNodeRegistry} from '../../typings';
 import {formMeta} from './form-meta';
-import {nanoid} from "nanoid";
 
 export const ApprovalNodeRegistry: FlowNodeRegistry = {
     type: 'APPROVAL',
@@ -8,29 +7,6 @@ export const ApprovalNodeRegistry: FlowNodeRegistry = {
         copyDisable: true,
         addDisable: false,
         expandable: false, // disable expanded,
-        strategies:[
-            'TimeoutStrategy',
-            'MultiOperatorAuditStrategy',
-            'SameOperatorAuditStrategy',
-            'RecordMergeStrategy',
-            'ResubmitStrategy',
-            'AdviceStrategy',
-            'ErrorTriggerStrategy',
-            'NodeTitleStrategy',
-            'FormFieldPermissionStrategy',
-            'OperatorLoadStrategy',
-            'RevokeStrategy'
-        ],
-        actions:[
-            'PASS',
-            'REJECT',
-            'SAVE',
-            'ADD_AUDIT',
-            'TRANSFER',
-            'RETURN',
-            'DELEGATE',
-            'CUSTOM'
-        ]
     },
     info: {
         icon: 'APPROVAL',
@@ -39,15 +15,5 @@ export const ApprovalNodeRegistry: FlowNodeRegistry = {
     /**
      * Render node via formMeta
      */
-    formMeta,
-    onAdd: (ctx, from) => {
-        return {
-            id: `approval_${nanoid()}`,
-            type: 'APPROVAL',
-            data: {
-                title: `审批节点`,
-                value: 'APPROVAL Value'
-            },
-        }
-    }
+    formMeta
 };

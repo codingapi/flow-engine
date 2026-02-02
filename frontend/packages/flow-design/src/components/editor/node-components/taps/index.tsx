@@ -1,23 +1,17 @@
 import {Tabs, TabsProps} from "antd";
-import React, {useContext} from "react";
+import React from "react";
 import {TabBase} from "./base";
 import {TabAction} from "./action";
 import {TabPromission} from "./promission";
-import {NodeRenderContext} from "@/components/editor/context";
-import {StrategyManager} from "@/components/editor/node-components/strategy";
+import {useNodeDisplayManager} from "@/components/editor/hooks";
+
 
 interface NodeTapsProps {
 
 }
 
 export const NodeTaps: React.FC<NodeTapsProps> = (props) => {
-    const {node} = useContext(NodeRenderContext);
-    const actions = node.getNodeRegistry()?.meta.actions || [];
-    const strategies = node.getNodeRegistry()?.meta.strategies || [];
-
-    const strategyManager = React.useCallback(() => {
-        return new StrategyManager(strategies);
-    }, [strategies]);
+    const nodeDisplayManager = useNodeDisplayManager();
 
     const items: TabsProps['items'] = [];
 
@@ -28,7 +22,7 @@ export const NodeTaps: React.FC<NodeTapsProps> = (props) => {
         destroyOnHidden: true,
     });
 
-    if (actions.length > 0) {
+    if (nodeDisplayManager.showAction()) {
         items.push({
             key: 'action',
             label: `按钮配置`,
@@ -36,8 +30,7 @@ export const NodeTaps: React.FC<NodeTapsProps> = (props) => {
             destroyOnHidden: true,
         })
     }
-
-    if (strategyManager().hasKey('FormFieldPermissionStrategy')) {
+    if (nodeDisplayManager.showPromission()) {
         items.push({
             key: 'promission',
             label: `权限配置`,

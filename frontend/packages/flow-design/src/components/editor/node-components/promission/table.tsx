@@ -20,7 +20,6 @@ const FormPromissionTable: React.FC<FormPromissionTableProps> = (props) => {
     const promissionManager = props.promissionManager;
     const datasource = promissionManager.getDatasource(code);
 
-    console.log('load datasource',datasource);
     const columns = [
         {
             title: 'id',

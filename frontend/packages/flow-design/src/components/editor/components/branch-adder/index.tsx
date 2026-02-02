@@ -35,7 +35,7 @@ export const BranchAdderRender:React.FC<BranchAdderProps> = (props) => {
 
     const handleAddBranch = () => {
 
-        presenter.createNode(props.addType).then(block=>{
+        presenter.createNode(node.id,props.addType).then(block=>{
             operation.addBlock(
                 node,
                 block,

@@ -1,14 +1,12 @@
-import React, {useContext} from "react";
+import React from "react";
 import {Flex} from "antd";
-import {NodeRenderContext} from "@/components/editor/context";
-import {StrategyManager} from "@/components/editor/node-components/strategy";
+import {useNodeDisplayManager} from "@/components/editor/hooks";
 
 export const TabBase:React.FC = () => {
-    const {node} = useContext(NodeRenderContext);
-    const strategies = node.getNodeRegistry()?.meta.strategies || [];
-    const strategyManager = React.useCallback(()=>{
-        return new StrategyManager(strategies);
-    },[strategies]);
+
+    const nodeDisplayManager = useNodeDisplayManager();
+    const strategyRenderManager = nodeDisplayManager.getStrategyRenderManager();
+
     return (
         <Flex
             justify="center"
@@ -19,22 +17,22 @@ export const TabBase:React.FC = () => {
                 padding: 8,
             }}
         >
-            {strategyManager().render('OperatorLoadStrategy')}
-            {strategyManager().render('NodeTitleStrategy')}
-            {strategyManager().render('MultiOperatorAuditStrategy')}
-            {strategyManager().render('SameOperatorAuditStrategy')}
-            {strategyManager().render('ErrorTriggerStrategy')}
-            {strategyManager().render('DelayStrategy')}
-            {strategyManager().render('ResubmitStrategy')}
-            {strategyManager().render('AdviceStrategy')}
-            {strategyManager().render('TimeoutStrategy')}
-            {strategyManager().render('RevokeStrategy')}
-            {strategyManager().render('TriggerStrategy')}
-            {strategyManager().render('RecordMergeStrategy')}
-            {strategyManager().render('SubProcessStrategy')}
-            {strategyManager().render('ConditionBranchStrategy')}
-            {strategyManager().render('InclusiveBranchStrategy')}
-            {strategyManager().render('ParallelBranchStrategy')}
+            {strategyRenderManager.render('OperatorLoadStrategy')}
+            {strategyRenderManager.render('NodeTitleStrategy')}
+            {strategyRenderManager.render('MultiOperatorAuditStrategy')}
+            {strategyRenderManager.render('SameOperatorAuditStrategy')}
+            {strategyRenderManager.render('ErrorTriggerStrategy')}
+            {strategyRenderManager.render('DelayStrategy')}
+            {strategyRenderManager.render('ResubmitStrategy')}
+            {strategyRenderManager.render('AdviceStrategy')}
+            {strategyRenderManager.render('TimeoutStrategy')}
+            {strategyRenderManager.render('RevokeStrategy')}
+            {strategyRenderManager.render('TriggerStrategy')}
+            {strategyRenderManager.render('RecordMergeStrategy')}
+            {strategyRenderManager.render('SubProcessStrategy')}
+            {strategyRenderManager.render('ConditionBranchStrategy')}
+            {strategyRenderManager.render('InclusiveBranchStrategy')}
+            {strategyRenderManager.render('ParallelBranchStrategy')}
 
         </Flex>
     )

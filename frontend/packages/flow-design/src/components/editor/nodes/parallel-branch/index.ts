@@ -8,9 +8,13 @@ export const ParallelBranchNodeRegistry: FlowNodeRegistry = {
     meta: {
         copyDisable: true,
         addDisable: true,
+        sidebarDisable:true,
         strategies:[
             'ParallelBranchStrategy'
-        ]
+        ],
+        style:{
+            width: '100%',
+        }
     },
     info: {
         icon: 'PARALLEL_BRANCH',
