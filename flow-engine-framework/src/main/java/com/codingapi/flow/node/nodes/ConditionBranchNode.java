@@ -20,7 +20,7 @@ import java.util.Map;
 public class ConditionBranchNode extends BaseFlowNode {
 
     public static final String NODE_TYPE = NodeType.CONDITION_BRANCH.name();
-    public static final String DEFAULT_NAME = "分支节点";
+    public static final String DEFAULT_NAME = "条件节点节点";
 
     /**
      * 条件脚本

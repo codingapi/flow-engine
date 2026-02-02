@@ -3,18 +3,16 @@ import {FormMeta, FormRenderProps, ValidateTrigger,} from '@flowgram.ai/fixed-la
 
 import {FlowNodeJSON} from '../../typings';
 import {BranchAdderRender} from "@/components/editor/components/branch-adder";
-import {ParallelBranchNodeRegistry} from "@/components/editor/nodes/parallel-branch";
 
 export const renderForm = ({form}: FormRenderProps<FlowNodeJSON['data']>) => {
 
     return (
         <BranchAdderRender
             buttonText={'添加并行分支'}
-            onAdd={ParallelBranchNodeRegistry.onAdd}
+            addType={'PARALLEL_BRANCH'}
         />
     );
 };
-
 
 
 export const formMeta: FormMeta<FlowNodeJSON['data']> = {

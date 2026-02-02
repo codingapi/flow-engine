@@ -7,6 +7,8 @@ import {NodeHeader} from "@/components/editor/node-components/header";
 import {Button} from "antd";
 import {nodeFormPanelFactory} from "@/components/editor/components/sidebar";
 import { usePanelManager } from "@flowgram.ai/panel-manager-plugin";
+import {useDesignContext} from "@/pages/design-panel/hooks/use-design-context";
+import {NodeType} from "@/components/editor/typings/node-type";
 
 interface BranchAdderPropsType {
     activated?: boolean;
@@ -19,7 +21,7 @@ export const BranchAdder: React.FC<BranchAdderPropsType> = (props: BranchAdderPr
 
 interface BranchAdderProps {
     buttonText: string;
-    onAdd?: (ctx: FixedLayoutPluginContext, from: FlowNodeEntity) => FlowNodeJSON;
+    addType:NodeType
 }
 
 export const BranchAdderRender:React.FC<BranchAdderProps> = (props) => {
@@ -28,19 +30,24 @@ export const BranchAdderRender:React.FC<BranchAdderProps> = (props) => {
     const ctx = useClientContext();
     const {operation, playground} = ctx;
     const panelManager = usePanelManager();
+    const {context} = useDesignContext();
+    const presenter = context.getPresenter();
 
     const handleAddBranch = () => {
-        operation.addBlock(
-            node,
-            props.onAdd!(ctx, node),
-            {
-                index: 0,
-            }
-        );
 
-        setTimeout(()=>{
-            handleClose();
-        },10)
+        presenter.createNode(props.addType).then(block=>{
+            operation.addBlock(
+                node,
+                block,
+                {
+                    index: 0,
+                }
+            );
+
+            setTimeout(()=>{
+                handleClose();
+            },10)
+        });
     }
 
     const handleClose = useCallback(() => {

@@ -91,6 +91,7 @@ export interface FlowNode{
     order:number;
     actions:FlowAction[];
     strategies:any[];
+    blocks?:FlowNode[]
 }
 
 // 全局状态
@@ -127,4 +128,6 @@ export interface DesignPanelApi {
     load(id:string): Promise<Workflow>;
 
     save(body:any): Promise<void>;
+
+    createNode(type:string):Promise<FlowNode>;
 }

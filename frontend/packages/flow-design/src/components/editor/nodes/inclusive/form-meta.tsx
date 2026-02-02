@@ -3,7 +3,6 @@ import {FormMeta, FormRenderProps, ValidateTrigger,} from '@flowgram.ai/fixed-la
 
 import {FlowNodeJSON} from '../../typings';
 import {BranchAdderRender} from "@/components/editor/components/branch-adder";
-import {InclusiveBranchNodeRegistry} from "@/components/editor/nodes/inclusive-branch";
 
 
 export const renderForm = ({form}: FormRenderProps<FlowNodeJSON['data']>) => {
@@ -11,7 +10,7 @@ export const renderForm = ({form}: FormRenderProps<FlowNodeJSON['data']>) => {
     return (
         <BranchAdderRender
             buttonText={'添加包容分支'}
-            onAdd={InclusiveBranchNodeRegistry.onAdd}
+            addType={'INCLUSIVE_BRANCH'}
         />
     );
 };

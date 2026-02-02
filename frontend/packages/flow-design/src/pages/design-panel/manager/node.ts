@@ -10,17 +10,25 @@ export class NodeManager {
 
     public toRender(nodes: FlowNode[]) {
         return nodes.map(node => {
-            return {
-                id: node.id,
-                type: node.type,
-                data: {
-                    title: node.name,
-                    order: node.order,
-                    actions: node.actions,
-                    ...this.toStrategyRender(node),
-                }
-            }
+            return this.toItemRender(node);
         });
+    }
+
+    public toItemRender(node: FlowNode) {
+        const blocks:any[] = (node.blocks || [])
+            .map(item => {return this.toItemRender(item)});
+
+        return {
+            id: node.id,
+            type: node.type,
+            data: {
+                title: node.name,
+                order: node.order,
+                actions: node.actions,
+                ...this.toStrategyRender(node),
+            },
+            blocks: [...blocks]
+        }
     }
 
     public toData(nodes: any[]) {
@@ -36,7 +44,6 @@ export class NodeManager {
             }
         });
     }
-
 
     private toStrategyRender(node: FlowNode) {
         const strategies = node.strategies || [];

@@ -1,6 +1,11 @@
 package com.codingapi.flow.api.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.codingapi.flow.api.pojo.NodeCreateRequest;
+import com.codingapi.flow.api.service.NodeBuildService;
+import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.NodeType;
+import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.workflow.Workflow;
@@ -13,6 +18,8 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/cmd/workflow")
@@ -21,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class WorkflowController {
 
     private final WorkflowRepository workflowRepository;
+    private final NodeBuildService nodeBuildService;
 
     @PostMapping("/remove")
     public Response remove(@RequestBody IdRequest request) {
@@ -33,8 +41,14 @@ public class WorkflowController {
     public SingleResponse<JSONObject> create() {
         Workflow workflow = WorkflowBuilder.builder()
                 .build(false);
+        workflow.addDefaultNodesAndEdges();
         JSONObject jsonObject = JSONObject.parseObject(workflow.toJson(true));
         return SingleResponse.of(jsonObject);
+    }
+
+    @PostMapping("/create-node")
+    public SingleResponse<Map<String, Object>> createNode(@RequestBody NodeCreateRequest request) {
+        return SingleResponse.of(nodeBuildService.buildNode(request.getType()));
     }
 
     @PostMapping("/save")

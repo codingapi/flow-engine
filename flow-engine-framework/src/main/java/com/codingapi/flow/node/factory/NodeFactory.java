@@ -1,6 +1,7 @@
 package com.codingapi.flow.node.factory;
 
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.nodes.*;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -33,6 +34,16 @@ public class NodeFactory {
         nodesClasses.put(StartNode.NODE_TYPE, StartNode.class);
         nodesClasses.put(SubProcessNode.NODE_TYPE, SubProcessNode.class);
         nodesClasses.put(TriggerNode.NODE_TYPE, TriggerNode.class);
+    }
+
+
+    @SneakyThrows
+    public IFlowNode createNode(NodeType type) {
+        Class<? extends IFlowNode> clazz = nodesClasses.get(type.name());
+        if (clazz != null) {
+            return clazz.getDeclaredConstructor().newInstance();
+        }
+        return null;
     }
 
 

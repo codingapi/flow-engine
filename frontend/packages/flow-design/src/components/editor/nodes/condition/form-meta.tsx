@@ -2,7 +2,6 @@ import {provideJsonSchemaOutputs, syncVariableTitle,} from '@flowgram.ai/form-ma
 import {FormMeta, FormRenderProps, ValidateTrigger,} from '@flowgram.ai/fixed-layout-editor';
 
 import {FlowNodeJSON} from '../../typings';
-import {ConditionBranchNodeRegistry} from "@/components/editor/nodes/condition-branch";
 import {BranchAdderRender} from "@/components/editor/components/branch-adder";
 
 export const renderForm = ({form}: FormRenderProps<FlowNodeJSON['data']>) => {
@@ -10,7 +9,7 @@ export const renderForm = ({form}: FormRenderProps<FlowNodeJSON['data']>) => {
     return (
         <BranchAdderRender
             buttonText={'添加条件分支'}
-            onAdd={ConditionBranchNodeRegistry.onAdd}
+            addType={'CONDITION_BRANCH'}
         />
     );
 };

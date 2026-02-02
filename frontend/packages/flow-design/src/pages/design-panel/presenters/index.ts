@@ -2,8 +2,12 @@ import {DesignPanelApi, initStateData, State, TabPanelType} from "../types";
 import {Dispatch} from "@flow-engine/flow-core";
 import {FormActionContext} from "@/pages/design-panel/presenters/form";
 import {WorkflowFormManager} from "@/pages/design-panel/manager/form";
+import {NodeManager} from "@/pages/design-panel/manager/node";
 
 export class Presenter {
+
+
+
 
     private state: State;
     private readonly dispatch: Dispatch<State>;
@@ -123,6 +127,12 @@ export class Presenter {
         };
         await this.api.save(latest.workflow);
         console.log('save latest:', latest);
+    }
+
+    public async createNode(type:string) {
+        const flowNode = await this.api.createNode(type);
+        const nodeManager = new NodeManager();
+        return nodeManager.toItemRender(flowNode);
     }
 
 

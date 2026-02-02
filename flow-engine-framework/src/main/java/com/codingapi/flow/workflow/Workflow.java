@@ -105,6 +105,26 @@ public class Workflow {
         this.updateTime();
     }
 
+    public void addDefaultNodesAndEdges() {
+        this.nodes.addAll(defaultNodes());
+        this.edges.addAll(defaultEdges());
+    }
+
+    private List<IFlowNode> defaultNodes() {
+        List<IFlowNode> nodeList = new ArrayList<>();
+        nodeList.add(new StartNode());
+        nodeList.add(new EndNode());
+        return nodeList;
+    }
+
+    private List<FlowEdge> defaultEdges() {
+        List<FlowEdge> edgeList = new ArrayList<>();
+        IFlowNode startNode = this.getStartNode();
+        IFlowNode endNode = this.getEndNode();
+        edgeList.add(new FlowEdge(startNode.getId(), endNode.getId()));
+        return edgeList;
+    }
+
     private List<IWorkflowStrategy> defaultStrategies() {
         List<IWorkflowStrategy> strategyList = new ArrayList<>();
         strategyList.add(InterfereStrategy.defaultStrategy());
