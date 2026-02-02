@@ -16,6 +16,7 @@ export const TabAction:React.FC = () => {
             align={"center"}
             style={{
                 width: "100%",
+                padding: 8,
             }}
         >
             {actionManager().render('SAVE')}

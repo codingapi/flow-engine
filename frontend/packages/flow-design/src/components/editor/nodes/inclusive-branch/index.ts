@@ -8,6 +8,9 @@ export const InclusiveBranchNodeRegistry: FlowNodeRegistry = {
     meta: {
         copyDisable: true,
         addDisable: true,
+        strategies:[
+            'InclusiveBranchStrategy'
+        ]
     },
     info: {
         icon: 'INCLUSIVE_BRANCH',

@@ -8,6 +8,9 @@ export const ConditionBranchNodeRegistry: FlowNodeRegistry = {
     meta: {
         copyDisable: true,
         addDisable: true,
+        strategies:[
+            'ConditionBranchStrategy'
+        ]
     },
     info: {
         icon: 'CONDITION_BRANCH',

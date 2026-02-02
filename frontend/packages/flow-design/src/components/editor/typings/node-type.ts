@@ -64,7 +64,13 @@ export type NodeStrategyType =
     // 超时策略配置
     "TimeoutStrategy"|
     // 触发策略配置
-    "TriggerStrategy";
+    "TriggerStrategy" |
+    // 条件分支策略
+    "ConditionBranchStrategy" |
+    // 并行分支策略
+    "ParallelBranchStrategy"|
+    // 包容分支策略
+    "InclusiveBranchStrategy";
 
 
 /**

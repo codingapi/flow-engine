@@ -16,6 +16,7 @@ export const TabBase:React.FC = () => {
             align={"center"}
             style={{
                 width: "100%",
+                padding: 8,
             }}
         >
             {strategyManager().render('OperatorLoadStrategy')}
@@ -31,6 +32,9 @@ export const TabBase:React.FC = () => {
             {strategyManager().render('TriggerStrategy')}
             {strategyManager().render('RecordMergeStrategy')}
             {strategyManager().render('SubProcessStrategy')}
+            {strategyManager().render('ConditionBranchStrategy')}
+            {strategyManager().render('InclusiveBranchStrategy')}
+            {strategyManager().render('ParallelBranchStrategy')}
 
         </Flex>
     )

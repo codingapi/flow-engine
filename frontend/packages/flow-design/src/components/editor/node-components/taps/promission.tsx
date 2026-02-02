@@ -16,6 +16,7 @@ export const TabPromission:React.FC = () => {
             align={"center"}
             style={{
                 width: "100%",
+                padding: 8,
             }}
         >
             {strategyManager().render('FormFieldPermissionStrategy')}

@@ -15,6 +15,9 @@ import {SubProcessStrategy} from "@/components/editor/node-components/strategy/s
 import {TimeoutStrategy} from "@/components/editor/node-components/strategy/timeout";
 import {TriggerStrategy} from "@/components/editor/node-components/strategy/trigger";
 import {RouterStrategy} from "@/components/editor/node-components/strategy/router";
+import {ConditionBranchStrategy} from "@/components/editor/node-components/strategy/branch/condition";
+import {InclusiveBranchStrategy} from "@/components/editor/node-components/strategy/branch/inclusive";
+import {ParallelBranchStrategy} from "@/components/editor/node-components/strategy/branch/parallel";
 
 const strategiesMap: Map<NodeStrategyType, React.ComponentType> = new Map();
 strategiesMap.set('AdviceStrategy', AdviceStrategy);
@@ -32,6 +35,9 @@ strategiesMap.set('SubProcessStrategy', SubProcessStrategy);
 strategiesMap.set('TimeoutStrategy', TimeoutStrategy);
 strategiesMap.set('TriggerStrategy', TriggerStrategy);
 strategiesMap.set('RouterStrategy', RouterStrategy);
+strategiesMap.set('ConditionBranchStrategy', ConditionBranchStrategy);
+strategiesMap.set('InclusiveBranchStrategy', InclusiveBranchStrategy);
+strategiesMap.set('ParallelBranchStrategy', ParallelBranchStrategy);
 
 
 export class StrategyManager {
