@@ -11,10 +11,8 @@ export class NodeManager {
         });
     }
 
-    public toItemRender(node: FlowNode) {
-        const blocks:any[] = (node.blocks || [])
-            .map(item => {return this.toItemRender(item)});
-
+    public toItemRender(node: FlowNode): any {
+        const blocks: any[] = node?.blocks || [];
         return {
             id: node.id,
             type: node.type,
@@ -22,25 +20,34 @@ export class NodeManager {
                 title: node.name,
                 order: node.order,
                 actions: node.actions,
-                script:node.script,
+                script: node.script,
                 ...this.toStrategyRender(node),
             },
-            blocks: [...blocks]
+            blocks: blocks.map(item => this.toItemRender(item))
         }
     }
 
     public toData(nodes: any[]) {
         return nodes.map(node => {
-            const data = node.data;
-            return {
-                id: node.id,
-                type: node.type,
-                name: data?.title,
-                order: data?.order ? data?.order + '' : '0',
-                actions: data?.actions || [],
-                strategies: this.toStrategyData(data)
-            }
+            return this.toDataItem(node);
         });
+    }
+
+
+    public toDataItem(node: any): any {
+        const data = node.data;
+        const blocks: any[] = node?.blocks || [];
+        return {
+            id: node.id,
+            type: node.type,
+            name: data?.title,
+            order: data?.order ? data?.order + '' : '0',
+            actions: data?.actions || [],
+            strategies: this.toStrategyData(data),
+            blocks: blocks.map(item => {
+                return this.toDataItem(item)
+            }),
+        }
     }
 
     private toStrategyRender(node: FlowNode) {

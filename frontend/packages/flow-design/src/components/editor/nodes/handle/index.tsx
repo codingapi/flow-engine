@@ -15,5 +15,5 @@ export const HandleNodeRegistry: FlowNodeRegistry = {
     /**
      * Render node via formMeta
      */
-    formMeta
+    formMeta,
 };

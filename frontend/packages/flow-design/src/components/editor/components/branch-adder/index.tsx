@@ -1,12 +1,11 @@
-import {FixedLayoutPluginContext, type FlowNodeEntity, useClientContext} from '@flowgram.ai/fixed-layout-editor';
+import {type FlowNodeEntity, useClientContext} from '@flowgram.ai/fixed-layout-editor';
 import React, {useCallback, useContext} from "react";
-import {FlowNodeJSON} from "@/components/editor/typings";
 import {NodeRenderContext} from "@/components/editor/context";
 import {NodePanel} from "@/components/editor/node-components/panel";
 import {NodeHeader} from "@/components/editor/node-components/header";
 import {Button} from "antd";
 import {nodeFormPanelFactory} from "@/components/editor/components/sidebar";
-import { usePanelManager } from "@flowgram.ai/panel-manager-plugin";
+import {usePanelManager} from "@flowgram.ai/panel-manager-plugin";
 import {useDesignContext} from "@/pages/design-panel/hooks/use-design-context";
 import {NodeType} from "@/components/editor/typings/node-type";
 
@@ -21,10 +20,10 @@ export const BranchAdder: React.FC<BranchAdderPropsType> = (props: BranchAdderPr
 
 interface BranchAdderProps {
     buttonText: string;
-    addType:NodeType
+    addType: NodeType
 }
 
-export const BranchAdderRender:React.FC<BranchAdderProps> = (props) => {
+export const BranchAdderRender: React.FC<BranchAdderProps> = (props) => {
 
     const {node} = useContext(NodeRenderContext);
     const ctx = useClientContext();
@@ -34,8 +33,7 @@ export const BranchAdderRender:React.FC<BranchAdderProps> = (props) => {
     const presenter = context.getPresenter();
 
     const handleAddBranch = () => {
-
-        presenter.createNode(node.id,props.addType).then(block=>{
+        presenter.createNode(node.id, props.addType).then(block => {
             operation.addBlock(
                 node,
                 block,
@@ -43,10 +41,9 @@ export const BranchAdderRender:React.FC<BranchAdderProps> = (props) => {
                     index: 0,
                 }
             );
-
-            setTimeout(()=>{
+            setTimeout(() => {
                 handleClose();
-            },10)
+            }, 10)
         });
     }
 

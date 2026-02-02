@@ -1,4 +1,6 @@
 // Tab布局类型
+import {NodeType} from "@/components/editor/typings/node-type";
+
 export type TabPanelType = 'base' | 'form' | 'flow' | 'setting';
 
 // 布局顶部高度
@@ -87,7 +89,7 @@ export interface FlowAction{
 export interface FlowNode{
     id:string;
     name:string;
-    type:string;
+    type:NodeType;
     order:number;
     actions:FlowAction[];
     strategies:any[];

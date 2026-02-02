@@ -29,7 +29,7 @@ interface AdderProps {
     hoverActivated: boolean;
 }
 
-export const Adder:React.FC<AdderProps> =(props)=> {
+export const Adder: React.FC<AdderProps> = (props) => {
     const {from} = props;
     const [visible, setVisible] = useState(false);
     const {playground, operation, clipboard} = useClientContext();

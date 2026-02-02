@@ -3,6 +3,7 @@ import {Dispatch} from "@flow-engine/flow-core";
 import {FormActionContext} from "@/pages/design-panel/presenters/form";
 import {WorkflowFormManager} from "@/pages/design-panel/manager/form";
 import {NodeManager} from "@/pages/design-panel/manager/node";
+import {WorkflowApiConvertor} from "@/pages/design-panel/presenters/convertor";
 
 export class Presenter {
 
@@ -28,6 +29,14 @@ export class Presenter {
     }
 
     private mergeWorkflow(prevWorkflow: any, currentWorkflow: any) {
+        const nodes:FlowNode[] = [];
+        if(currentWorkflow.nodes && currentWorkflow.nodes.length > 0){
+            nodes.push(...currentWorkflow.nodes);
+        }else {
+            if(prevWorkflow.nodes && prevWorkflow.nodes.length > 0){
+                nodes.push(...prevWorkflow.nodes);
+            }
+        }
         return {
             ...prevWorkflow,
             ...currentWorkflow,
@@ -35,6 +44,7 @@ export class Presenter {
                 ...prevWorkflow.form,
                 ...currentWorkflow.form,
             },
+            nodes:nodes
         }
     }
 
@@ -52,29 +62,6 @@ export class Presenter {
             }
         });
     }
-
-    private updateWorkflowNode(fromId:string,newNode: FlowNode) {
-        this.dispatch((prevState: State) => {
-            const nodes = prevState.workflow.nodes || [];
-            const list:FlowNode[] = [];
-            for (const node of nodes) {
-                if (node.id === fromId) {
-                    list.push(node);
-                    list.push(newNode);
-                }else {
-                    list.push(node);
-                }
-            }
-            return {
-                ...prevState,
-                workflow: {
-                    ...prevState.workflow,
-                    nodes: list,
-                }
-            }
-        });
-    }
-
 
     private updateWorkflowForm(form: any) {
         this.dispatch((prevState: State) => {
@@ -133,13 +120,14 @@ export class Presenter {
             ...this.state,
             workflow: this.mergeWorkflow(this.state.workflow, values),
         };
-        await this.api.save(latest.workflow);
-        console.log('save latest:', latest);
+        const convertor = new WorkflowApiConvertor(latest.workflow);
+        const apiData = convertor.toApi();
+        await this.api.save(apiData);
+        console.log('save latest:', apiData);
     }
 
-    public async createNode(form:string,type:string) {
+    public async createNode(form: string, type: string) {
         const flowNode = await this.api.createNode(type);
-        this.updateWorkflowNode(form,flowNode);
         const nodeManager = new NodeManager();
         return nodeManager.toItemRender(flowNode);
     }
@@ -151,13 +139,17 @@ export class Presenter {
 
     public loadDesign(id: string) {
         this.api.load(id).then(result => {
-            this.updateWorkflow(result);
+            const convertor = new WorkflowApiConvertor(result);
+            const renderData = convertor.toRender();
+            this.updateWorkflow(renderData);
         });
     }
 
     public createDesign() {
         this.api.create().then(result => {
-            this.updateWorkflow(result);
+            const convertor = new WorkflowApiConvertor(result);
+            const renderData = convertor.toRender();
+            this.updateWorkflow(renderData);
         });
     }
 }
