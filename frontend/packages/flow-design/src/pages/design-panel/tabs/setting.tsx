@@ -14,8 +14,9 @@ export const TabSetting = () => {
 
     const formActionContext = context.getPresenter().getFormActionContext();
 
+    const workflowStrategyManager = new WorkflowStrategyManager();
+
     const resetFieldsValue = ()=>{
-        const workflowStrategyManager = new WorkflowStrategyManager();
         const formData = workflowStrategyManager.toForm(state.workflow.strategies as any[]);
         form.setFieldsValue(formData);
     }
@@ -31,10 +32,16 @@ export const TabSetting = () => {
 
         formActionContext.addAction({
             save() {
-                const workflowStrategyManager = new WorkflowStrategyManager();
                 return workflowStrategyManager.toList(form.getFieldsValue());
+            },
+            key(): string {
+                return 'setting';
             }
         });
+
+        return () => {
+            formActionContext.removeAction('setting');
+        };
     }, []);
 
     return (

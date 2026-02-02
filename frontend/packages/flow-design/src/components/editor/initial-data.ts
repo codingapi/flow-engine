@@ -1,4 +1,4 @@
-import type { FlowDocumentJSON } from '@flowgram.ai/fixed-layout-editor';
+import {FlowDocumentJSON} from "@/components/editor/typings";
 
 export const initialData: FlowDocumentJSON = {
     nodes: [
@@ -9,39 +9,6 @@ export const initialData: FlowDocumentJSON = {
                 title:'开始节点',
                 value:'start-value'
             }
-        },
-        {
-            id: 'approval_1',
-            type: 'APPROVAL',
-            data:{
-                title:'审批节点',
-                value:'APPROVAL value'
-            },
-        },
-        {
-            id: 'condition_1',
-            type: 'CONDITION',
-            data:{
-                title:'条件控制',
-            },
-            blocks:[
-                {
-                    id: 'case_1',
-                    type: 'CONDITION_BRANCH',
-                    data:{
-                        title:'条件节点A',
-                        value:'condition-branch-value-a'
-                    },
-                },
-                {
-                    id: 'case_2',
-                    type: 'CONDITION_BRANCH',
-                    data:{
-                        title:'条件节点B',
-                        value:'condition-branch-value-b'
-                    },
-                }
-            ]
         },
         {
             id: 'end',

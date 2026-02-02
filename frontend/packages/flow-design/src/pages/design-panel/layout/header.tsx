@@ -43,6 +43,7 @@ export const Header = () => {
                 width: "100%",
                 height: LayoutHeaderHeight,
             }}
+            destroyOnHidden={true}
             centered={true}
             items={[
                 {

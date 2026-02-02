@@ -27,13 +27,26 @@ export class Presenter {
     }
 
     private mergeWorkflow(prevWorkflow: any, currentWorkflow: any) {
+        const nodes:any[] = [];
+
+        if(currentWorkflow.nodes && currentWorkflow.nodes.length > 0){
+            nodes.push(...currentWorkflow.nodes);
+        }else {
+            if(prevWorkflow.nodes && prevWorkflow.nodes.length > 0){
+                nodes.push(...prevWorkflow.nodes);
+            }
+        }
+
         return {
             ...prevWorkflow,
             ...currentWorkflow,
             form: {
                 ...prevWorkflow.form,
                 ...currentWorkflow.form,
-            }
+            },
+            nodes: [
+                ...nodes
+            ]
         }
     }
 

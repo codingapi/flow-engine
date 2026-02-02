@@ -6,16 +6,15 @@ import {defaultFixedSemiMaterials} from '@flowgram.ai/fixed-semi-materials';
 import {ConstantKeys, FixedLayoutProps, FlowLayoutDefault, FlowRendererKey} from '@flowgram.ai/fixed-layout-editor';
 import {createDownloadPlugin} from "@flowgram.ai/export-plugin";
 import {createPanelManagerPlugin} from "@flowgram.ai/panel-manager-plugin";
-import {initialData} from '../initial-data';
 import {nodeFormPanelFactory} from "../components/sidebar";
 import {BaseNode} from "@/components/editor/components/base-node";
 import {debounce} from "lodash-es";
-import {FlowNodeRegistry} from "@/components/editor/typings";
+import {FlowDocumentJSON, FlowNodeRegistry} from "@/components/editor/typings";
 import {Adder} from "@/components/editor/components/node-adder";
 import {BranchAdder} from "@/components/editor/components/branch-adder";
 import {Collapse} from "../components/collapse";
 
-export function useEditorProps(nodeRegistries: FlowNodeRegistry[]): FixedLayoutProps {
+export function useEditorProps(initialData:FlowDocumentJSON,nodeRegistries: FlowNodeRegistry[]): FixedLayoutProps {
 
     const {token} = theme.useToken();
 

@@ -56,6 +56,7 @@ export interface Workflow {
     code: string;
     form: FlowForm;
     strategies?:any[];
+    nodes?:any[];
 }
 
 
