@@ -3,7 +3,7 @@ import {Dispatch} from "@flow-engine/flow-core";
 import {FormActionContext} from "@/pages/design-panel/presenters/form";
 import {WorkflowFormManager} from "@/pages/design-panel/manager/form";
 import {NodeManager} from "@/pages/design-panel/manager/node";
-import {WorkflowApiConvertor} from "@/pages/design-panel/presenters/convertor";
+import {WorkflowConvertor} from "@/pages/design-panel/presenters/convertor";
 
 export class Presenter {
 
@@ -120,7 +120,7 @@ export class Presenter {
             ...this.state,
             workflow: this.mergeWorkflow(this.state.workflow, values),
         };
-        const convertor = new WorkflowApiConvertor(latest.workflow);
+        const convertor = new WorkflowConvertor(latest.workflow);
         const apiData = convertor.toApi();
         await this.api.save(apiData);
         console.log('save latest:', apiData);
@@ -139,7 +139,7 @@ export class Presenter {
 
     public loadDesign(id: string) {
         this.api.load(id).then(result => {
-            const convertor = new WorkflowApiConvertor(result);
+            const convertor = new WorkflowConvertor(result);
             const renderData = convertor.toRender();
             this.updateWorkflow(renderData);
         });
@@ -147,7 +147,7 @@ export class Presenter {
 
     public createDesign() {
         this.api.create().then(result => {
-            const convertor = new WorkflowApiConvertor(result);
+            const convertor = new WorkflowConvertor(result);
             const renderData = convertor.toRender();
             this.updateWorkflow(renderData);
         });

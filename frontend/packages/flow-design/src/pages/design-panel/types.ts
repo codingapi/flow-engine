@@ -66,7 +66,7 @@ export interface Workflow {
 
 // 节点关系
 export interface FlowEdge {
-    form:string;
+    from:string;
     to:string;
 }
 
