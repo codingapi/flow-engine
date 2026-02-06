@@ -11,7 +11,7 @@ export interface FlowNodeJSON extends FlowNodeJSONDefault {
     data: {
         title?: string;
         actions?: any[];
-        order?:number;
+        order?:number|string;
         [key: string]: any;
     };
 }
