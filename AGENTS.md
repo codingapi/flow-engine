@@ -116,23 +116,6 @@ Organize by groups:
 2. Third-party (`org.junit.jupiter.*`, `lombok.*`, `groovy.*`, `org.apache.*`)
 3. Project imports (`com.codingapi.flow.*`)
 
-#### Lombok Usage
-
-```java
-// For simple DTOs
-@Data
-public class FormFieldMeta { }
-
-// For getters/setters on individual fields
-@Setter
-@Getter
-public class Workflow { }
-
-// For constructors
-@AllArgsConstructor
-public class OperatorMatchScript { }
-```
-
 #### Error Handling
 
 - Wrap checked exceptions in RuntimeException
