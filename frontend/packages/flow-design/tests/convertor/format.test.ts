@@ -85,10 +85,14 @@ describe.sequential('workflow', () => {
 
         const workflowNodeConvertor = new WorkflowNodeConvertor(workflow4 as any);
         const nodes = workflowNodeConvertor.toNodes();
+        console.log('Nodes count:', nodes.length);
+        console.log('Nodes:', nodes.map(n => ({ id: n.id, type: n.type })));
         expect(nodes.length).toBe(14);
 
         const workflowEdgeConvertor = new WorkflowEdgeConvertor(workflow4 as any);
         const edges = workflowEdgeConvertor.toEdges();
+        console.log('Edges count:', edges.length);
+        console.log('Edges:', edges);
         expect(edges.length).toBe(16);
 
         const workflowRenderConvertor = new WorkflowRenderConvertor({

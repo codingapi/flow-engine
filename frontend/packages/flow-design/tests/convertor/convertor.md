@@ -20,6 +20,8 @@ toRender，即将后台flow-engine后台服务的edges数据和nodes数据转换
 
 三、@flowgram.ai表述节点的关系的时候，只有CONDITION, PARALLEL, INCLUSIVE这三种类型和其子节点（即CONDITION_BRANCH, PARALLEL_BRANCH, INCLUSIVE_BRANCH）下会存在blocks数据，其他节点的blocks数据都是空或者空数组。CONDITION, PARALLEL, INCLUSIVE这三种的blocks表述的节点关系都是并行的。但是CONDITION_BRANCH, PARALLEL_BRANCH, INCLUSIVE_BRANCH这三种节点下的blocks表述的则是顺序的，就是从如果blocks有两个，则会执行第一条再执行第二条。
 
+四、当便利node的节点之所以能到了下一个node节点，是因为在最外循环下，则个node的子子blocks为空即视为是最外层循环的下一个node。
+
 
 注意：
 我在convertor写下的单元测试的代码断言语句，以及data下的json测试数据都是用于测试，你不能为了达成测试符合预期而修改单元测试的断言语句或者测试数据，同时也不能为了满足单元测试在实现的edge.ts、node.ts、render.ts下写入测试的固定数据内容。
