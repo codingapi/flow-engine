@@ -72,7 +72,7 @@ export class WorkflowEdgeConvertor {
             }
         }
         
-        // 修复：确保只有一个审批节点到 END 的边，同时移除 ROUTER 到 END 的边
+        // 修复：移除 ROUTER 到 END 的边
         const endEdges = this.edges.filter(edge => {
             const fromNode = this.allNodes.find(node => node.id === edge.from);
             const toNode = this.allNodes.find(node => node.id === edge.to);
@@ -89,23 +89,6 @@ export class WorkflowEdgeConvertor {
             const index = this.edges.findIndex(e => e.from === edge.from && e.to === edge.to);
             if (index !== -1) {
                 this.edges.splice(index, 1);
-            }
-        }
-        
-        // 确保只有一个审批节点到 END 的边
-        const approvalToEndEdges = this.edges.filter(edge => {
-            const fromNode = this.allNodes.find(node => node.id === edge.from);
-            const toNode = this.allNodes.find(node => node.id === edge.to);
-            return fromNode?.type === 'APPROVAL' && toNode?.type === 'END';
-        });
-        
-        if (approvalToEndEdges.length > 1) {
-            // 只保留第一条到 END 的边
-            for (let i = 1; i < approvalToEndEdges.length; i++) {
-                const index = this.edges.findIndex(edge => edge.from === approvalToEndEdges[i].from && edge.to === approvalToEndEdges[i].to);
-                if (index !== -1) {
-                    this.edges.splice(index, 1);
-                }
             }
         }
         
@@ -160,11 +143,11 @@ export class WorkflowEdgeConvertor {
             return;
         }
         
-        // 处理nextNodes时，需要递归展开所有嵌套的CONDITION节点
+        // 处理nextNodes时，需要递归展开所有嵌套的容器节点（CONDITION、PARALLEL、INCLUSIVE）
         const processedNodes: FlowNode[] = [];
         for (const node of nextNodes) {
             if (this.filterNodes.includes(node.type)) {
-                // 如果是CONDITION类型节点，直接递归其blocks
+                // 如果是容器类型节点，直接递归其blocks
                 if (node.blocks && node.blocks.length > 0) {
                     processedNodes.push(...this.loadNextBlocks(node.blocks));
                 }
