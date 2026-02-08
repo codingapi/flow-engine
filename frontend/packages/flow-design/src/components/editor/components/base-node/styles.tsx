@@ -1,5 +1,5 @@
+import { InfoCircleOutlined } from "@ant-design/icons";
 import styled from 'styled-components';
-import { IconInfoCircle } from '@douyinfe/semi-icons';
 
 // 使用样式组件 + 动态 props
 interface BaseNodeStyleProps {
@@ -25,7 +25,7 @@ export const BaseNodeStyle = styled.div<BaseNodeStyleProps>`
 `;
 
 export const ErrorIcon = () => (
-  <IconInfoCircle
+  <InfoCircleOutlined
     style={{
       position: 'absolute',
       color: 'red',

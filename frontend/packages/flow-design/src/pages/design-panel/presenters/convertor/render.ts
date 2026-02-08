@@ -139,7 +139,7 @@ export class WorkflowRenderConvertor {
             if (edge.from === node.id) {
                 const toNode = this.getNodeById(edge.to);
                 if (toNode) {
-                    if (!this.isStopNode(toNode)) {
+                    if (toNode.type !== 'END') { // 只过滤 END 节点，保留 ROUTER 节点
                         nextNodes.push(toNode);
                     }
                 }
@@ -163,7 +163,7 @@ export class WorkflowRenderConvertor {
             if (edge.from === node.id) {
                 const toNode = this.getNodeById(edge.to);
                 if (toNode) {
-                    if (!this.isStopNode(toNode)) {
+                    if (toNode.type !== 'END') { // 只过滤 END 节点，保留 ROUTER 节点
                         nextNodes.push(toNode);
                     }
                 }

@@ -44,4 +44,26 @@ describe.sequential('WorkflowConvert', () => {
         console.log(edges);
         expect(edges.length).toBe(8);
     });
+
+    test('toEdge4_router_should_not_create_outgoing_edges', () => {
+        const workflowUtils = new WorkflowUtils();
+        workflowUtils.createNodeAndSave('START', 'start');
+        const router = workflowUtils.createNodeAndSave('ROUTER', 'router');
+        workflowUtils.createNodeAndSave('END', 'end');
+        
+        const workflow = workflowUtils.createWorkflow();
+        const workflowEdgeConvertor = new WorkflowEdgeConvertor(workflow);
+        const edges = workflowEdgeConvertor.toEdges();
+        
+        console.log('Router test edges:', edges);
+        
+        // 验证只有从 START 到 ROUTER 的一条边
+        expect(edges.length).toBe(1);
+        expect(edges[0].from).toBe('start');
+        expect(edges[0].to).toBe('router');
+        
+        // 验证没有从 ROUTER 出发的边
+        const edgesFromRouter = edges.filter(e => e.from === 'router');
+        expect(edgesFromRouter.length).toBe(0);
+    });
 });
