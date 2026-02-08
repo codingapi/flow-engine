@@ -52,7 +52,7 @@ cd frontend && pnpm install
 # Run all tests for flow-design package
 cd frontend && pnpm -F @flow-engine/flow-design test
 
-# Run specific tests
+# Run specific test files
 cd frontend && pnpm -F @flow-engine/flow-design test:format    # format tests
 cd frontend && pnpm -F @flow-engine/flow-design test:toNode    # node tests
 cd frontend && pnpm -F @flow-engine/flow-design test:toEdge    # edge tests
@@ -76,6 +76,8 @@ cd frontend && pnpm watch:flow-design  # Watch flow-design changes
 - Write tests in `*.test.ts` files
 - Use `describe.sequential` for test suites
 - Use `test` for test cases
+- To run a single test file: `cd frontend && pnpm -F @flow-engine/flow-design rstest tests/convertor/format.test.ts`
+- To run a specific test case: `cd frontend && pnpm -F @flow-engine/flow-design rstest -t "test case name"`
 
 ## Code Style Guidelines
 
@@ -128,19 +130,6 @@ Organize by groups:
 - Never use `new FlowXXXException()` directly - always use factory methods
 - Never use `ERROR_CODE_PREFIX` constants
 - All exception messages must be in English
-
-**Exception Examples**:
-```java
-// Correct - use factory method
-throw FlowValidationException.required("workflow id");
-throw FlowNotFoundException.workflow(workflowId);
-throw FlowStateException.recordAlreadyDone();
-throw FlowExecutionException.scriptExecutionError(method, e);
-
-// Incorrect - direct construction
-throw new FlowValidationException("validation.required", "Field is required");
-throw new FlowConfigException(ERROR_CODE_PREFIX + "001", "Config error");
-```
 
 #### Testing Guidelines
 

@@ -1,0 +1,164 @@
+{
+  "nodes": [
+    {
+      "id": "e5h643JBWJJ1vJi0Hw",
+      "type": "START",
+      "data": {
+        "title": "开始节点",
+        "order": "0",
+        "actions": [
+          {
+            "enable": true,
+            "display": {
+              "title": "通过"
+            },
+            "id": "OlmCuwOoKGibQLJkr9",
+            "type": "PASS",
+            "title": "通过"
+          },
+          {
+            "enable": true,
+            "display": {
+              "title": "保存"
+            },
+            "id": "NA1jZCdaxgCk0VVvHj",
+            "type": "SAVE",
+            "title": "保存"
+          },
+          {
+            "enable": true,
+            "display": {
+              "title": "自定义"
+            },
+            "id": "TtKtrTMr8XNH2Nnk0s",
+            "type": "CUSTOM",
+            "title": "自定义",
+            "script": "def run(session){return 'PASS'}"
+          }
+        ],
+        "NodeTitleStrategy": {
+          "script": "def run(request){return '你有一条待办'}",
+          "strategyType": "NodeTitleStrategy"
+        },
+        "FormFieldPermissionStrategy": {
+          "strategyType": "FormFieldPermissionStrategy",
+          "fieldPermissions": []
+        },
+        "RevokeStrategy": {
+          "enable": true,
+          "type": "REVOKE_CURRENT",
+          "strategyType": "RevokeStrategy"
+        }
+      },
+      "blocks": []
+    },
+    {
+      "id": "C2kSPQWXd1YGltthrr",
+      "type": "CONDITION",
+      "data": {
+        "title": "条件控制",
+        "order": 1
+      },
+      "blocks": [
+        {
+          "id": "zbYbfl27LX85kr3ist",
+          "type": "CONDITION_BRANCH",
+          "data": {
+            "title": "条件节点节点",
+            "order": "0",
+            "actions": [],
+            "script": "def run(session){return true}"
+          },
+          "blocks": []
+        },
+        {
+          "id": "Yu7Cc022Jo2BqpoPbP",
+          "type": "CONDITION_BRANCH",
+          "data": {
+            "title": "条件节点节点",
+            "order": "0",
+            "actions": [],
+            "script": "def run(session){return true}"
+          },
+          "blocks": [
+            {
+              "id": "poi4MTY08FdYcuThyZ",
+              "type": "CONDITION",
+              "data": {
+                "title": "条件控制",
+                "order": 1
+              },
+              "blocks": [
+                {
+                  "id": "ScNjJFZyODhoFYJbVt",
+                  "type": "CONDITION_BRANCH",
+                  "data": {
+                    "title": "条件节点节点",
+                    "order": "0",
+                    "actions": [],
+                    "script": "def run(session){return true}"
+                  },
+                  "blocks": []
+                },
+                {
+                  "id": "QfuY8B1zv7R6b7LeZ6",
+                  "type": "CONDITION_BRANCH",
+                  "data": {
+                    "title": "条件节点节点",
+                    "order": "0",
+                    "actions": [],
+                    "script": "def run(session){return true}"
+                  },
+                  "blocks": [
+                    {
+                      "id": "CqBtNJfTn4vD33Hjd9",
+                      "type": "CONDITION",
+                      "data": {
+                        "title": "条件控制",
+                        "order": 1
+                      },
+                      "blocks": [
+                        {
+                          "id": "180HGVMuxsCwHrxekU",
+                          "type": "CONDITION_BRANCH",
+                          "data": {
+                            "title": "条件节点节点",
+                            "order": "0",
+                            "actions": [],
+                            "script": "def run(session){return true}"
+                          },
+                          "blocks": []
+                        },
+                        {
+                          "id": "Grn8aoY1geqX3GZEDF",
+                          "type": "CONDITION_BRANCH",
+                          "data": {
+                            "title": "条件节点节点",
+                            "order": "0",
+                            "actions": [],
+                            "script": "def run(session){return true}"
+                          },
+                          "blocks": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t9RE5kjkI3zHbL3Bkt",
+      "type": "END",
+      "data": {
+        "title": "结束节点",
+        "order": "0",
+        "actions": []
+      },
+      "blocks": []
+    }
+  ]
+}
