@@ -13,7 +13,7 @@ export class WorkflowEdgeConvertor {
     private readonly edges: FlowEdge[];
     preNodes: FlowNode[] = [];
 
-    // 用于存储所有节点（包括嵌套在 blocks 中的）以便快速查找
+    // 用于存储所有节点（包括嵌套在 blocks 中的）以便快速查找，但排除容器节点（与WorkflowNodeConvertor一致）
     private allNodes: FlowNode[] = [];
 
     public constructor(workflow: Workflow) {
@@ -23,13 +23,21 @@ export class WorkflowEdgeConvertor {
         this.allNodes = this.collectAllNodes(this.nodes);
     }
 
-    // 递归收集所有节点，包括嵌套在 blocks 中的
+    // 递归收集所有节点，包括嵌套在 blocks 中的，但排除容器节点（与WorkflowNodeConvertor一致）
     private collectAllNodes(nodes: FlowNode[]): FlowNode[] {
         const result: FlowNode[] = [];
         for (const node of nodes) {
-            result.push(node);
-            if (node.blocks && node.blocks.length > 0) {
-                result.push(...this.collectAllNodes(node.blocks));
+            if (this.filterNodes.includes(node.type)) {
+                // 容器节点本身不保留，但递归处理其blocks
+                if (node.blocks && node.blocks.length > 0) {
+                    result.push(...this.collectAllNodes(node.blocks));
+                }
+            } else {
+                // 普通节点：保留，并递归处理其blocks
+                result.push(node);
+                if (node.blocks && node.blocks.length > 0) {
+                    result.push(...this.collectAllNodes(node.blocks));
+                }
             }
         }
         return result;
@@ -146,35 +154,47 @@ export class WorkflowEdgeConvertor {
         }
     }
 
-
     private loadNextEdges(fromNode: FlowNode, nextNodes: FlowNode[]) {
         // 如果 fromNode 是终止节点，不创建任何边
         if (this.stopNodes.includes(fromNode.type)) {
             return;
         }
-        this.createToEdges(fromNode, nextNodes);
-        for (const nextNode of nextNodes) {
-            if (nextNode.blocks && nextNode.blocks.length > 0) {
-                // 对于容器节点，不递归处理其子节点（子节点会在其他地方处理）
-                if (!this.filterNodes.includes(nextNode.type)) {
-                    this.loadNextEdges(nextNode, nextNode.blocks);
+        
+        // 处理nextNodes时，需要递归展开所有嵌套的CONDITION节点
+        const processedNodes: FlowNode[] = [];
+        for (const node of nextNodes) {
+            if (this.filterNodes.includes(node.type)) {
+                // 如果是CONDITION类型节点，直接递归其blocks
+                if (node.blocks && node.blocks.length > 0) {
+                    processedNodes.push(...this.loadNextBlocks(node.blocks));
                 }
+            } else {
+                processedNodes.push(node);
+            }
+        }
+        
+        this.createToEdges(fromNode, processedNodes);
+        
+        for (const nextNode of processedNodes) {
+            if (nextNode.blocks && nextNode.blocks.length > 0) {
+                this.loadNextEdges(nextNode, nextNode.blocks);
             }
         }
     }
 
-
-    private loadNextBlocks(blocks: FlowNode[]) {
+    private loadNextBlocks(blocks: FlowNode[]): FlowNode[] {
         const list: FlowNode[] = [];
         for (const item of blocks) {
             if (this.filterNodes.includes(item.type)) {
-                list.push(...this.loadNextBlocks(item.blocks || []));
+                // 容器节点（CONDITION、PARALLEL、INCLUSIVE）需要递归处理其blocks
+                if (item.blocks && item.blocks.length > 0) {
+                    list.push(...this.loadNextBlocks(item.blocks));
+                }
             } else {
-                // 保留所有非过滤节点，包括 ROUTER（但 ROUTER 节点不会有输出边）
+                // 普通节点直接添加，但不递归处理其blocks（避免重复添加）
                 list.push(item);
             }
         }
         return list;
     }
 }
-

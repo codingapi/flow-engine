@@ -1,6 +1,7 @@
 import {describe, expect, test} from "@rstest/core";
-import workflow2 from "../data/workflow2.json"
 import workflow1 from "../data/workflow1.json"
+import workflow2 from "../data/workflow2.json"
+import workflow3 from "../data/workflow3.json"
 import {WorkflowNodeConvertor} from "@/pages/design-panel/presenters/convertor/node";
 import {WorkflowEdgeConvertor} from "@/pages/design-panel/presenters/convertor/edge";
 import {WorkflowRenderConvertor} from "@/pages/design-panel/presenters/convertor/render";
@@ -43,7 +44,29 @@ describe.sequential('workflow', () => {
 
         const workflowEdgeConvertor = new WorkflowEdgeConvertor(workflow2 as any);
         const edges = workflowEdgeConvertor.toEdges();
-        expect(edges.length).toBe(20); // 修复：根据实际计算结果调整
+        expect(edges.length).toBe(25); // 修复：根据实际计算结果调整
+
+        const workflowRenderConvertor = new WorkflowRenderConvertor({
+            nodes: nodes,
+            edges: edges,
+        } as any);
+
+        const renderData = workflowRenderConvertor.toRender();
+        console.log(renderData.nodes);
+        expect(renderData.nodes.length).toBe(3);
+
+    });
+
+    test('format3', () => {
+        console.log(workflow3);
+
+        const workflowNodeConvertor = new WorkflowNodeConvertor(workflow3 as any);
+        const nodes = workflowNodeConvertor.toNodes();
+        expect(nodes.length).toBe(8);
+
+        const workflowEdgeConvertor = new WorkflowEdgeConvertor(workflow3 as any);
+        const edges = workflowEdgeConvertor.toEdges();
+        expect(edges.length).toBe(10);
 
         const workflowRenderConvertor = new WorkflowRenderConvertor({
             nodes: nodes,
