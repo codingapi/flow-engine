@@ -11,7 +11,6 @@ public class WorkflowConvertor {
     private final static OperatorMatchScriptConvertor operatorMatchScriptConvertor = new OperatorMatchScriptConvertor();
     private final static WorkflowStrategyListConvertor workflowStrategyListConvertor = new WorkflowStrategyListConvertor();
     private final static FormMetaConvertor formMetaConvertor = new FormMetaConvertor();
-    private final static FlowEdgeListConvertor flowEdgeListConvertor = new FlowEdgeListConvertor();
 
 
     public static WorkflowEntity convert(Workflow workflow){
@@ -30,7 +29,6 @@ public class WorkflowConvertor {
         entity.setForm(formMetaConvertor.convertToDatabaseColumn(workflow.getForm()));
         entity.setOperatorCreateScript(operatorMatchScriptConvertor.convertToDatabaseColumn(workflow.getOperatorCreateScript()));
         entity.setNodes(flowNodeListConvertor.convertToDatabaseColumn(workflow.getNodes()));
-        entity.setEdges(flowEdgeListConvertor.convertToDatabaseColumn(workflow.getEdges()));
         entity.setSchema(workflow.getSchema());
         entity.setStrategies(workflowStrategyListConvertor.convertToDatabaseColumn(workflow.getStrategies()));
         return entity;
@@ -49,7 +47,6 @@ public class WorkflowConvertor {
                 formMetaConvertor.convertToEntityAttribute(entity.getForm()),
                 operatorMatchScriptConvertor.convertToEntityAttribute(entity.getOperatorCreateScript()),
                 flowNodeListConvertor.convertToEntityAttribute(entity.getNodes()),
-                flowEdgeListConvertor.convertToEntityAttribute(entity.getEdges()),
                 entity.getSchema(),
                 workflowStrategyListConvertor.convertToEntityAttribute(entity.getStrategies()));
     }

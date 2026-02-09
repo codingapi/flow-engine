@@ -51,7 +51,7 @@ public class NodeStrategyManager {
         List<INodeStrategy> strategies = this.strategies;
         for (INodeStrategy strategy : strategies) {
             if (strategy instanceof RecordMergeStrategy) {
-                return ((RecordMergeStrategy) strategy).isMergeable();
+                return ((RecordMergeStrategy) strategy).isEnable();
             }
         }
         return false;

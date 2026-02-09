@@ -6,7 +6,6 @@ import com.codingapi.flow.builder.ActionBuilder;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
-import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
@@ -24,6 +23,7 @@ import com.codingapi.flow.script.runtime.IBeanFactory;
 import com.codingapi.flow.strategy.node.ErrorTriggerStrategy;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
+import com.codingapi.flow.strategy.node.RouterStrategy;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
@@ -97,8 +97,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -177,8 +175,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -278,8 +274,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -379,8 +373,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -447,18 +439,6 @@ class FlowServiceTest {
                         .build())
                 .build();
 
-        ConditionBranchNode departConditionNode = ConditionBranchNode.builder()
-                .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') <= 3}")
-                .order(1)
-                .build();
-
-        ConditionBranchNode bossConditionNode = ConditionBranchNode.builder()
-                .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') > 3}")
-                .order(2)
-                .build();
-
         ApprovalNode departApprovalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .strategies(NodeStrategyBuilder.builder()
@@ -485,6 +465,26 @@ class FlowServiceTest {
                 )
                 .build();
 
+
+        ConditionBranchNode departConditionNode = ConditionBranchNode.builder()
+                .name("条件分支")
+                .conditionScript("def run(request){return request.getFormData('days') <= 3}")
+                .order(1)
+                .blocks(departApprovalNode)
+                .build();
+
+        ConditionBranchNode bossConditionNode = ConditionBranchNode.builder()
+                .name("条件分支")
+                .conditionScript("def run(request){return request.getFormData('days') > 3}")
+                .order(2)
+                .blocks(bossApprovalNode)
+                .build();
+
+        ConditionNode conditionNode = ConditionNode.builder()
+                .name("条件控制")
+                .blocks(departConditionNode, bossConditionNode)
+                .build();
+
         EndNode endNode = EndNode.builder().build();
         Workflow workflow = WorkflowBuilder.builder()
                 .title("请假流程")
@@ -492,17 +492,8 @@ class FlowServiceTest {
                 .createdOperator(user)
                 .form(form)
                 .addNode(startNode)
-                .addNode(departConditionNode)
-                .addNode(bossConditionNode)
-                .addNode(departApprovalNode)
-                .addNode(bossApprovalNode)
+                .addNode(conditionNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), departConditionNode.getId()))
-                .addEdge(new FlowEdge(startNode.getId(), bossConditionNode.getId()))
-                .addEdge(new FlowEdge(departConditionNode.getId(), departApprovalNode.getId()))
-                .addEdge(new FlowEdge(bossConditionNode.getId(), bossApprovalNode.getId()))
-                .addEdge(new FlowEdge(departApprovalNode.getId(), endNode.getId()))
-                .addEdge(new FlowEdge(bossApprovalNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -606,8 +597,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -703,15 +692,7 @@ class FlowServiceTest {
                         .build())
                 .build();
 
-        ParallelBranchNode parallelBranchNode1 = ParallelBranchNode.builder()
-                .name("并行分支1")
-                .order(1)
-                .build();
 
-        ParallelBranchNode parallelBranchNode2 = ParallelBranchNode.builder()
-                .name("并行分支2")
-                .order(2)
-                .build();
 
         ApprovalNode departApprovalNode = ApprovalNode.builder()
                 .name("经理审批")
@@ -752,6 +733,24 @@ class FlowServiceTest {
                 )
                 .build();
 
+
+        ParallelBranchNode parallelBranchNode1 = ParallelBranchNode.builder()
+                .name("并行分支1")
+                .blocks(departApprovalNode)
+                .order(1)
+                .build();
+
+        ParallelBranchNode parallelBranchNode2 = ParallelBranchNode.builder()
+                .name("并行分支2")
+                .blocks(bossApprovalNode,bigBossApprovalNode)
+                .order(2)
+                .build();
+
+        ParallelNode parallelNode = ParallelNode.builder()
+                .name("并行控制节点")
+                .blocks(parallelBranchNode1,parallelBranchNode2)
+                .build();
+
         EndNode endNode = EndNode.builder().build();
         Workflow workflow = WorkflowBuilder.builder()
                 .title("请假流程")
@@ -759,19 +758,8 @@ class FlowServiceTest {
                 .createdOperator(user)
                 .form(form)
                 .addNode(startNode)
-                .addNode(parallelBranchNode1)
-                .addNode(parallelBranchNode2)
-                .addNode(departApprovalNode)
-                .addNode(bossApprovalNode)
-                .addNode(bigBossApprovalNode)
+                .addNode(parallelNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), parallelBranchNode1.getId()))
-                .addEdge(new FlowEdge(startNode.getId(), parallelBranchNode2.getId()))
-                .addEdge(new FlowEdge(parallelBranchNode1.getId(), departApprovalNode.getId()))
-                .addEdge(new FlowEdge(parallelBranchNode2.getId(), bossApprovalNode.getId()))
-                .addEdge(new FlowEdge(bossApprovalNode.getId(), bigBossApprovalNode.getId()))
-                .addEdge(new FlowEdge(departApprovalNode.getId(), endNode.getId()))
-                .addEdge(new FlowEdge(bigBossApprovalNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -876,17 +864,8 @@ class FlowServiceTest {
                         .build())
                 .build();
 
-        InclusiveBranchNode parallelBranchNode1 = InclusiveBranchNode.builder()
-                .name("包容分支1")
-                .conditionScript("def run(request){return true}")
-                .order(1)
-                .build();
 
-        InclusiveBranchNode parallelBranchNode2 = InclusiveBranchNode.builder()
-                .name("包容分支2")
-                .conditionScript("def run(request){return request.getFormData('days') >= 3}")
-                .order(2)
-                .build();
+
 
         ApprovalNode departApprovalNode = ApprovalNode.builder()
                 .name("经理审批")
@@ -927,6 +906,27 @@ class FlowServiceTest {
                 )
                 .build();
 
+
+        InclusiveBranchNode parallelBranchNode1 = InclusiveBranchNode.builder()
+                .name("包容分支1")
+                .conditionScript("def run(request){return true}")
+                .blocks(departApprovalNode)
+                .order(1)
+                .build();
+
+        InclusiveBranchNode parallelBranchNode2 = InclusiveBranchNode.builder()
+                .name("包容分支2")
+                .conditionScript("def run(request){return request.getFormData('days') >= 3}")
+                .blocks(bossApprovalNode,bigBossApprovalNode)
+                .order(2)
+                .build();
+
+        InclusiveNode inclusiveNode = InclusiveNode.builder()
+                .name("包容控制")
+                .blocks(parallelBranchNode1,parallelBranchNode2)
+                .build();
+
+
         EndNode endNode = EndNode.builder().build();
         Workflow workflow = WorkflowBuilder.builder()
                 .title("请假流程")
@@ -934,19 +934,8 @@ class FlowServiceTest {
                 .createdOperator(user)
                 .form(form)
                 .addNode(startNode)
-                .addNode(parallelBranchNode1)
-                .addNode(parallelBranchNode2)
-                .addNode(departApprovalNode)
-                .addNode(bossApprovalNode)
-                .addNode(bigBossApprovalNode)
+                .addNode(inclusiveNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), parallelBranchNode1.getId()))
-                .addEdge(new FlowEdge(startNode.getId(), parallelBranchNode2.getId()))
-                .addEdge(new FlowEdge(parallelBranchNode1.getId(), departApprovalNode.getId()))
-                .addEdge(new FlowEdge(parallelBranchNode2.getId(), bossApprovalNode.getId()))
-                .addEdge(new FlowEdge(bossApprovalNode.getId(), bigBossApprovalNode.getId()))
-                .addEdge(new FlowEdge(departApprovalNode.getId(), endNode.getId()))
-                .addEdge(new FlowEdge(bigBossApprovalNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -1056,17 +1045,7 @@ class FlowServiceTest {
                         .build())
                 .build();
 
-        ConditionBranchNode departConditionNode = ConditionBranchNode.builder()
-                .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') <= 3}")
-                .order(1)
-                .build();
 
-        ConditionBranchNode bossConditionNode = ConditionBranchNode.builder()
-                .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') > 3}")
-                .order(2)
-                .build();
 
         ApprovalNode bossNode = ApprovalNode.builder()
                 .name("老板审批")
@@ -1083,7 +1062,9 @@ class FlowServiceTest {
 
         RouterNode routerNode = RouterNode.builder()
                 .name("路由节点")
-                .routerNodeScript(String.format("def run(request){return '%s'}", bossNode.getId()))
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new RouterStrategy(String.format("def run(request){return '%s'}", bossNode.getId())))
+                        .build())
                 .build();
 
         ApprovalNode departNode = ApprovalNode.builder()
@@ -1099,6 +1080,27 @@ class FlowServiceTest {
                 )
                 .build();
 
+
+        ConditionBranchNode departConditionNode = ConditionBranchNode.builder()
+                .name("条件分支")
+                .conditionScript("def run(request){return request.getFormData('days') <= 3}")
+                .order(1)
+                .blocks(departNode,routerNode)
+                .build();
+
+        ConditionBranchNode bossConditionNode = ConditionBranchNode.builder()
+                .name("条件分支")
+                .conditionScript("def run(request){return request.getFormData('days') > 3}")
+                .order(2)
+                .blocks(bossNode)
+                .build();
+
+        ConditionNode conditionNode = ConditionNode.builder()
+                .name("条件控制节点")
+                .blocks(departConditionNode, bossConditionNode)
+                .build();
+
+
         EndNode endNode = EndNode.builder().build();
         Workflow workflow = WorkflowBuilder.builder()
                 .title("请假流程")
@@ -1106,20 +1108,8 @@ class FlowServiceTest {
                 .createdOperator(user)
                 .form(form)
                 .addNode(startNode)
-                .addNode(departConditionNode)
-                .addNode(bossConditionNode)
-                .addNode(departNode)
-                .addNode(bossNode)
-                .addNode(routerNode)
+                .addNode(conditionNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossConditionNode.getId()))
-                .addEdge(new FlowEdge(bossConditionNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
-
-                .addEdge(new FlowEdge(startNode.getId(), departConditionNode.getId()))
-                .addEdge(new FlowEdge(departConditionNode.getId(), departNode.getId()))
-                .addEdge(new FlowEdge(departNode.getId(), routerNode.getId()))
-                .addEdge(new FlowEdge(routerNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -1240,9 +1230,6 @@ class FlowServiceTest {
                 .addNode(delayNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), delayNode.getId()))
-                .addEdge(new FlowEdge(delayNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -1356,9 +1343,6 @@ class FlowServiceTest {
                 .addNode(bossNode)
                 .addNode(triggerNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), triggerNode.getId()))
-                .addEdge(new FlowEdge(triggerNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -1463,9 +1447,6 @@ class FlowServiceTest {
                 .addNode(bossNode)
                 .addNode(subProcessNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), subProcessNode.getId()))
-                .addEdge(new FlowEdge(subProcessNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -1566,8 +1547,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -1683,8 +1662,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -1810,8 +1787,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -1927,8 +1902,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -2052,8 +2025,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -2175,8 +2146,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -2275,8 +2244,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -2396,8 +2363,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -2508,8 +2473,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -2613,8 +2576,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);
@@ -2718,8 +2679,6 @@ class FlowServiceTest {
                 .addNode(startNode)
                 .addNode(bossNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), bossNode.getId()))
-                .addEdge(new FlowEdge(bossNode.getId(), endNode.getId()))
                 .build();
 
         workflowRepository.save(workflow);

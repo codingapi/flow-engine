@@ -4,7 +4,7 @@ import {InterferePanel} from "@/pages/design-panel/panels/workflow/interfere";
 import {UrgePanel} from "@/pages/design-panel/panels/workflow/urge";
 import {CardForm} from "@/components/form/card";
 import {useDesignContext} from "@/pages/design-panel/hooks/use-design-context";
-import {WorkflowStrategyManager} from "@/pages/design-panel/manager/workflow/strategy";
+import {WorkflowStrategyManager} from "@/pages/design-panel/manager/strategy";
 
 
 export const TabSetting = () => {
@@ -14,9 +14,10 @@ export const TabSetting = () => {
 
     const formActionContext = context.getPresenter().getFormActionContext();
 
+    const workflowStrategyManager = new WorkflowStrategyManager();
+
     const resetFieldsValue = ()=>{
-        const workflowStrategyManager = new WorkflowStrategyManager();
-        const formData = workflowStrategyManager.toForm(state.workflow.strategies as any[]);
+        const formData = workflowStrategyManager.toRender(state.workflow.strategies as any[]);
         form.setFieldsValue(formData);
     }
 
@@ -31,10 +32,16 @@ export const TabSetting = () => {
 
         formActionContext.addAction({
             save() {
-                const workflowStrategyManager = new WorkflowStrategyManager();
-                return workflowStrategyManager.toList(form.getFieldsValue());
+                return workflowStrategyManager.toData(form.getFieldsValue());
+            },
+            key(): string {
+                return 'setting';
             }
         });
+
+        return () => {
+            formActionContext.removeAction('setting');
+        };
     }, []);
 
     return (

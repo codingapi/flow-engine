@@ -33,6 +33,7 @@ public class CustomAction extends BaseAction {
     public CustomAction() {
         this.id = RandomUtils.generateStringId();
         this.title = "自定义";
+        this.enable = true;
         this.type = ActionType.CUSTOM.name();
         this.display = new ActionDisplay(this.title);
         this.script = CustomScript.defaultCustomScript();

@@ -1,7 +1,9 @@
-import {DesignPanelApi, initStateData, State, TabPanelType} from "../types";
+import {DesignPanelApi, FlowNode, initStateData, State, TabPanelType} from "../types";
 import {Dispatch} from "@flow-engine/flow-core";
 import {FormActionContext} from "@/pages/design-panel/presenters/form";
-import {WorkflowFormManager} from "@/pages/design-panel/manager/workflow/form";
+import {WorkflowFormManager} from "@/pages/design-panel/manager/form";
+import {NodeManager} from "@/pages/design-panel/manager/node";
+import {WorkflowConvertor} from "@/pages/design-panel/presenters/convertor";
 
 export class Presenter {
 
@@ -27,15 +29,25 @@ export class Presenter {
     }
 
     private mergeWorkflow(prevWorkflow: any, currentWorkflow: any) {
+        const nodes:FlowNode[] = [];
+        if(currentWorkflow.nodes && currentWorkflow.nodes.length > 0){
+            nodes.push(...currentWorkflow.nodes);
+        }else {
+            if(prevWorkflow.nodes && prevWorkflow.nodes.length > 0){
+                nodes.push(...prevWorkflow.nodes);
+            }
+        }
         return {
             ...prevWorkflow,
             ...currentWorkflow,
             form: {
                 ...prevWorkflow.form,
                 ...currentWorkflow.form,
-            }
+            },
+            nodes:nodes
         }
     }
+
 
     public updateViewPanelTab(tab: TabPanelType) {
         const values = this.formActionContext.save() as any;
@@ -108,8 +120,16 @@ export class Presenter {
             ...this.state,
             workflow: this.mergeWorkflow(this.state.workflow, values),
         };
-        await this.api.save(latest.workflow);
-        console.log('save latest:', latest);
+        const convertor = new WorkflowConvertor(latest.workflow);
+        const apiData = convertor.toApi();
+        await this.api.save(apiData);
+        console.log('save latest:', apiData);
+    }
+
+    public async createNode(form: string, type: string) {
+        const flowNode = await this.api.createNode(type);
+        const nodeManager = new NodeManager();
+        return nodeManager.toItemRender(flowNode);
     }
 
 
@@ -119,13 +139,17 @@ export class Presenter {
 
     public loadDesign(id: string) {
         this.api.load(id).then(result => {
-            this.updateWorkflow(result);
+            const convertor = new WorkflowConvertor(result);
+            const renderData = convertor.toRender();
+            this.updateWorkflow(renderData);
         });
     }
 
     public createDesign() {
         this.api.create().then(result => {
-            this.updateWorkflow(result);
+            const convertor = new WorkflowConvertor(result);
+            const renderData = convertor.toRender();
+            this.updateWorkflow(renderData);
         });
     }
 }

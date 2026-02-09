@@ -3,6 +3,8 @@ package com.codingapi.flow.builder;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.factory.FlowActionFactory;
 import com.codingapi.flow.form.permission.FormFieldPermission;
+import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.strategy.node.INodeStrategy;
 import com.codingapi.flow.strategy.node.NodeStrategyFactory;
 
@@ -50,6 +52,21 @@ public class NodeMapBuilder {
                 strategyList.add(strategy);
             }
             return strategyList;
+        }
+        return null;
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public static List<IFlowNode> loadNodes(Map<String, Object> data){
+        List<Map<String, Object>> nodes = (List<Map<String, Object>>) data.get("blocks");
+        if (nodes != null) {
+            List<IFlowNode> nodeList = new ArrayList<>();
+            for (Map<String, Object> node : nodes) {
+                IFlowNode flowNode = NodeFactory.getInstance().createNode(node);
+                nodeList.add(flowNode);
+            }
+            return nodeList;
         }
         return null;
     }

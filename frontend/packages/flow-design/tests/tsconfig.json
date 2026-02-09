@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "include": [".", "../rstest.setup.ts"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../src/*"]
+    }
+  }
+}

@@ -1,6 +1,5 @@
 package com.codingapi.flow.workflow;
 
-import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -74,18 +73,6 @@ public class WorkflowBuilder {
         return this;
     }
 
-    public WorkflowBuilder addEdge(FlowEdge edge) {
-        if (workflow.getEdges() == null) {
-            workflow.setEdges(new ArrayList<>());
-        }
-        workflow.getEdges().add(edge);
-        return this;
-    }
-
-    public WorkflowBuilder edges(List<FlowEdge> edges) {
-        workflow.setEdges(edges);
-        return this;
-    }
 
     public Workflow build(boolean verify) {
         if(verify) {

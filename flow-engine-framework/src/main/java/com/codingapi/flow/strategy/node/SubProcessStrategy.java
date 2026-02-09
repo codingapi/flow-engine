@@ -18,7 +18,13 @@ import java.util.Map;
 @NoArgsConstructor
 public class SubProcessStrategy extends BaseStrategy {
 
+    /**
+     *  是否创建后自动提交
+     */
     private boolean submit;
+    /**
+     * 子流程触发脚本
+     */
     private SubProcessScript subProcessScript;
 
     public void setTriggerScript(String script) {

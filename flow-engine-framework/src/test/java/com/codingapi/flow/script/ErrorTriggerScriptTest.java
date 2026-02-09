@@ -2,7 +2,6 @@ package com.codingapi.flow.script;
 
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
-import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.form.FormMeta;
@@ -72,8 +71,6 @@ class ErrorTriggerScriptTest {
                 .addNode(startNode)
                 .addNode(approvalNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), approvalNode.getId()))
-                .addEdge(new FlowEdge(approvalNode.getId(), endNode.getId()))
                 .build();
 
         FormData data = new FormData(form);

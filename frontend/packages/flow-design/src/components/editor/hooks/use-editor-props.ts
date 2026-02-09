@@ -1,52 +1,29 @@
 import '@flowgram.ai/fixed-layout-editor/index.css';
 import {useMemo} from 'react';
+import {theme} from "antd";
 import {createMinimapPlugin} from '@flowgram.ai/minimap-plugin';
 import {defaultFixedSemiMaterials} from '@flowgram.ai/fixed-semi-materials';
 import {ConstantKeys, FixedLayoutProps, FlowLayoutDefault, FlowRendererKey} from '@flowgram.ai/fixed-layout-editor';
-
-import {NodeRender} from '../nodes/node-render';
-import {nodeRegistries} from '../nodes/node-registries';
-import {initialData} from '../initial-data';
-import {Adder} from '../nodes/adder';
 import {createDownloadPlugin} from "@flowgram.ai/export-plugin";
+import {createPanelManagerPlugin} from "@flowgram.ai/panel-manager-plugin";
+import {nodeFormPanelFactory} from "../components/sidebar";
+import {BaseNode} from "@/components/editor/components/base-node";
 import {debounce} from "lodash-es";
+import {FlowDocumentJSON, FlowNodeRegistry} from "@/components/editor/typings";
+import {Adder} from "@/components/editor/components/node-adder";
+import {BranchAdder} from "@/components/editor/components/branch-adder";
+import {Collapse} from "../components/collapse";
 
-export function useEditorProps(): FixedLayoutProps {
+export function useEditorProps(initialData:FlowDocumentJSON,nodeRegistries: FlowNodeRegistry[]): FixedLayoutProps {
+
+    const {token} = theme.useToken();
+
     return useMemo<FixedLayoutProps>(
         () => ({
-            plugins: () => [
-                /**
-                 *  minimap 小地图
-                 */
-                createMinimapPlugin({
-                    disableLayer: true,
-                    enableDisplayAllNodes: true,
-                    canvasStyle: {
-                        canvasWidth: 182,
-                        canvasHeight: 102,
-                        canvasPadding: 50,
-                        canvasBackground: 'rgba(245, 245, 245, 1)',
-                        canvasBorderRadius: 10,
-                        viewportBackground: 'rgba(235, 235, 235, 1)',
-                        viewportBorderRadius: 4,
-                        viewportBorderColor: 'rgba(201, 201, 201, 1)',
-                        viewportBorderWidth: 1,
-                        viewportBorderDashLength: 2,
-                        nodeColor: 'rgba(255, 255, 255, 1)',
-                        nodeBorderRadius: 2,
-                        nodeBorderWidth: 0.145,
-                        nodeBorderColor: 'rgba(6, 7, 9, 0.10)',
-                        overlayColor: 'rgba(255, 255, 255, 0)',
-                    },
-                }),
-                /**
-                 * Download plugin
-                 * 下载插件
-                 */
-                createDownloadPlugin({}),
-            ],
-            nodeRegistries,
-            initialData,
+            /**
+             * Whether to enable the background
+             */
+            background: true,
             /**
              * 画布相关配置
              * Canvas-related configurations
@@ -64,6 +41,50 @@ export function useEditorProps(): FixedLayoutProps {
              */
             readonly: false,
             /**
+             * Initial data
+             * 初始化数据
+             */
+            initialData,
+            /**
+             * Node registries
+             * 节点注册
+             */
+            nodeRegistries,
+            /**
+             * Get the default node registry, which will be merged with the 'nodeRegistries'
+             * 提供默认的节点注册，这个会和 nodeRegistries 做合并
+             */
+            getNodeDefaultRegistry(type) {
+                return {
+                    type,
+                    meta: {
+                        /**
+                         * Default expanded
+                         * 默认展开所有节点
+                         */
+                        defaultExpanded: true,
+                    },
+                };
+            },
+            /**
+             * 节点数据转换, 由 ctx.document.fromJSON 调用
+             * Node data transformation, called by ctx.document.fromJSON
+             * @param node
+             * @param json
+             */
+            fromNodeJSON(node, json) {
+                return json;
+            },
+            /**
+             * 节点数据转换, 由 ctx.document.toJSON 调用
+             * Node data transformation, called by ctx.document.toJSON
+             * @param node
+             * @param json
+             */
+            toNodeJSON(node, json) {
+                return json;
+            },
+            /**
              * Set default layout
              */
             defaultLayout: FlowLayoutDefault.VERTICAL_FIXED_LAYOUT, // or FlowLayoutDefault.HORIZONTAL_FIXED_LAYOUT
@@ -80,11 +101,21 @@ export function useEditorProps(): FixedLayoutProps {
                 // [ConstantKeys.ROUNDED_LINE_Y_RADIUS]: 10,
                 // [ConstantKeys.INLINE_BLOCKS_INLINE_SPACING_TOP]: 23,
                 // [ConstantKeys.INLINE_BLOCKS_PADDING_BOTTOM]: 30,
-                [ConstantKeys.COLLAPSED_SPACING]: 10,
+                // [ConstantKeys.COLLAPSED_SPACING]: 10,
                 [ConstantKeys.BASE_COLOR]: '#B8BCC1',
-                [ConstantKeys.BASE_ACTIVATED_COLOR]: '#82A7FC',
+                [ConstantKeys.BASE_ACTIVATED_COLOR]: token.colorPrimary,
             },
+            /**
+             * SelectBox config
+             */
+            // selectBox: {
+            //     SelectorBoxPopover,
+            // },
 
+            // Config shortcuts
+            // shortcuts: (registry: ShortcutsRegistry, ctx) => {
+            //     registry.addHandlers(...shortcutGetter.map((getter) => getter(ctx)));
+            // },
             /**
              * Drag/Drop config
              */
@@ -114,24 +145,134 @@ export function useEditorProps(): FixedLayoutProps {
             history: {
                 enable: true,
                 enableChangeNode: true, // Listen Node engine data change
-                onApply: debounce((ctx:any, opt:any) => {
+                onApply: debounce((ctx, opt) => {
                     if (ctx.document.disposed) return;
                     // Listen change to trigger auto save
-                    console.log('auto save: ', ctx.document.toJSON());
+                    console.log('flow-engine auto save: ', ctx.document.toJSON());
                 }, 100),
             },
-            onAllLayersRendered: (ctx) => {
-                setTimeout(() => {
-                    ctx.playground.config.fitView(ctx.document.root.bounds.pad(30));
-                }, 10);
+            /**
+             * Node engine enable, you can configure formMeta in the FlowNodeRegistry
+             */
+            nodeEngine: {
+                enable: true,
             },
+            /**
+             * Variable engine enable
+             */
+            variableEngine: {
+                enable: true,
+            },
+            /**
+             * Materials, components can be customized based on the key
+             * @see https://github.com/bytedance/flowgram.ai/blob/main/packages/materials/fixed-semi-materials/src/components/index.tsx
+             * 可以通过 key 自定义 UI 组件
+             */
             materials: {
-                renderDefaultNode: NodeRender,
                 components: {
                     ...defaultFixedSemiMaterials,
-                    [FlowRendererKey.ADDER]: Adder,
+                    [FlowRendererKey.ADDER]: Adder, // Node Add Button
+                    [FlowRendererKey.BRANCH_ADDER]: BranchAdder, // Branch Add Button
+                    [FlowRendererKey.COLLAPSE]: Collapse,
                 },
+                renderDefaultNode: BaseNode, // node render
             },
+            /**
+             * Bind condition service
+             */
+            onBind: ({bind}) => {
+                // bind(CustomService).toSelf().inSingletonScope();
+            },
+            scroll: {
+                /**
+                 * 限制滚动，防止节点都看不到
+                 * Limit scrolling so that none of the nodes can see it
+                 */
+                enableScrollLimit: true,
+            },
+            /**
+             * Playground init
+             */
+            onInit: (ctx) => {
+                /**
+                 * Data can also be dynamically loaded via fromJSON
+                 * 也可以通过 fromJSON 动态加载数据
+                 */
+                // ctx.document.fromJSON(initialData)
+                console.log('---- Playground Init ----');
+            },
+            /**
+             * Playground render
+             */
+            onAllLayersRendered: (ctx) => {
+                setTimeout(() => {
+                    // fitView all nodes
+                    ctx.tools.fitView();
+                }, 10);
+                console.log(ctx.document.toString(true)); // Get the document tree
+            },
+            /**
+             * Playground dispose
+             */
+            onDispose: () => {
+                console.log('---- Playground Dispose ----');
+            },
+            plugins: () => [
+                /**
+                 * Minimap plugin
+                 * 缩略图插件
+                 */
+                createMinimapPlugin({
+                    disableLayer: true,
+                    enableDisplayAllNodes: true,
+                    canvasStyle: {
+                        canvasWidth: 182,
+                        canvasHeight: 102,
+                        canvasPadding: 50,
+                        canvasBackground: 'rgba(245, 245, 245, 1)',
+                        canvasBorderRadius: 10,
+                        viewportBackground: 'rgba(235, 235, 235, 1)',
+                        viewportBorderRadius: 4,
+                        viewportBorderColor: 'rgba(201, 201, 201, 1)',
+                        viewportBorderWidth: 1,
+                        viewportBorderDashLength: 2,
+                        nodeColor: 'rgba(255, 255, 255, 1)',
+                        nodeBorderRadius: 2,
+                        nodeBorderWidth: 0.145,
+                        nodeBorderColor: 'rgba(6, 7, 9, 0.10)',
+                        overlayColor: 'rgba(255, 255, 255, 0)',
+                    },
+                }),
+                /**
+                 * Download plugin
+                 * 下载插件
+                 */
+                createDownloadPlugin({}),
+                /**
+                 * Group plugin
+                 * 分组插件
+                 */
+                // createGroupPlugin({
+                //     components: {
+                //         GroupBoxHeader,
+                //         GroupNode,
+                //     },
+                // }),
+                /**
+                 * Clipboard plugin
+                 * 剪切板插件
+                 */
+                // createClipboardPlugin(),
+
+                /**
+                 * Variable panel plugin
+                 * 变量面板插件
+                 */
+                // createVariablePanelPlugin({}),
+                createPanelManagerPlugin({
+                    factories: [nodeFormPanelFactory],
+                }),
+            ],
         }),
         []
     );

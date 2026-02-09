@@ -29,6 +29,7 @@ public class PassAction extends BaseAction {
     public PassAction() {
         this.id = RandomUtils.generateStringId();
         this.title = "通过";
+        this.enable = true;
         this.type = ActionType.PASS.name();
         this.display = new ActionDisplay(this.title);
     }

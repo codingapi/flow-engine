@@ -1,23 +1,20 @@
-/**
- * Copyright (c) 2025 Bytedance Ltd. and/or its affiliates
- * SPDX-License-Identifier: MIT
- */
-
-import type { FlowDocumentJSON } from '@flowgram.ai/fixed-layout-editor';
+import {FlowDocumentJSON} from "@/components/editor/typings";
 
 export const initialData: FlowDocumentJSON = {
     nodes: [
         {
-            id: 'start_0',
-            type: 'start',
+            id: 'start',
+            type: 'START',
+            data: {
+                title: '开始节点',
+            }
         },
         {
-            id: 'custom_1',
-            type: 'custom',
-        },
-        {
-            id: 'end_2',
-            type: 'end',
+            id: 'end',
+            type: 'END',
+            data: {
+                title: '结束节点',
+            }
         },
     ],
 };

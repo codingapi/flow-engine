@@ -13,20 +13,22 @@
     - `title`: 流程名称
     - `form`: 流程表单定义 (`FormMeta`)
     - `nodes`: 节点列表 (`List<IFlowNode>`)
-    - `edges`: 节点连接关系 (`List<FlowEdge>`)
     - `operatorCreateScript`: 创建者匹配脚本
-    - `isInterfere`: 是否开启干预
-    - `isRevoke`: 是否开启撤销
+    - `strategies`: 流程策略列表 (`List<IWorkflowStrategy>`)
     - `createdOperator`: 创建者ID
     - `createdTime`: 创建时间
+    - `updatedTime`: 更新时间
     - `schema`: 流程版本标识
 - **核心方法**:
     - `verify()`: 验证流程定义的合法性
-    - `nextNodes(IFlowNode)`: 获取指定节点的后续节点
+    - `nextNodes(IFlowNode)`: 获取指定节点的后续节点（通过FlowNodeEdgeManager遍历blocks）
     - `getStartNode()`: 获取开始节点
     - `getEndNode()`: 获取结束节点
     - `toJson()`: 序列化为JSON
     - `formJson(String)`: 从JSON反序列化（静态方法）
+- **数据结构说明**:
+    - 节点关系通过`blocks`属性实现层次化结构，不再使用单独的`edges`边关系
+    - 流程策略（InterfereStrategy、UrgeStrategy）在流程级别配置
 
 #### WorkflowBuilder
 - **位置**: `com.codingapi.flow.workflow.WorkflowBuilder`
@@ -47,19 +49,23 @@
     3. `generateCurrentRecords(FlowSession)`: 生成当前节点的流程记录
     4. `isDone(FlowSession)`: 判断节点是否完成
     5. `fillNewRecord(FlowSession, FlowRecord)`: 填充新记录数据
-    6. `filterBranches()`: 过滤条件分支
-    7. `actionManager()`: 获取动作管理器
-    8. `nodeStrategyManager()`: 获取策略管理器
+    6. `blocks()`: 获取当前节点的子节点列表（块节点有子节点，其他节点返回null或空）
+    7. `filterBranches()`: 过滤条件分支（块节点用于筛选执行的分支）
+    8. `actionManager()`: 获取动作管理器
+    9. `nodeStrategyManager()`: 获取策略管理器
 
 #### BaseFlowNode
 - **位置**: `com.codingapi.flow.node.BaseFlowNode`
 - **职责**: 所有节点的抽象基类，实现IFlowNode的默认行为
-- **核心属性**: `id`, `name`, `order`, `actions`, `strategies`
+- **核心属性**: `id`, `name`, `order`, `actions`, `strategies`, `blocks`（子节点列表）
 - **核心方法**:
     - `isWaitParallelRecord()`: 判断是否等待并行节点汇聚
     - `verifySession()`: 委托给ActionManager和StrategyManager验证
     - `setActions()`: 支持动作的复制更新（CustomAction除外）
     - `setStrategies()`: 支持策略的复制更新
+    - `blocks()`: 返回子节点列表
+    - `toMap()`: 序列化为Map（包含blocks字段）
+    - `fromMap()`: 从Map反序列化（从blocks字段加载子节点）
 
 #### BaseAuditNode
 - **位置**: `com.codingapi.flow.node.BaseAuditNode`
@@ -73,22 +79,89 @@
     - `isDone()`: 通过StrategyManager判断多人审批完成状态
     - `generateCurrentRecords()`: 通过StrategyManager加载操作者并生成记录
 
-#### 节点类型一览 (12种)
+#### 块节点系统 (Block Nodes System)
+
+**数据结构变更说明**:
+- 旧设计: 使用独立的`FlowEdge`对象和`edges`列表表示节点连接关系
+- 新设计: 使用层次化的`blocks`属性，节点包含子节点形成树形结构
+
+**FlowNodeState** - 节点状态分类
+- **位置**: `com.codingapi.flow.manager.FlowNodeState`
+- **职责**: 对节点进行分类，判断节点类型
+- **节点分类**:
+  - **块节点 (Block Nodes)**: `CONDITION`, `INCLUSIVE`, `PARALLEL` - 包含子节点的容器节点
+  - **分支节点 (Branch Nodes)**: `CONDITION_BRANCH`, `INCLUSIVE_BRANCH`, `PARALLEL_BRANCH` - 作为块节点的子节点
+- **核心方法**:
+  - `isBlockNode()`: 判断是否为块节点（有blocks属性）
+  - `isBranchNode()`: 判断是否为分支节点
+  - `getBlocks()`: 获取节点的子节点列表
+  - `getFirstBlocks()`: 获取第一个子节点（用于分支节点）
+
+**FlowNodeEdgeManager** - 节点关系管理器
+- **位置**: `com.codingapi.flow.manager.FlowNodeEdgeManager`
+- **职责**: 管理节点之间的连接关系，通过遍历blocks实现
+- **核心方法**:
+  - `getNextNodes(IFlowNode)`: 获取指定节点的后续节点
+  - `loadNextNodes()`: 递归加载下一节点（遍历blocks）
+- **遍历逻辑**:
+  1. 如果当前节点是块节点，返回其blocks
+  2. 如果当前节点是分支节点，返回其第一个block
+  3. 否则返回节点列表中的下一个节点
+  4. 递归处理嵌套的blocks
+
+**NodeMapBuilder** - 节点映射构建器
+- **位置**: `com.codingapi.flow.builder.NodeMapBuilder`
+- **职责**: 从Map数据构建节点对象
+- **核心方法**:
+  - `loadNodes(Map)`: 从Map的"blocks"键加载子节点列表
+  - `loadActions(Map)`: 加载节点动作
+  - `loadNodeStrategies(Map)`: 加载节点策略
+
+**节点关系示例**:
+```
+Workflow
+├── StartNode
+├── ApprovalNode
+├── ConditionNode (块节点)
+│   ├── blocks:
+│   │   ├── ConditionBranchNode (order=1)
+│   │   │   └── blocks: [NotifyNode, EndNode]
+│   │   └── ConditionBranchNode (order=2)
+│   │       └── blocks: [HandleNode, EndNode]
+└── EndNode
+```
+
+#### 节点类型一览 (15种)
+
+**基础节点 (9种)**:
 
 | 节点类型 | 类名 | NODE_TYPE | 说明 |
 |---------|------|-----------|------|
-| 开始节点 | StartNode | `start` | 流程起点 |
-| 结束节点 | EndNode | `end` | 流程终点 |
-| 审批节点 | ApprovalNode | `approval` | 需要审批的任务节点 |
-| 办理节点 | HandleNode | `handle` | 需要办理的任务节点 |
-| 条件分支 | ConditionBranchNode | `condition_branch` | 按条件路由 |
-| 并行分支 | ParallelBranchNode | `parallel_branch` | 并行执行多个分支 |
-| 路由分支 | RouterNode | `router` | 普通路由节点 |
-| 包容分支 | InclusiveBranchNode | `inclusive_branch` | 包容性分支 |
-| 通知节点 | NotifyNode | `notify` | 发送通知 |
-| 延迟节点 | DelayNode | `delay` | 延迟执行 |
-| 触发节点 | TriggerNode | `trigger` | 事件触发 |
-| 子流程节点 | SubProcessNode | `sub_process` | 嵌套子流程 |
+| 开始节点 | StartNode | `START` | 流程起点 |
+| 结束节点 | EndNode | `END` | 流程终点 |
+| 审批节点 | ApprovalNode | `APPROVAL` | 需要审批的任务节点 |
+| 办理节点 | HandleNode | `HANDLE` | 需要办理的任务节点 |
+| 路由分支 | RouterNode | `ROUTER` | 普通路由节点 |
+| 通知节点 | NotifyNode | `NOTIFY` | 发送通知 |
+| 延迟节点 | DelayNode | `DELAY` | 延迟执行 |
+| 触发节点 | TriggerNode | `TRIGGER` | 事件触发 |
+| 子流程节点 | SubProcessNode | `SUB_PROCESS` | 嵌套子流程 |
+
+**块节点/容器节点 (3种)** - 包含子节点(blocks):
+
+| 节点类型 | 类名 | NODE_TYPE | 说明 |
+|---------|------|-----------|------|
+| 条件控制 | ConditionNode | `CONDITION` | 条件分支容器，包含多个ConditionBranchNode |
+| 并行控制 | ParallelNode | `PARALLEL` | 并行分支容器，包含多个ParallelBranchNode |
+| 包容控制 | InclusiveNode | `INCLUSIVE` | 包容分支容器，包含多个InclusiveBranchNode |
+
+**分支节点 (3种)** - 作为块节点的子节点:
+
+| 节点类型 | 类名 | NODE_TYPE | 说明 |
+|---------|------|-----------|------|
+| 条件分支 | ConditionBranchNode | `CONDITION_BRANCH` | 条件控制下的分支，包含条件脚本 |
+| 并行分支 | ParallelBranchNode | `PARALLEL_BRANCH` | 并行控制下的分支 |
+| 包容分支 | InclusiveBranchNode | `INCLUSIVE_BRANCH` | 包容控制下的分支 |
 
 ---
 

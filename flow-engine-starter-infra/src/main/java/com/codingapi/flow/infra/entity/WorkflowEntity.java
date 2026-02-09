@@ -60,12 +60,6 @@ public class WorkflowEntity {
     private String nodes;
 
     /**
-     * 流程关系
-     */
-    @Lob
-    private String edges;
-
-    /**
      * 流程设计
      */
     @Lob

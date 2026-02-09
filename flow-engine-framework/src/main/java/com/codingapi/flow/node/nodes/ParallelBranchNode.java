@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 并行节点
+ * 并行分支节点
  */
 public class ParallelBranchNode extends BaseFlowNode {
 
     public static final String NODE_TYPE = NodeType.PARALLEL_BRANCH.name();
-    public static final String DEFAULT_NAME = "并行节点";
+    public static final String DEFAULT_NAME = "并行分支节点";
 
     @Override
     public String getType() {

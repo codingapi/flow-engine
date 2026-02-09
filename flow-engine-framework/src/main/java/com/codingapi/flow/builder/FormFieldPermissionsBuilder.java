@@ -21,7 +21,7 @@ public class FormFieldPermissionsBuilder {
     public FormFieldPermissionsBuilder addPermission(String form, String name, PermissionType type) {
         FormFieldPermission permission = new FormFieldPermission();
         permission.setFormCode(form);
-        permission.setFieldName(name);
+        permission.setFieldCode(name);
         permission.setType(type);
         permissions.add(permission);
         return this;

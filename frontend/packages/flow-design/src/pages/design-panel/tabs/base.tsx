@@ -1,44 +1,55 @@
 import React from "react";
-import { Input } from "antd";
+import {Input} from "antd";
 import {Panel} from "@/components/panel";
 import {CardForm} from "@/components/form/card";
 import {useDesignContext} from "../hooks/use-design-context";
 
 
-export const TabBase = ()=>{
+export const TabBase = () => {
 
     const [baseForm] = CardForm.useForm();
     const [operatorForm] = CardForm.useForm();
-    const {state,context} = useDesignContext();
+    const {state, context} = useDesignContext();
 
     const formActionContext = context.getPresenter().getFormActionContext();
 
-    React.useEffect(()=>{
+    React.useEffect(() => {
         baseForm.resetFields();
         baseForm.setFieldsValue(state.workflow);
         operatorForm.resetFields();
         operatorForm.setFieldsValue(state.workflow);
-    },[]);
+    }, []);
 
     // 注册form行为
-    React.useEffect(()=>{
+    React.useEffect(() => {
         formActionContext.addAction({
             save() {
                 return baseForm.getFieldsValue();
+            },
+            key(): string {
+                return 'base';
             }
         });
 
         formActionContext.addAction({
             save() {
                 return operatorForm.getFieldsValue();
+            },
+            key(): string {
+                return 'operator';
             }
         });
-    },[]);
 
-    React.useEffect(()=>{
+        return ()=>{
+            formActionContext.removeAction('base');
+            formActionContext.removeAction('operator');
+        }
+    }, []);
+
+    React.useEffect(() => {
         baseForm.setFieldsValue(state.workflow);
         operatorForm.setFieldsValue(state.workflow);
-    },[state.workflow]);
+    }, [state.workflow]);
 
     return (
         <Panel>
@@ -74,7 +85,7 @@ export const TabBase = ()=>{
                 </CardForm.Item>
 
                 <CardForm.Item
-                    name={["form","name"]}
+                    name={["form", "name"]}
                     label={"表单名称"}
                     tooltip={"表单名称是主表的名称"}
                     rules={[
@@ -88,7 +99,7 @@ export const TabBase = ()=>{
                 </CardForm.Item>
 
                 <CardForm.Item
-                    name={["form","code"]}
+                    name={["form", "code"]}
                     label={"表单编码"}
                     tooltip={"表单编码是主表的编码"}
                     rules={[

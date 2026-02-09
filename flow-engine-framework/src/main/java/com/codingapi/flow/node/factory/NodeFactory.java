@@ -1,6 +1,7 @@
 package com.codingapi.flow.node.factory;
 
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.nodes.*;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -22,17 +23,30 @@ public class NodeFactory {
 
     private void initNodes() {
         nodesClasses.put(ApprovalNode.NODE_TYPE, ApprovalNode.class);
+        nodesClasses.put(ConditionNode.NODE_TYPE, ConditionNode.class);
         nodesClasses.put(ConditionBranchNode.NODE_TYPE, ConditionBranchNode.class);
         nodesClasses.put(DelayNode.NODE_TYPE, DelayNode.class);
         nodesClasses.put(EndNode.NODE_TYPE, EndNode.class);
         nodesClasses.put(HandleNode.NODE_TYPE, HandleNode.class);
+        nodesClasses.put(InclusiveNode.NODE_TYPE, InclusiveNode.class);
         nodesClasses.put(InclusiveBranchNode.NODE_TYPE, InclusiveBranchNode.class);
         nodesClasses.put(NotifyNode.NODE_TYPE, NotifyNode.class);
         nodesClasses.put(RouterNode.NODE_TYPE, RouterNode.class);
+        nodesClasses.put(ParallelNode.NODE_TYPE, ParallelNode.class);
         nodesClasses.put(ParallelBranchNode.NODE_TYPE, ParallelBranchNode.class);
         nodesClasses.put(StartNode.NODE_TYPE, StartNode.class);
         nodesClasses.put(SubProcessNode.NODE_TYPE, SubProcessNode.class);
         nodesClasses.put(TriggerNode.NODE_TYPE, TriggerNode.class);
+    }
+
+
+    @SneakyThrows
+    public IFlowNode createNode(NodeType type) {
+        Class<? extends IFlowNode> clazz = nodesClasses.get(type.name());
+        if (clazz != null) {
+            return clazz.getDeclaredConstructor().newInstance();
+        }
+        return null;
     }
 
 

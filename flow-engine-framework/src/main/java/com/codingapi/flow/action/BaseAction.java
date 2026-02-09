@@ -20,6 +20,7 @@ public abstract class BaseAction implements IFlowAction {
     protected String id;
     protected String type;
     protected String title;
+    protected boolean enable;
     protected ActionDisplay display;
 
     @Override
@@ -43,6 +44,11 @@ public abstract class BaseAction implements IFlowAction {
     }
 
     @Override
+    public boolean enable() {
+        return enable;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof BaseAction action) {
             return action.getId().equals(id);
@@ -56,6 +62,7 @@ public abstract class BaseAction implements IFlowAction {
         map.put("id", id);
         map.put("type", type);
         map.put("title", title);
+        map.put("enable", enable);
         map.put("display", display != null ? display.toMap() : null);
         return map;
     }
@@ -71,6 +78,7 @@ public abstract class BaseAction implements IFlowAction {
         this.type = action.type();
         this.title = action.title();
         this.display = action.display();
+        this.enable = action.enable();
     }
 
     @SneakyThrows
@@ -80,6 +88,11 @@ public abstract class BaseAction implements IFlowAction {
         action.setId((String) data.get("id"));
         action.setType((String) data.get("type"));
         action.setTitle((String) data.get("title"));
+        if(data.get("enable")!=null) {
+            action.setEnable((boolean) data.get("enable"));
+        }else {
+            action.setEnable(false);
+        }
         Map<String, Object> display = (Map<String, Object>) data.get("display");
         if (display != null) {
             action.setDisplay(ActionDisplay.fromMap(display));
