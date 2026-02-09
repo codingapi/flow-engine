@@ -89,6 +89,7 @@ describe.sequential('workflow', () => {
         } as any);
 
         const renderData = workflowRenderConvertor.toRender();
+        console.log(renderData.nodes.map(node => node.id));
         expect(renderData.nodes.length).toBe(5);
 
     });
