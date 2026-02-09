@@ -6,7 +6,8 @@
 
 | 功能 | 状态 | 说明 |
 |-----|------|------|
-| 12 种节点类型 | ✅ | StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, ConditionBranchNode, ParallelBranchNode, RouterNode, InclusiveBranchNode, SubProcessNode, DelayNode, TriggerNode |
+| 15 种节点类型 | ✅ | StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, RouterNode, SubProcessNode, DelayNode, TriggerNode (基础9种); ConditionNode, ParallelNode, InclusiveNode (块节点3种); ConditionBranchNode, ParallelBranchNode, InclusiveBranchNode (分支节点3种) |
+| 节点层次化结构 | ✅ | 通过blocks属性实现节点间的层次关系，不再使用独立的边关系 |
 | 节点生命周期管理 | ✅ | verifySession → continueTrigger → generateCurrentRecords → fillNewRecord → isDone |
 | 节点配置面板 | ✅ | 基础信息、审批人配置、策略配置 |
 
@@ -293,7 +294,10 @@
 
 ### v0.2.0 (当前开发版本)
 
-- ✅ 12 种节点类型实现
+- ✅ 15 种节点类型实现（新增ConditionNode、ParallelNode、InclusiveNode块节点）
+- ✅ 节点层次化结构（blocks属性替代独立的边关系）
+- ✅ FlowNodeState节点分类（块节点vs分支节点）
+- ✅ FlowNodeEdgeManager关系管理器（遍历blocks实现）
 - ✅ 延迟节点完整实现
 - ✅ 触发节点完整实现
 - ✅ 路由节点完整实现
@@ -302,10 +306,7 @@
 - ✅ 流程催办功能（UrgeStrategy + UrgeInterval + FlowRecordUrgeEvent）
 - ✅ 流程干预功能（InterfereStrategy）
 - ✅ 节点撤回功能（RevokeStrategy）
-- 🚧 条件分支节点增强
-- 🚧 子流程节点完善
-- 🚧 包容分支节点完善
-- 🚧 前端流程设计器基础功能
+- 🚧 前端流程设计器基础功能（@flowgram.ai集成）
 
 ### v0.3.0 (计划中)
 

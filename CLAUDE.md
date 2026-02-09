@@ -64,14 +64,16 @@ Note: `app-mobile`, `flow-pc`, and `flow-mobile` are planned but not yet impleme
 The workflow engine is organized into 8 layers:
 
 1. **Workflow Layer** (`com.codingapi.flow.workflow`)
-   - `Workflow` - Top-level container with nodes, edges, form definition
+   - `Workflow` - Top-level container with nodes, form definition
    - `WorkflowBuilder` - Builder pattern for workflow construction
 
 2. **Node Layer** (`com.codingapi.flow.node`)
-   - `IFlowNode` - Interface defining node lifecycle methods
-   - `BaseFlowNode` - Abstract base for all nodes, manages actions and strategies
+   - `IFlowNode` - Interface defining node lifecycle methods, includes `blocks()` method for child nodes
+   - `BaseFlowNode` - Abstract base for all nodes, manages actions, strategies, and blocks
    - `BaseAuditNode` - Abstract base for audit nodes (ApprovalNode, HandleNode)
-   - 12 node types: StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, ConditionBranchNode, ParallelBranchNode, RouterNode, InclusiveBranchNode, SubProcessNode, DelayNode, TriggerNode
+   - 15 node types: StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, ConditionBranchNode, ParallelBranchNode, RouterNode, InclusiveBranchNode, SubProcessNode, DelayNode, TriggerNode, ConditionNode, ParallelNode, InclusiveNode
+   - **Block nodes** (containers with child blocks): ConditionNode, ParallelNode, InclusiveNode
+   - **Branch nodes** (child nodes in blocks): ConditionBranchNode, ParallelBranchNode, InclusiveBranchNode
 
 3. **Action Layer** (`com.codingapi.flow.action`, `com.codingapi.flow.action.actions`)
    - `IFlowAction` - Interface for node actions with `copy()` method
@@ -109,7 +111,7 @@ The workflow engine is organized into 8 layers:
 - **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation. Implementations are in `flow-engine-starter-infra`. Access via `RepositoryHolderContext` singleton.
 - **Gateway Pattern** (`com.codingapi.flow.gateway`) - Anti-corruption layer for external system integration (operators, users). Access via `GatewayContext` singleton.
 - **Domain Objects** (`com.codingapi.flow.domain`) - DelayTask, DelayTaskManager, UrgeInterval
-- **Edge System** (`com.codingapi.flow.edge`) - FlowEdge for node connections
+- **Node State System** (`com.codingapi.flow.manager`) - FlowNodeState for node classification (block nodes vs branch nodes), FlowNodeEdgeManager for traversing node relationships via blocks
 - **Event System** (`com.codingapi.flow.event`) - 5 event types: FlowRecordStartEvent, FlowRecordTodoEvent, FlowRecordDoneEvent, FlowRecordFinishEvent, FlowRecordUrgeEvent
 - **Backup System** (`com.codingapi.flow.backup`) - WorkflowBackup for workflow versioning
 
