@@ -10,12 +10,9 @@ import {WorkflowRenderConvertor} from "@/pages/design-panel/presenters/convertor
 describe.sequential('workflow', () => {
 
     test('format1', () => {
-        console.log(workflow1);
-
         const workflowNodeConvertor = new WorkflowNodeConvertor(workflow1 as any);
         const nodes = workflowNodeConvertor.toNodes();
         console.log('Nodes count:', nodes.length);
-        console.log('Nodes:', nodes.map(n => ({ id: n.id, type: n.type })));
         expect(nodes.length).toBe(10);
 
         const workflowEdgeConvertor = new WorkflowEdgeConvertor(workflow1 as any);
@@ -37,8 +34,6 @@ describe.sequential('workflow', () => {
 
 
     test('format2', () => {
-        console.log(workflow2);
-
         const workflowNodeConvertor = new WorkflowNodeConvertor(workflow2 as any);
         const nodes = workflowNodeConvertor.toNodes();
         expect(nodes.length).toBe(20);
@@ -53,14 +48,11 @@ describe.sequential('workflow', () => {
         } as any);
 
         const renderData = workflowRenderConvertor.toRender();
-        console.log(renderData.nodes);
         expect(renderData.nodes.length).toBe(3);
 
     });
 
     test('format3', () => {
-        console.log(workflow3);
-
         const workflowNodeConvertor = new WorkflowNodeConvertor(workflow3 as any);
         const nodes = workflowNodeConvertor.toNodes();
         expect(nodes.length).toBe(8);
@@ -75,18 +67,14 @@ describe.sequential('workflow', () => {
         } as any);
 
         const renderData = workflowRenderConvertor.toRender();
-        console.log(renderData.nodes);
         expect(renderData.nodes.length).toBe(3);
 
     });
 
     test('format4', () => {
-        console.log(workflow4);
-
         const workflowNodeConvertor = new WorkflowNodeConvertor(workflow4 as any);
         const nodes = workflowNodeConvertor.toNodes();
         console.log('Nodes count:', nodes.length);
-        console.log('Nodes:', nodes.map(n => ({ id: n.id, type: n.type })));
         expect(nodes.length).toBe(14);
 
         const workflowEdgeConvertor = new WorkflowEdgeConvertor(workflow4 as any);
@@ -101,7 +89,6 @@ describe.sequential('workflow', () => {
         } as any);
 
         const renderData = workflowRenderConvertor.toRender();
-        console.log(renderData.nodes);
         expect(renderData.nodes.length).toBe(5);
 
     });

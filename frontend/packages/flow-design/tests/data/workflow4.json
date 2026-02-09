@@ -1,7 +1,7 @@
 {
   "nodes": [
     {
-      "id": "cHta9GpxMetfTHOHDC",
+      "id": "start",
       "type": "START",
       "data": {
         "title": "开始节点",
@@ -53,7 +53,7 @@
       "blocks": []
     },
     {
-      "id": "LpdhhMzg47QO9qIYW6",
+      "id": "approval1",
       "type": "APPROVAL",
       "data": {
         "title": "审批节点",
@@ -190,7 +190,7 @@
       "blocks": []
     },
     {
-      "id": "jrHYFyjtBwSHIYjl5g",
+      "id": "approval2",
       "type": "APPROVAL",
       "data": {
         "title": "审批节点",
@@ -327,7 +327,7 @@
       "blocks": []
     },
     {
-      "id": "xCwbEzilhkWjy4UQVv",
+      "id": "1condition",
       "type": "CONDITION",
       "data": {
         "title": "条件控制",
@@ -335,7 +335,7 @@
       },
       "blocks": [
         {
-          "id": "WrgvRwbHSc4OLLXd8j",
+          "id": "1condition1",
           "type": "CONDITION_BRANCH",
           "data": {
             "title": "条件节点节点",
@@ -345,7 +345,7 @@
           },
           "blocks": [
             {
-              "id": "yQVSFeUM5IAZafxrh6",
+              "id": "1condition1_approval1",
               "type": "APPROVAL",
               "data": {
                 "title": "审批节点",
@@ -482,7 +482,7 @@
               "blocks": []
             },
             {
-              "id": "dWZm3uCKQw8eptd3pe",
+              "id": "1condition1_approval2",
               "type": "APPROVAL",
               "data": {
                 "title": "审批节点",
@@ -619,7 +619,7 @@
               "blocks": []
             },
             {
-              "id": "sRXSHBXC3KBtPqi2pC",
+              "id": "1condition1_2condition",
               "type": "CONDITION",
               "data": {
                 "title": "条件控制",
@@ -627,7 +627,7 @@
               },
               "blocks": [
                 {
-                  "id": "XPsztMNmvayYc1tytl",
+                  "id": "1condition1_2condition1",
                   "type": "CONDITION_BRANCH",
                   "data": {
                     "title": "条件节点节点",
@@ -638,7 +638,7 @@
                   "blocks": []
                 },
                 {
-                  "id": "abRy9KPdxktq5TqZYL",
+                  "id": "1condition1_2condition2",
                   "type": "CONDITION_BRANCH",
                   "data": {
                     "title": "条件节点节点",
@@ -653,7 +653,7 @@
           ]
         },
         {
-          "id": "67tHC5VAgzAFaDtCJU",
+          "id": "1condition2",
           "type": "CONDITION_BRANCH",
           "data": {
             "title": "条件节点节点",
@@ -663,7 +663,7 @@
           },
           "blocks": [
             {
-              "id": "fRHmVx2wRjiWAJ5J64",
+              "id": "1condition2_approval1",
               "type": "APPROVAL",
               "data": {
                 "title": "审批节点",
@@ -800,7 +800,7 @@
               "blocks": []
             },
             {
-              "id": "N0f2OunymVbW4WHbsm",
+              "id": "1condition2_approval2",
               "type": "APPROVAL",
               "data": {
                 "title": "审批节点",
@@ -937,7 +937,7 @@
               "blocks": []
             },
             {
-              "id": "lFVY6MVlBXwAEs4bka",
+              "id": "1condition2_1parallel",
               "type": "PARALLEL",
               "data": {
                 "title": "并行控制",
@@ -945,7 +945,7 @@
               },
               "blocks": [
                 {
-                  "id": "IMqnCCQa7BiovlJBKx",
+                  "id": "1condition2_1parallel1",
                   "type": "PARALLEL_BRANCH",
                   "data": {
                     "title": "并行节点",
@@ -955,7 +955,7 @@
                   "blocks": []
                 },
                 {
-                  "id": "hviCTQQnyNqDbpyoYL",
+                  "id": "1condition2_1parallel2",
                   "type": "PARALLEL_BRANCH",
                   "data": {
                     "title": "并行节点",
@@ -971,7 +971,7 @@
       ]
     },
     {
-      "id": "1bAI4bGqQ519CVLJ8c",
+      "id": "end",
       "type": "END",
       "data": {
         "title": "结束节点",

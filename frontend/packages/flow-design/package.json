@@ -15,11 +15,11 @@
   "scripts": {
     "build": "rslib build",
     "dev": "rslib build --watch",
-    "test:format": "rstest -t format",
     "test": "rstest",
-    "test:toNode": "rstest -t toNode",
-    "test:toEdge": "rstest -t toEdge",
-    "test:toRender": "rstest -t toRender"
+    "test:format1": "rstest -t format1",
+    "test:format2": "rstest -t format2",
+    "test:format3": "rstest -t format3",
+    "test:format4": "rstest -t format4"
   },
   "peerDependencies": {
     "react": ">=18",
