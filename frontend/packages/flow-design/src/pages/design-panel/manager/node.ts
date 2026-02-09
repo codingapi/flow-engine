@@ -44,6 +44,7 @@ export class NodeManager {
             order: data?.order ? data?.order + '' : '0',
             actions: data?.actions || [],
             strategies: this.toStrategyData(data),
+            script: data?.script,
             blocks: blocks.map(item => {
                 return this.toDataItem(item)
             }),
