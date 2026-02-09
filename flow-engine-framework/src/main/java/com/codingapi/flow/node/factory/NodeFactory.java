@@ -23,6 +23,7 @@ public class NodeFactory {
 
     private void initNodes() {
         nodesClasses.put(ApprovalNode.NODE_TYPE, ApprovalNode.class);
+        nodesClasses.put(ConditionNode.NODE_TYPE, ConditionNode.class);
         nodesClasses.put(ConditionBranchNode.NODE_TYPE, ConditionBranchNode.class);
         nodesClasses.put(DelayNode.NODE_TYPE, DelayNode.class);
         nodesClasses.put(EndNode.NODE_TYPE, EndNode.class);

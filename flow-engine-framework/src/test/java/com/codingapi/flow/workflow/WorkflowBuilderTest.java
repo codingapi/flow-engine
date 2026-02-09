@@ -3,7 +3,6 @@ package com.codingapi.flow.workflow;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
-import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
@@ -73,8 +72,6 @@ class WorkflowBuilderTest {
                 .addNode(startNode)
                 .addNode(approvalNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), approvalNode.getId()))
-                .addEdge(new FlowEdge(approvalNode.getId(), endNode.getId()))
                 .build();
 
         assertNotNull(workflow);
@@ -100,7 +97,6 @@ class WorkflowBuilderTest {
         assertEquals(workflow.getCreatedOperator().getUserId(), workflowBck.getCreatedOperator().getUserId());
         assertEquals(workflow.getForm(), workflowBck.getForm());
         assertEquals(workflow.getNodes().size(), workflowBck.getNodes().size());
-        assertEquals(workflow.getEdges().size(), workflowBck.getEdges().size());
         assertEquals(workflow.getSchema(), workflowBck.getSchema());
         assertEquals(workflow.getNodes().get(0).getId(), workflowBck.getNodes().get(0).getId());
 
@@ -155,8 +151,6 @@ class WorkflowBuilderTest {
                 .addNode(startNode)
                 .addNode(approvalNode)
                 .addNode(endNode)
-                .addEdge(new FlowEdge(startNode.getId(), approvalNode.getId()))
-                .addEdge(new FlowEdge(approvalNode.getId(), endNode.getId()))
                 .build();
 
 

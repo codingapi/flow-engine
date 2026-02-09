@@ -2,14 +2,15 @@ package com.codingapi.flow.workflow;
 
 import com.alibaba.fastjson.JSON;
 import com.codingapi.flow.context.GatewayContext;
-import com.codingapi.flow.edge.FlowEdge;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.manager.FlowNodeManager;
 import com.codingapi.flow.manager.WorkflowStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.node.helper.BackNodeHelper;
+import com.codingapi.flow.manager.FlowNodeEdgeManager;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -78,10 +79,6 @@ public class Workflow {
      */
     private List<IFlowNode> nodes;
 
-    /**
-     * 流程关系
-     */
-    private List<FlowEdge> edges;
 
     /**
      * 流程设计
@@ -100,14 +97,12 @@ public class Workflow {
         this.createdTime = System.currentTimeMillis();
         this.operatorCreateScript = OperatorMatchScript.any();
         this.nodes = new ArrayList<>();
-        this.edges = new ArrayList<>();
         this.strategies = defaultStrategies();
         this.updateTime();
     }
 
     public void addDefaultNodesAndEdges() {
         this.nodes.addAll(defaultNodes());
-        this.edges.addAll(defaultEdges());
     }
 
     private List<IFlowNode> defaultNodes() {
@@ -117,13 +112,6 @@ public class Workflow {
         return nodeList;
     }
 
-    private List<FlowEdge> defaultEdges() {
-        List<FlowEdge> edgeList = new ArrayList<>();
-        IFlowNode startNode = this.getStartNode();
-        IFlowNode endNode = this.getEndNode();
-        edgeList.add(new FlowEdge(startNode.getId(), endNode.getId()));
-        return edgeList;
-    }
 
     private List<IWorkflowStrategy> defaultStrategies() {
         List<IWorkflowStrategy> strategyList = new ArrayList<>();
@@ -161,10 +149,6 @@ public class Workflow {
         this.nodes = nodes;
     }
 
-    protected void setEdges(List<FlowEdge> edges) {
-        this.edges = edges;
-    }
-
     protected void setSchema(String schema) {
         this.schema = schema;
     }
@@ -192,15 +176,14 @@ public class Workflow {
         map.put("id", id);
         map.put("code", code);
         map.put("title", title);
-        if(createdOperator!=null) {
+        if (createdOperator != null) {
             map.put("createdOperator", String.valueOf(createdOperator.getUserId()));
         }
-        if(form!=null) {
+        if (form != null) {
             map.put("form", form.toMap());
         }
         map.put("operatorCreateScript", operatorCreateScript.getScript());
         map.put("nodes", nodes.stream().map(IFlowNode::toMap).toList());
-        map.put("edges", edges);
         map.put("createdTime", String.valueOf(createdTime));
         map.put("updatedTime", String.valueOf(updatedTime));
         map.put("schema", hasSchema ? schema : null);
@@ -213,7 +196,7 @@ public class Workflow {
     public static Workflow formJson(String json) {
         Map<String, Object> data = JSON.parseObject(json);
         long createOperator = Long.parseLong((String) data.get("createdOperator"));
-        List<Map<String, Object>> nodes = (List<Map<String, Object>>) data.get("nodes");
+
         Workflow workflow = new Workflow();
         workflow.setId((String) data.get("id"));
         workflow.setCode((String) data.get("code"));
@@ -225,23 +208,14 @@ public class Workflow {
         workflow.setForm(FormMeta.fromMap((Map<String, Object>) data.get("form")));
         workflow.setOperatorCreateScript(new OperatorMatchScript((String) data.get("operatorCreateScript")));
 
+        List<Map<String, Object>> nodes = (List<Map<String, Object>>) data.get("nodes");
         if (nodes != null) {
             List<IFlowNode> nodeList = new ArrayList<>();
             for (Map<String, Object> node : nodes) {
                 IFlowNode flowNode = NodeFactory.getInstance().createNode(node);
                 nodeList.add(flowNode);
             }
-            workflow.setNodes(nodeList);
-        }
-
-        List<Map<String, Object>> edges = (List<Map<String, Object>>) data.get("edges");
-        if (edges != null) {
-            List<FlowEdge> edgeList = new ArrayList<>();
-            for (Map<String, Object> edge : edges) {
-                FlowEdge flowEdge = new FlowEdge((String) edge.get("from"), (String) edge.get("to"));
-                edgeList.add(flowEdge);
-            }
-            workflow.setEdges(edgeList);
+           workflow.setNodes(nodeList);
         }
 
         List<Map<String, Object>> strategies = (List<Map<String, Object>>) data.get("strategies");
@@ -278,7 +252,6 @@ public class Workflow {
     public void verify() {
         this.verifyFields();
         this.verifyNodes();
-        this.verifyEdges();
     }
 
     private void verifyFields() {
@@ -302,9 +275,6 @@ public class Workflow {
         }
         if (nodes == null || nodes.isEmpty()) {
             throw FlowConfigException.nodeConfigError(title, "nodes can not be null");
-        }
-        if (edges == null || edges.isEmpty()) {
-            throw FlowConfigException.edgeConfigError("edges can not be null");
         }
     }
 
@@ -338,19 +308,6 @@ public class Workflow {
         }
     }
 
-    private void verifyEdges() {
-        for (FlowEdge edge : edges) {
-            if (edge.getFrom().equals(edge.getTo())) {
-                throw FlowConfigException.edgeConfigError("can not have same from and to");
-            }
-        }
-        IFlowNode startNode = this.nodes.stream().filter(node -> node instanceof StartNode).findFirst().get();
-
-        List<IFlowNode> nextNodes = nextNodes(startNode);
-        for (IFlowNode nextNode : nextNodes) {
-            this.verifyNextEdge(nextNode);
-        }
-    }
 
     private void verifyNextEdge(IFlowNode node) {
         if (node instanceof EndNode) {
@@ -367,14 +324,13 @@ public class Workflow {
     }
 
     public List<IFlowNode> nextNodes(IFlowNode node) {
-        return edges.stream().filter(edge -> edge.getFrom().equals(node.getId()))
-                .map(edge -> nodes.stream().filter(item -> item.getId().equals(edge.getTo())).findFirst().get()).toList();
+        FlowNodeEdgeManager edgeManager = new FlowNodeEdgeManager(nodes);
+        return edgeManager.getNextNodes(node);
     }
 
     public IFlowNode getFlowNode(String nodeId) {
-        return nodes.stream()
-                .filter(node -> node.getId().equals(nodeId))
-                .findFirst().orElse(null);
+        FlowNodeManager nodeManager = new FlowNodeManager(nodes);
+        return nodeManager.getFlowNode(nodeId);
     }
 
     public IFlowNode getStartNode() {

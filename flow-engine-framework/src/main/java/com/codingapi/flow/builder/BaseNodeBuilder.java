@@ -2,8 +2,11 @@ package com.codingapi.flow.builder;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.strategy.node.INodeStrategy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class BaseNodeBuilder<B extends BaseNodeBuilder<B, N>, N extends BaseFlowNode> {
@@ -26,6 +29,17 @@ public abstract class BaseNodeBuilder<B extends BaseNodeBuilder<B, N>, N extends
 
     public B name(String name) {
         node.setName(name);
+        return (B) this;
+    }
+
+    public B blocks(IFlowNode... nodes) {
+        List<IFlowNode> nodeList = new ArrayList<>(Arrays.asList(nodes));
+        node.setBlocks(nodeList);
+        return (B) this;
+    }
+
+    public B blocks(List<IFlowNode> nodes) {
+        node.setBlocks(nodes);
         return (B) this;
     }
 

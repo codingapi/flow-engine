@@ -61,6 +61,14 @@ public abstract class BaseFlowNode implements IFlowNode {
 
 
     /**
+     * 节点块
+     */
+    @Getter
+    @Setter
+    protected List<IFlowNode> blocks;
+
+
+    /**
      * 节点策略
      *
      * @param strategies 节点策略
@@ -139,6 +147,9 @@ public abstract class BaseFlowNode implements IFlowNode {
         map.put("name", name);
         map.put("type", getType());
         map.put("order", String.valueOf(order));
+        if(this.blocks!=null && !this.blocks.isEmpty()) {
+            map.put("blocks", blocks.stream().map(IFlowNode::toMap).toList());
+        }
         map.put("actions", actions.stream().map(IFlowAction::toMap).toList());
         map.put("strategies", strategies.stream().map(INodeStrategy::toMap).toList());
         return map;
@@ -153,6 +164,7 @@ public abstract class BaseFlowNode implements IFlowNode {
         if(map.get("order")!=null) {
             node.setOrder(Integer.parseInt((String) map.get("order")));
         }
+        node.setBlocks(NodeMapBuilder.loadNodes(map));
         node.setActions(NodeMapBuilder.loadActions(map));
         node.setStrategies(NodeMapBuilder.loadNodeStrategies(map));
         return node;
@@ -226,6 +238,11 @@ public abstract class BaseFlowNode implements IFlowNode {
     @Override
     public void fillNewRecord(FlowSession session, FlowRecord flowRecord) {
 
+    }
+
+    @Override
+    public List<IFlowNode> blocks() {
+        return this.blocks;
     }
 
     @Override

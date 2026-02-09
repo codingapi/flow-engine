@@ -106,6 +106,12 @@ public interface IFlowNode extends IMapConvertor {
 
 
     /**
+     * 获取当前节点下blocks数据，废弃edge的设计
+     */
+    List<IFlowNode> blocks();
+
+
+    /**
      * 过滤条件分支
      *
      * @param nodeList    当前节点下的所有条件
