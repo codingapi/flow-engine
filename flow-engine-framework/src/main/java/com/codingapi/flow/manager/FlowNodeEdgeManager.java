@@ -1,107 +1,75 @@
 package com.codingapi.flow.manager;
 
+import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.NodeType;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
- *  TODO 节点关系管理,寻找下一节点的路径上存在bug
+ * 流程节点关系管理器
  */
 public class FlowNodeEdgeManager {
 
-    private final List<IFlowNode> nodes;
-
-    private final List<String> blockNodeTypes = new ArrayList<>();
-    private final List<String> branchNodeTypes = new ArrayList<>();
+    private final Iterator<FlowNodeState> nodes;
 
     public FlowNodeEdgeManager(List<IFlowNode> nodes) {
-        this.nodes = nodes;
-
-        this.blockNodeTypes.add(NodeType.CONDITION.name());
-        this.blockNodeTypes.add(NodeType.INCLUSIVE.name());
-        this.blockNodeTypes.add(NodeType.PARALLEL.name());
-
-        this.branchNodeTypes.add(NodeType.CONDITION_BRANCH.name());
-        this.branchNodeTypes.add(NodeType.INCLUSIVE_BRANCH.name());
-        this.branchNodeTypes.add(NodeType.PARALLEL_BRANCH.name());
+        this.nodes = nodes.stream().map(FlowNodeState::new).iterator();
     }
 
+    /**
+     * 获取下一节点
+     *
+     * @param current 当前节点
+     * @return 下一节点列表
+     */
     public List<IFlowNode> getNextNodes(IFlowNode current) {
-        return this.loadNextNodes(current);
+        return this.loadNextNodes(new FlowNodeState(current), this.nodes);
     }
 
-    private List<IFlowNode> loadNextNodes(IFlowNode current) {
-        if (isBlockNode(current)) {
-            return current.blocks();
+    /**
+     * 加载下一节点
+     * @param current 当前节点状态
+     * @param iterator  当前遍历的节点列表
+     * @return 下一节点列表
+     */
+    private List<IFlowNode> loadNextNodes(FlowNodeState current, Iterator<FlowNodeState> iterator) {
+        if(current.isEndNode()){
+            return new ArrayList<>();
         }
-        if (isBranchNode(current)) {
-            List<IFlowNode> branchNodes = current.blocks();
-            if (branchNodes != null && !branchNodes.isEmpty()) {
-                return List.of(branchNodes.get(0));
-            }
-        }
-        return this.fetchNextNode(current, this.nodes);
-    }
-
-
-    private boolean isBlockNode(IFlowNode node) {
-        return blockNodeTypes.contains(node.getType());
-    }
-
-    private boolean isBranchNode(IFlowNode node) {
-        return branchNodeTypes.contains(node.getType());
-    }
-
-
-    private List<IFlowNode> fetchNextNode(IFlowNode current, List<IFlowNode> nodes) {
-        List<IFlowNode> nextNodes = new ArrayList<>();
-        boolean match = false;
-
-        for (int i = 0; i < nodes.size(); i++) {
-            IFlowNode node = nodes.get(i);
-            if (match) {
-                nextNodes.add(node);
-                break;
-            }
-            if (current.getId().equals(node.getId())) {
-                match = true;
-            }
-            if (this.isBlockNode(node) || this.isBranchNode(node)) {
-                List<IFlowNode> matchNodes = this.fetchNextNode(current, node.blocks());
-                if (!matchNodes.isEmpty()) {
-                    nextNodes.addAll(matchNodes);
+        while (iterator.hasNext()) {
+            FlowNodeState node = iterator.next();
+            if (node.equals(current)) {
+                if (node.isBlockNode()) {
+                    return node.getBlocks();
+                }
+                if (node.isBranchNode()) {
+                    return node.getFirstBlocks();
+                }
+                if (iterator.hasNext()) {
+                    FlowNodeState next = iterator.next();
+                    return Stream.of(next.getNode()).toList();
                 } else {
-                    if (this.hasNodeBlocks(node, current)) {
-                        nextNodes.add(nodes.get(i + 1));
-                        break;
+                    // 跳过大循环，直接进入下一节点
+                    if (this.nodes.hasNext()) {
+                        return Stream.of(this.nodes.next().getNode()).toList();
+                    }else {
+                        throw FlowConfigException.edgeConfigError(current.getName());
                     }
                 }
             }
-        }
-        return nextNodes;
-    }
 
-
-    private boolean hasNodeBlocks(IFlowNode node, IFlowNode current) {
-        List<IFlowNode> blocks = node.blocks();
-        return blocks != null && !blocks.isEmpty() && hasNodeBlocks(current, blocks);
-    }
-
-
-    private boolean hasNodeBlocks(IFlowNode current, List<IFlowNode> nodes) {
-        for (IFlowNode node : nodes) {
-            if (node.getId().equals(current.getId())) {
-                return true;
-            }
-            if (this.isBlockNode(node) || this.isBranchNode(node)) {
-                if (hasNodeBlocks(current, node.blocks())) {
-                    return true;
+            if (node.isBlockNode() || node.isBranchNode()) {
+                List<IFlowNode> nextNodes = this.loadNextNodes(current, node.getBlocks().stream().map(FlowNodeState::new).toList().iterator());
+                if (!nextNodes.isEmpty()) {
+                    return nextNodes;
                 }
             }
+
         }
-        return false;
+        return new ArrayList<>();
     }
 
 }

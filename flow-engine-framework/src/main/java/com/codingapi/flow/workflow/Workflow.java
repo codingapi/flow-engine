@@ -308,21 +308,6 @@ public class Workflow {
         }
     }
 
-
-    private void verifyNextEdge(IFlowNode node) {
-        if (node instanceof EndNode) {
-            return;
-        } else {
-            List<IFlowNode> nextNodes = nextNodes(node);
-            if (nextNodes.isEmpty()) {
-                throw FlowConfigException.edgeConfigError("must have one end edge");
-            }
-            for (IFlowNode nextNode : nextNodes) {
-                this.verifyNextEdge(nextNode);
-            }
-        }
-    }
-
     public List<IFlowNode> nextNodes(IFlowNode node) {
         FlowNodeEdgeManager edgeManager = new FlowNodeEdgeManager(nodes);
         return edgeManager.getNextNodes(node);

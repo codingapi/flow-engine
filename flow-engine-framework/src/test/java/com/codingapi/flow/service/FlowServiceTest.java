@@ -692,15 +692,7 @@ class FlowServiceTest {
                         .build())
                 .build();
 
-        ParallelBranchNode parallelBranchNode1 = ParallelBranchNode.builder()
-                .name("并行分支1")
-                .order(1)
-                .build();
 
-        ParallelBranchNode parallelBranchNode2 = ParallelBranchNode.builder()
-                .name("并行分支2")
-                .order(2)
-                .build();
 
         ApprovalNode departApprovalNode = ApprovalNode.builder()
                 .name("经理审批")
@@ -741,6 +733,24 @@ class FlowServiceTest {
                 )
                 .build();
 
+
+        ParallelBranchNode parallelBranchNode1 = ParallelBranchNode.builder()
+                .name("并行分支1")
+                .blocks(departApprovalNode)
+                .order(1)
+                .build();
+
+        ParallelBranchNode parallelBranchNode2 = ParallelBranchNode.builder()
+                .name("并行分支2")
+                .blocks(bossApprovalNode,bigBossApprovalNode)
+                .order(2)
+                .build();
+
+        ParallelNode parallelNode = ParallelNode.builder()
+                .name("并行控制节点")
+                .blocks(parallelBranchNode1,parallelBranchNode2)
+                .build();
+
         EndNode endNode = EndNode.builder().build();
         Workflow workflow = WorkflowBuilder.builder()
                 .title("请假流程")
@@ -748,11 +758,7 @@ class FlowServiceTest {
                 .createdOperator(user)
                 .form(form)
                 .addNode(startNode)
-                .addNode(parallelBranchNode1)
-                .addNode(parallelBranchNode2)
-                .addNode(departApprovalNode)
-                .addNode(bossApprovalNode)
-                .addNode(bigBossApprovalNode)
+                .addNode(parallelNode)
                 .addNode(endNode)
                 .build();
 
@@ -858,17 +864,6 @@ class FlowServiceTest {
                         .build())
                 .build();
 
-        InclusiveBranchNode parallelBranchNode1 = InclusiveBranchNode.builder()
-                .name("包容分支1")
-                .conditionScript("def run(request){return true}")
-                .order(1)
-                .build();
-
-        InclusiveBranchNode parallelBranchNode2 = InclusiveBranchNode.builder()
-                .name("包容分支2")
-                .conditionScript("def run(request){return request.getFormData('days') >= 3}")
-                .order(2)
-                .build();
 
 
 
@@ -911,6 +906,27 @@ class FlowServiceTest {
                 )
                 .build();
 
+
+        InclusiveBranchNode parallelBranchNode1 = InclusiveBranchNode.builder()
+                .name("包容分支1")
+                .conditionScript("def run(request){return true}")
+                .blocks(departApprovalNode)
+                .order(1)
+                .build();
+
+        InclusiveBranchNode parallelBranchNode2 = InclusiveBranchNode.builder()
+                .name("包容分支2")
+                .conditionScript("def run(request){return request.getFormData('days') >= 3}")
+                .blocks(bossApprovalNode,bigBossApprovalNode)
+                .order(2)
+                .build();
+
+        InclusiveNode inclusiveNode = InclusiveNode.builder()
+                .name("包容控制")
+                .blocks(parallelBranchNode1,parallelBranchNode2)
+                .build();
+
+
         EndNode endNode = EndNode.builder().build();
         Workflow workflow = WorkflowBuilder.builder()
                 .title("请假流程")
@@ -918,11 +934,7 @@ class FlowServiceTest {
                 .createdOperator(user)
                 .form(form)
                 .addNode(startNode)
-                .addNode(parallelBranchNode1)
-                .addNode(parallelBranchNode2)
-                .addNode(departApprovalNode)
-                .addNode(bossApprovalNode)
-                .addNode(bigBossApprovalNode)
+                .addNode(inclusiveNode)
                 .addNode(endNode)
                 .build();
 

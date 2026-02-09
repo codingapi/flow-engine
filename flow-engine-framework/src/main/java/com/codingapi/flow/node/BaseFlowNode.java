@@ -8,6 +8,7 @@ import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.manager.ActionManager;
+import com.codingapi.flow.manager.FlowNodeState;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.HandleNode;
@@ -147,7 +148,7 @@ public abstract class BaseFlowNode implements IFlowNode {
         map.put("name", name);
         map.put("type", getType());
         map.put("order", String.valueOf(order));
-        if(this.blocks!=null && !this.blocks.isEmpty()) {
+        if (this.blocks != null && !this.blocks.isEmpty()) {
             map.put("blocks", blocks.stream().map(IFlowNode::toMap).toList());
         }
         map.put("actions", actions.stream().map(IFlowAction::toMap).toList());
@@ -161,7 +162,7 @@ public abstract class BaseFlowNode implements IFlowNode {
         T node = IMapConvertor.fromMap(map, clazz);
         node.setId((String) map.get("id"));
         node.setName((String) map.get("name"));
-        if(map.get("order")!=null) {
+        if (map.get("order") != null) {
             node.setOrder(Integer.parseInt((String) map.get("order")));
         }
         node.setBlocks(NodeMapBuilder.loadNodes(map));
@@ -193,6 +194,14 @@ public abstract class BaseFlowNode implements IFlowNode {
         }
         if (strategies == null) {
             throw FlowConfigException.strategiesNotNull();
+        }
+
+        FlowNodeState nodeState = new FlowNodeState(this);
+        if (nodeState.isBlockNode() || nodeState.isBranchNode()) {
+            List<IFlowNode> blocks = this.blocks();
+            if (blocks == null || blocks.isEmpty()) {
+                throw FlowConfigException.nodeConfigError(id, "blocks can not be null");
+            }
         }
     }
 

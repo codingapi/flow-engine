@@ -15,24 +15,39 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 并行分支节点
+ * 包容控制节点
  */
-public class ParallelBranchNode extends BaseFlowNode {
+public class InclusiveNode extends BaseFlowNode {
 
-    public static final String NODE_TYPE = NodeType.PARALLEL_BRANCH.name();
-    public static final String DEFAULT_NAME = "并行分支节点";
+    public static final String NODE_TYPE = NodeType.INCLUSIVE.name();
+    public static final String DEFAULT_NAME = "包容控制节点";
+
 
     @Override
     public String getType() {
         return NODE_TYPE;
     }
 
-    public ParallelBranchNode(String id, String name) {
-        super(id, name);
+
+    public InclusiveNode(String id, String name, int order) {
+        super(id, name, order);
     }
 
-    public ParallelBranchNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME);
+    public InclusiveNode() {
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, 0);
+    }
+
+    /**
+     * 匹配条件
+     */
+    @Override
+    public boolean handle(FlowSession request) {
+        return true;
+    }
+
+
+    public static InclusiveNode formMap(Map<String, Object> map) {
+        return BaseFlowNode.fromMap(map, InclusiveNode.class);
     }
 
     /**
@@ -58,18 +73,14 @@ public class ParallelBranchNode extends BaseFlowNode {
         return nodeList;
     }
 
-
-    public static ParallelBranchNode formMap(Map<String, Object> map) {
-        return BaseFlowNode.fromMap(map, ParallelBranchNode.class);
-    }
-
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends BaseNodeBuilder<Builder, ParallelBranchNode> {
+    public static class Builder extends BaseNodeBuilder<Builder, InclusiveNode> {
+
         public Builder() {
-            super(new ParallelBranchNode());
+            super(new InclusiveNode());
         }
     }
 }
