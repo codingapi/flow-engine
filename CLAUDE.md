@@ -49,15 +49,38 @@ pnpm run dev:app-pc
 
 - **flow-engine-framework** - Core framework with workflow engine, node types, form system, script execution
 - **flow-engine-starter** - Spring Boot starter for web applications
-- **flow-engine-starter-infra** - Infrastructure persistence layer (implements repository interfaces)
+- **flow-engine-starter-infra** - Infrastructure persistence layer with JPA entities, convertors, and repository implementations
+  - `entity/` - JPA entities (WorkflowEntity, FlowRecordEntity, DelayTaskEntity, etc.)
+  - `convert/` - Entity-Domain convertors
+  - `jpa/` - Spring Data JPA repositories
+  - `repository/impl/` - Repository interface implementations
 - **flow-engine-example** - Example application
 
 ### Frontend Structure
 
 - **apps/app-pc** - PC client application
-- **packages/flow-design** - Flow designer component library
+- **packages/flow-design** - Flow designer component library using @flowgram.ai fixed-layout-editor
+  - `pages/design-panel/types.ts` - TypeScript interfaces for Workflow, FlowNode, FlowForm
+  - `FlowNode.blocks?: FlowNode[]` - Child nodes for hierarchical structure
+  - `FlowNode.strategies` - Node strategies configuration
+  - `FlowNode.actions` - Node actions configuration
 
 Note: `app-mobile`, `flow-pc`, and `flow-mobile` are planned but not yet implemented.
+
+### Data Structure: Blocks vs Edges
+
+**Critical**: This project uses a hierarchical node structure via `blocks`, NOT edge-based connections.
+
+**Backend (Java)**:
+- `IFlowNode.blocks()` returns `List<IFlowNode>` - child nodes
+- Block nodes: `ConditionNode`, `ParallelNode`, `InclusiveNode` contain branch nodes
+- Branch nodes: `ConditionBranchNode`, `ParallelBranchNode`, `InclusiveBranchNode` are children
+- `FlowNodeEdgeManager` traverses blocks recursively to find next nodes
+
+**Frontend (TypeScript)**:
+- `FlowNode.blocks?: FlowNode[]` - optional child nodes array
+- Legacy `FlowEdge` interface exists but is deprecated
+- @flowgram.ai fixed-layout-editor handles the visual representation
 
 ### Core Layered Architecture
 
@@ -91,8 +114,10 @@ The workflow engine is organized into 8 layers:
 6. **Manager Layer** (`com.codingapi.flow.manager`)
    - `ActionManager` - Manages node actions, provides `getAction(Class)`, `verifySession()`
    - `OperatorManager` - Manages node operators
-   - `NodeStrategyManager` - Manages node strategies, provides `loadOperators()`, `generateTitle()`, `verifySession()`
+   - `NodeStrategyManager` - Manages node strategies, provides `loadOperators()`, `generateTitle()`, `verifySession()`, `getTimeoutTime()`, `isDone()`
    - `WorkflowStrategyManager` - Manages workflow strategies
+   - `FlowNodeState` - Classifies nodes as block nodes or branch nodes for traversal
+   - `FlowNodeEdgeManager` - Traverses hierarchical node structure via blocks to find next nodes
 
 7. **Strategy Layer** (`com.codingapi.flow.strategy`)
    - `INodeStrategy` - Interface with `copy()`, `getId()`, `strategyType()`
@@ -108,10 +133,9 @@ The workflow engine is organized into 8 layers:
 - **Common Interfaces** (`com.codingapi.flow.common`)
    - `ICopyAbility` - Interface for copy capability (used by strategies and actions)
    - `IMapConvertor` - Interface for Map conversion (used by strategies and actions)
-- **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation. Implementations are in `flow-engine-starter-infra`. Access via `RepositoryHolderContext` singleton.
+- **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation. Implementations are in `flow-engine-starter-infra` under `com.codingapi.flow.infra.repository.impl`. Access via `RepositoryHolderContext` singleton. Pattern: Interface in framework, implementation in infra using JPA entities and convertors.
 - **Gateway Pattern** (`com.codingapi.flow.gateway`) - Anti-corruption layer for external system integration (operators, users). Access via `GatewayContext` singleton.
 - **Domain Objects** (`com.codingapi.flow.domain`) - DelayTask, DelayTaskManager, UrgeInterval
-- **Node State System** (`com.codingapi.flow.manager`) - FlowNodeState for node classification (block nodes vs branch nodes), FlowNodeEdgeManager for traversing node relationships via blocks
 - **Event System** (`com.codingapi.flow.event`) - 5 event types: FlowRecordStartEvent, FlowRecordTodoEvent, FlowRecordDoneEvent, FlowRecordFinishEvent, FlowRecordUrgeEvent
 - **Backup System** (`com.codingapi.flow.backup`) - WorkflowBackup for workflow versioning
 
@@ -245,8 +269,6 @@ All framework exceptions extend `FlowException` (RuntimeException). Exception co
 ## Documentation References
 
 - **Design.md** (root) - Comprehensive architecture documentation with class design, lifecycle diagrams, design patterns, and key implementation details
-- **AGENTS.md** - Detailed coding guidelines and patterns
-- **frontend/apps/app-pc/AGENTS.md** - Frontend app development
-- **frontend/packages/flow-design/AGENTS.md** - Frontend library development
+- **frontend/apps/app-pc/AGENTS.md** - Frontend app development guidelines
 - **Rsbuild**: https://rsbuild.rs/llms.txt
 - **Rspack**: https://rspack.rs/llms.txt

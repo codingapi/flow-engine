@@ -352,7 +352,6 @@ category.subcategory.errorType
 
 - [PRD.md](PRD.md) - 产品需求文档
 - [Design.md](Design.md) - 架构设计文档
-- [AGENTS.md](AGENTS.md) - 编码规范
 - [CLAUDE.md](CLAUDE.md) - Claude Code 指南
 - [TODO.md](TODO.md) - 开发进度
 
