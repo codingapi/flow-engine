@@ -8,6 +8,10 @@ export const remove = (id:string) => {
     return httpClient.post('/api/cmd/workflow/remove',{id});
 }
 
+export const changeState = (id:string) => {
+    return httpClient.post('/api/cmd/workflow/changeState',{id});
+}
+
 export const create = () => {
     return httpClient.post('/api/cmd/workflow/create',{});
 }

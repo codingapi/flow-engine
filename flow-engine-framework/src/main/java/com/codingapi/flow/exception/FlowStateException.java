@@ -61,6 +61,19 @@ public class FlowStateException extends FlowException {
         return new FlowStateException("state.operator.notMatch", "Current operator has no permission to process this flow record");
     }
 
+
+
+    /**
+     *
+     * Workflow is already disable
+     * @param workflowId workflowId
+     * @return exception
+     */
+    public static FlowStateException workflowAlreadyDisable(String workflowId) {
+        return new FlowStateException("state.workflow.disable",
+                String.format("Workflow is disable: %s", workflowId));
+    }
+
     /**
      * Workflow is already finished
      *

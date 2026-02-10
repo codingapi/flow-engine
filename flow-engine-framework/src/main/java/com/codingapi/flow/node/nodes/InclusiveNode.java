@@ -3,6 +3,7 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.IBlockNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.helper.ParallelNodeRelationHelper;
@@ -11,13 +12,14 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * 包容控制节点
  */
-public class InclusiveNode extends BaseFlowNode {
+public class InclusiveNode extends BaseFlowNode implements IBlockNode {
 
     public static final String NODE_TYPE = NodeType.INCLUSIVE.name();
     public static final String DEFAULT_NAME = "包容控制节点";
@@ -43,6 +45,17 @@ public class InclusiveNode extends BaseFlowNode {
     @Override
     public boolean handle(FlowSession request) {
         return true;
+    }
+
+
+    @Override
+    public void addDefaultBranch(int count){
+        List<IFlowNode> branches = new ArrayList<>();
+        for (int i=0;i<count;i++){
+            InclusiveBranchNode branchNode = new InclusiveBranchNode();
+            branches.add(branchNode);
+        }
+        this.setBlocks(branches);
     }
 
 

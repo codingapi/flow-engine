@@ -21,6 +21,7 @@ export class NodeManager {
                 order: node.order,
                 actions: node.actions,
                 script: node.script,
+                view: node.view,
                 ...this.toStrategyRender(node),
             },
             blocks: blocks.map(item => this.toItemRender(item))
@@ -42,6 +43,7 @@ export class NodeManager {
             type: node.type,
             name: data?.title,
             order: data?.order ? data?.order + '' : '0',
+            view: data?.view,
             actions: data?.actions || [],
             strategies: this.toStrategyData(data),
             script: data?.script,

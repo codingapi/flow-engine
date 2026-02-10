@@ -15,6 +15,7 @@ import {SameOperatorAuditStrategy} from "@/components/editor/node-components/str
 import {RecordMergeStrategy} from "@/components/editor/node-components/strategy/record-merge";
 import {ResubmitStrategy} from "@/components/editor/node-components/strategy/resubmit";
 import {AdviceStrategy} from "@/components/editor/node-components/strategy/advice";
+import {View} from "@/components/editor/node-components/view";
 
 export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
@@ -23,6 +24,7 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
       <NodePanel>
           <NodeHeader/>
           <TabNodeLayout>
+              <View/>
               <OperatorLoadStrategy/>
               <NodeTitleStrategy/>
               <MultiOperatorAuditStrategy/>

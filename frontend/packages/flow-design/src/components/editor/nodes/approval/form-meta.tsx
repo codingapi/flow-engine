@@ -16,6 +16,7 @@ import {AdviceStrategy} from "@/components/editor/node-components/strategy/advic
 import {TimeoutStrategy} from "@/components/editor/node-components/strategy/timeout";
 import {RecordMergeStrategy} from "@/components/editor/node-components/strategy/record-merge";
 import {RevokeStrategy} from "@/components/editor/node-components/strategy/revoke";
+import {View} from "@/components/editor/node-components/view";
 
 export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
@@ -24,6 +25,7 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
       <NodePanel>
           <NodeHeader/>
           <TabNodeLayout>
+              <View/>
               <OperatorLoadStrategy/>
               <NodeTitleStrategy/>
               <MultiOperatorAuditStrategy/>

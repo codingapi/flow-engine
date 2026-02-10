@@ -42,16 +42,6 @@ public class FormMeta {
         return false;
     }
 
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof FormMeta form) {
-            String json = JSON.toJSONString(form.toMap());
-            return json.equals(JSON.toJSONString(this.toMap()));
-        }
-        return super.equals(obj);
-    }
-
     /**
      * 转换成map
      */
@@ -60,7 +50,9 @@ public class FormMeta {
         map.put("name", name);
         map.put("code", code);
         map.put("fields", fields);
-        map.put("subForms", subForms != null ? subForms.stream().map(FormMeta::toMap).toList() : null);
+        if (subForms != null && !subForms.isEmpty()) {
+            map.put("subForms", subForms.stream().map(FormMeta::toMap).toList());
+        }
         return map;
     }
 
@@ -69,7 +61,7 @@ public class FormMeta {
         FormMeta form = new FormMeta();
         List<Map<String, Object>> fields = (List<Map<String, Object>>) map.get("fields");
         List<FormFieldMeta> fieldList = new ArrayList<>();
-        if(fields!=null && !fields.isEmpty()) {
+        if (fields != null && !fields.isEmpty()) {
             for (Map<String, Object> field : fields) {
                 FormFieldMeta fieldMeta = new FormFieldMeta();
                 fieldMeta.setId((String) field.get("id"));

@@ -95,6 +95,7 @@ export interface FlowNode{
     strategies:any[];
     blocks?:FlowNode[];
     script?:string;
+    view?:string;
 }
 
 // 全局状态

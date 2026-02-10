@@ -32,6 +32,12 @@ export class Presenter extends BasePresenter<State, DesignListApi> {
         })
     }
 
+    public async changeState(id:string){
+        await this.model.changeState(id).then(result => {
+            this.reload();
+        });
+    }
+
     public showEditable() {
         this.dispatch(preState => {
             return {

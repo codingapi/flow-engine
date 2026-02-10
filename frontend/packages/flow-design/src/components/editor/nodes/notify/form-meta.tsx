@@ -9,6 +9,7 @@ import {TabNodeLayout} from "@/components/editor/node-components/layout";
 import {ErrorTriggerStrategy} from "@/components/editor/node-components/strategy/error-trigger";
 import {NodeTitleStrategy} from "@/components/editor/node-components/strategy/node-title";
 import {OperatorLoadStrategy} from "@/components/editor/node-components/strategy/operator-load";
+import {View} from "@/components/editor/node-components/view";
 
 export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
@@ -17,6 +18,7 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
       <NodePanel>
           <NodeHeader/>
           <TabNodeLayout hiddenAction={true}>
+              <View/>
               <OperatorLoadStrategy/>
               <NodeTitleStrategy/>
               <ErrorTriggerStrategy/>
