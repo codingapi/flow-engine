@@ -162,7 +162,7 @@ public class ScriptRuntimeContext {
     }
 
     /**
-     * 执行脚本
+     * 执行脚本，脚本传入的$bind对象，对应{@link FlowScriptContext}对象，用于脚本运行时获取相关的服务数据能力。
      * <p>
      * 线程安全：使用脚本哈希值进行细粒度同步
      * 资源管理：执行完成后确保资源被释放

@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 催办间隔控制
+ * 催办间隔控制，防止催办过快，配合节点的{@link com.codingapi.flow.strategy.workflow.UrgeStrategy}策略使用
  */
 @Getter
 @AllArgsConstructor

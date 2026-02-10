@@ -13,11 +13,29 @@ import lombok.Getter;
 @AllArgsConstructor
 public class DelayTask {
 
+    /**
+     *  延迟任务id
+     */
     private final String id;
+    /**
+     *  创建时间
+     */
     private final long createTime;
+    /**
+     *  触发时间
+     */
     private final long triggerTime;
+    /**
+     *  当前记录id
+     */
     private final long currentRecordId;
+    /**
+     *  流程编号
+     */
     private final String workCode;
+    /**
+     *  延迟节点id
+     */
     private final String delayNodeId;
 
     public DelayTask(DelayStrategy delayStrategy, FlowRecord flowRecord, String delayNodeId) {

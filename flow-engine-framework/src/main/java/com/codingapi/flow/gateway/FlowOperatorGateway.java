@@ -4,6 +4,9 @@ import com.codingapi.flow.operator.IFlowOperator;
 
 import java.util.List;
 
+/**
+ * 流程操作者防腐层
+ */
 public interface FlowOperatorGateway {
 
     IFlowOperator get(long id);
