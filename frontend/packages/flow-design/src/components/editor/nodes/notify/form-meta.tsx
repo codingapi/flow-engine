@@ -1,12 +1,14 @@
 import {provideJsonSchemaOutputs, syncVariableTitle,} from '@flowgram.ai/form-materials';
-import {Field, FieldRenderProps, FormMeta, FormRenderProps, ValidateTrigger,} from '@flowgram.ai/fixed-layout-editor';
+import {FormMeta, FormRenderProps, ValidateTrigger,} from '@flowgram.ai/fixed-layout-editor';
 
-import {FlowNodeJSON, JsonSchema} from '../../typings';
+import {FlowNodeJSON} from '../../typings';
 import {useIsSidebar} from '../../hooks';
-import {Input} from "antd";
 import {NodeHeader} from "@/components/editor/node-components/header";
 import {NodePanel} from "@/components/editor/node-components/panel";
-import {NodeLayout} from "@/components/editor/node-components/layout";
+import {TabNodeLayout} from "@/components/editor/node-components/layout";
+import {ErrorTriggerStrategy} from "@/components/editor/node-components/strategy/error-trigger";
+import {NodeTitleStrategy} from "@/components/editor/node-components/strategy/node-title";
+import {OperatorLoadStrategy} from "@/components/editor/node-components/strategy/operator-load";
 
 export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
@@ -14,7 +16,11 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
     return (
       <NodePanel>
           <NodeHeader/>
-          <NodeLayout type={'tap'}/>
+          <TabNodeLayout hiddenAction={true}>
+              <OperatorLoadStrategy/>
+              <NodeTitleStrategy/>
+              <ErrorTriggerStrategy/>
+          </TabNodeLayout>
       </NodePanel>
     );
   }

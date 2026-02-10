@@ -14,7 +14,7 @@ import {Adder} from "@/components/editor/components/node-adder";
 import {BranchAdder} from "@/components/editor/components/branch-adder";
 import {Collapse} from "../components/collapse";
 
-export function useEditorProps(initialData:FlowDocumentJSON,nodeRegistries: FlowNodeRegistry[]): FixedLayoutProps {
+export function useEditorProps(initialData: FlowDocumentJSON, nodeRegistries: FlowNodeRegistry[]): FixedLayoutProps {
 
     const {token} = theme.useToken();
 
@@ -148,7 +148,8 @@ export function useEditorProps(initialData:FlowDocumentJSON,nodeRegistries: Flow
                 onApply: debounce((ctx, opt) => {
                     if (ctx.document.disposed) return;
                     // Listen change to trigger auto save
-                    console.log('flow-engine auto save: ', ctx.document.toJSON());
+                    const data = ctx.document.toJSON();
+                    console.log('flow-engine auto save: ', data);
                 }, 100),
             },
             /**

@@ -5,7 +5,8 @@ import {FlowNodeJSON} from '../../typings';
 import {useIsSidebar} from '../../hooks';
 import {NodeHeader} from "@/components/editor/node-components/header";
 import {NodePanel} from "@/components/editor/node-components/panel";
-import {NodeLayout} from "@/components/editor/node-components/layout";
+import {PanelLayout} from "@/components/editor/node-components/layout";
+import {SubProcessStrategy} from "@/components/editor/node-components/strategy/sub-process";
 
 export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
@@ -13,7 +14,9 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
     return (
       <NodePanel>
           <NodeHeader/>
-          <NodeLayout type={'fall'}/>
+          <PanelLayout>
+              <SubProcessStrategy/>
+          </PanelLayout>
       </NodePanel>
     );
   }
