@@ -90,6 +90,16 @@ public class Workflow {
     private List<IWorkflowStrategy> strategies;
 
 
+    /**
+     * 启用状态
+     */
+    private boolean enable;
+
+
+    public boolean isDisable(){
+        return !enable;
+    }
+
     protected Workflow() {
         this.id = RandomUtils.generateStringId();
         this.code = RandomUtils.generateWorkflowCode();
@@ -97,6 +107,7 @@ public class Workflow {
         this.operatorCreateScript = OperatorMatchScript.any();
         this.nodes = new ArrayList<>();
         this.strategies = defaultStrategies();
+        this.enable = false;
         this.updateTime();
     }
 
@@ -252,6 +263,26 @@ public class Workflow {
         this.verifyFields();
         this.verifyNodes();
     }
+
+
+    /**
+     * 启动流程
+     */
+    public void enable(){
+        this.verify();
+        this.enable = true;
+        this.updateTime();
+    }
+
+
+    /**
+     * 禁用流程
+     */
+    public void disable(){
+        this.enable = false;
+        this.updateTime();
+    }
+
 
     private void verifyFields() {
         if (!StringUtils.hasText(id)) {

@@ -31,6 +31,7 @@ public class WorkflowConvertor {
         entity.setNodes(flowNodeListConvertor.convertToDatabaseColumn(workflow.getNodes()));
         entity.setSchema(workflow.getSchema());
         entity.setStrategies(workflowStrategyListConvertor.convertToDatabaseColumn(workflow.getStrategies()));
+        entity.setEnable(workflow.isEnable());
         return entity;
     }
 
@@ -48,6 +49,7 @@ public class WorkflowConvertor {
                 operatorMatchScriptConvertor.convertToEntityAttribute(entity.getOperatorCreateScript()),
                 flowNodeListConvertor.convertToEntityAttribute(entity.getNodes()),
                 entity.getSchema(),
-                workflowStrategyListConvertor.convertToEntityAttribute(entity.getStrategies()));
+                workflowStrategyListConvertor.convertToEntityAttribute(entity.getStrategies()),
+                entity.getEnable());
     }
 }

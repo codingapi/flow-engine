@@ -8,6 +8,7 @@ import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowPermissionException;
+import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.node.nodes.StartNode;
@@ -42,6 +43,9 @@ public class FlowCreateService {
         Workflow workflow = workflowRepository.get(request.getWorkId());
         if (workflow == null) {
             throw FlowNotFoundException.workflow(request.getWorkId());
+        }
+        if (workflow.isDisable()) {
+            throw FlowStateException.workflowAlreadyDisable(request.getWorkId());
         }
         workflow.verify();
         // 获取备份

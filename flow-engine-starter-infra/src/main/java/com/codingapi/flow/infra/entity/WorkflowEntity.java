@@ -70,4 +70,9 @@ public class WorkflowEntity {
      */
     @Lob
     private String strategies;
+
+    /**
+     * 启用状态
+     */
+    private Boolean enable;
 }

@@ -3,9 +3,6 @@ package com.codingapi.flow.api.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.codingapi.flow.api.pojo.NodeCreateRequest;
 import com.codingapi.flow.api.service.NodeBuildService;
-import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.NodeType;
-import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.workflow.Workflow;
@@ -36,6 +33,20 @@ public class WorkflowController {
         workflowRepository.delete(workflow);
         return Response.buildSuccess();
     }
+
+
+    @PostMapping("/changeState")
+    public Response changeState(@RequestBody IdRequest request) {
+        Workflow workflow = workflowRepository.get(request.getStringId());
+        if(workflow.isDisable()){
+            workflow.enable();
+        }else {
+            workflow.disable();
+        }
+        workflowRepository.save(workflow);
+        return Response.buildSuccess();
+    }
+
 
     @PostMapping("/create")
     public SingleResponse<JSONObject> create() {

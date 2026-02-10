@@ -7,6 +7,7 @@ import {NodePanel} from "@/components/editor/node-components/panel";
 import {TabNodeLayout} from "@/components/editor/node-components/layout";
 import {NodeTitleStrategy} from "@/components/editor/node-components/strategy/node-title";
 import {RevokeStrategy} from "@/components/editor/node-components/strategy/revoke";
+import {View} from "@/components/editor/node-components/view";
 
 export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
@@ -15,6 +16,7 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
       <NodePanel>
           <NodeHeader/>
           <TabNodeLayout>
+              <View/>
               <NodeTitleStrategy/>
               <RevokeStrategy/>
           </TabNodeLayout>

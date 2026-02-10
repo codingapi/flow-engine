@@ -39,6 +39,39 @@ export const DesignList: React.FC<DesignListProps> = (props) => {
             }
         },
         {
+            dataIndex: 'enable',
+            title: '状态',
+            render: (value, record) => {
+                if(value){
+                    return  (
+                        <Popconfirm
+                            title={"确认要禁用吗？"}
+                            onConfirm={()=>{
+                                presenter.changeState(record.id).then(()=>{
+                                    message.success('流程已禁用.')
+                                });
+                            }}
+                        >
+                            <a>启用</a>
+                        </Popconfirm>
+                    )
+                }else {
+                    return  (
+                        <Popconfirm
+                            title={"确认要启用吗？"}
+                            onConfirm={()=>{
+                                presenter.changeState(record.id).then(()=>{
+                                    message.success('流程已启用.')
+                                });
+                            }}
+                        >
+                            <a>禁用</a>
+                        </Popconfirm>
+                    )
+                }
+            }
+        },
+        {
             dataIndex: 'option',
             title: '操作',
             render: (value, record) => {

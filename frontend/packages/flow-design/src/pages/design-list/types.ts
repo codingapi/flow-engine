@@ -21,6 +21,8 @@ export interface DesignListApi {
 
     delete: (id: string) => Promise<void>;
 
+    changeState:(id:string) => Promise<void>;
+
 }
 
 export interface DesignListProps {

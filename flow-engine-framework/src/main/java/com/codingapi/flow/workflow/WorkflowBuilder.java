@@ -74,9 +74,9 @@ public class WorkflowBuilder {
     }
 
 
-    public Workflow build(boolean verify) {
-        if(verify) {
-            workflow.verify();
+    public Workflow build(boolean enable) {
+        if(enable) {
+            workflow.enable();
         }
         return workflow;
     }
