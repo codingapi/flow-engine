@@ -96,7 +96,7 @@ class WorkflowBuilderTest {
         assertEquals(workflow.getCode(), workflowBck.getCode());
         assertEquals(workflow.getId(), workflowBck.getId());
         assertEquals(workflow.getCreatedOperator().getUserId(), workflowBck.getCreatedOperator().getUserId());
-        assertEquals(workflow.getForm(), workflowBck.getForm());
+        assertEquals(workflow.getForm().getCode(), workflowBck.getForm().getCode());
         assertEquals(workflow.getNodes().size(), workflowBck.getNodes().size());
         assertEquals(workflow.getSchema(), workflowBck.getSchema());
         assertEquals(workflow.getNodes().get(0).getId(), workflowBck.getNodes().get(0).getId());

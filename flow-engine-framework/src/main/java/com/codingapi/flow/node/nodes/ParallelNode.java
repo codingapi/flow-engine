@@ -3,6 +3,7 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.IBlockNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.helper.ParallelNodeRelationHelper;
@@ -11,13 +12,14 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * 并行控制
  */
-public class ParallelNode extends BaseFlowNode {
+public class ParallelNode extends BaseFlowNode implements IBlockNode {
 
     public static final String NODE_TYPE = NodeType.PARALLEL.name();
     public static final String DEFAULT_NAME = "并行控制节点";
@@ -56,6 +58,16 @@ public class ParallelNode extends BaseFlowNode {
         flowRecord.parallelBranchNode(overNode.getId(), nodeList.size(), RandomUtils.generateStringId());
 
         return nodeList;
+    }
+
+    @Override
+    public void addDefaultBranch(int count){
+        List<IFlowNode> branches = new ArrayList<>();
+        for (int i=0;i<count;i++){
+            ParallelBranchNode branchNode = new ParallelBranchNode();
+            branches.add(branchNode);
+        }
+        this.setBlocks(branches);
     }
 
 

@@ -2,6 +2,7 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.IBlockNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.session.FlowSession;
@@ -15,7 +16,7 @@ import java.util.Map;
 /**
  * 条件控制节点
  */
-public class ConditionNode extends BaseFlowNode {
+public class ConditionNode extends BaseFlowNode implements IBlockNode {
 
     public static final String NODE_TYPE = NodeType.CONDITION.name();
     public static final String DEFAULT_NAME = "条件控制节点";
@@ -57,6 +58,15 @@ public class ConditionNode extends BaseFlowNode {
         return nodes;
     }
 
+    @Override
+    public void addDefaultBranch(int count){
+        List<IFlowNode> branches = new ArrayList<>();
+        for (int i=0;i<count;i++){
+            ConditionBranchNode branchNode = new ConditionBranchNode();
+            branches.add(branchNode);
+        }
+        this.setBlocks(branches);
+    }
 
     public static ConditionNode formMap(Map<String, Object> map) {
         return BaseFlowNode.fromMap(map, ConditionNode.class);
