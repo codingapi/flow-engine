@@ -1,27 +1,11 @@
 import React, {useState} from 'react';
 import {Popover} from "antd";
 import {type FlowNodeEntity, useClientContext} from '@flowgram.ai/fixed-layout-editor';
-import {generateNodeId} from "@/components/editor/utils";
 
 import {NodeList} from '../node-list';
 import {Wrap} from './styles';
 import {PlusCircleOutlined} from "@ant-design/icons";
 
-
-const generateNewIdForChildren = (n: FlowNodeEntity): FlowNodeEntity => {
-    if (n.blocks) {
-        return {
-            ...n,
-            id: generateNodeId(n),
-            blocks: n.blocks.map((b) => generateNewIdForChildren(b)),
-        } as FlowNodeEntity;
-    } else {
-        return {
-            ...n,
-            id: generateNodeId(n),
-        } as FlowNodeEntity;
-    }
-};
 
 interface AdderProps {
     from: FlowNodeEntity;
