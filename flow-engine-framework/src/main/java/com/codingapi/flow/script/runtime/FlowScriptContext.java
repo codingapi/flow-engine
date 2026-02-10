@@ -10,6 +10,9 @@ import lombok.Setter;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ *  脚本运行时的$bind上下文对象
+ */
 public class FlowScriptContext {
 
     @Getter

@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 
 @AllArgsConstructor
-public class FlowRepositoryRegister implements InitializingBean {
+public class RepositoryHolderContextRegister implements InitializingBean {
 
     private final WorkflowRepository workflowRepository;
     private final WorkflowBackupRepository workflowBackupRepository;

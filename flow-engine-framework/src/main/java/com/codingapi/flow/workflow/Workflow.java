@@ -10,7 +10,6 @@ import com.codingapi.flow.manager.WorkflowStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.node.helper.BackNodeHelper;
-import com.codingapi.flow.manager.FlowNodeEdgeManager;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -309,8 +308,8 @@ public class Workflow {
     }
 
     public List<IFlowNode> nextNodes(IFlowNode node) {
-        FlowNodeEdgeManager edgeManager = new FlowNodeEdgeManager(nodes);
-        return edgeManager.getNextNodes(node);
+        FlowNodeManager flowNodeManager = new FlowNodeManager(nodes);
+        return flowNodeManager.getNextNodes(node);
     }
 
     public IFlowNode getFlowNode(String nodeId) {
