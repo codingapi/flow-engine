@@ -37,6 +37,7 @@ export class Presenter {
                 nodes.push(...prevWorkflow.nodes);
             }
         }
+        console.log('update nodes:',nodes);
         return {
             ...prevWorkflow,
             ...currentWorkflow,
