@@ -14,14 +14,18 @@ export class PromissionManager {
         this.formList =[form,...(form.subForms||[])];
     }
 
-    public getDatasource(code: string) {
-        const list = this.data.filter(item => item.formCode === code) || [];
-        return list.map(item => {
-            return {
-                ...item,
-                fieldName:this.getFieldName(item.formCode,item.fieldCode)
+    private getFormFields(code:string){
+        for (const form of this.formList){
+            if (code === form.code){
+                return form.fields;
             }
-        });
+        }
+        return [];
+    }
+
+
+    public getDatasource(code: string) {
+        return this.convertFieldsToColumns(code)
     }
 
     private getFieldName(formCode:string,fieldCode:string){
@@ -36,6 +40,30 @@ export class PromissionManager {
             }
         }
         return null;
+    }
+
+    private convertFieldsToColumns(code:string){
+        const currentColumns = this.data.filter(item => item.formCode === code) || [];
+
+        return  this.getFormFields(code).map(field => {
+            return {
+                id: field.id,
+                fieldName: field.name,
+                fieldCode: field.code,
+                formCode: code,
+                type: 'WRITE',
+            }
+        }).map(field => {
+            const currentColumnType = currentColumns.find(column => column.fieldCode === field.fieldCode);
+            if(currentColumnType){
+                return {
+                    ...field,
+                    type:currentColumnType.type
+                }
+            }else {
+                return field;
+            }
+        });
     }
 
     public initFormPromission() {
