@@ -1,7 +1,7 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
-import com.codingapi.flow.exception.FlowConfigException;
+import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
@@ -35,6 +35,11 @@ public class ParallelBranchNode extends BaseFlowNode {
         this(RandomUtils.generateStringId(), DEFAULT_NAME);
     }
 
+    @Override
+    public boolean handle(FlowSession request) {
+        return true;
+    }
+
     /**
      * 匹配条件分支
      *
@@ -44,11 +49,12 @@ public class ParallelBranchNode extends BaseFlowNode {
      */
     public List<IFlowNode> filterBranches(List<IFlowNode> nodeList, FlowSession flowSession) {
         Workflow workflow = flowSession.getWorkflow();
-        ParallelNodeRelationHelper helper = new ParallelNodeRelationHelper(nodeList, workflow);
+        IFlowNode currentNode = flowSession.getCurrentNode();
+        ParallelNodeRelationHelper helper = new ParallelNodeRelationHelper(workflow, currentNode, nodeList);
         // 分析并行分支的结束汇聚节点
-        IFlowNode overNode = helper.fetchParallelEndNode();
+        IFlowNode overNode = helper.fetchMargeNode();
         if (overNode == null) {
-            throw FlowConfigException.parallelEndNodeNotNull();
+            throw FlowNotFoundException.parallelEndNodeNotNull();
         }
 
         // 在流程记录中记录，合并的条件信息。

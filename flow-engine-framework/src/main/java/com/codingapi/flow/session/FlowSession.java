@@ -10,7 +10,9 @@ import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Getter;
+import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,7 +42,8 @@ public class FlowSession {
     /**
      * 当前审批流程记录
      */
-    private final FlowRecord currentRecord;
+    @Setter
+    private FlowRecord currentRecord;
 
     /**
      * 当前节点的流程记录
@@ -114,7 +117,7 @@ public class FlowSession {
                                            IFlowAction currentAction,
                                            FormData formData,
                                            long backupId) {
-        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, null, null, backupId, new FlowAdvice());
+        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, null, new ArrayList<>(), backupId, new FlowAdvice());
     }
 
 

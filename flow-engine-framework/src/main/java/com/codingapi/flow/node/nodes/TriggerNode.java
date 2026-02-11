@@ -43,10 +43,13 @@ public class TriggerNode extends BaseFlowNode {
 
     @Override
     public boolean handle(FlowSession session) {
-        NodeStrategyManager nodeStrategyManager = this.strategyManager();
-        TriggerStrategy triggerStrategy = nodeStrategyManager.getStrategy(TriggerStrategy.class);
-        triggerStrategy.execute(session);
-        return true;
+        if(super.handle(session)) {
+            NodeStrategyManager nodeStrategyManager = this.strategyManager();
+            TriggerStrategy triggerStrategy = nodeStrategyManager.getStrategy(TriggerStrategy.class);
+            triggerStrategy.execute(session);
+            return true;
+        }
+        return false;
     }
 
     public static TriggerNode formMap(Map<String, Object> map) {

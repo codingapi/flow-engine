@@ -5,7 +5,7 @@ import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.context.RepositoryHolderContext;
-import com.codingapi.flow.exception.FlowConfigException;
+import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.FlowNodeState;
@@ -184,23 +184,23 @@ public abstract class BaseFlowNode implements IFlowNode {
 
     private void verifyDefaultConfig() {
         if (!StringUtils.hasText(name)) {
-            throw FlowConfigException.nodeConfigError(name, "name can not be null");
+            throw FlowValidationException.nodeRequired("name");
         }
         if (!StringUtils.hasText(id)) {
-            throw FlowConfigException.nodeConfigError(id, "id can not be null");
+            throw FlowValidationException.nodeRequired("id");
         }
         if (actions == null) {
-            throw FlowConfigException.actionsNotNull();
+            throw FlowValidationException.nodeRequired("action");
         }
         if (strategies == null) {
-            throw FlowConfigException.strategiesNotNull();
+            throw FlowValidationException.nodeRequired("strategies");
         }
 
         FlowNodeState nodeState = new FlowNodeState(this);
         if (nodeState.isBlockNode() || nodeState.isBranchNode()) {
             List<IFlowNode> blocks = this.blocks();
             if (blocks == null || blocks.isEmpty()) {
-                throw FlowConfigException.nodeConfigError(id, "blocks can not be null");
+                throw FlowValidationException.nodeRequired("blocks");
             }
         }
     }
@@ -225,8 +225,15 @@ public abstract class BaseFlowNode implements IFlowNode {
     }
 
 
+    /**
+     * 匹配条件
+     */
     @Override
-    public boolean handle(FlowSession session) {
+    public boolean handle(FlowSession request) {
+        // 是否等待并行合并节点
+        if (this.isWaitRecordMargeParallelNode(request)) {
+            return false;
+        }
         return true;
     }
 

@@ -2,8 +2,7 @@ package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.common.IMapConvertor;
-import com.codingapi.flow.exception.FlowConfigException;
-import com.codingapi.flow.exception.FlowPermissionException;
+import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
@@ -47,7 +46,7 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
         for (FormFieldPermission permission : fieldPermissions) {
             String key = permission.getFormCode() + "." + permission.getFieldCode();
             if (!fieldTypes.containsKey(key)) {
-                throw FlowPermissionException.fieldNotFound(key);
+                throw FlowValidationException.fieldNotFound(key);
             }
         }
     }
@@ -64,11 +63,11 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
                     List<Map<String, Object>> currentSubFormData = (List<Map<String, Object>>) currentData.get(permission.getFormCode());
                     List<Map<String, Object>> latestSubFormData = (List<Map<String, Object>>) latestData.get(permission.getFormCode());
                     if (currentSubFormData == null || latestSubFormData == null) {
-                        throw FlowConfigException.formConfigError(permission.getFormCode(), "is not a sub form");
+                        throw FlowValidationException.nodeRequired("form");
                     }
 
                     if (currentSubFormData.size() != latestSubFormData.size()) {
-                        throw FlowConfigException.formConfigError(permission.getFormCode(), "size is not equal");
+                        throw FlowValidationException.nodeRequired("form");
                     }
 
                     for (int i = 0; i < currentSubFormData.size(); i++) {
@@ -77,7 +76,7 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
                         Object currentValue = currentSubFormItem.get(permission.getFieldCode());
                         Object latestValue = latestSubFormItem.get(permission.getFieldCode());
                         if (!currentValue.equals(latestValue)) {
-                            throw FlowPermissionException.fieldReadOnly(permission.getFieldCode());
+                            throw FlowValidationException.fieldReadOnly(permission.getFieldCode());
                         }
                     }
                 }
@@ -87,7 +86,7 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
                     Object currentValue = currentData.get(permission.getFieldCode());
                     Object latestValue = latestData.get(permission.getFieldCode());
                     if (!currentValue.equals(latestValue)) {
-                        throw FlowPermissionException.fieldReadOnly(permission.getFieldCode());
+                        throw FlowValidationException.fieldReadOnly(permission.getFieldCode());
                     }
                 }
             }

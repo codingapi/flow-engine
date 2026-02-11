@@ -67,9 +67,9 @@ public class FlowCreateService {
         IFlowAction action = currentNode.actionManager().getActionById(request.getActionId());
         FlowSession session = FlowSession.startSession(currentOperator, workflow, currentNode, action, formData, workflowBackup.getId());
 
-        currentNode.verifySession(session);
-
         List<FlowRecord> flowRecords = currentNode.generateCurrentRecords(session);
+
+        currentNode.verifySession(session);
 
         if (flowRecords.size() > 1) {
             throw FlowExecutionException.createRecordSizeError();

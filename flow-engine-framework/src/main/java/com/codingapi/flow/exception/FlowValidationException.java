@@ -10,7 +10,6 @@ package com.codingapi.flow.exception;
  */
 public class FlowValidationException extends FlowException {
 
-    private static final long serialVersionUID = 1L;
 
     /**
      * Constructor
@@ -23,14 +22,48 @@ public class FlowValidationException extends FlowException {
     }
 
     /**
-     * Constructor
+     * node field is empty
      *
-     * @param code    error code
-     * @param message error message
-     * @param cause   cause
+     * @param fieldName node field name
+     * @return exception
      */
-    public FlowValidationException(String code, String message, Throwable cause) {
-        super(code, message, cause);
+    public static FlowValidationException nodeRequired(String fieldName) {
+        return new FlowValidationException("validation.node."+fieldName,
+                String.format("Required field %s cannot be empty", fieldName));
+    }
+
+
+    /**
+     * Field is read-only
+     *
+     * @param fieldName field name
+     * @return exception
+     */
+    public static FlowValidationException fieldReadOnly(String fieldName) {
+        return new FlowValidationException("validation.field.readOnly",
+                String.format("Field '%s' is read-only and cannot be modified", fieldName));
+    }
+
+    /**
+     * Field not found
+     *
+     * @param fieldName field name
+     * @return exception
+     */
+    public static FlowValidationException fieldNotFound(String fieldName) {
+        return new FlowValidationException("validation.field.notFound",
+                String.format("Field '%s' does not exist", fieldName));
+    }
+
+    /**
+     * workflow field is empty
+     *
+     * @param fieldName node field name
+     * @return exception
+     */
+    public static FlowValidationException workflowRequired(String fieldName) {
+        return new FlowValidationException("validation.workflow."+fieldName,
+                String.format("Required field %s cannot be empty", fieldName));
     }
 
     /**
@@ -42,17 +75,6 @@ public class FlowValidationException extends FlowException {
     public static FlowValidationException required(String fieldName) {
         return new FlowValidationException("validation.field.required",
                 String.format("Required field %s cannot be empty", fieldName));
-    }
-
-    /**
-     * Field value cannot be empty
-     *
-     * @param fieldName field name
-     * @return exception
-     */
-    public static FlowValidationException notEmpty(String fieldName) {
-        return new FlowValidationException("validation.field.notEmpty",
-                String.format("Field %s value cannot be empty", fieldName));
     }
 
     /**

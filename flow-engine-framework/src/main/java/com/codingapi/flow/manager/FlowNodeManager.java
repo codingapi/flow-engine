@@ -1,6 +1,6 @@
 package com.codingapi.flow.manager;
 
-import com.codingapi.flow.exception.FlowConfigException;
+import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.node.IFlowNode;
 
 import java.util.ArrayList;
@@ -99,7 +99,7 @@ public class FlowNodeManager {
                         if (this.nodes.hasNext()) {
                             return Stream.of(this.nodes.next().getNode()).toList();
                         }else {
-                            throw FlowConfigException.edgeConfigError(current.getName());
+                            throw FlowStateException.edgeConfigError(current.getName());
                         }
                     }
                 }

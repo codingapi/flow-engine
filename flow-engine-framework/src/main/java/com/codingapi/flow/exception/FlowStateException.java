@@ -10,7 +10,6 @@ package com.codingapi.flow.exception;
  */
 public class FlowStateException extends FlowException {
 
-    private static final long serialVersionUID = 1L;
 
     /**
      * Constructor
@@ -23,14 +22,31 @@ public class FlowStateException extends FlowException {
     }
 
     /**
-     * Constructor
+     * Repository not registered
      *
-     * @param code    error code
-     * @param message error message
-     * @param cause   cause
+     * @return exception
      */
-    public FlowStateException(String code, String message, Throwable cause) {
-        super(code, message, cause);
+    public static FlowStateException repositoryNotRegistered() {
+        return new FlowStateException("state.repository.notRegistered", "Flow repository components not registered");
+    }
+
+    /**
+     * Current node cannot be null
+     *
+     * @return exception
+     */
+    public static FlowStateException currentNodeNotNull() {
+        return new FlowStateException("state.node.current.required", "Current node cannot be null");
+    }
+
+    /**
+     * Edge configuration error
+     *
+     * @param reason reason
+     * @return exception
+     */
+    public static FlowStateException edgeConfigError(String reason) {
+        return new FlowStateException("state.edge.error", String.format("Edge configuration error: %s", reason));
     }
 
     /**
@@ -62,10 +78,10 @@ public class FlowStateException extends FlowException {
     }
 
 
-
     /**
      *
      * Workflow is already disable
+     *
      * @param workflowId workflowId
      * @return exception
      */
@@ -73,37 +89,6 @@ public class FlowStateException extends FlowException {
         return new FlowStateException("state.workflow.disable",
                 String.format("Workflow is disable: %s", workflowId));
     }
-
-    /**
-     * Workflow is already finished
-     *
-     * @return exception
-     */
-    public static FlowStateException workflowAlreadyFinished() {
-        return new FlowStateException("state.workflow.alreadyFinished", "Workflow is finished, further operation not allowed");
-    }
-
-    /**
-     * Workflow is already terminated
-     *
-     * @return exception
-     */
-    public static FlowStateException workflowAlreadyTerminated() {
-        return new FlowStateException("state.workflow.alreadyTerminated", "Workflow is terminated, further operation not allowed");
-    }
-
-    /**
-     * Invalid state transition
-     *
-     * @param fromState current state
-     * @param toState   target state
-     * @return exception
-     */
-    public static FlowStateException invalidStateTransition(String fromState, String toState) {
-        return new FlowStateException("state.transition.invalid",
-                String.format("Invalid state transition: from '%s' to '%s'", fromState, toState));
-    }
-
 
     /**
      * Record not support revoke

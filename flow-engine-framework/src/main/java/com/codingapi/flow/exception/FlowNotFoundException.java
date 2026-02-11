@@ -10,7 +10,6 @@ package com.codingapi.flow.exception;
  */
 public class FlowNotFoundException extends FlowException {
 
-    private static final long serialVersionUID = 1L;
 
     /**
      * Constructor
@@ -23,14 +22,12 @@ public class FlowNotFoundException extends FlowException {
     }
 
     /**
-     * Constructor
+     * Parallel end node cannot be null
      *
-     * @param code    error code
-     * @param message error message
-     * @param cause   cause
+     * @return exception
      */
-    public FlowNotFoundException(String code, String message, Throwable cause) {
-        super(code, message, cause);
+    public static FlowNotFoundException parallelEndNodeNotNull() {
+        return new FlowNotFoundException("notFound.parallel.endNode.required", "Parallel end node cannot be null");
     }
 
     /**

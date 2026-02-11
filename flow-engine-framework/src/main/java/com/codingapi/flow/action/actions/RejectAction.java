@@ -7,7 +7,8 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
-import com.codingapi.flow.exception.FlowConfigException;
+import com.codingapi.flow.exception.FlowStateException;
+import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.action.RejectActionScript;
@@ -76,7 +77,7 @@ public class RejectAction extends BaseAction {
             currentNode = flowSession.getWorkflow().getEndNode();
         }
         if (currentNode == null) {
-            throw FlowConfigException.currentNodeNotNull();
+            throw FlowStateException.currentNodeNotNull();
         }
         flowSession = flowSession.updateSession(currentNode);
         return currentNode.generateCurrentRecords(flowSession);

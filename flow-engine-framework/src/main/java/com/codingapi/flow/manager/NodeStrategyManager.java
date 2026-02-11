@@ -3,7 +3,6 @@ package com.codingapi.flow.manager;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.error.ErrorThrow;
-import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.session.FlowAdvice;
@@ -23,12 +22,8 @@ public class NodeStrategyManager {
     @Getter
     private final List<INodeStrategy> strategies;
 
-
     public NodeStrategyManager(List<INodeStrategy> strategies) {
         this.strategies = strategies;
-        if (this.strategies == null) {
-            throw FlowConfigException.strategiesNotNull();
-        }
     }
 
     /**
@@ -165,6 +160,7 @@ public class NodeStrategyManager {
     }
 
     public void verifySession(FlowSession session) {
+
         FlowAdvice flowAdvice = session.getAdvice();
         IFlowAction flowAction = flowAdvice.getAction();
         // 是否必须填写审批意见
@@ -181,6 +177,10 @@ public class NodeStrategyManager {
                     throw FlowValidationException.required("signKey");
                 }
             }
+        }
+
+        for (INodeStrategy strategy : strategies){
+            strategy.verifySession(session);
         }
     }
 

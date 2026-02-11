@@ -1,5 +1,7 @@
 package com.codingapi.flow.exception;
 
+import com.codingapi.springboot.framework.exception.LocaleMessageException;
+
 /**
  * 流程引擎框架异常基类
  * <p>
@@ -7,14 +9,7 @@ package com.codingapi.flow.exception;
  *
  * @since 1.0.0
  */
-public abstract class FlowException extends RuntimeException {
-
-    private static final long serialVersionUID = 1L;
-
-    /**
-     * 错误码
-     */
-    private final String errorCode;
+public abstract class FlowException extends LocaleMessageException {
 
     /**
      * 构造函数
@@ -23,8 +18,7 @@ public abstract class FlowException extends RuntimeException {
      * @param message   错误信息
      */
     public FlowException(String errorCode, String message) {
-        super(message);
-        this.errorCode = errorCode;
+        super(errorCode,message);
     }
 
     /**
@@ -35,21 +29,7 @@ public abstract class FlowException extends RuntimeException {
      * @param cause     原因
      */
     public FlowException(String errorCode, String message, Throwable cause) {
-        super(message, cause);
-        this.errorCode = errorCode;
+        super(errorCode,message, cause);
     }
 
-    /**
-     * 获取错误码
-     *
-     * @return 错误码
-     */
-    public String getErrorCode() {
-        return errorCode;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("[%s] %s", errorCode, getMessage());
-    }
 }
