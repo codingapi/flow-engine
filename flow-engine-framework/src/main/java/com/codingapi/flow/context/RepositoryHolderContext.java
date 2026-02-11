@@ -1,7 +1,7 @@
 package com.codingapi.flow.context;
 
 import com.codingapi.flow.domain.DelayTask;
-import com.codingapi.flow.exception.FlowConfigException;
+import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
@@ -53,7 +53,7 @@ public class RepositoryHolderContext {
 
     public void verify() {
         if (!isRegistered()) {
-            throw FlowConfigException.repositoryNotRegistered();
+            throw FlowStateException.repositoryNotRegistered();
         }
     }
 

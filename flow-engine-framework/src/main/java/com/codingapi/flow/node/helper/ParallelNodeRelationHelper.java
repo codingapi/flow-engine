@@ -10,6 +10,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * 并行节点需要在最后的合并的节点上统一触发下一流程，因此需要分析最终汇聚的节点
+ *
+ * TODO 获取合并节点的算法，可直接进入大循环的下一个节点即可得到
+ * TODO 合并节点，也未必是一个节点，可能是条件、并行、包容、子流程等这些无审批记录的节点上
+ */
 public class ParallelNodeRelationHelper {
     private final Workflow workflow;
     private final List<IFlowNode> parallelNodes;

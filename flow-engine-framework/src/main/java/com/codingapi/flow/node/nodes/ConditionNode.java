@@ -9,7 +9,6 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -40,22 +39,6 @@ public class ConditionNode extends BaseFlowNode implements IBlockNode {
     @Override
     public boolean handle(FlowSession request) {
         return true;
-    }
-
-    @Override
-    public List<IFlowNode> filterBranches(List<IFlowNode> nodeList, FlowSession flowSession) {
-        List<IFlowNode> nodes = new ArrayList<>();
-        for (IFlowNode node : nodeList) {
-            if (node.handle(flowSession)) {
-                nodes.add(node);
-            }
-        }
-        // 获取最小order的节点
-        nodes.sort(Comparator.comparingInt(IFlowNode::getOrder));
-        if (!nodes.isEmpty()) {
-            return nodes.subList(0, 1);
-        }
-        return nodes;
     }
 
     @Override

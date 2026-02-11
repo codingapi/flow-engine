@@ -2,7 +2,7 @@ package com.codingapi.flow.node;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.error.ErrorThrow;
-import com.codingapi.flow.exception.FlowConfigException;
+import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
@@ -49,7 +49,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     public void verifyNode(FormMeta form) {
         super.verifyNode(form);
         if (!StringUtils.hasText(view)) {
-            throw FlowConfigException.viewNotNull();
+            throw FlowValidationException.nodeRequired("view");
         }
     }
 
@@ -121,7 +121,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         if(operatorManager.isEmpty()){
             ErrorThrow errorThrow =  nodeStrategyManager.errorTrigger(session);
             if(errorThrow==null){
-                throw FlowConfigException.errorThrowNotNull();
+                throw FlowValidationException.nodeRequired("errorTrigger");
             }
             if(errorThrow.isNode()){
                 IFlowNode errorNode = errorThrow.getNode();

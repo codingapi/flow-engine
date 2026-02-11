@@ -2,7 +2,6 @@ package com.codingapi.flow.workflow;
 
 import com.alibaba.fastjson.JSON;
 import com.codingapi.flow.context.GatewayContext;
-import com.codingapi.flow.exception.FlowConfigException;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.manager.FlowNodeManager;
@@ -289,22 +288,22 @@ public class Workflow {
             throw FlowValidationException.required("workflow id");
         }
         if (!StringUtils.hasText(code)) {
-            throw FlowValidationException.required("workflow code");
+            throw FlowValidationException.workflowRequired("code");
         }
         if (!StringUtils.hasText(title)) {
-            throw FlowValidationException.required("workflow title");
+            throw FlowValidationException.workflowRequired("title");
         }
         if (createdTime <= 0) {
-            throw FlowValidationException.required("workflow createdTime");
+            throw FlowValidationException.workflowRequired("createdTime");
         }
         if (form == null) {
-            throw FlowValidationException.required("workflow form");
+            throw FlowValidationException.workflowRequired("form");
         }
         if (createdOperator == null) {
-            throw FlowValidationException.required("workflow createdOperator");
+            throw FlowValidationException.workflowRequired("createdOperator");
         }
         if (nodes == null || nodes.isEmpty()) {
-            throw FlowConfigException.nodeConfigError(title, "nodes can not be null");
+            throw FlowValidationException.workflowRequired( "nodes");
         }
     }
 
@@ -330,7 +329,11 @@ public class Workflow {
             }
         }
         if (start != 1 || end != 1) {
-            throw FlowConfigException.nodeConfigError(title, "must have one start node and one end node");
+            if(start!=1) {
+                throw FlowValidationException.nodeRequired("startNode");
+            }else {
+                throw FlowValidationException.nodeRequired("endNode");
+            }
         }
 
         for (IFlowNode node : nodes) {

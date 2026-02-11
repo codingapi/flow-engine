@@ -10,8 +10,6 @@ package com.codingapi.flow.exception;
  */
 public class FlowExecutionException extends FlowException {
 
-    private static final long serialVersionUID = 1L;
-
     /**
      * Constructor
      *
@@ -43,54 +41,6 @@ public class FlowExecutionException extends FlowException {
     public static FlowExecutionException scriptExecutionError(String scriptType, Throwable cause) {
         return new FlowExecutionException("execution.script.error",
                 String.format("Script execution error: %s", scriptType), cause);
-    }
-
-    /**
-     * Node execution error
-     *
-     * @param nodeId node ID
-     * @param cause  cause
-     * @return exception
-     */
-    public static FlowExecutionException nodeExecutionError(String nodeId, Throwable cause) {
-        return new FlowExecutionException("execution.node.error",
-                String.format("Node execution error: %s", nodeId), cause);
-    }
-
-    /**
-     * Action execution error
-     *
-     * @param actionId action ID
-     * @param cause    cause
-     * @return exception
-     */
-    public static FlowExecutionException actionExecutionError(String actionId, Throwable cause) {
-        return new FlowExecutionException("execution.action.error",
-                String.format("Action execution error: %s", actionId), cause);
-    }
-
-    /**
-     * Workflow execution error
-     *
-     * @param processId process instance ID
-     * @param cause     cause
-     * @return exception
-     */
-    public static FlowExecutionException workflowExecutionError(String processId, Throwable cause) {
-        return new FlowExecutionException("execution.workflow.error",
-                String.format("Workflow execution error: %s", processId), cause);
-    }
-
-    /**
-     * Database operation error
-     *
-     * @param operation operation type
-     * @param cause     cause
-     * @return exception
-     */
-    public static FlowExecutionException databaseError(String operation, Throwable cause) {
-        return new FlowExecutionException("execution.database.error",
-                String.format("Database operation error: %s", operation), cause);
     }
 
     /**

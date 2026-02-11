@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * 1. 流程的调用第一步将会执行 {@link com.codingapi.flow.action.IFlowAction#run(FlowSession)} 函数。<br/>
  * 2. 在{@link com.codingapi.flow.action.IFlowAction#run(FlowSession)} 中流程将需要判断当前流程{@link IFlowNode#isDone(FlowSession)} 是否已经办理完成。 <br/>
  * 3. 流程办理完成后将会分析流程对的下一节点对象 {@link com.codingapi.flow.action.BaseAction#triggerNode(FlowSession, Consumer)} ()},将递归掉分析执行下一节点 <br/>
- * 4. 在获取下一节点对象时，将会访问当节点的拦截策略 {@link IFlowNode#filterBranches(List, FlowSession)}，该函数将根据节点的配置进行匹配下一节点。 <br/>
+ * 4. 在获取下一节点对象时，将会访问节点的过滤策略 {@link IFlowNode#filterBranches(List, FlowSession)}，该函数将根据节点的配置进行过滤匹配下一节点。 <br/>
  * 5. 获取到下一节点对象后，则会访问流程节点的 {@link IFlowNode#handle(FlowSession)} 函数分析流程是否继续执行。当函数返回true时则会继续循环调用匹配下一节点的逻辑，即triggerNode的递归逻辑。 <br/>
  * 6. 当{@link IFlowNode#handle(FlowSession)} 返回的是false时，则停止继续下一节点流程，开始执行当前节点的生成流程记录函数 {@link  IFlowNode#generateCurrentRecords(FlowSession)} <br/>
  * 7. 在构建出先的流程记录数据以后，在数据保存时还将会触发节点对流程记录对象的填充函数 {@link  IFlowNode#fillNewRecord(FlowSession, FlowRecord)} <br/>
@@ -112,7 +112,7 @@ public interface IFlowNode extends IMapConvertor {
 
 
     /**
-     * 过滤条件分支
+     * 过滤节点
      *
      * @param nodeList    当前节点下的所有条件
      * @param flowSession 当前会话

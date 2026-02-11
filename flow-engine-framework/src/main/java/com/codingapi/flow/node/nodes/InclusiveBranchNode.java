@@ -1,7 +1,8 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
-import com.codingapi.flow.exception.FlowConfigException;
+import com.codingapi.flow.exception.FlowNotFoundException;
+import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
@@ -80,7 +81,7 @@ public class InclusiveBranchNode extends BaseFlowNode {
         // 分析并行分支的结束汇聚节点
         IFlowNode overNode = helper.fetchParallelEndNode();
         if (overNode == null) {
-            throw FlowConfigException.parallelEndNodeNotNull();
+            throw FlowNotFoundException.parallelEndNodeNotNull();
         }
 
         // 在流程记录中记录，合并的条件信息。
