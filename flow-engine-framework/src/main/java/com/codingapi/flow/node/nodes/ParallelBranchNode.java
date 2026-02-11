@@ -44,9 +44,10 @@ public class ParallelBranchNode extends BaseFlowNode {
      */
     public List<IFlowNode> filterBranches(List<IFlowNode> nodeList, FlowSession flowSession) {
         Workflow workflow = flowSession.getWorkflow();
-        ParallelNodeRelationHelper helper = new ParallelNodeRelationHelper(nodeList, workflow);
+        IFlowNode currentNode = flowSession.getCurrentNode();
+        ParallelNodeRelationHelper helper = new ParallelNodeRelationHelper(workflow, currentNode, nodeList);
         // 分析并行分支的结束汇聚节点
-        IFlowNode overNode = helper.fetchParallelEndNode();
+        IFlowNode overNode = helper.fetchMargeNode();
         if (overNode == null) {
             throw FlowNotFoundException.parallelEndNodeNotNull();
         }

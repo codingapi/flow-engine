@@ -1,8 +1,6 @@
 package com.codingapi.flow.service;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.actions.CustomAction;
-import com.codingapi.flow.builder.ActionBuilder;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
@@ -10,26 +8,20 @@ import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.gateway.impl.UserGateway;
+import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.*;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
-import com.codingapi.flow.pojo.request.FlowRevokeRequest;
-import com.codingapi.flow.pojo.request.FlowUrgeRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.*;
-import com.codingapi.flow.script.runtime.FlowScriptContext;
-import com.codingapi.flow.script.runtime.IBeanFactory;
-import com.codingapi.flow.strategy.node.ErrorTriggerStrategy;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
-import com.codingapi.flow.strategy.node.RouterStrategy;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +37,6 @@ class FlowParallelServiceTest {
     private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
     private final UrgeIntervalRepository urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
     private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
-
-
 
 
     /**
@@ -82,7 +72,6 @@ class FlowParallelServiceTest {
                                 .build()))
                         .build())
                 .build();
-
 
 
         ApprovalNode departApprovalNode1 = ApprovalNode.builder()
@@ -133,13 +122,13 @@ class FlowParallelServiceTest {
 
         ParallelBranchNode parallelBranchNode12 = ParallelBranchNode.builder()
                 .name("并行分支2")
-                .blocks(bossApprovalNode1,bigBossApprovalNode1)
+                .blocks(bossApprovalNode1, bigBossApprovalNode1)
                 .order(2)
                 .build();
 
         ParallelNode parallelNode1 = ParallelNode.builder()
                 .name("并行控制节点")
-                .blocks(parallelBranchNode11,parallelBranchNode12)
+                .blocks(parallelBranchNode11, parallelBranchNode12)
                 .build();
 
 
@@ -191,13 +180,13 @@ class FlowParallelServiceTest {
 
         ParallelBranchNode parallelBranchNode22 = ParallelBranchNode.builder()
                 .name("并行分支2")
-                .blocks(bossApprovalNode2,bigBossApprovalNode2)
+                .blocks(bossApprovalNode2, bigBossApprovalNode2)
                 .order(2)
                 .build();
 
         ParallelNode parallelNode2 = ParallelNode.builder()
                 .name("并行控制节点")
-                .blocks(parallelBranchNode21,parallelBranchNode22)
+                .blocks(parallelBranchNode21, parallelBranchNode22)
                 .build();
 
         EndNode endNode = EndNode.builder().build();
@@ -213,6 +202,12 @@ class FlowParallelServiceTest {
                 .build();
 
         workflowRepository.save(workflow);
+
+
+        List<IFlowNode> nextNodes = workflow.nextNodes(bossApprovalNode1);
+        assertEquals(1, nextNodes.size());
+        assertEquals(bigBossApprovalNode1, nextNodes.get(0));
+
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 3, "reason", "leave");
 
@@ -272,10 +267,50 @@ class FlowParallelServiceTest {
         bigBossRequest.setAdvice(new FlowAdviceBody(bigBossActions.get(0).id(), "同意", boss.getUserId()));
         flowService.action(bigBossRequest);
 
+        departRecordList = flowRecordRepository.findTodoByOperator(depart.getUserId());
+        assertEquals(1, departRecordList.size());
+
+        boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        assertEquals(1, boosRecordList.size());
+
+
+        departActions = departApprovalNode2.actionManager().getActions();
+
+        departRequest = new FlowActionRequest();
+        departRequest.setFormData(data);
+        departRequest.setRecordId(departRecordList.get(0).getId());
+        departRequest.setAdvice(new FlowAdviceBody(departActions.get(0).id(), "同意", depart.getUserId()));
+        flowService.action(departRequest);
+
+        boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        assertEquals(1, boosRecordList.size());
+
+
+        bossActions = bossApprovalNode2.actionManager().getActions();
+
+        dossRequest = new FlowActionRequest();
+        dossRequest.setFormData(data);
+        dossRequest.setRecordId(boosRecordList.get(0).getId());
+        dossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", boss.getUserId()));
+        flowService.action(dossRequest);
+
+
+        boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        assertEquals(1, boosRecordList.size());
+
+        bigBossActions = bigBossApprovalNode2.actionManager().getActions();
+
+        bigBossRequest = new FlowActionRequest();
+        bigBossRequest.setFormData(data);
+        bigBossRequest.setRecordId(boosRecordList.get(0).getId());
+        bigBossRequest.setAdvice(new FlowAdviceBody(bigBossActions.get(0).id(), "同意", boss.getUserId()));
+        flowService.action(bigBossRequest);
+
+
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(departRecordList.get(0).getProcessId());
-        assertEquals(5, records.size());
+        assertEquals(8, records.size());
         assertEquals(0, records.stream().filter(FlowRecord::isTodo).toList().size());
-        assertEquals(5, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(8, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 }

@@ -225,8 +225,15 @@ public abstract class BaseFlowNode implements IFlowNode {
     }
 
 
+    /**
+     * 匹配条件
+     */
     @Override
-    public boolean handle(FlowSession session) {
+    public boolean handle(FlowSession request) {
+        // 是否等待并行合并节点
+        if (this.isWaitRecordMargeParallelNode(request)) {
+            return false;
+        }
         return true;
     }
 

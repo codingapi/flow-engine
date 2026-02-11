@@ -2,7 +2,6 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.exception.FlowNotFoundException;
-import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
@@ -77,9 +76,10 @@ public class InclusiveBranchNode extends BaseFlowNode {
      */
     public List<IFlowNode> filterBranches(List<IFlowNode> nodeList, FlowSession flowSession) {
         Workflow workflow = flowSession.getWorkflow();
-        ParallelNodeRelationHelper helper = new ParallelNodeRelationHelper(nodeList, workflow);
+        IFlowNode currentNode = flowSession.getCurrentNode();
+        ParallelNodeRelationHelper helper = new ParallelNodeRelationHelper(workflow,currentNode,nodeList);
         // 分析并行分支的结束汇聚节点
-        IFlowNode overNode = helper.fetchParallelEndNode();
+        IFlowNode overNode = helper.fetchMargeNode();
         if (overNode == null) {
             throw FlowNotFoundException.parallelEndNodeNotNull();
         }
