@@ -15,7 +15,7 @@ export const routers = [
     {
         path:'/user',
         element:<UserPage/>,
-        name: '用户界面'
+        name: '用户管理'
     },
     {
         path:'/design',
