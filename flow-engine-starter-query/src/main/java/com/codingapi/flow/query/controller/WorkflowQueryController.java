@@ -2,6 +2,7 @@ package com.codingapi.flow.query.controller;
 
 import com.codingapi.flow.infra.entity.WorkflowEntity;
 import com.codingapi.flow.infra.jpa.WorkflowEntityRepository;
+import com.codingapi.flow.infra.pojo.Select;
 import com.codingapi.springboot.framework.dto.request.SearchRequest;
 import com.codingapi.springboot.framework.dto.response.MultiResponse;
 import lombok.AllArgsConstructor;
@@ -20,6 +21,11 @@ public class WorkflowQueryController {
     @GetMapping("/list")
     public MultiResponse<WorkflowEntity> list(SearchRequest searchRequest) {
         return MultiResponse.of(workflowEntityRepository.searchRequest(searchRequest));
+    }
+
+    @GetMapping("/options")
+    public MultiResponse<Select> options() {
+        return MultiResponse.of(workflowEntityRepository.options());
     }
 
 }

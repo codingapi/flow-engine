@@ -1,13 +1,23 @@
 import React from "react";
-import {list,todo,done} from "@/api/record.ts";
-import {type ActionType, type TableProps,Table} from "@flow-engine/flow-design";
-import {Button, Space, Tabs,type TabsProps } from "antd";
+import {done, list, todo} from "@/api/record.ts";
+import {
+    type ActionType,
+    ApprovalPanelDrawer,
+    Table,
+    type TableProps,
+    WorkflowSelectModal
+} from "@flow-engine/flow-design";
+import {Button, Space, Tabs, type TabsProps} from "antd";
 
-const TodoPage:React.FC = ()=>{
+const TodoPage: React.FC = () => {
 
     const actionAll = React.useRef<ActionType>(null);
     const actionTodo = React.useRef<ActionType>(null);
     const actionDone = React.useRef<ActionType>(null);
+
+    const [selectVisible, setSelectVisible] = React.useState(false);
+    const [approvalVisible, setApprovalVisible] = React.useState(false);
+    const [workflowCode, setWorkflowCode] = React.useState<string>('');
 
     const columns: TableProps<any>['columns'] = [
         {
@@ -49,12 +59,11 @@ const TodoPage:React.FC = ()=>{
         }
     ];
 
-
-    const items:TabsProps['items'] = [
+    const items: TabsProps['items'] = [
         {
-            key:'all',
-            label:'全部流程',
-            children:(
+            key: 'all',
+            label: '全部流程',
+            children: (
                 <Table
                     rowKey={"id"}
                     actionType={actionAll}
@@ -66,9 +75,9 @@ const TodoPage:React.FC = ()=>{
             )
         },
         {
-            key:'todo',
-            label:'我的待办',
-            children:(
+            key: 'todo',
+            label: '我的待办',
+            children: (
                 <Table
                     rowKey={"id"}
                     actionType={actionTodo}
@@ -80,9 +89,9 @@ const TodoPage:React.FC = ()=>{
             )
         },
         {
-            key:'done',
-            label:'我的已办',
-            children:(
+            key: 'done',
+            label: '我的已办',
+            children: (
                 <Table
                     rowKey={"id"}
                     actionType={actionDone}
@@ -100,26 +109,46 @@ const TodoPage:React.FC = ()=>{
             <Tabs
                 items={items}
                 centered={true}
-                onChange={(currentKey)=>{
-                    if(currentKey==='all'){
+                onChange={(currentKey) => {
+                    if (currentKey === 'all') {
                         actionAll.current?.reload();
                     }
-                    if(currentKey==='done'){
+                    if (currentKey === 'done') {
                         actionDone.current?.reload();
                     }
-                    if(currentKey==='todo'){
+                    if (currentKey === 'todo') {
                         actionTodo.current?.reload();
                     }
                 }}
                 tabBarExtraContent={{
-                    right:(
+                    right: (
                         <Button
                             key={"create"}
                             type={'primary'}
                             onClick={() => {
-
+                                setSelectVisible(true);
                             }}>发起流程</Button>
                     )
+                }}
+            />
+
+            <WorkflowSelectModal
+                open={selectVisible}
+                onSelect={(code) => {
+                    setWorkflowCode(code);
+                    setSelectVisible(false);
+                    setApprovalVisible(true);
+                }}
+                onClose={() => {
+                    setSelectVisible(false);
+                }}
+            />
+
+            <ApprovalPanelDrawer
+                workflowCode={workflowCode}
+                open={approvalVisible}
+                onClose={() => {
+                    setApprovalVisible(false);
                 }}
             />
         </div>

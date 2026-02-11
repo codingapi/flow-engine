@@ -14,7 +14,6 @@ import com.codingapi.springboot.framework.dto.request.IdRequest;
 import com.codingapi.springboot.framework.dto.response.Response;
 import com.codingapi.springboot.framework.dto.response.SingleResponse;
 import com.codingapi.springboot.framework.user.UserContext;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +23,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/cmd/workflow")
 @AllArgsConstructor
-@Transactional
 public class WorkflowController {
 
     private final WorkflowRepository workflowRepository;
