@@ -343,7 +343,6 @@ category.subcategory.errorType
 - `permission.field.readOnly` - 字段只读
 - `state.record.alreadyDone` - 记录已完成
 - `validation.field.required` - 必填字段为空
-- `config.node.strategies.required` - 节点策略必填
 - `execution.script.error` - 脚本执行错误
 
 所有异常消息使用英文。
