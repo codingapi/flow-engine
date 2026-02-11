@@ -43,10 +43,13 @@ public class SubProcessNode extends BaseFlowNode {
 
     @Override
     public boolean handle(FlowSession session) {
-        NodeStrategyManager nodeStrategyManager = this.strategyManager();
-        SubProcessStrategy processStrategy = nodeStrategyManager.getStrategy(SubProcessStrategy.class);
-        processStrategy.execute(session);
-        return true;
+        if(super.handle(session)) {
+            NodeStrategyManager nodeStrategyManager = this.strategyManager();
+            SubProcessStrategy processStrategy = nodeStrategyManager.getStrategy(SubProcessStrategy.class);
+            processStrategy.execute(session);
+            return true;
+        }
+        return false;
     }
 
     public static SubProcessNode formMap(Map<String, Object> map) {

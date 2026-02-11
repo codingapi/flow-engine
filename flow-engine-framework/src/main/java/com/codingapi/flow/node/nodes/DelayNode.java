@@ -31,12 +31,15 @@ public class DelayNode extends BaseFlowNode {
 
     @Override
     public boolean handle(FlowSession session) {
-        NodeStrategyManager nodeStrategyManager = this.strategyManager();
-        DelayStrategy delayStrategy = nodeStrategyManager.getStrategy(DelayStrategy.class);
-        if (delayStrategy != null) {
-            FlowRecord currentRecord = session.getCurrentRecord();
-            DelayTask delayTask = new DelayTask(delayStrategy, currentRecord, this.getId());
-            DelayTaskManager.getInstance().addTask(delayTask);
+        if(super.handle(session)) {
+            NodeStrategyManager nodeStrategyManager = this.strategyManager();
+            DelayStrategy delayStrategy = nodeStrategyManager.getStrategy(DelayStrategy.class);
+            if (delayStrategy != null) {
+                FlowRecord currentRecord = session.getCurrentRecord();
+                DelayTask delayTask = new DelayTask(delayStrategy, currentRecord, this.getId());
+                DelayTaskManager.getInstance().addTask(delayTask);
+            }
+            return false;
         }
         return false;
     }

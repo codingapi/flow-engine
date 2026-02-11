@@ -5,7 +5,6 @@ import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IBlockNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
-import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
@@ -31,14 +30,6 @@ public class ConditionNode extends BaseFlowNode implements IBlockNode {
 
     public ConditionNode() {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, 0);
-    }
-
-    /**
-     * 匹配条件
-     */
-    @Override
-    public boolean handle(FlowSession request) {
-        return true;
     }
 
     @Override

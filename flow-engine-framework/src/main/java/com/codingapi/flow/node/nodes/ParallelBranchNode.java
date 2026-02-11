@@ -35,6 +35,11 @@ public class ParallelBranchNode extends BaseFlowNode {
         this(RandomUtils.generateStringId(), DEFAULT_NAME);
     }
 
+    @Override
+    public boolean handle(FlowSession request) {
+        return true;
+    }
+
     /**
      * 匹配条件分支
      *

@@ -40,6 +40,9 @@ public class NotifyNode extends BaseAuditNode {
 
     @Override
     public boolean handle(FlowSession session) {
+        if (this.isWaitRecordMargeParallelNode(session)) {
+            return false;
+        }
         List<FlowRecord> records = this.generateCurrentRecords(session);
         for (FlowRecord record : records) {
             this.fillNewRecord(session, record);
