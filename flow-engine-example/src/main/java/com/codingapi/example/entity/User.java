@@ -39,6 +39,11 @@ public class User implements IFlowOperator {
     }
 
 
+    public void encodePassword(PasswordEncoder passwordEncoder){
+        this.password = passwordEncoder.encode(password);
+    }
+
+
     public List<String> getRoles() {
         return List.of(ADMIN_ROLE);
     }
