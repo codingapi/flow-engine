@@ -26,8 +26,10 @@ import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -132,6 +134,10 @@ public class FlowMergeableServiceTest {
         List<FlowRecord> bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(count, bossRecordList.size());
         assertEquals(count, bossRecordList.stream().filter(FlowRecord::isMergeable).toList().size());
+
+        List<String> mergeIdList = bossRecordList.stream().map(FlowRecord::getMergeId).toList();
+        Set<String> set = new HashSet<>(mergeIdList);
+        assertEquals(1,set.size());
 
 
         List<IFlowAction> bossActions = bossNode.actionManager().getActions();

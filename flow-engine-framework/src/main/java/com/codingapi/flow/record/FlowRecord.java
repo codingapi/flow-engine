@@ -190,7 +190,7 @@ public class FlowRecord {
     private long timeoutTime;
     /**
      * 是否可合并
-     * 合并的数据，相同的 {@link FlowRecord#currentOperatorId} {@link FlowRecord#workBackupId} {@link FlowRecord#nodeId}字段的数据合并到一条记录上，待办列表中只展示最新的一条记录和总数。
+     * {@link FlowRecord#getMergeId()}
      */
     private boolean mergeable;
     /**
@@ -223,6 +223,18 @@ public class FlowRecord {
      */
     private int parallelBranchTotal;
 
+    /**
+     * 数据合并的依据,当开启时值为固定值，否则为随机数据
+     * 相同的 {@link FlowRecord#currentOperatorId} {@link FlowRecord#workBackupId} {@link FlowRecord#nodeId}字段的数据合并到一条记录上。
+     */
+    public String getMergeId() {
+        if (mergeable) {
+            return String.format("%s-%s-%s", currentOperatorId, workBackupId, nodeId);
+        } else {
+            return RandomUtils.generateStringId();
+        }
+    }
+
 
     public FlowRecord(FlowSession flowSession, int nodeOrder) {
         IFlowAction action = flowSession.getCurrentAction();
@@ -240,9 +252,9 @@ public class FlowRecord {
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
         this.createOperatorName = flowSession.getCreatedOperator().getName();
         // 是否转交之后的人来审批的判断
-        if(currentOperator.equals(sourceOperator)){
+        if (currentOperator.equals(sourceOperator)) {
             this.forwardOperatorId = 0;
-        }else {
+        } else {
             this.forwardOperatorId = sourceOperator.getUserId();
             this.forwardOperatorName = sourceOperator.getName();
         }
