@@ -35,7 +35,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class FlowServiceTest {
+class FlowSampleServiceTest {
 
     private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
     private final UserGateway userGateway = new UserGateway();
