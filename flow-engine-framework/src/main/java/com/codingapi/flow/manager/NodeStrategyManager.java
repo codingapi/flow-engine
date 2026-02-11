@@ -160,6 +160,7 @@ public class NodeStrategyManager {
     }
 
     public void verifySession(FlowSession session) {
+
         FlowAdvice flowAdvice = session.getAdvice();
         IFlowAction flowAction = flowAdvice.getAction();
         // 是否必须填写审批意见
@@ -176,6 +177,10 @@ public class NodeStrategyManager {
                     throw FlowValidationException.required("signKey");
                 }
             }
+        }
+
+        for (INodeStrategy strategy : strategies){
+            strategy.verifySession(session);
         }
     }
 
