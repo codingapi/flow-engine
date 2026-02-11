@@ -9,12 +9,29 @@ import java.util.List;
  */
 public interface FlowRecordRepository {
 
+    /**
+     * 获取流程详细
+     * @param id 流程id
+     * @return 流程记录
+     */
     FlowRecord get(long id);
 
+    /**
+     * 保存流程
+     * @param flowRecord 流程记录
+     */
     void save(FlowRecord flowRecord);
 
+    /**
+     * 批量保存流程
+     * @param flowRecords 流程记录
+     */
     void saveAll(List<FlowRecord> flowRecords);
 
+    /**
+     * 删除流程记录
+     * @param flowRecord 流程记录
+     */
     void delete(FlowRecord flowRecord);
 
     /**

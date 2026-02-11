@@ -35,7 +35,7 @@ public class FlowRecordQueryController {
     public MultiResponse<FlowRecordEntity> todo(SearchRequest request) {
         IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
         PageRequest pageRequest = request.toPageRequest(FlowRecordEntity.class);
-        return MultiResponse.of(flowRecordEntityRepository.findTodoPage(current.getUserId(),pageRequest));
+        return MultiResponse.of(flowRecordEntityRepository.findTodoRecordPage(current.getUserId(),pageRequest));
     }
 
 
@@ -46,6 +46,6 @@ public class FlowRecordQueryController {
     public MultiResponse<FlowRecordEntity> done(SearchRequest request) {
         IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
         PageRequest pageRequest = request.toPageRequest(FlowRecordEntity.class);
-        return MultiResponse.of(flowRecordEntityRepository.findDonePage(current.getUserId(),pageRequest));
+        return MultiResponse.of(flowRecordEntityRepository.findDoneRecordPage(current.getUserId(),pageRequest));
     }
 }

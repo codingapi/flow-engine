@@ -40,7 +40,7 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
 
     @Override
     public List<FlowRecord> findCurrentNodeRecords(long fromId, String nodeId) {
-        return flowRecordEntityRepository.findFlowRecordEntityByFromIdAndNodeIdAndRevoked(fromId, nodeId, false)
+        return flowRecordEntityRepository.findCurrentNodeRecords(fromId, nodeId)
                 .stream()
                 .map(FlowRecordConvertor::convert)
                 .toList();
@@ -48,7 +48,7 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
 
     @Override
     public List<FlowRecord> findProcessRecords(String processId) {
-        return flowRecordEntityRepository.findFlowRecordEntityByProcessId(processId)
+        return flowRecordEntityRepository.findProcessIdRecords(processId)
                 .stream()
                 .map(FlowRecordConvertor::convert)
                 .toList();
@@ -56,7 +56,7 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
 
     @Override
     public List<FlowRecord> findTodoRecords(String processId) {
-        return flowRecordEntityRepository.findFlowRecordEntityByProcessIdAndRecordStateAndFlowStateAndHiddenAndRevoked(processId, FlowRecord.SATE_RECORD_TODO, FlowRecord.SATE_FLOW_RUNNING, false, false)
+        return flowRecordEntityRepository.findTodoRecords(processId)
                 .stream()
                 .map(FlowRecordConvertor::convert)
                 .toList();
@@ -64,7 +64,7 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
 
     @Override
     public List<FlowRecord> findAfterRecords(String processId, long fromId) {
-        return flowRecordEntityRepository.findFlowRecordEntityByProcessIdAndFromIdGreaterThanEqual(processId, fromId)
+        return flowRecordEntityRepository.findAfterRecords(processId, fromId)
                 .stream()
                 .map(FlowRecordConvertor::convert)
                 .toList();

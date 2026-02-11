@@ -12,25 +12,23 @@ public interface FlowRecordEntityRepository extends FastRepository<FlowRecordEnt
 
     FlowRecordEntity getFlowRecordEntityById(long id);
 
-    List<FlowRecordEntity> findFlowRecordEntityByProcessId(String processId);
+    @Query("from FlowRecordEntity r where r.processId = ?1")
+    List<FlowRecordEntity> findProcessIdRecords(String processId);
 
-    List<FlowRecordEntity> findFlowRecordEntityByFromIdAndNodeIdAndRevoked(long fromId, String nodeId, boolean revoked);
+    @Query("from FlowRecordEntity r where r.fromId = ?1 and r.nodeId =?2 and r.revoked = false")
+    List<FlowRecordEntity> findCurrentNodeRecords(long fromId, String nodeId);
 
-    List<FlowRecordEntity> findFlowRecordEntityByProcessIdAndRecordStateAndFlowStateAndHiddenAndRevoked(String processId,
-                                                                                                        int recordState,
-                                                                                                        int flowState,
-                                                                                                        boolean hidden,
-                                                                                                        boolean revoked);
+    @Query("from FlowRecordEntity r where r.processId = ?1 and (r.recordState = 0 and r.flowState = 0 and r.hidden=false and r.revoked = false)")
+    List<FlowRecordEntity> findTodoRecords(String processId);
 
-    List<FlowRecordEntity> findFlowRecordEntityByProcessIdAndFromIdGreaterThanEqual(String processId, long fromId);
-
+    @Query("from FlowRecordEntity r where r.processId = ?1 and r.fromId >=?2 and r.hidden=false and r.revoked = false")
+    List<FlowRecordEntity> findAfterRecords(String processId, long fromId);
 
     @Query("from FlowRecordEntity r where r.currentOperatorId = ?1 and (r.recordState = 0 and r.flowState = 0 and r.hidden=false and r.revoked = false)")
-    Page<FlowRecordEntity> findTodoPage(long operatorId, PageRequest pageRequest);
-
+    Page<FlowRecordEntity> findTodoRecordPage(long operatorId, PageRequest pageRequest);
 
     @Query("from FlowRecordEntity r where r.currentOperatorId = ?1 and (r.recordState = 1 and r.hidden=false and r.revoked = false) ")
-    Page<FlowRecordEntity> findDonePage(long operatorId, PageRequest pageRequest);
+    Page<FlowRecordEntity> findDoneRecordPage(long operatorId, PageRequest pageRequest);
 
 
 }

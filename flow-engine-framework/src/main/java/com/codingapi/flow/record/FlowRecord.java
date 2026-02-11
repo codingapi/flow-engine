@@ -99,14 +99,24 @@ public class FlowRecord {
     private String signKey;
 
     /**
-     * 当前审批人
+     * 当前审批人Id
      */
     private long currentOperatorId;
 
     /**
-     * 代替的审批人
+     * 当前审批人名称
+     */
+    private String currentOperatorName;
+
+    /**
+     * 代替的审批人Id
      */
     private long forwardOperatorId;
+
+    /**
+     * 代替的审批人名称
+     */
+    private String forwardOperatorName;
 
     /**
      * 有那个节点退回的
@@ -165,6 +175,11 @@ public class FlowRecord {
      */
     private long createOperatorId;
     /**
+     * 发起者名称
+     */
+    private String createOperatorName;
+
+    /**
      * 异常信息
      */
     private String errMessage;
@@ -175,12 +190,18 @@ public class FlowRecord {
     private long timeoutTime;
     /**
      * 是否可合并
+     * 合并的数据，相同的 {@link FlowRecord#currentOperatorId} {@link FlowRecord#workBackupId} {@link FlowRecord#nodeId}字段的数据合并到一条记录上，待办列表中只展示最新的一条记录和总数。
      */
     private boolean mergeable;
     /**
-     * 被干预的用户
+     * 被干预的用户Id
      */
     private long interferedOperatorId;
+
+    /**
+     * 被干预的用户名称
+     */
+    private String interferedOperatorName;
 
     /**
      * 委托记录id
@@ -217,11 +238,21 @@ public class FlowRecord {
         this.nodeOrder = nodeOrder;
         this.processId = RandomUtils.generateStringId();
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
-        this.forwardOperatorId = currentOperator.equals(sourceOperator) ? 0 : sourceOperator.getUserId();
+        this.createOperatorName = flowSession.getCreatedOperator().getName();
+        // 是否转交之后的人来审批的判断
+        if(currentOperator.equals(sourceOperator)){
+            this.forwardOperatorId = 0;
+        }else {
+            this.forwardOperatorId = sourceOperator.getUserId();
+            this.forwardOperatorName = sourceOperator.getName();
+        }
         this.recordState = SATE_RECORD_TODO;
         this.actionId = action.id();
         this.actionType = action.type();
+
         this.currentOperatorId = currentOperator.getUserId();
+        this.currentOperatorName = currentOperator.getName();
+
         this.advice = flowSession.getAdvice().getAdvice();
         this.signKey = flowSession.getAdvice().getSignKey();
         this.flowState = SATE_FLOW_RUNNING;
@@ -347,6 +378,7 @@ public class FlowRecord {
         // 设置流程干预人信息，流程干预只能由流程管理员才能操作
         if (flowSession.getCurrentOperator().getUserId() != this.currentOperatorId) {
             this.interferedOperatorId = flowSession.getCurrentOperator().getUserId();
+            this.interferedOperatorName = flowSession.getCurrentOperator().getName();
         }
 
         if (flowAdvice != null) {
@@ -445,6 +477,7 @@ public class FlowRecord {
     public FlowRecord create(FlowSession flowSession) {
         FlowRecord flowRecord = new FlowRecord(flowSession, 0);
         flowRecord.currentOperatorId = flowSession.getCurrentOperator().getUserId();
+        flowRecord.currentOperatorName = flowSession.getCurrentOperator().getName();
         return flowRecord;
     }
 

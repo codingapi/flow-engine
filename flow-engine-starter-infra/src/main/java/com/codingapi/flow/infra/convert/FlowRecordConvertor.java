@@ -27,7 +27,9 @@ public class FlowRecordConvertor {
                 entity.getAdvice(),
                 entity.getSignKey(),
                 entity.getCurrentOperatorId(),
+                entity.getCurrentOperatorName(),
                 entity.getForwardOperatorId(),
+                entity.getForwardOperatorName(),
                 entity.getReturnNodeId(),
                 entity.getNodeOrder(),
                 entity.getHidden(),
@@ -40,10 +42,12 @@ public class FlowRecordConvertor {
                 entity.getFinishTime(),
                 entity.getReadable(),
                 entity.getCreateOperatorId(),
+                entity.getCreateOperatorName(),
                 entity.getErrMessage(),
                 entity.getTimeoutTime(),
                 entity.getMergeable(),
                 entity.getInterferedOperatorId(),
+                entity.getInterferedOperatorName(),
                 entity.getDelegateId(),
                 entity.getParallelId(),
                 entity.getParallelBranchNodeId(),
@@ -70,7 +74,9 @@ public class FlowRecordConvertor {
         entity.setAdvice(record.getAdvice());
         entity.setSignKey(record.getSignKey());
         entity.setCurrentOperatorId(record.getCurrentOperatorId());
+        entity.setCurrentOperatorName(record.getCurrentOperatorName());
         entity.setForwardOperatorId(record.getForwardOperatorId());
+        entity.setForwardOperatorName(record.getForwardOperatorName());
         entity.setReturnNodeId(record.getReturnNodeId());
         entity.setNodeOrder(record.getNodeOrder());
         entity.setHidden(record.isHidden());
@@ -83,10 +89,12 @@ public class FlowRecordConvertor {
         entity.setFinishTime(record.getFinishTime());
         entity.setReadable(record.isReadable());
         entity.setCreateOperatorId(record.getCreateOperatorId());
+        entity.setCreateOperatorName(record.getCreateOperatorName());
         entity.setErrMessage(record.getErrMessage());
         entity.setTimeoutTime(record.getTimeoutTime());
         entity.setMergeable(record.isMergeable());
         entity.setInterferedOperatorId(record.getInterferedOperatorId());
+        entity.setInterferedOperatorName(record.getInterferedOperatorName());
         entity.setDelegateId(record.getDelegateId());
         entity.setParallelId(record.getParallelId());
         entity.setParallelBranchNodeId(record.getParallelBranchNodeId());

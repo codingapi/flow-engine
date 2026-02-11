@@ -78,9 +78,19 @@ public class FlowRecordEntity {
     private Long currentOperatorId;
 
     /**
+     * 当前审批人名称
+     */
+    private String currentOperatorName;
+
+    /**
      * 代替的审批人
      */
     private Long forwardOperatorId;
+
+    /**
+     * 代替的审批人名称
+     */
+    private String forwardOperatorName;
 
     /**
      * 有那个节点退回的
@@ -136,6 +146,12 @@ public class FlowRecordEntity {
      * 发起者id
      */
     private Long createOperatorId;
+
+    /**
+     * 发起者名称
+     */
+    private String createOperatorName;
+
     /**
      * 异常信息
      */
@@ -153,6 +169,11 @@ public class FlowRecordEntity {
      * 被干预的用户
      */
     private Long interferedOperatorId;
+
+    /**
+     * 被干预的用户名称
+     */
+    private String interferedOperatorName;
 
     /**
      * 委托记录id
