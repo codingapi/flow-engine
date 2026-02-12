@@ -30,5 +30,8 @@ public interface FlowRecordEntityRepository extends FastRepository<FlowRecordEnt
     @Query("from FlowRecordEntity r where r.currentOperatorId = ?1 and (r.recordState = 1 and r.hidden=false and r.revoked = false) ")
     Page<FlowRecordEntity> findDoneRecordPage(long operatorId, PageRequest pageRequest);
 
+    @Query("from FlowRecordEntity r where r.currentOperatorId = ?1 and r.notify = true and r.hidden=false and r.revoked = false ")
+    Page<FlowRecordEntity> findNotifyRecordPage(long operatorId, PageRequest pageRequest);
+
 
 }

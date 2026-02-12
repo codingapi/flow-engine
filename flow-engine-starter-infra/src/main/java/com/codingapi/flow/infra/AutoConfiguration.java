@@ -43,4 +43,14 @@ public class AutoConfiguration {
         return new FlowRecordRepositoryImpl(flowRecordEntityRepository);
     }
 
+    @Bean
+    public FlowTodoRecordRepository flowTodoRecordRepository(FlowTodoRecordEntityRepository flowTodoRecordEntityRepository){
+        return new FlowTodoRecordRepositoryImpl(flowTodoRecordEntityRepository);
+    }
+
+    @Bean
+    public FlowTodoMergeRepository flowTodoMargeRepository(FlowTodoMargeEntityRepository flowTodoMargeEntityRepository){
+        return new FlowTodoMergeRepositoryImpl(flowTodoMargeEntityRepository);
+    }
+
 }

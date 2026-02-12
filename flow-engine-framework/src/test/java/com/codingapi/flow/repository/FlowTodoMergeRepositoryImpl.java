@@ -1,16 +1,16 @@
 package com.codingapi.flow.repository;
 
-import com.codingapi.flow.record.FlowTodoMarge;
+import com.codingapi.flow.record.FlowTodoMerge;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FlowTodoMargeRepositoryImpl implements FlowTodoMargeRepository {
+public class FlowTodoMergeRepositoryImpl implements FlowTodoMergeRepository {
 
-    private final Map<Long, FlowTodoMarge> cache = new HashMap<>();
+    private final Map<Long, FlowTodoMerge> cache = new HashMap<>();
 
-    private void save(FlowTodoMarge relation) {
+    private void save(FlowTodoMerge relation) {
         if (relation.getId() > 0) {
             cache.put(relation.getId(), relation);
         } else {
@@ -21,19 +21,19 @@ public class FlowTodoMargeRepositoryImpl implements FlowTodoMargeRepository {
     }
 
     @Override
-    public void remove(FlowTodoMarge relation) {
-        this.cache.remove(relation.getId());
+    public void remove(FlowTodoMerge todoMerge) {
+        this.cache.remove(todoMerge.getId());
     }
 
     @Override
-    public void saveAll(List<FlowTodoMarge> relations) {
-        for (FlowTodoMarge relation : relations){
+    public void saveAll(List<FlowTodoMerge> list) {
+        for (FlowTodoMerge relation : list){
             this.save(relation);
         }
     }
 
     @Override
-    public List<FlowTodoMarge> findByTodoId(long todoId) {
+    public List<FlowTodoMerge> findByTodoId(long todoId) {
         return cache.values().stream().
                 filter(relation -> relation.getTodoId() == todoId)
                 .toList();

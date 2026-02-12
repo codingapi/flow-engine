@@ -10,7 +10,7 @@ import lombok.Setter;
  */
 @Getter
 @AllArgsConstructor
-public class FlowTodoMarge {
+public class FlowTodoMerge {
 
     @Setter
     private long id;
@@ -27,7 +27,7 @@ public class FlowTodoMarge {
      */
     private long createTime;
 
-    public FlowTodoMarge(FlowTodoRecord margeRecord){
+    public FlowTodoMerge(FlowTodoRecord margeRecord){
         this.todoId = margeRecord.getId();
         this.recordId = margeRecord.getRecordId();
         this.createTime = margeRecord.getCreateTime();

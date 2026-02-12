@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class FlowParallelServiceTest {
 
     private final FlowTodoRecordRepositoryImpl flowTodoMargeRecordRepository = new FlowTodoRecordRepositoryImpl();
-    private final FlowTodoMargeRepositoryImpl flowTodoMargeRelationRepository = new FlowTodoMargeRepositoryImpl();
+    private final FlowTodoMergeRepositoryImpl flowTodoMargeRelationRepository = new FlowTodoMergeRepositoryImpl();
     private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
     private final UserGateway userGateway = new UserGateway();
     private final WorkflowBackupRepository workflowBackupRepository = new WorkflowBackupRepositoryImpl();

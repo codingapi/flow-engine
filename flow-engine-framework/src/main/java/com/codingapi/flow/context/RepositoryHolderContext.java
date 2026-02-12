@@ -6,7 +6,7 @@ import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.record.FlowTodoRecord;
-import com.codingapi.flow.record.FlowTodoMarge;
+import com.codingapi.flow.record.FlowTodoMerge;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.service.FlowService;
 import com.codingapi.flow.service.impl.FlowActionService;
@@ -34,7 +34,7 @@ public class RepositoryHolderContext {
     @Getter
     private FlowTodoRecordRepository flowTodoRecordRepository;
     @Getter
-    private FlowTodoMargeRepository flowTodoMargeRepository;
+    private FlowTodoMergeRepository flowTodoMergeRepository;
     @Getter
     private FlowOperatorGateway flowOperatorGateway;
     @Getter
@@ -53,7 +53,7 @@ public class RepositoryHolderContext {
                 && workflowBackupRepository != null
                 && flowRecordRepository != null
                 && flowTodoRecordRepository != null
-                && flowTodoMargeRepository != null
+                && flowTodoMergeRepository != null
                 && flowOperatorGateway != null
                 && workflowRepository != null
                 && urgeIntervalRepository != null;
@@ -70,7 +70,7 @@ public class RepositoryHolderContext {
                          WorkflowBackupRepository workflowBackupRepository,
                          FlowRecordRepository flowRecordRepository,
                          FlowTodoRecordRepository flowTodoRecordRepository,
-                         FlowTodoMargeRepository flowTodoMargeRepository,
+                         FlowTodoMergeRepository flowTodoMergeRepository,
                          FlowOperatorGateway flowOperatorGateway,
                          ParallelBranchRepository parallelBranchRepository,
                          DelayTaskRepository delayTaskRepository,
@@ -79,7 +79,7 @@ public class RepositoryHolderContext {
         this.workflowBackupRepository = workflowBackupRepository;
         this.flowRecordRepository = flowRecordRepository;
         this.flowTodoRecordRepository = flowTodoRecordRepository;
-        this.flowTodoMargeRepository = flowTodoMargeRepository;
+        this.flowTodoMergeRepository = flowTodoMergeRepository;
         this.flowOperatorGateway = flowOperatorGateway;
         this.parallelBranchRepository = parallelBranchRepository;
         this.delayTaskRepository = delayTaskRepository;
@@ -125,7 +125,7 @@ public class RepositoryHolderContext {
                 flowOperatorGateway,
                 flowRecordRepository,
                 flowTodoRecordRepository,
-                flowTodoMargeRepository,
+                flowTodoMergeRepository,
                 workflowBackupRepository,
                 parallelBranchRepository,
                 delayTaskRepository,
@@ -198,20 +198,20 @@ public class RepositoryHolderContext {
 
         private final List<FlowRecord> flowRecords;
         private final FlowTodoRecordRepository flowTodoRecordRepository;
-        private final FlowTodoMargeRepository flowTodoMargeRepository;
+        private final FlowTodoMergeRepository flowTodoMergeRepository;
         private final FlowRecordRepository flowRecordRepository;
 
 
         public FlowRecordRepositoryService(List<FlowRecord> flowRecords) {
             this.flowTodoRecordRepository = RepositoryHolderContext.getInstance().getFlowTodoRecordRepository();
-            this.flowTodoMargeRepository = RepositoryHolderContext.getInstance().getFlowTodoMargeRepository();
+            this.flowTodoMergeRepository = RepositoryHolderContext.getInstance().getFlowTodoMergeRepository();
             this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
             this.flowRecords = flowRecords;
         }
 
         public FlowRecordRepositoryService(FlowRecord flowRecord) {
             this.flowTodoRecordRepository = RepositoryHolderContext.getInstance().getFlowTodoRecordRepository();
-            this.flowTodoMargeRepository = RepositoryHolderContext.getInstance().getFlowTodoMargeRepository();
+            this.flowTodoMergeRepository = RepositoryHolderContext.getInstance().getFlowTodoMergeRepository();
             this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
             this.flowRecords = new ArrayList<>();
             this.flowRecords.add(flowRecord);
@@ -224,7 +224,7 @@ public class RepositoryHolderContext {
                 if (flowRecord.isTodo()) {
                     FlowTodoRecord todoMargeRecord = null;
                     if (flowRecord.isMergeable()) {
-                        todoMargeRecord = flowTodoRecordRepository.getByMageKey(flowRecord.getMergeKey());
+                        todoMargeRecord = flowTodoRecordRepository.getByMergeKey(flowRecord.getMergeKey());
                         if (todoMargeRecord == null) {
                             todoMargeRecord = new FlowTodoRecord(flowRecord);
                         } else {
@@ -242,13 +242,13 @@ public class RepositoryHolderContext {
             }
 
             if (!flowTodoRecords.isEmpty()) {
-                List<FlowTodoMarge> relationList = new ArrayList<>();
+                List<FlowTodoMerge> relationList = new ArrayList<>();
                 for (FlowTodoRecord margeRecord : flowTodoRecords) {
                     if(margeRecord.isMergeable()) {
-                        relationList.add(new FlowTodoMarge(margeRecord));
+                        relationList.add(new FlowTodoMerge(margeRecord));
                     }
                 }
-                flowTodoMargeRepository.saveAll(relationList);
+                flowTodoMergeRepository.saveAll(relationList);
             }
         }
 
@@ -263,13 +263,13 @@ public class RepositoryHolderContext {
             for (FlowRecord flowRecord : flowRecords) {
                 if (flowRecord.isDone()) {
                     if (flowRecord.isMergeable()) {
-                        FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByMageKey(flowRecord.getMergeKey());
+                        FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByMergeKey(flowRecord.getMergeKey());
                         if(todoMargeRecord!=null) {
-                            List<FlowTodoMarge> margeRelations = flowTodoMargeRepository.findByTodoId(todoMargeRecord.getId());
+                            List<FlowTodoMerge> margeRelations = flowTodoMergeRepository.findByTodoId(todoMargeRecord.getId());
                             if(margeRelations!=null && !margeRelations.isEmpty()) {
-                                for (FlowTodoMarge margeRelation : margeRelations) {
+                                for (FlowTodoMerge margeRelation : margeRelations) {
                                     if (margeRelation.isRecord(flowRecord.getId())) {
-                                        flowTodoMargeRepository.remove(margeRelation);
+                                        flowTodoMergeRepository.remove(margeRelation);
                                         todoMargeRecord.divMargeCount();
                                         if (todoMargeRecord.hasMargeCount()) {
                                             flowTodoRecordRepository.save(todoMargeRecord);
@@ -281,7 +281,7 @@ public class RepositoryHolderContext {
                             }
                         }
                     } else {
-                        FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByMageKey(flowRecord.getMergeKey());
+                        FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByMergeKey(flowRecord.getMergeKey());
                         if (todoMargeRecord != null) {
                             flowTodoRecordRepository.remove(todoMargeRecord);
                         }

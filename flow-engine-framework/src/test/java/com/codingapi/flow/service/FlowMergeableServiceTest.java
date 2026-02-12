@@ -18,7 +18,7 @@ import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.record.FlowTodoRecord;
-import com.codingapi.flow.record.FlowTodoMarge;
+import com.codingapi.flow.record.FlowTodoMerge;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class FlowMergeableServiceTest {
 
     private final FlowTodoRecordRepositoryImpl flowTodoMargeRecordRepository = new FlowTodoRecordRepositoryImpl();
-    private final FlowTodoMargeRepositoryImpl flowTodoMargeRelationRepository = new FlowTodoMargeRepositoryImpl();
+    private final FlowTodoMergeRepositoryImpl flowTodoMargeRelationRepository = new FlowTodoMergeRepositoryImpl();
     private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
     private final UserGateway userGateway = new UserGateway();
     private final WorkflowBackupRepository workflowBackupRepository = new WorkflowBackupRepositoryImpl();
@@ -147,7 +147,7 @@ public class FlowMergeableServiceTest {
         assertEquals(1, todoMargeRecords.size());
 
         FlowTodoRecord todoMargeRecord = todoMargeRecords.get(0);
-        List<FlowTodoMarge> relationList = flowTodoMargeRelationRepository.findByTodoId(todoMargeRecord.getId());
+        List<FlowTodoMerge> relationList = flowTodoMargeRelationRepository.findByTodoId(todoMargeRecord.getId());
         assertEquals(count, relationList.size());
 
 
