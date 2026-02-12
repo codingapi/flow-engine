@@ -12,6 +12,9 @@ public interface FlowRecordEntityRepository extends FastRepository<FlowRecordEnt
 
     FlowRecordEntity getFlowRecordEntityById(long id);
 
+    @Query("from FlowRecordEntity r where r.id in ?1")
+    List<FlowRecordEntity> findByIds(List<Long> ids);
+
     @Query("from FlowRecordEntity r where r.processId = ?1")
     List<FlowRecordEntity> findProcessIdRecords(String processId);
 
@@ -23,6 +26,9 @@ public interface FlowRecordEntityRepository extends FastRepository<FlowRecordEnt
 
     @Query("from FlowRecordEntity r where r.processId = ?1 and r.fromId >=?2 and r.hidden=false and r.revoked = false")
     List<FlowRecordEntity> findAfterRecords(String processId, long fromId);
+
+    @Query("from FlowRecordEntity r where r.processId = ?1 and r.id < ?2 and r.hidden=false and r.revoked = false")
+    List<FlowRecordEntity> findBeforeRecords(String processId, long id);
 
     @Query("from FlowRecordEntity r where r.currentOperatorId = ?1 and (r.recordState = 0 and r.flowState = 0 and r.hidden=false and r.revoked = false)")
     Page<FlowRecordEntity> findTodoRecordPage(long operatorId, PageRequest pageRequest);

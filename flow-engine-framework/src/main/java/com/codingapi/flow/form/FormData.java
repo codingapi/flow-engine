@@ -123,7 +123,7 @@ public class FormData {
         public DataBody(FormMeta formMeta) {
             this.formMeta = formMeta;
             this.data = new HashMap<>();
-            this.fieldTypes = formMeta.getMainFieldTypeMaps();
+            this.fieldTypes = formMeta.loadMainFieldTypeMaps();
         }
 
 

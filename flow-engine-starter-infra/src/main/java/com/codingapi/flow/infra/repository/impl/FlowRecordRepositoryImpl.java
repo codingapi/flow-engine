@@ -20,6 +20,13 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
     }
 
     @Override
+    public List<FlowRecord> findByIds(List<Long> ids) {
+        return flowRecordEntityRepository.findByIds(ids).stream()
+                .map(FlowRecordConvertor::convert)
+                .toList();
+    }
+
+    @Override
     public void save(FlowRecord flowRecord) {
         FlowRecordEntity entity = FlowRecordConvertor.convert(flowRecord);
         flowRecordEntityRepository.save(entity);
@@ -65,6 +72,14 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
     @Override
     public List<FlowRecord> findAfterRecords(String processId, long fromId) {
         return flowRecordEntityRepository.findAfterRecords(processId, fromId)
+                .stream()
+                .map(FlowRecordConvertor::convert)
+                .toList();
+    }
+
+    @Override
+    public List<FlowRecord> findBeforeRecords(String processId, long id) {
+        return flowRecordEntityRepository.findBeforeRecords(processId, id)
                 .stream()
                 .map(FlowRecordConvertor::convert)
                 .toList();

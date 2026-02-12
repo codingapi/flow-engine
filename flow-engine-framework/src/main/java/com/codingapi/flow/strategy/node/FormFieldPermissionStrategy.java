@@ -42,7 +42,7 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
      */
     @Override
     public void verifyNode(FormMeta form) {
-        Map<String, String> fieldTypes = form.getAllFieldTypeMaps();
+        Map<String, String> fieldTypes = form.loadAllFieldTypeMaps();
         for (FormFieldPermission permission : fieldPermissions) {
             String key = permission.getFormCode() + "." + permission.getFieldCode();
             if (!fieldTypes.containsKey(key)) {
