@@ -228,7 +228,7 @@ public class RepositoryHolderContext {
                     } else {
                         todoMargeRecord.update(flowRecord);
                         if (flowRecord.isMergeable()) {
-                            todoMargeRecord.addMargeCount();
+                            todoMargeRecord.addMergeCount();
                         }
                     }
                     flowTodoRecords.add(todoMargeRecord);
@@ -267,8 +267,8 @@ public class RepositoryHolderContext {
                                 for (FlowTodoMerge margeRelation : margeRelations) {
                                     if (margeRelation.isRecord(flowRecord.getId())) {
                                         flowTodoMergeRepository.remove(margeRelation);
-                                        todoMargeRecord.divMargeCount();
-                                        if (todoMargeRecord.hasMargeCount()) {
+                                        todoMargeRecord.divMergeCount();
+                                        if (todoMargeRecord.hasMergeCount()) {
                                             flowTodoRecordRepository.save(todoMargeRecord);
                                         } else {
                                             flowTodoRecordRepository.remove(todoMargeRecord);
