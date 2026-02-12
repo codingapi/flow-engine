@@ -83,6 +83,7 @@
 | FormFieldPermissionStrategy | ✅ | 表单字段权限策略 |
 | DelayStrategy | ✅ | 延迟策略（支持秒/分钟/小时/天） |
 | TriggerStrategy | ✅ | 触发策略 |
+| RouterStrategy | ✅ | 路由策略 |
 | SubProcessStrategy | ✅ | 子流程策略 |
 | RevokeStrategy | ✅ | 撤回策略（撤回下级/撤回到当前节点） |
 | InterfereStrategy | ✅ | 干预策略（工作流级别） |

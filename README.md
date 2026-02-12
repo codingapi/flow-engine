@@ -89,6 +89,8 @@ flow-engine
 │       │   ├── ActionManager     # 动作管理器
 │       │   ├── NodeStrategyManager # 节点策略管理器
 │       │   ├── OperatorManager   # 操作者管理器
+│       │   ├── FlowNodeManager  # 节点管理器
+│       │   ├── FlowNodeState    # 节点状态分类
 │       │   └── WorkflowStrategyManager # 工作流策略管理器
 │       ├── node                  # 节点层
 │       │   ├── nodes             # 节点实现（15种）
@@ -111,6 +113,7 @@ flow-engine
 │       │   ├── helper            # 节点助手
 │       │   │   ├── BackNodeHelper           # 退回节点助手
 │       │   │   └── ParallelNodeRelationHelper # 并行关系助手
+│       │   ├── IBlockNode       # 块节点接口
 │       │   ├── BaseFlowNode      # 节点抽象基类
 │       │   ├── BaseAuditNode     # 审批节点抽象基类
 │       │   ├── IFlowNode         # 节点接口
@@ -119,20 +122,27 @@ flow-engine
 │       │   └── IFlowOperator     # 操作者接口
 │       ├── pojo                  # 数据对象
 │       │   ├── body              # FlowAdviceBody 请求体
-│       │   └── request           # 请求对象
-│       │       ├── FlowActionRequest  # 动作请求
-│       │       ├── FlowCreateRequest  # 创建请求
-│       │       ├── FlowRevokeRequest  # 撤回请求
-│       │       └── FlowUrgeRequest    # 催办请求
+│       │   ├── request           # 请求对象
+│       │   │   ├── FlowActionRequest  # 动作请求
+│       │   │   ├── FlowCreateRequest  # 创建请求
+│       │   │   ├── FlowRevokeRequest  # 撤回请求
+│       │   │   └── FlowUrgeRequest    # 催办请求
+│       │   └── response          # 响应对象
+│       │       ├── FlowOperator   # 流程操作者
+│       │       └── FlowContent   # 流程内容
 │       ├── record                # 流程记录
-│       │   └── FlowRecord        # 执行记录（TODO/DONE状态）
+│       │   ├── FlowRecord        # 执行记录（TODO/DONE状态）
+│       │   ├── FlowTodoRecord    # 待办记录
+│       │   └── FlowTodoMerge     # 待办合并记录
 │       ├── repository            # 仓储接口（持久化抽象）
 │       │   ├── WorkflowRepository
 │       │   ├── FlowRecordRepository
 │       │   ├── WorkflowBackupRepository
 │       │   ├── ParallelBranchRepository
 │       │   ├── DelayTaskRepository
-│       │   └── UrgeIntervalRepository
+│       │   ├── UrgeIntervalRepository
+│       │   ├── FlowTodoRecordRepository
+│       │   └── FlowTodoMergeRepository
 │       ├── script                # 脚本系统
 │       │   ├── node              # 节点脚本（8种）
 │       │   │   ├── OperatorMatchScript  # 发起人匹配脚本
@@ -156,12 +166,13 @@ flow-engine
 │       │   │   ├── FlowActionService    # 流程动作服务
 │       │   │   ├── FlowDelayTriggerService # 延迟触发服务
 │       │   │   ├── FlowRevokeService    # 流程撤回服务
-│       │   │   └── FlowUrgeService      # 流程催办服务
+│       │   │   ├── FlowUrgeService      # 流程催办服务
+│       │   │   └── FlowDetailService   # 流程详情服务
 │       │   └── FlowService       # 服务接口
 │       ├── session               # 会话层
 │       │   ├── FlowSession       # 执行上下文
 │       │   └── FlowAdvice        # 审批参数（意见、签名、退回节点等）
-│       ├── strategy              # 策略层（16种：14种节点策略 + 2种工作流策略）
+│       ├── strategy              # 策略层（18种：16种节点策略 + 2种工作流策略）
 │       │   ├── node                # 节点策略
 │       │   │   ├── MultiOperatorAuditStrategy  # 多人审批策略
 │       │   │   ├── TimeoutStrategy          # 超时策略
@@ -175,6 +186,7 @@ flow-engine
 │       │   │   ├── FormFieldPermissionStrategy # 字段权限策略
 │       │   │   ├── DelayStrategy            # 延迟策略
 │       │   │   ├── TriggerStrategy          # 触发策略
+│       │   │   ├── RouterStrategy          # 路由策略
 │       │   │   ├── SubProcessStrategy       # 子流程策略
 │       │   │   ├── RevokeStrategy           # 撤回策略
 │       │   │   ├── NodeStrategyFactory      # 节点策略工厂
@@ -198,9 +210,12 @@ flow-engine
 ├── flow-engine-example           # 示例项目
 └── frontend                      # 前端项目
     ├── apps
-    │   └── app-pc                # PC端应用
+    │   ├── app-pc                # PC端应用
+    │   └── app-mobile            # 移动端应用（开发中）
     └── packages
-        └── flow-design           # 流程设计器
+        ├── flow-design           # 流程设计器组件库
+        ├── flow-core            # 核心 API 库
+        └── flow-types           # TypeScript 类型定义库
 ```
 
 ## 技术栈

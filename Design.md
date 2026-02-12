@@ -306,7 +306,7 @@ Workflow
 
 #### 策略类型
 
-**节点策略 (14种)**:
+**节点策略 (16种)**:
 
 | 策略类 | 说明 |
 |-------|------|
@@ -322,6 +322,7 @@ Workflow
 | FormFieldPermissionStrategy | 表单字段权限策略 |
 | DelayStrategy | 延迟策略 |
 | TriggerStrategy | 触发策略 |
+| RouterStrategy | 路由策略 |
 | SubProcessStrategy | 子流程策略 |
 | RevokeStrategy | 撤回策略（REVOKE_NEXT撤回下级/REVOKE_CURRENT撤回到当前节点） |
 

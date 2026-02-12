@@ -59,13 +59,16 @@ pnpm run dev:app-pc
 ### Frontend Structure
 
 - **apps/app-pc** - PC client application
+- **apps/app-mobile** - Mobile client application (in development)
 - **packages/flow-design** - Flow designer component library using @flowgram.ai fixed-layout-editor
+- **packages/flow-core** - Core API library with HTTP client and service interfaces
+- **packages/flow-types** - TypeScript type definitions for the entire frontend
   - `pages/design-panel/types.ts` - TypeScript interfaces for Workflow, FlowNode, FlowForm
   - `FlowNode.blocks?: FlowNode[]` - Child nodes for hierarchical structure
   - `FlowNode.strategies` - Node strategies configuration
   - `FlowNode.actions` - Node actions configuration
 
-Note: `app-mobile`, `flow-pc`, and `flow-mobile` are planned but not yet implemented.
+Note: `app-mobile` is currently in development. `flow-pc` and `flow-mobile` packages are planned but not yet implemented.
 
 ### Data Structure: Blocks vs Edges
 
@@ -105,6 +108,8 @@ The workflow engine is organized into 8 layers:
 
 4. **Record Layer** (`com.codingapi.flow.record`)
    - `FlowRecord` - Execution record with states (TODO/DONE, RUNNING/FINISH/ERROR/DELETE)
+   - `FlowTodoRecord` - Todo record for pending tasks
+   - `FlowTodoMerge` - Todo merge record for aggregation
    - Tracks processId, nodeId, currentOperatorId, formData, parallel branch info
 
 5. **Session Layer** (`com.codingapi.flow.session`)
@@ -116,12 +121,13 @@ The workflow engine is organized into 8 layers:
    - `OperatorManager` - Manages node operators
    - `NodeStrategyManager` - Manages node strategies, provides `loadOperators()`, `generateTitle()`, `verifySession()`, `getTimeoutTime()`, `isDone()`
    - `WorkflowStrategyManager` - Manages workflow strategies
+   - `FlowNodeManager` - Node management functionality
    - `FlowNodeState` - Classifies nodes as block nodes or branch nodes for traversal
    - `FlowNodeEdgeManager` - Traverses hierarchical node structure via blocks to find next nodes
 
 7. **Strategy Layer** (`com.codingapi.flow.strategy`)
    - `INodeStrategy` - Interface with `copy()`, `getId()`, `strategyType()`
-   - **Node strategies** (14 types): MultiOperatorAuditStrategy, TimeoutStrategy, SameOperatorAuditStrategy, RecordMergeStrategy, ResubmitStrategy, AdviceStrategy, OperatorLoadStrategy, ErrorTriggerStrategy, NodeTitleStrategy, FormFieldPermissionStrategy, DelayStrategy, TriggerStrategy, SubProcessStrategy, RevokeStrategy
+   - **Node strategies** (16 types): MultiOperatorAuditStrategy, TimeoutStrategy, SameOperatorAuditStrategy, RecordMergeStrategy, ResubmitStrategy, AdviceStrategy, OperatorLoadStrategy, ErrorTriggerStrategy, NodeTitleStrategy, FormFieldPermissionStrategy, DelayStrategy, TriggerStrategy, RouterStrategy, SubProcessStrategy, RevokeStrategy
    - **Workflow strategies** (2 types): InterfereStrategy, UrgeStrategy
 
 8. **Script Layer** (`com.codingapi.flow.script.runtime`)
@@ -133,7 +139,7 @@ The workflow engine is organized into 8 layers:
 - **Common Interfaces** (`com.codingapi.flow.common`)
    - `ICopyAbility` - Interface for copy capability (used by strategies and actions)
    - `IMapConvertor` - Interface for Map conversion (used by strategies and actions)
-- **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation. Implementations are in `flow-engine-starter-infra` under `com.codingapi.flow.infra.repository.impl`. Access via `RepositoryHolderContext` singleton. Pattern: Interface in framework, implementation in infra using JPA entities and convertors.
+- **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation. Includes: WorkflowRepository, FlowRecordRepository, WorkflowBackupRepository, ParallelBranchRepository, DelayTaskRepository, UrgeIntervalRepository, FlowTodoRecordRepository, FlowTodoMergeRepository. Implementations are in `flow-engine-starter-infra` under `com.codingapi.flow.infra.repository.impl`. Access via `RepositoryHolderContext` singleton. Pattern: Interface in framework, implementation in infra using JPA entities and convertors.
 - **Gateway Pattern** (`com.codingapi.flow.gateway`) - Anti-corruption layer for external system integration (operators, users). Access via `GatewayContext` singleton.
 - **Domain Objects** (`com.codingapi.flow.domain`) - DelayTask, DelayTaskManager, UrgeInterval
 - **Event System** (`com.codingapi.flow.event`) - 5 event types: FlowRecordStartEvent, FlowRecordTodoEvent, FlowRecordDoneEvent, FlowRecordFinishEvent, FlowRecordUrgeEvent
@@ -155,6 +161,9 @@ When a node is executed, methods are called in this order:
 
 **FlowActionService** (executing an action):
 1. Validate request → Validate operator → Get record → Validate state → Load workflow → Get current node → Get action → Build form data → Create session → Verify session → Execute action
+
+**FlowDetailService** (querying workflow details):
+1. Fetch workflow details by processId → Include workflow definition, current records, form data
 
 **PassAction.run()** (typical action):
 1. Check if node done (StrategyManager) → Update current record → Generate subsequent records → Trigger next nodes → Save records → Push events
