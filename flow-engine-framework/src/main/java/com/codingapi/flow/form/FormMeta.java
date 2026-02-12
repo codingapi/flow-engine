@@ -1,6 +1,5 @@
 package com.codingapi.flow.form;
 
-import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -91,7 +90,7 @@ public class FormMeta {
     /**
      * 获取表单字段名称
      */
-    public List<String> getFieldNames() {
+    public List<String> loadFieldNames() {
         return fields.stream().map(FormFieldMeta::getName).toList();
     }
 
@@ -118,7 +117,7 @@ public class FormMeta {
      *
      * @return 表单字段类型
      */
-    public Map<String, String> getAllFieldTypeMaps() {
+    public Map<String, String> loadAllFieldTypeMaps() {
         Map<String, String> types = new HashMap<>();
         List<FormMeta> forms = this.getSubForms();
         if (forms == null) {
@@ -137,7 +136,7 @@ public class FormMeta {
      *
      * @return 表单字段类型
      */
-    public Map<String, String> getMainFieldTypeMaps() {
+    public Map<String, String> loadMainFieldTypeMaps() {
         Map<String, String> types = new HashMap<>();
         List<FormMeta> forms = new ArrayList<>();
         forms.add(this);

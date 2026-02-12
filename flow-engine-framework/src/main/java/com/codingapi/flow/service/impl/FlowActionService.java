@@ -18,8 +18,6 @@ import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
 
-import java.util.List;
-
 /**
  * 节点动作服务
  */
@@ -78,8 +76,7 @@ public class FlowActionService {
         formData.reset(request.getFormData());
         FlowAdvice flowAdvice = request.toFlowAdvice(workflow, flowAction);
 
-        List<FlowRecord> currentRecords = RepositoryHolderContext.getInstance().findCurrentNodeRecords(flowRecord.getFromId(), flowRecord.getNodeId());
-        FlowSession session = new FlowSession(currentOperator, workflow, currentNode, flowAction, formData, flowRecord, currentRecords, workflowBackup.getId(), flowAdvice);
+        FlowSession session = flowRecord.createFlowSession(workflow,currentOperator,formData,flowAdvice);
         // 验证会话
         currentNode.verifySession(session);
         // 执行动作

@@ -17,6 +17,13 @@ public interface FlowRecordRepository {
     FlowRecord get(long id);
 
     /**
+     * 批量获取流程详细
+     * @param ids 流程id列表
+     * @return 批量流程记录
+     */
+    List<FlowRecord> findByIds(List<Long> ids);
+
+    /**
      * 保存流程
      * 为何确保待办合并数据的一致性，保存流程需要通过 {@link com.codingapi.flow.context.RepositoryHolderContext#saveRecord(FlowRecord)} 保存
      * @param flowRecord 流程记录
@@ -68,5 +75,14 @@ public interface FlowRecordRepository {
      * @return 记录列表
      */
     List<FlowRecord> findAfterRecords(String processId, long fromId);
+
+
+    /**
+     * 查询所有之前的流程记录
+     * @param processId 流程id
+     * @param id 记录id
+     * @return 记录列表
+     */
+    List<FlowRecord> findBeforeRecords(String processId,long id);
 
 }

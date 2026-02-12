@@ -2,8 +2,17 @@ package com.codingapi.flow.pojo.response;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.manager.NodeStrategyManager;
+import com.codingapi.flow.manager.OperatorManager;
+import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
+import com.codingapi.flow.workflow.Workflow;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +57,22 @@ public class FlowContent {
     /**
      * 发起者id
      */
-    private long createOperatorId;
+    private FlowOperator createOperator;
+
+    /**
+     * 当前审批者id
+     */
+    private FlowOperator currentOperator;
+
+    /**
+     * 流程状态 | 运行中、已完成、异常、删除
+     */
+    private int flowState;
+
+    /**
+     * 节点状态 | 待办、已办
+     */
+    private int recordState;
 
     /**
      * 历史记录
@@ -59,6 +83,78 @@ public class FlowContent {
      * 下一审批
      */
     private List<NextNode> nextNodes;
+
+    public void pushNextNodes(FlowSession flowSession, List<IFlowNode> nextNodes) {
+        List<NextNode> nextNodeList = new ArrayList<>();
+        for (IFlowNode node : nextNodes){
+            NextNode nextNode = new NextNode();
+            nextNode.setNodeId(node.getId());
+            nextNode.setNodeName(node.getName());
+            nextNode.setNodeType(node.getType());
+
+            NodeStrategyManager nodeStrategyManager = node.strategyManager();
+            OperatorManager operatorManager = nodeStrategyManager.loadOperators(flowSession);
+            nextNode.setOperators(operatorManager.getOperators().stream().map(FlowOperator::new).toList());
+
+            nextNodeList.add(nextNode);
+        }
+        this.nextNodes = nextNodeList;
+    }
+
+    public void pushCurrentNode(IFlowNode currentNode) {
+        this.actions = currentNode.actionManager().getActions();
+        Map<String,Object> nodeData = currentNode.toMap();
+        this.view = (String) nodeData.get("view");
+    }
+
+    public void pushWorkflow(Workflow workflow) {
+        this.form = workflow.getForm();
+        this.workflowCode = workflow.getCode();
+    }
+
+    public void pushRecords(FlowRecord record, List<FlowRecord> mergeRecords) {
+        this.recordId = record.getId();
+        this.createOperator = new FlowOperator(record.getCreateOperatorId(), record.getCreateOperatorName());
+        this.mergeable = record.isMergeable();
+        this.flowState = record.getFlowState();
+        this.recordState = record.getRecordState();
+
+        this.todos = new ArrayList<>();
+        for (FlowRecord item : mergeRecords){
+            Body body = new Body();
+            body.setRecordId(item.getId());
+            body.setTitle(item.getTitle());
+            body.setData(item.getFormData());
+            body.setRecordState(item.getRecordState());
+            body.setFlowState(item.getFlowState());
+            this.todos.add(body);
+        }
+    }
+
+    public void pushHistory(Workflow workflow,List<FlowRecord> historyRecords) {
+        this.histories = new ArrayList<>();
+        for (FlowRecord item : historyRecords){
+            IFlowNode node = workflow.getFlowNode(item.getNodeId());
+            History history = new History();
+            history.setRecordId(item.getId());
+            history.setTitle(item.getTitle());
+            history.setAdvice(item.getAdvice());
+            history.setSignKey(item.getSignKey());
+            history.setNodeName(node.getName());
+            history.setNodeId(item.getNodeId());
+            history.setNodeType(item.getNodeType());
+            history.setUpdateTime(item.getUpdateTime());
+            history.setCurrentOperatorId(item.getCurrentOperatorId());
+            history.setCurrentOperatorName(item.getCurrentOperatorName());
+            this.histories.add(history);
+        }
+    }
+
+    public void pushCurrentOperator(IFlowOperator currentOperator) {
+        this.currentOperator = new FlowOperator(currentOperator);
+        this.createOperator =  new FlowOperator(currentOperator);
+    }
+
 
     /**
      * 流程图
@@ -77,6 +173,11 @@ public class FlowContent {
          * 节点类型
          */
         private String nodeType;
+
+        /**
+         * 节点审批人
+         */
+        private List<FlowOperator> operators;
     }
 
     @Data

@@ -15,6 +15,10 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
         return cache.get(id);
     }
 
+    @Override
+    public List<FlowRecord> findByIds(List<Long> ids) {
+        return ids.stream().map(cache::get).toList();
+    }
 
     public List<FlowRecord> findTodoByOperator(long operatorId) {
         return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId && flowRecord.isTodo()).toList();
@@ -79,6 +83,16 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
         return cache.values().stream().filter(flowRecord ->
                 flowRecord.getProcessId().equals(processId)
                         && flowRecord.getFromId() >= fromId
+                        && !flowRecord.isRevoked()
+                        && !flowRecord.isHidden()
+        ).toList();
+    }
+
+    @Override
+    public List<FlowRecord> findBeforeRecords(String processId, long id) {
+        return cache.values().stream().filter(flowRecord ->
+                flowRecord.getProcessId().equals(processId)
+                        && flowRecord.getId() < id
                         && !flowRecord.isRevoked()
                         && !flowRecord.isHidden()
         ).toList();
