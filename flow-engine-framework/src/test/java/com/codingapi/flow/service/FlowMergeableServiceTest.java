@@ -37,8 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FlowMergeableServiceTest {
 
-    private final FlowTodoRecordRepositoryImpl flowTodoMargeRecordRepository = new FlowTodoRecordRepositoryImpl();
-    private final FlowTodoMergeRepositoryImpl flowTodoMargeRelationRepository = new FlowTodoMergeRepositoryImpl();
+    private final FlowTodoRecordRepositoryImpl flowTodoRecordRepository = new FlowTodoRecordRepositoryImpl();
+    private final FlowTodoMergeRepositoryImpl flowTodoMergeRepository = new FlowTodoMergeRepositoryImpl();
     private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
     private final UserGateway userGateway = new UserGateway();
     private final WorkflowBackupRepository workflowBackupRepository = new WorkflowBackupRepositoryImpl();
@@ -46,7 +46,7 @@ public class FlowMergeableServiceTest {
     private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
     private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
     private final UrgeIntervalRepository urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
-    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository,flowTodoMargeRecordRepository,flowTodoMargeRelationRepository, workflowBackupRepository, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
+    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, flowTodoRecordRepository, flowTodoMergeRepository, workflowBackupRepository, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
 
 
     /**
@@ -143,12 +143,12 @@ public class FlowMergeableServiceTest {
         Set<String> set = new HashSet<>(mergeIdList);
         assertEquals(1,set.size());
 
-        List<FlowTodoRecord> todoMargeRecords = flowTodoMargeRecordRepository.findByOperatorId(boss.getUserId());
-        assertEquals(1, todoMargeRecords.size());
+        List<FlowTodoRecord> todoRecords = flowTodoRecordRepository.findByOperatorId(boss.getUserId());
+        assertEquals(1, todoRecords.size());
 
-        FlowTodoRecord todoMargeRecord = todoMargeRecords.get(0);
-        List<FlowTodoMerge> relationList = flowTodoMargeRelationRepository.findByTodoId(todoMargeRecord.getId());
-        assertEquals(count, relationList.size());
+        FlowTodoRecord todoMargeRecord = todoRecords.get(0);
+        List<FlowTodoMerge> mergeList = flowTodoMergeRepository.findByTodoId(todoMargeRecord.getId());
+        assertEquals(count, mergeList.size());
 
 
         List<IFlowAction> bossActions = bossNode.actionManager().getActions();
@@ -167,5 +167,12 @@ public class FlowMergeableServiceTest {
             assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
         }
 
-    }
+        List<FlowTodoRecord> todoRecordList = flowTodoRecordRepository.findAll();
+        assertEquals(0, todoRecordList.size());
+
+        List<FlowTodoMerge> todoMargeList = flowTodoMergeRepository.findAll();
+        assertEquals(0, todoMargeList.size());
+
+
+     }
 }

@@ -5,14 +5,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- *  待办记录数据，所有的待办列表
+ * 待办记录数据，所有的待办列表（自动合并记录）
  */
 @Getter
 @AllArgsConstructor
 public class FlowTodoRecord {
 
     /**
-     * 合并记录id
+     * 待办记录id (todoId,无业务属性，流程处理还是通过recordId来处理)
      */
     @Setter
     private long id;
@@ -81,6 +81,7 @@ public class FlowTodoRecord {
 
     /**
      * 合并记录数量
+     * 当 {@link FlowTodoRecord#mergeable} 为true时，该字段有效,否则为0
      */
     private int margeCount;
 
@@ -101,11 +102,12 @@ public class FlowTodoRecord {
 
 
     public FlowTodoRecord(FlowRecord flowRecord) {
-       this.update(flowRecord);
+        this.update(flowRecord);
+        this.margeCount = flowRecord.isMergeable() ? 1 : 0;
     }
 
 
-    public void update(FlowRecord flowRecord){
+    public void update(FlowRecord flowRecord) {
         this.processId = flowRecord.getProcessId();
         this.workBackupId = flowRecord.getWorkBackupId();
         this.workCode = flowRecord.getWorkCode();
@@ -124,19 +126,28 @@ public class FlowTodoRecord {
         this.timeoutTime = flowRecord.getTimeoutTime();
     }
 
-    public void addMargeCount(){
-        if(this.mergeable) {
+    /**
+     * 添加合并记录数量
+     */
+    public void addMergeCount() {
+        if (this.mergeable) {
             this.margeCount++;
         }
     }
 
-    public void divMargeCount(){
-        if(this.mergeable) {
+    /**
+     * 减去合并记录数量
+     */
+    public void divMergeCount() {
+        if (this.mergeable) {
             this.margeCount--;
         }
     }
 
-    public boolean hasMargeCount(){
+    /**
+     * 是否有合并记录数量
+     */
+    public boolean hasMergeCount() {
         return this.mergeable && this.margeCount > 0;
     }
 

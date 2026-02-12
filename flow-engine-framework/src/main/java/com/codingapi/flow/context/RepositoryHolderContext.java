@@ -222,17 +222,14 @@ public class RepositoryHolderContext {
             List<FlowTodoRecord> flowTodoRecords = new ArrayList<>();
             for (FlowRecord flowRecord : flowRecords) {
                 if (flowRecord.isTodo()) {
-                    FlowTodoRecord todoMargeRecord = null;
-                    if (flowRecord.isMergeable()) {
-                        todoMargeRecord = flowTodoRecordRepository.getByMergeKey(flowRecord.getMergeKey());
-                        if (todoMargeRecord == null) {
-                            todoMargeRecord = new FlowTodoRecord(flowRecord);
-                        } else {
-                            todoMargeRecord.update(flowRecord);
-                            todoMargeRecord.addMargeCount();
-                        }
-                    } else {
+                    FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByMergeKey(flowRecord.getMergeKey());
+                    if (todoMargeRecord == null) {
                         todoMargeRecord = new FlowTodoRecord(flowRecord);
+                    } else {
+                        todoMargeRecord.update(flowRecord);
+                        if (flowRecord.isMergeable()) {
+                            todoMargeRecord.addMergeCount();
+                        }
                     }
                     flowTodoRecords.add(todoMargeRecord);
                 }
@@ -259,7 +256,7 @@ public class RepositoryHolderContext {
         }
 
 
-        private void removeTodoMargeRecords() {
+        private void removeTodoMergeRecords() {
             for (FlowRecord flowRecord : flowRecords) {
                 if (flowRecord.isDone()) {
                     if (flowRecord.isMergeable()) {
@@ -270,8 +267,8 @@ public class RepositoryHolderContext {
                                 for (FlowTodoMerge margeRelation : margeRelations) {
                                     if (margeRelation.isRecord(flowRecord.getId())) {
                                         flowTodoMergeRepository.remove(margeRelation);
-                                        todoMargeRecord.divMargeCount();
-                                        if (todoMargeRecord.hasMargeCount()) {
+                                        todoMargeRecord.divMergeCount();
+                                        if (todoMargeRecord.hasMergeCount()) {
                                             flowTodoRecordRepository.save(todoMargeRecord);
                                         } else {
                                             flowTodoRecordRepository.remove(todoMargeRecord);
@@ -293,7 +290,7 @@ public class RepositoryHolderContext {
         public void saveAll() {
             this.saveRecords();
             this.saveTodoMargeRecords();
-            this.removeTodoMargeRecords();
+            this.removeTodoMergeRecords();
         }
 
 

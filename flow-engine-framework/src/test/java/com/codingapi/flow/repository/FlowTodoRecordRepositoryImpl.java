@@ -45,4 +45,8 @@ public class FlowTodoRecordRepositoryImpl implements FlowTodoRecordRepository {
         return cache.values().stream().filter(record -> record.getCurrentOperatorId() == operatorId).toList();
     }
 
+    public List<FlowTodoRecord> findAll() {
+        return cache.values().stream().toList();
+    }
+
 }
