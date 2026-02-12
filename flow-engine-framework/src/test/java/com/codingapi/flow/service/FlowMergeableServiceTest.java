@@ -17,6 +17,8 @@ import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.record.FlowTodoRecord;
+import com.codingapi.flow.record.FlowTodoMarge;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
@@ -35,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FlowMergeableServiceTest {
 
+    private final FlowTodoRecordRepositoryImpl flowTodoMargeRecordRepository = new FlowTodoRecordRepositoryImpl();
+    private final FlowTodoMargeRepositoryImpl flowTodoMargeRelationRepository = new FlowTodoMargeRepositoryImpl();
     private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
     private final UserGateway userGateway = new UserGateway();
     private final WorkflowBackupRepository workflowBackupRepository = new WorkflowBackupRepositoryImpl();
@@ -42,7 +46,7 @@ public class FlowMergeableServiceTest {
     private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
     private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
     private final UrgeIntervalRepository urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
-    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, workflowBackupRepository, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
+    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository,flowTodoMargeRecordRepository,flowTodoMargeRelationRepository, workflowBackupRepository, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
 
 
     /**
@@ -135,22 +139,33 @@ public class FlowMergeableServiceTest {
         assertEquals(count, bossRecordList.size());
         assertEquals(count, bossRecordList.stream().filter(FlowRecord::isMergeable).toList().size());
 
-        List<String> mergeIdList = bossRecordList.stream().map(FlowRecord::getMergeId).toList();
+        List<String> mergeIdList = bossRecordList.stream().map(FlowRecord::getMergeKey).toList();
         Set<String> set = new HashSet<>(mergeIdList);
         assertEquals(1,set.size());
+
+        List<FlowTodoRecord> todoMargeRecords = flowTodoMargeRecordRepository.findByOperatorId(boss.getUserId());
+        assertEquals(1, todoMargeRecords.size());
+
+        FlowTodoRecord todoMargeRecord = todoMargeRecords.get(0);
+        List<FlowTodoMarge> relationList = flowTodoMargeRelationRepository.findByTodoId(todoMargeRecord.getId());
+        assertEquals(count, relationList.size());
 
 
         List<IFlowAction> bossActions = bossNode.actionManager().getActions();
 
-        FlowActionRequest bossRequest = new FlowActionRequest();
-        bossRequest.setFormData(data);
-        bossRequest.setRecordId(bossRecordList.get(0).getId());
-        bossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", boss.getUserId()));
-        flowService.action(bossRequest);
+        for(int i=0;i<count;i++){
+            FlowActionRequest bossRequest = new FlowActionRequest();
+            bossRequest.setFormData(data);
+            bossRequest.setRecordId(bossRecordList.get(i).getId());
+            bossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", boss.getUserId()));
+            flowService.action(bossRequest);
+        }
 
-        List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        for(int i=0;i<count;i++) {
+            List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(i).getProcessId());
+            assertEquals(3, records.size());
+            assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        }
 
     }
 }

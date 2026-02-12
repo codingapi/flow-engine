@@ -190,7 +190,7 @@ public class FlowRecord {
     private long timeoutTime;
     /**
      * 是否可合并
-     * {@link FlowRecord#getMergeId()}
+     * {@link FlowRecord#getMergeKey()}
      */
     private boolean mergeable;
     /**
@@ -227,11 +227,11 @@ public class FlowRecord {
      * 数据合并的依据,当开启时值为固定值，否则为随机数据
      * 相同的 {@link FlowRecord#currentOperatorId} {@link FlowRecord#workBackupId} {@link FlowRecord#nodeId}字段的数据合并到一条记录上。
      */
-    public String getMergeId() {
+    public String getMergeKey() {
         if (mergeable) {
             return String.format("%s-%s-%s", currentOperatorId, workBackupId, nodeId);
         } else {
-            return RandomUtils.generateStringId();
+            return String.valueOf(id);
         }
     }
 
@@ -350,6 +350,13 @@ public class FlowRecord {
      */
     public boolean isTodo() {
         return recordState == SATE_RECORD_TODO && flowState == SATE_FLOW_RUNNING && !hidden && !revoked;
+    }
+
+    /**
+     *  是否已办
+     */
+    public boolean isDone() {
+        return recordState == SATE_RECORD_DONE && !hidden && !revoked;
     }
 
 

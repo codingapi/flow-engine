@@ -1,6 +1,7 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.backup.WorkflowBackup;
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -21,18 +22,13 @@ public class FlowDetailService {
     private final WorkflowRepository workflowRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
 
-    public FlowDetailService(String id,
-                             IFlowOperator currentOperator,
-                             FlowRecordRepository flowRecordRepository,
-                             FlowOperatorGateway flowOperatorGateway,
-                             WorkflowRepository workflowRepository,
-                             WorkflowBackupRepository workflowBackupRepository) {
+    public FlowDetailService(String id, IFlowOperator currentOperator) {
         this.id = id;
         this.currentOperator = currentOperator;
-        this.flowRecordRepository = flowRecordRepository;
-        this.flowOperatorGateway = flowOperatorGateway;
-        this.workflowRepository = workflowRepository;
-        this.workflowBackupRepository = workflowBackupRepository;
+        this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
+        this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
+        this.workflowRepository = RepositoryHolderContext.getInstance().getWorkflowRepository();
+        this.workflowBackupRepository = RepositoryHolderContext.getInstance().getWorkflowBackupRepository();
     }
 
 

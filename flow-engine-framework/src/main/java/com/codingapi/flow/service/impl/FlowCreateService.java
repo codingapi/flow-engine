@@ -2,6 +2,7 @@ package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.backup.WorkflowBackup;
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordStartEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -15,13 +16,11 @@ import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.repository.WorkflowBackupRepository;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.springboot.framework.event.EventPusher;
-import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,14 +28,19 @@ import java.util.List;
 /**
  * 创建流程服务
  */
-@AllArgsConstructor
 public class FlowCreateService {
 
     private final FlowCreateRequest request;
     private final FlowOperatorGateway flowOperatorGateway;
-    private final FlowRecordRepository flowRecordRepository;
     private final WorkflowRepository workflowRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
+
+    public FlowCreateService(FlowCreateRequest request) {
+        this.request = request;
+        this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
+        this.workflowRepository = RepositoryHolderContext.getInstance().getWorkflowRepository();
+        this.workflowBackupRepository = RepositoryHolderContext.getInstance().getWorkflowBackupRepository();
+    }
 
     public long create() {
         request.verify();
@@ -75,7 +79,7 @@ public class FlowCreateService {
             throw FlowExecutionException.createRecordSizeError();
         }
 
-        flowRecordRepository.saveAll(flowRecords);
+        RepositoryHolderContext.getInstance().saveRecords(flowRecords);
 
         List<IFlowEvent> events = new ArrayList<>();
         for (FlowRecord flowRecord : flowRecords) {

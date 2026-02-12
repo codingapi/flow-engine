@@ -1,6 +1,7 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.backup.WorkflowBackup;
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.domain.UrgeInterval;
 import com.codingapi.flow.event.FlowRecordUrgeEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -17,7 +18,6 @@ import com.codingapi.flow.repository.WorkflowBackupRepository;
 import com.codingapi.flow.strategy.workflow.UrgeStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.springboot.framework.event.EventPusher;
-import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,6 @@ import java.util.List;
 /**
  * 催办服务
  */
-@AllArgsConstructor
 public class FlowUrgeService {
 
     private final FlowUrgeRequest request;
@@ -33,6 +32,14 @@ public class FlowUrgeService {
     private final FlowOperatorGateway flowOperatorGateway;
     private final UrgeIntervalRepository urgeIntervalRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
+
+    public FlowUrgeService(FlowUrgeRequest request) {
+        this.request = request;
+        this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
+        this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
+        this.urgeIntervalRepository = RepositoryHolderContext.getInstance().getUrgeIntervalRepository();
+        this.workflowBackupRepository = RepositoryHolderContext.getInstance().getWorkflowBackupRepository();
+    }
 
     /**
      * 催办

@@ -5,6 +5,8 @@ import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.record.FlowTodoRecord;
+import com.codingapi.flow.record.FlowTodoMarge;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.service.FlowService;
 import com.codingapi.flow.service.impl.FlowActionService;
@@ -12,6 +14,7 @@ import com.codingapi.flow.service.impl.FlowDelayTriggerService;
 import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RepositoryHolderContext {
@@ -29,6 +32,10 @@ public class RepositoryHolderContext {
     @Getter
     private FlowRecordRepository flowRecordRepository;
     @Getter
+    private FlowTodoRecordRepository flowTodoRecordRepository;
+    @Getter
+    private FlowTodoMargeRepository flowTodoMargeRepository;
+    @Getter
     private FlowOperatorGateway flowOperatorGateway;
     @Getter
     private ParallelBranchRepository parallelBranchRepository;
@@ -45,6 +52,8 @@ public class RepositoryHolderContext {
                 && delayTaskRepository != null
                 && workflowBackupRepository != null
                 && flowRecordRepository != null
+                && flowTodoRecordRepository != null
+                && flowTodoMargeRepository != null
                 && flowOperatorGateway != null
                 && workflowRepository != null
                 && urgeIntervalRepository != null;
@@ -60,6 +69,8 @@ public class RepositoryHolderContext {
     public void register(WorkflowRepository workflowRepository,
                          WorkflowBackupRepository workflowBackupRepository,
                          FlowRecordRepository flowRecordRepository,
+                         FlowTodoRecordRepository flowTodoRecordRepository,
+                         FlowTodoMargeRepository flowTodoMargeRepository,
                          FlowOperatorGateway flowOperatorGateway,
                          ParallelBranchRepository parallelBranchRepository,
                          DelayTaskRepository delayTaskRepository,
@@ -67,6 +78,8 @@ public class RepositoryHolderContext {
         this.workflowRepository = workflowRepository;
         this.workflowBackupRepository = workflowBackupRepository;
         this.flowRecordRepository = flowRecordRepository;
+        this.flowTodoRecordRepository = flowTodoRecordRepository;
+        this.flowTodoMargeRepository = flowTodoMargeRepository;
         this.flowOperatorGateway = flowOperatorGateway;
         this.parallelBranchRepository = parallelBranchRepository;
         this.delayTaskRepository = delayTaskRepository;
@@ -97,10 +110,7 @@ public class RepositoryHolderContext {
      */
     public FlowActionService createFlowActionService(FlowSession flowSession) {
         this.verify();
-        return new FlowActionService(flowSession.toActionRequest(),
-                flowOperatorGateway,
-                flowRecordRepository,
-                workflowBackupRepository);
+        return new FlowActionService(flowSession.toActionRequest());
     }
 
 
@@ -114,6 +124,8 @@ public class RepositoryHolderContext {
         return new FlowService(workflowRepository,
                 flowOperatorGateway,
                 flowRecordRepository,
+                flowTodoRecordRepository,
+                flowTodoMargeRepository,
                 workflowBackupRepository,
                 parallelBranchRepository,
                 delayTaskRepository,
@@ -142,12 +154,15 @@ public class RepositoryHolderContext {
         delayTaskRepository.delete(delayTask);
     }
 
+
     public void saveRecords(List<FlowRecord> flowRecords) {
-        flowRecordRepository.saveAll(flowRecords);
+        FlowRecordRepositoryService flowRecordRepositoryService = new FlowRecordRepositoryService(flowRecords);
+        flowRecordRepositoryService.saveAll();
     }
 
     public void saveRecord(FlowRecord flowRecord) {
-        flowRecordRepository.save(flowRecord);
+        FlowRecordRepositoryService flowRecordRepositoryService = new FlowRecordRepositoryService(flowRecord);
+        flowRecordRepositoryService.saveAll();
     }
 
     public List<FlowRecord> findCurrentNodeRecords(long fromId, String nodeId) {
@@ -178,5 +193,110 @@ public class RepositoryHolderContext {
         return delayTaskRepository.findAll();
     }
 
+
+    private static class FlowRecordRepositoryService {
+
+        private final List<FlowRecord> flowRecords;
+        private final FlowTodoRecordRepository flowTodoRecordRepository;
+        private final FlowTodoMargeRepository flowTodoMargeRepository;
+        private final FlowRecordRepository flowRecordRepository;
+
+
+        public FlowRecordRepositoryService(List<FlowRecord> flowRecords) {
+            this.flowTodoRecordRepository = RepositoryHolderContext.getInstance().getFlowTodoRecordRepository();
+            this.flowTodoMargeRepository = RepositoryHolderContext.getInstance().getFlowTodoMargeRepository();
+            this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
+            this.flowRecords = flowRecords;
+        }
+
+        public FlowRecordRepositoryService(FlowRecord flowRecord) {
+            this.flowTodoRecordRepository = RepositoryHolderContext.getInstance().getFlowTodoRecordRepository();
+            this.flowTodoMargeRepository = RepositoryHolderContext.getInstance().getFlowTodoMargeRepository();
+            this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
+            this.flowRecords = new ArrayList<>();
+            this.flowRecords.add(flowRecord);
+        }
+
+
+        private void saveTodoMargeRecords() {
+            List<FlowTodoRecord> flowTodoRecords = new ArrayList<>();
+            for (FlowRecord flowRecord : flowRecords) {
+                if (flowRecord.isTodo()) {
+                    FlowTodoRecord todoMargeRecord = null;
+                    if (flowRecord.isMergeable()) {
+                        todoMargeRecord = flowTodoRecordRepository.getByMageKey(flowRecord.getMergeKey());
+                        if (todoMargeRecord == null) {
+                            todoMargeRecord = new FlowTodoRecord(flowRecord);
+                        } else {
+                            todoMargeRecord.update(flowRecord);
+                            todoMargeRecord.addMargeCount();
+                        }
+                    } else {
+                        todoMargeRecord = new FlowTodoRecord(flowRecord);
+                    }
+                    flowTodoRecords.add(todoMargeRecord);
+                }
+            }
+            if (!flowTodoRecords.isEmpty()) {
+                flowTodoRecordRepository.saveAll(flowTodoRecords);
+            }
+
+            if (!flowTodoRecords.isEmpty()) {
+                List<FlowTodoMarge> relationList = new ArrayList<>();
+                for (FlowTodoRecord margeRecord : flowTodoRecords) {
+                    if(margeRecord.isMergeable()) {
+                        relationList.add(new FlowTodoMarge(margeRecord));
+                    }
+                }
+                flowTodoMargeRepository.saveAll(relationList);
+            }
+        }
+
+        private void saveRecords() {
+            if (!flowRecords.isEmpty()) {
+                flowRecordRepository.saveAll(flowRecords);
+            }
+        }
+
+
+        private void removeTodoMargeRecords() {
+            for (FlowRecord flowRecord : flowRecords) {
+                if (flowRecord.isDone()) {
+                    if (flowRecord.isMergeable()) {
+                        FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByMageKey(flowRecord.getMergeKey());
+                        if(todoMargeRecord!=null) {
+                            List<FlowTodoMarge> margeRelations = flowTodoMargeRepository.findByTodoId(todoMargeRecord.getId());
+                            if(margeRelations!=null && !margeRelations.isEmpty()) {
+                                for (FlowTodoMarge margeRelation : margeRelations) {
+                                    if (margeRelation.isRecord(flowRecord.getId())) {
+                                        flowTodoMargeRepository.remove(margeRelation);
+                                        todoMargeRecord.divMargeCount();
+                                        if (todoMargeRecord.hasMargeCount()) {
+                                            flowTodoRecordRepository.save(todoMargeRecord);
+                                        } else {
+                                            flowTodoRecordRepository.remove(todoMargeRecord);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByMageKey(flowRecord.getMergeKey());
+                        if (todoMargeRecord != null) {
+                            flowTodoRecordRepository.remove(todoMargeRecord);
+                        }
+                    }
+                }
+            }
+        }
+
+        public void saveAll() {
+            this.saveRecords();
+            this.saveTodoMargeRecords();
+            this.removeTodoMargeRecords();
+        }
+
+
+    }
 
 }
