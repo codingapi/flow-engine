@@ -137,7 +137,7 @@ public class FlowTodoRecord {
     }
 
     public boolean hasMargeCount(){
-        return this.mergeable && this.margeCount > 0;
+        return this.mergeable && this.margeCount >= 0;
     }
 
 }

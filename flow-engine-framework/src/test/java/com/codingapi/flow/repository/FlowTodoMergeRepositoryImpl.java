@@ -38,4 +38,9 @@ public class FlowTodoMergeRepositoryImpl implements FlowTodoMergeRepository {
                 filter(relation -> relation.getTodoId() == todoId)
                 .toList();
     }
+
+
+    public List<FlowTodoMerge> findAll() {
+        return cache.values().stream().toList();
+    }
 }
