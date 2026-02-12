@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ *  流程审批意见
+ */
 @Data
 @NoArgsConstructor
 public class FlowAdviceBody {

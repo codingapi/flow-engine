@@ -6,6 +6,7 @@ import com.codingapi.flow.register.FlowScriptContextRegister;
 import com.codingapi.flow.register.GatewayContextRegister;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.runner.FlowDelayTaskRunner;
+import com.codingapi.flow.service.FlowService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +38,8 @@ public class AutoConfiguration {
             WorkflowRepository workflowRepository,
             WorkflowBackupRepository workflowBackupRepository,
             FlowRecordRepository flowRecordRepository,
+            FlowTodoRecordRepository flowTodoRecordRepository,
+            FlowTodoMergeRepository flowTodoMergeRepository,
             FlowOperatorGateway flowOperatorGateway,
             ParallelBranchRepository parallelBranchRepository,
             DelayTaskRepository delayTaskRepository,
@@ -46,7 +49,34 @@ public class AutoConfiguration {
                 workflowRepository,
                 workflowBackupRepository,
                 flowRecordRepository,
+                flowTodoRecordRepository,
+                flowTodoMergeRepository,
                 flowOperatorGateway,
+                parallelBranchRepository,
+                delayTaskRepository,
+                urgeIntervalRepository
+        );
+    }
+
+    @Bean
+    public FlowService flowService(
+            WorkflowRepository workflowRepository,
+            FlowOperatorGateway flowOperatorGateway,
+            FlowRecordRepository flowRecordRepository,
+            FlowTodoRecordRepository flowTodoRecordRepository,
+            FlowTodoMergeRepository flowTodoMergeRepository,
+            WorkflowBackupRepository workflowBackupRepository,
+            ParallelBranchRepository parallelBranchRepository,
+            DelayTaskRepository delayTaskRepository,
+            UrgeIntervalRepository urgeIntervalRepository
+    ) {
+        return new FlowService(
+                workflowRepository,
+                flowOperatorGateway,
+                flowRecordRepository,
+                flowTodoRecordRepository,
+                flowTodoMergeRepository,
+                workflowBackupRepository,
                 parallelBranchRepository,
                 delayTaskRepository,
                 urgeIntervalRepository

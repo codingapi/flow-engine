@@ -17,20 +17,25 @@ import com.codingapi.flow.repository.WorkflowBackupRepository;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
-import lombok.AllArgsConstructor;
 
 import java.util.List;
 
 /**
  * 节点动作服务
  */
-@AllArgsConstructor
 public class FlowActionService {
 
     private final FlowActionRequest request;
     private final FlowOperatorGateway flowOperatorGateway;
     private final FlowRecordRepository flowRecordRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
+
+    public FlowActionService(FlowActionRequest request) {
+        this.request = request;
+        this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
+        this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
+        this.workflowBackupRepository = RepositoryHolderContext.getInstance().getWorkflowBackupRepository();
+    }
 
     public void action() {
 

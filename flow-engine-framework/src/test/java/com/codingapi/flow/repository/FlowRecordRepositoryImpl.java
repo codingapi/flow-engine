@@ -60,7 +60,9 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
 
     @Override
     public List<FlowRecord> findProcessRecords(String processId) {
-        return cache.values().stream().filter(flowRecord -> flowRecord.getProcessId().equals(processId)).toList();
+        return cache.values().stream().filter(flowRecord ->
+                flowRecord.getProcessId().equals(processId))
+                .toList();
     }
 
     @Override
@@ -68,7 +70,6 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
         return cache.values().stream().filter(flowRecord ->
                         flowRecord.getProcessId().equals(processId)
                                 && flowRecord.isTodo()
-                                && !flowRecord.isRevoked()
                 )
                 .toList();
     }
@@ -76,7 +77,10 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
     @Override
     public List<FlowRecord> findAfterRecords(String processId, long fromId) {
         return cache.values().stream().filter(flowRecord ->
-                flowRecord.getProcessId().equals(processId) && flowRecord.getFromId() >= fromId
+                flowRecord.getProcessId().equals(processId)
+                        && flowRecord.getFromId() >= fromId
+                        && !flowRecord.isRevoked()
+                        && !flowRecord.isHidden()
         ).toList();
     }
 }

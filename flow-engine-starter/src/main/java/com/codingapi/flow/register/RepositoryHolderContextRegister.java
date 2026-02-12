@@ -12,6 +12,8 @@ public class RepositoryHolderContextRegister implements InitializingBean {
     private final WorkflowRepository workflowRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
     private final FlowRecordRepository flowRecordRepository;
+    private final FlowTodoRecordRepository flowTodoRecordRepository;
+    private final FlowTodoMergeRepository flowTodoMergeRepository;
     private final FlowOperatorGateway flowOperatorGateway;
     private final ParallelBranchRepository parallelBranchRepository;
     private final DelayTaskRepository delayTaskRepository;
@@ -24,6 +26,8 @@ public class RepositoryHolderContextRegister implements InitializingBean {
                 workflowRepository,
                 workflowBackupRepository,
                 flowRecordRepository,
+                flowTodoRecordRepository,
+                flowTodoMergeRepository,
                 flowOperatorGateway,
                 parallelBranchRepository,
                 delayTaskRepository,

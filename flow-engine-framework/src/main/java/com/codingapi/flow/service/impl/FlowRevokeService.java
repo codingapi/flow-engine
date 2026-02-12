@@ -15,7 +15,6 @@ import com.codingapi.flow.repository.WorkflowBackupRepository;
 import com.codingapi.flow.strategy.node.RevokeStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.springboot.framework.event.EventPusher;
-import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +22,17 @@ import java.util.List;
 /**
  * 撤销流程服务
  */
-@AllArgsConstructor
 public class FlowRevokeService {
 
     private final FlowRevokeRequest request;
     private final FlowRecordRepository flowRecordRepository;
     private final WorkflowBackupRepository workflowBackupRepository;
+
+    public FlowRevokeService(FlowRevokeRequest request) {
+        this.request = request;
+        this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
+        this.workflowBackupRepository = RepositoryHolderContext.getInstance().getWorkflowBackupRepository();
+    }
 
     public void revoke() {
         request.verify();

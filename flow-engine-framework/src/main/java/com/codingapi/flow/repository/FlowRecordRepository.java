@@ -9,12 +9,30 @@ import java.util.List;
  */
 public interface FlowRecordRepository {
 
+    /**
+     * 获取流程详细
+     * @param id 流程id
+     * @return 流程记录
+     */
     FlowRecord get(long id);
 
+    /**
+     * 保存流程
+     * 为何确保待办合并数据的一致性，保存流程需要通过 {@link com.codingapi.flow.context.RepositoryHolderContext#saveRecord(FlowRecord)} 保存
+     * @param flowRecord 流程记录
+     */
     void save(FlowRecord flowRecord);
 
+    /**
+     * 批量保存流程
+     * @param flowRecords 流程记录
+     */
     void saveAll(List<FlowRecord> flowRecords);
 
+    /**
+     * 删除流程记录
+     * @param flowRecord 流程记录
+     */
     void delete(FlowRecord flowRecord);
 
     /**
