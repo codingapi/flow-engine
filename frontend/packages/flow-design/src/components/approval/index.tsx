@@ -1,26 +1,33 @@
 import React from "react";
 import {Drawer} from "@/components/drawer";
 import {detail} from "@/api/record";
+import {FlowContent} from "@/components/approval/typings";
+import {ApprovalLayout} from "@/components/approval/layout";
 
 
 interface ApprovalPanelProps {
     workflowCode?: string;
-    recordId?:string
+    recordId?:string;
+    onClose?: () => void;
 }
 
 export const ApprovalPanel: React.FC<ApprovalPanelProps> = (props) => {
+
+    const [state,dispatch] = React.useState<FlowContent|undefined>(undefined);
 
     React.useEffect(()=>{
         const id = props.workflowCode || props.recordId || '';
         detail(id).then(res=>{
             if(res.success){
-                console.log(res.data)
+                dispatch(res.data);
             }
         });
     },[]);
 
     return (
-        <>approval</>
+        <>
+            {state && <ApprovalLayout content={state} onClose={props.onClose}/>}
+        </>
     )
 }
 
@@ -35,8 +42,6 @@ export const ApprovalPanelDrawer: React.FC<ApprovalPanelDrawerProps> = (props) =
         <Drawer
             open={props.open}
             onClose={props.onClose}
-            title={"发起流程"}
-            closeIcon={true}
         >
             <ApprovalPanel
                 {...props}

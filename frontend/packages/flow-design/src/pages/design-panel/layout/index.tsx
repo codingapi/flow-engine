@@ -9,7 +9,7 @@ import {Body} from "./body";
 import {DesignPanelProps} from "../types";
 
 
-const ContentScope: React.FC<DesignPanelProps> = (props) => {
+const DesignPanelLayoutScope: React.FC<DesignPanelProps> = (props) => {
     const {context} = createDesignContext(props);
     return (
         <DesignPanelContext.Provider value={context}>
@@ -20,11 +20,11 @@ const ContentScope: React.FC<DesignPanelProps> = (props) => {
     )
 }
 
-export const Content: React.FC<DesignPanelProps> = (props) => {
+export const DesignPanelLayout: React.FC<DesignPanelProps> = (props) => {
     return (
         <>
             <Provider store={designStore}>
-                <ContentScope {...props}/>
+                <DesignPanelLayoutScope {...props}/>
             </Provider>
         </>
     )
