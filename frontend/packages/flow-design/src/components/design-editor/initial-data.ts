@@ -1,0 +1,20 @@
+import {FlowDocumentJSON} from "@/components/design-editor/typings";
+
+export const initialData: FlowDocumentJSON = {
+    nodes: [
+        {
+            id: 'start',
+            type: 'START',
+            data: {
+                title: '开始节点',
+            }
+        },
+        {
+            id: 'end',
+            type: 'END',
+            data: {
+                title: '结束节点',
+            }
+        },
+    ],
+};

@@ -144,8 +144,7 @@ public class FlowContent {
             history.setNodeId(item.getNodeId());
             history.setNodeType(item.getNodeType());
             history.setUpdateTime(item.getUpdateTime());
-            history.setCurrentOperatorId(item.getCurrentOperatorId());
-            history.setCurrentOperatorName(item.getCurrentOperatorName());
+            history.setCurrentOperator(new FlowOperator(item.getCurrentOperatorId(), item.getCurrentOperatorName()));
             this.histories.add(history);
         }
     }
@@ -221,14 +220,9 @@ public class FlowContent {
         private long updateTime;
 
         /**
-         * 当前审批人Id
+         * 当前审批人
          */
-        private long currentOperatorId;
-
-        /**
-         * 当前审批人名称
-         */
-        private String currentOperatorName;
+        private FlowOperator currentOperator;
     }
 
     @Data
