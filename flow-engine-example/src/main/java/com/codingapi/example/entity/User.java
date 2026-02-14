@@ -65,6 +65,9 @@ public class User implements IFlowOperator {
 
     @Override
     public IFlowOperator forwardOperator() {
-        return GatewayContext.getInstance().getFlowOperator(flowOperatorId);
+        if(flowOperatorId!=null && flowOperatorId > 0){
+            return GatewayContext.getInstance().getFlowOperator(flowOperatorId);
+        }
+        return null;
     }
 }

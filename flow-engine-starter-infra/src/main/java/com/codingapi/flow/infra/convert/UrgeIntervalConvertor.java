@@ -10,7 +10,9 @@ public class UrgeIntervalConvertor {
             return null;
         }
         UrgeIntervalEntity entity = new UrgeIntervalEntity();
-        entity.setId(interval.getId());
+        if(interval.getId()>0) {
+            entity.setId(interval.getId());
+        }
         entity.setProcessId(interval.getProcessId());
         entity.setRecordId(interval.getRecordId());
         entity.setCreateTime(interval.getCreateTime());

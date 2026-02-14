@@ -8,7 +8,6 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Data;
 
@@ -26,10 +25,16 @@ public class FlowContent {
      * 流程记录编号
      */
     private long recordId;
+
     /**
      * 流程编号
      */
-    private String workflowCode;
+    private String workId;
+
+    /**
+     * 流程编码
+     */
+    private String workCode;
     /**
      * 流程视图
      */
@@ -109,7 +114,8 @@ public class FlowContent {
 
     public void pushWorkflow(Workflow workflow) {
         this.form = workflow.getForm();
-        this.workflowCode = workflow.getCode();
+        this.workCode = workflow.getCode();
+        this.workId = workflow.getId();
     }
 
     public void pushRecords(FlowRecord record, List<FlowRecord> mergeRecords) {

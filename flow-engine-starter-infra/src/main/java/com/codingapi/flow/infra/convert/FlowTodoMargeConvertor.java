@@ -22,7 +22,9 @@ public class FlowTodoMargeConvertor {
             return null;
         }
         FlowTodoMargeEntity entity = new FlowTodoMargeEntity();
-        entity.setId(marge.getId());
+        if(marge.getId()>0) {
+            entity.setId(marge.getId());
+        }
         entity.setTodoId(marge.getTodoId());
         entity.setRecordId(marge.getRecordId());
         entity.setCreateTime(marge.getCreateTime());

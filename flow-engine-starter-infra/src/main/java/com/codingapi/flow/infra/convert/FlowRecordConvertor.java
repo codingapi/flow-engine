@@ -59,7 +59,9 @@ public class FlowRecordConvertor {
             return null;
         }
         FlowRecordEntity entity = new FlowRecordEntity();
-        entity.setId(record.getId());
+        if(record.getId()>0) {
+            entity.setId(record.getId());
+        }
         entity.setWorkBackupId(record.getWorkBackupId());
         entity.setWorkCode(record.getWorkCode());
         entity.setNodeId(record.getNodeId());

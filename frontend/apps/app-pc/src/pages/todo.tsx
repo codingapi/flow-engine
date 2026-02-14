@@ -102,7 +102,7 @@ const TodoPage: React.FC = () => {
                 />
             )
         }
-    ]
+    ];
 
     return (
         <div>

@@ -10,10 +10,12 @@ import com.codingapi.flow.pojo.request.FlowUrgeRequest;
 import com.codingapi.flow.pojo.response.FlowContent;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.service.impl.*;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 流程服务
  */
+@Transactional
 public class FlowService {
 
     public FlowService(WorkflowRepository workflowRepository,

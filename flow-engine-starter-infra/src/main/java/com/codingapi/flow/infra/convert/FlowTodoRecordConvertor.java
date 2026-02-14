@@ -38,7 +38,9 @@ public class FlowTodoRecordConvertor {
         }
 
         FlowTodoRecordEntity entity = new FlowTodoRecordEntity();
-        entity.setId(record.getId());
+        if(record.getId()>0) {
+            entity.setId(record.getId());
+        }
         entity.setProcessId(record.getProcessId());
         entity.setWorkBackupId(record.getWorkBackupId());
         entity.setWorkCode(record.getWorkCode());

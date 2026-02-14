@@ -18,7 +18,7 @@ export interface FlowMeta {
 export interface Body{
     recordId:number;
     title:string;
-    data:Map<string,any>;
+    data:Record<string,any>;
     recordState:number;
     flowState:number;
 }
@@ -63,7 +63,8 @@ export interface NextNode{
 
 export interface FlowContent {
     recordId:number;
-    workflowCode:string;
+    workId:string;
+    workCode:string;
     view:string;
     form:FlowMeta;
     todos:Body[];

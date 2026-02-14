@@ -4,3 +4,10 @@ export const detail = (id:string) => {
     return httpClient.get('/api/cmd/record/detail',{id});
 }
 
+export const create = (body:any) => {
+    return httpClient.post('/api/cmd/record/create',body);
+}
+
+export const action = (body:any) => {
+    return httpClient.post('/api/cmd/record/action',body);
+}
