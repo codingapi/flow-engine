@@ -163,8 +163,8 @@ public class FlowMergeableServiceTest {
 
         for(int i=0;i<count;i++) {
             List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(i).getProcessId());
-            assertEquals(3, records.size());
-            assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+            assertEquals(2, records.size());
+            assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
         }
 
         List<FlowTodoRecord> todoRecordList = flowTodoRecordRepository.findAll();

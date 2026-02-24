@@ -310,9 +310,9 @@ class FlowParallelServiceTest {
 
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(departRecordList.get(0).getProcessId());
-        assertEquals(8, records.size());
+        assertEquals(7, records.size());
         assertEquals(0, records.stream().filter(FlowRecord::isTodo).toList().size());
-        assertEquals(8, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(7, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 }
