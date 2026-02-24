@@ -4,11 +4,9 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.NodeStrategyManager;
-import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Data;
 
@@ -95,36 +93,15 @@ public class FlowContent {
      */
     private List<History> histories;
 
-    /**
-     * 下一审批
-     */
-    private List<NextNode> nextNodes;
-
-    public void pushNextNodes(FlowSession flowSession, List<IFlowNode> nextNodes) {
-        List<NextNode> nextNodeList = new ArrayList<>();
-        for (IFlowNode node : nextNodes){
-            NextNode nextNode = new NextNode();
-            nextNode.setNodeId(node.getId());
-            nextNode.setNodeName(node.getName());
-            nextNode.setNodeType(node.getType());
-
-            NodeStrategyManager nodeStrategyManager = node.strategyManager();
-            OperatorManager operatorManager = nodeStrategyManager.loadOperators(flowSession);
-            nextNode.setOperators(operatorManager.getOperators().stream().map(FlowOperator::new).toList());
-
-            nextNodeList.add(nextNode);
-        }
-        this.nextNodes = nextNodeList;
-    }
 
     public void pushCurrentNode(IFlowNode currentNode) {
         ActionManager actionManager = currentNode.actionManager();
         NodeStrategyManager strategyManager = currentNode.strategyManager();
         this.actions = actionManager.getActions();
-        Map<String,Object> nodeData = currentNode.toMap();
-        this.view = (String) nodeData.get("view");
         this.adviceNullable = strategyManager.isEnableAdvice();
         this.signable = strategyManager.isEnableSignable();
+        Map<String,Object> nodeData = currentNode.toMap();
+        this.view = (String) nodeData.get("view");
     }
 
     public void pushWorkflow(Workflow workflow) {
@@ -175,30 +152,6 @@ public class FlowContent {
         this.createOperator =  new FlowOperator(currentOperator);
     }
 
-
-    /**
-     * 流程图
-     */
-    @Data
-    public static class NextNode{
-        /**
-         * 节点名称
-         */
-        private String nodeId;
-        /**
-         * 节点名称
-         */
-        private String nodeName;
-        /**
-         * 节点类型
-         */
-        private String nodeType;
-
-        /**
-         * 节点审批人
-         */
-        private List<FlowOperator> operators;
-    }
 
     @Data
     public static class History{

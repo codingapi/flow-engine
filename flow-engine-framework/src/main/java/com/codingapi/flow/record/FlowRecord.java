@@ -60,9 +60,14 @@ public class FlowRecord {
      */
     private String nodeType;
     /**
-     * 父节点id
+     * 来源id
      */
     private long fromId;
+    /**
+     * 父节点id（用于子流程中）
+     */
+    private long parentId;
+
     /**
      * 表单数据
      */
@@ -294,6 +299,7 @@ public class FlowRecord {
             this.fromId = record.id;
             this.processId = record.processId;
             this.delegateId = record.delegateId;
+            this.parentId = record.getParentId();
         }
     }
 
@@ -556,7 +562,10 @@ public class FlowRecord {
      * @param advice 节点审批信息
      * @return FlowSession
      */
-    public FlowSession createFlowSession( Workflow workflow,IFlowOperator currentOperator,FormData formData, FlowAdvice advice) {
+    public FlowSession createFlowSession( Workflow workflow,
+                                          IFlowOperator currentOperator,
+                                          FormData formData,
+                                          FlowAdvice advice) {
         List<FlowRecord> currentRecords = RepositoryHolderContext.getInstance().findCurrentNodeRecords(this.getFromId(), this.getNodeId());
         IFlowNode currentNode = workflow.getFlowNode(nodeId);
         return new FlowSession(

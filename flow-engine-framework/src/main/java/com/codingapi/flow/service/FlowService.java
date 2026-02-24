@@ -2,15 +2,14 @@ package com.codingapi.flow.service;
 
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
-import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.pojo.request.FlowActionRequest;
-import com.codingapi.flow.pojo.request.FlowCreateRequest;
-import com.codingapi.flow.pojo.request.FlowRevokeRequest;
-import com.codingapi.flow.pojo.request.FlowUrgeRequest;
+import com.codingapi.flow.pojo.request.*;
 import com.codingapi.flow.pojo.response.FlowContent;
+import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.service.impl.*;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 流程服务
@@ -41,13 +40,24 @@ public class FlowService {
 
     /**
      * 流程详情
-     * @param id 流程id 或者workflowCode
-     * @param currentOperator 当前操作人
+     * @param request 流程详情请求
      * @return 流程详情
      */
-    public FlowContent detail(String id,IFlowOperator currentOperator) {
-        FlowDetailService flowDetailService = new FlowDetailService(id,currentOperator);
+    public FlowContent detail(FlowDetailRequest request) {
+        FlowDetailService flowDetailService = new FlowDetailService(request);
         return flowDetailService.detail();
+    }
+
+
+
+    /**
+     * 流程节点记录
+     * @param request 流程节点记录请求
+     * @return 流程节点记录列表
+     */
+    public List<ProcessNode> processNodes(FlowProcessNodeRequest request) {
+        FlowProcessNodeService flowProcessNodeService = new FlowProcessNodeService(request);
+        return flowProcessNodeService.processNodes();
     }
 
     /**

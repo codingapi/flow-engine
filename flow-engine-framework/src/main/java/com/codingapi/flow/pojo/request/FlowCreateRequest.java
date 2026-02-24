@@ -31,6 +31,12 @@ public class FlowCreateRequest {
      */
     private long operatorId;
 
+    /**
+     * 父流程id
+     */
+    private long parentRecordId;
+
+
     public FlowActionRequest toActionRequest(long recordId) {
         FlowActionRequest flowActionRequest = new FlowActionRequest();
         flowActionRequest.setFormData(this.getFormData());
@@ -56,4 +62,7 @@ public class FlowCreateRequest {
         }
     }
 
+    public boolean isSubProcess() {
+        return this.parentRecordId!=0;
+    }
 }

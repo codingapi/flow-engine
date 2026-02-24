@@ -19,6 +19,15 @@ export class FlowActionPresenter {
         this.state = state;
     }
 
+    public async processNodes(){
+        const formData = this.formActionContext.save();
+        const id = this.state.flow?.recordId || this.state.flow?.workId || '';
+        return await this.api.processNodes({
+            id,
+            formData,
+        });
+    }
+
 
     public async action(actionId:string) {
         const recordId = this.state.flow?.recordId;

@@ -38,4 +38,9 @@ export class Presenter {
         this.dispatch(state);
     }
 
+
+    public processNodes(){
+        return this.flowActionPresenter.processNodes();
+    }
+
 }

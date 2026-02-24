@@ -1,6 +1,7 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
+import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,10 @@ public class SubProcessScript {
     private final String script;
 
     public FlowCreateRequest execute(FlowSession request) {
-        return ScriptRuntimeContext.getInstance().run(script, FlowCreateRequest.class, request);
+        FlowRecord flowRecord = request.getCurrentRecord();
+        FlowCreateRequest flowCreateRequest =  ScriptRuntimeContext.getInstance().run(script, FlowCreateRequest.class, request);
+        flowCreateRequest.setParentRecordId(flowRecord.getId());
+        return flowCreateRequest;
     }
 
     public static SubProcessScript defaultScript() {

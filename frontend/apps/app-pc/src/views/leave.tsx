@@ -1,12 +1,26 @@
 import React from "react";
 import {type ViewComponentProps} from "@flow-engine/flow-design";
 import {Form, Input} from "antd";
+import {ObjectUtils} from "@flow-engine/flow-core";
 
 export const LeaveView: React.FC<ViewComponentProps> = (props) => {
+
+    const [values, setValues] = React.useState<any>({});
+
+    const form = props.form;
+
     return (
         <Form
-            form={props.form}
+            form={form}
             layout={"vertical"}
+            onBlur={()=>{
+                const latestValues = form.getFieldsValue();
+                if(ObjectUtils.isEqual(values,latestValues)){
+                    return;
+                }
+                setValues(latestValues);
+                props.onValuesChange?.(latestValues);
+            }}
         >
             <Form.Item
                 name={"days"}

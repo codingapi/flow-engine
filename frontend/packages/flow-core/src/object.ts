@@ -4,6 +4,9 @@ export class ObjectUtils {
         return Object.keys(obj).length === 0 && obj.constructor === Object;
     }
 
+    public static isEqual(obj1: any, obj2: any): boolean {
+        return JSON.stringify(obj1) === JSON.stringify(obj2);
+    }
 
     public static cleanObject(obj: any, options = {
         removeNull: true,
