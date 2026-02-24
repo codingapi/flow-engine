@@ -8,6 +8,7 @@ import {
     WorkflowSelectModal
 } from "@flow-engine/flow-design";
 import {Button, Space, Tabs, type TabsProps} from "antd";
+import dayjs from "dayjs";
 
 const TodoPage: React.FC = () => {
 
@@ -18,10 +19,12 @@ const TodoPage: React.FC = () => {
     const [selectVisible, setSelectVisible] = React.useState(false);
     const [approvalVisible, setApprovalVisible] = React.useState(false);
     const [workflowCode, setWorkflowCode] = React.useState<string>('');
+    const [currentRecordId, setCurrentRecordId] = React.useState<string>('');
+    const [currentTab, setCurrentTab] = React.useState<string>('all');
 
     const columns: TableProps<any>['columns'] = [
         {
-            dataIndex: 'id',
+            dataIndex: 'recordId',
             title: '编号',
         },
         {
@@ -31,18 +34,32 @@ const TodoPage: React.FC = () => {
         {
             dataIndex: 'readTime',
             title: '读取状态',
+            render: (text, record) => {
+                return text ? '已读' : '未读';
+            }
         },
         {
             dataIndex: 'createTime',
             title: '创建时间',
+            render: (text, record) => {
+                return dayjs(text).format('YYYY-MM-DD HH:mm:ss');
+            }
         },
         {
             dataIndex: 'currentOperatorId',
+            title: '审批人',
+            hidden: true,
+        },
+        {
+            dataIndex: 'currentOperatorName',
             title: '审批人',
         },
         {
             dataIndex: 'recordState',
             title: '状态',
+            render: (text, record) => {
+                return text ? '已办' : '待办';
+            }
         },
         {
             dataIndex: 'option',
@@ -50,9 +67,12 @@ const TodoPage: React.FC = () => {
             render: (value, record) => {
                 return (
                     <Space>
-                        <a onClick={() => {
-
-                        }}>办理</a>
+                        <a
+                            onClick={() => {
+                                setCurrentRecordId(record.recordId);
+                                setApprovalVisible(true);
+                            }}
+                        >办理</a>
                     </Space>
                 )
             }
@@ -104,21 +124,29 @@ const TodoPage: React.FC = () => {
         }
     ];
 
+    const reloadCurrentTab = () => {
+        if (currentTab === 'all') {
+            actionAll.current?.reload();
+        }
+        if (currentTab === 'done') {
+            actionDone.current?.reload();
+        }
+        if (currentTab === 'todo') {
+            actionTodo.current?.reload();
+        }
+    }
+
+    React.useEffect(() => {
+        reloadCurrentTab();
+    },[currentTab]);
+
     return (
         <div>
             <Tabs
                 items={items}
                 centered={true}
                 onChange={(currentKey) => {
-                    if (currentKey === 'all') {
-                        actionAll.current?.reload();
-                    }
-                    if (currentKey === 'done') {
-                        actionDone.current?.reload();
-                    }
-                    if (currentKey === 'todo') {
-                        actionTodo.current?.reload();
-                    }
+                   setCurrentTab(currentKey);
                 }}
                 tabBarExtraContent={{
                     right: (
@@ -147,8 +175,10 @@ const TodoPage: React.FC = () => {
             <ApprovalPanelDrawer
                 workflowCode={workflowCode}
                 open={approvalVisible}
+                recordId={currentRecordId}
                 onClose={() => {
                     setApprovalVisible(false);
+                    reloadCurrentTab();
                 }}
             />
         </div>

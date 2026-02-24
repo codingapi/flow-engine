@@ -2,6 +2,7 @@ package com.codingapi.flow.pojo.response;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.node.IFlowNode;
@@ -39,6 +40,16 @@ public class FlowContent {
      * 流程视图
      */
     private String view;
+
+    /**
+     * 审批意见是否必填
+     */
+    private boolean adviceNullable;
+
+    /**
+     * 签名是否必填
+     */
+    private boolean signable;
 
     /**
      * 表单元数据
@@ -107,9 +118,13 @@ public class FlowContent {
     }
 
     public void pushCurrentNode(IFlowNode currentNode) {
-        this.actions = currentNode.actionManager().getActions();
+        ActionManager actionManager = currentNode.actionManager();
+        NodeStrategyManager strategyManager = currentNode.strategyManager();
+        this.actions = actionManager.getActions();
         Map<String,Object> nodeData = currentNode.toMap();
         this.view = (String) nodeData.get("view");
+        this.adviceNullable = strategyManager.isEnableAdvice();
+        this.signable = strategyManager.isEnableSignable();
     }
 
     public void pushWorkflow(Workflow workflow) {

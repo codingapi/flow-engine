@@ -4,7 +4,6 @@ import {detail} from "@/api/record";
 import {FlowContent} from "@/components/flow-approval/typings";
 import {ApprovalLayout} from "@/components/flow-approval/layout";
 
-
 interface ApprovalPanelProps {
     workflowCode?: string;
     recordId?:string;

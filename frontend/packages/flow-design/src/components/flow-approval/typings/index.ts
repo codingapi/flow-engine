@@ -30,7 +30,7 @@ export interface ActionDisplay{
 }
 
 export interface FlowAction{
-    id:number;
+    id:string;
     title:string;
     type:string;
     display:ActionDisplay;
@@ -66,6 +66,8 @@ export interface FlowContent {
     workId:string;
     workCode:string;
     view:string;
+    adviceNullable:boolean;
+    signable:boolean;
     form:FlowMeta;
     todos:Body[];
     actions:FlowAction[];
@@ -95,4 +97,7 @@ export const initStateData = {
 
 export interface FlowApprovalApi{
 
+    create(body:Record<string,any>):Promise<number>;
+
+    action(body:Record<string,any>):Promise<any>;
 }
