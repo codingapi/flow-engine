@@ -12,6 +12,7 @@ import com.codingapi.springboot.framework.user.UserContext;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +30,7 @@ public class FlowRecordQueryController {
      */
     @GetMapping("/list")
     public MultiResponse<FlowRecordContent> list(SearchRequest request) {
+        request.addSort(Sort.by("id").descending());
         Page<FlowRecordEntity> page = flowRecordEntityRepository.searchRequest(request);
         return MultiResponse.of(page.map(FlowRecordContent::convert));
     }
@@ -41,7 +43,7 @@ public class FlowRecordQueryController {
     public MultiResponse<FlowRecordContent> todo(SearchRequest request) {
         IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
         PageRequest pageRequest = request.toPageRequest(FlowRecordEntity.class);
-        Page<FlowTodoRecordEntity> page = flowTodoRecordEntityRepository.findTodoRecordPage(current.getUserId(),pageRequest);
+        Page<FlowTodoRecordEntity> page = flowTodoRecordEntityRepository.findTodoRecordPage(current.getUserId(),pageRequest.withSort(Sort.by("id").descending()));
         return MultiResponse.of(page.map(FlowRecordContent::convert));
     }
 
@@ -52,7 +54,7 @@ public class FlowRecordQueryController {
     public MultiResponse<FlowRecordContent> notify(SearchRequest request) {
         IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
         PageRequest pageRequest = request.toPageRequest(FlowRecordEntity.class);
-        Page<FlowRecordEntity> page =flowRecordEntityRepository.findNotifyRecordPage(current.getUserId(),pageRequest);
+        Page<FlowRecordEntity> page =flowRecordEntityRepository.findNotifyRecordPage(current.getUserId(),pageRequest.withSort(Sort.by("id").descending()));
         return MultiResponse.of(page.map(FlowRecordContent::convert));
     }
 
@@ -64,7 +66,7 @@ public class FlowRecordQueryController {
     public MultiResponse<FlowRecordContent> done(SearchRequest request) {
         IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
         PageRequest pageRequest = request.toPageRequest(FlowRecordEntity.class);
-        Page<FlowRecordEntity> page =flowRecordEntityRepository.findDoneRecordPage(current.getUserId(),pageRequest);
+        Page<FlowRecordEntity> page =flowRecordEntityRepository.findDoneRecordPage(current.getUserId(),pageRequest.withSort(Sort.by("id").descending()));
         return MultiResponse.of(page.map(FlowRecordContent::convert));
     }
 }

@@ -15,7 +15,7 @@ export const ApprovalPanel: React.FC<ApprovalPanelProps> = (props) => {
     const [content,dispatch] = React.useState<FlowContent|undefined>(undefined);
 
     React.useEffect(()=>{
-        const id = props.workflowCode || props.recordId || '';
+        const id =   props.recordId || props.workflowCode || '';
         detail(id).then(res=>{
             if(res.success){
                 dispatch(res.data);

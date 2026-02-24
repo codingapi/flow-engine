@@ -51,6 +51,12 @@ public class FlowDetailService {
                 throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + " not found");
             }
             Workflow workflow = workflowBackup.toWorkflow();
+
+            if(!flowRecord.isReadable()){
+                flowRecord.read();
+                RepositoryHolderContext.getInstance().saveRecord(flowRecord);
+            }
+
             return new FlowContentFactory(workflow, flowRecord,currentOperator).create();
         }
     }

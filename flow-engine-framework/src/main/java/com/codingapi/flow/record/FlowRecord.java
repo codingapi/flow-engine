@@ -59,6 +59,12 @@ public class FlowRecord {
      * 节点类型
      */
     private String nodeType;
+
+    /**
+     * 节点名称
+     */
+    private String nodeName;
+
     /**
      * 来源id
      */
@@ -254,6 +260,7 @@ public class FlowRecord {
         this.workBackupId = flowSession.getBackupId();
         this.nodeId = flowSession.getCurrentNodeId();
         this.nodeType = flowSession.getCurrentNodeType();
+        this.nodeName = flowSession.getCurrentNodeName();
         this.formData = flowSession.getFormData().toMapData();
         this.nodeOrder = nodeOrder;
         this.processId = RandomUtils.generateStringId();
@@ -579,5 +586,22 @@ public class FlowRecord {
                 this.workBackupId,
                 advice
         );
+    }
+
+    /**
+     * 设置为已读
+     */
+    public void read() {
+        this.readTime = System.currentTimeMillis();
+    }
+
+    /**
+     * 流程结束
+     */
+    public void over() {
+        this.title = "-";
+        this.readTime = System.currentTimeMillis();
+        this.currentOperatorId = -1;
+        this.recordState = SATE_RECORD_DONE;
     }
 }

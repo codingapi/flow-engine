@@ -1,5 +1,5 @@
 import React from "react";
-import {done, list, todo} from "@/api/record.ts";
+import {done, list, notify, todo} from "@/api/record.ts";
 import {
     type ActionType,
     ApprovalPanelDrawer,
@@ -15,12 +15,13 @@ const TodoPage: React.FC = () => {
     const actionAll = React.useRef<ActionType>(null);
     const actionTodo = React.useRef<ActionType>(null);
     const actionDone = React.useRef<ActionType>(null);
+    const actionNotify = React.useRef<ActionType>(null);
 
     const [selectVisible, setSelectVisible] = React.useState(false);
     const [approvalVisible, setApprovalVisible] = React.useState(false);
     const [workflowCode, setWorkflowCode] = React.useState<string>('');
     const [currentRecordId, setCurrentRecordId] = React.useState<string>('');
-    const [currentTab, setCurrentTab] = React.useState<string>('all');
+    const [currentTab, setCurrentTab] = React.useState<string>('todo');
 
     const columns: TableProps<any>['columns'] = [
         {
@@ -34,9 +35,13 @@ const TodoPage: React.FC = () => {
         {
             dataIndex: 'readTime',
             title: '读取状态',
-            render: (text, record) => {
-                return text ? '已读' : '未读';
+            render: (value, record) => {
+                return value ? '已读' : '未读';
             }
+        },
+        {
+            dataIndex: 'nodeName',
+            title: '节点名称',
         },
         {
             dataIndex: 'createTime',
@@ -65,35 +70,24 @@ const TodoPage: React.FC = () => {
             dataIndex: 'option',
             title: '操作',
             render: (value, record) => {
-                return (
-                    <Space>
-                        <a
-                            onClick={() => {
-                                setCurrentRecordId(record.recordId);
-                                setApprovalVisible(true);
-                            }}
-                        >办理</a>
-                    </Space>
-                )
+                if(currentTab==='todo'){
+                    return (
+                        <Space>
+                            <a
+                                onClick={() => {
+                                    setCurrentRecordId(record.recordId);
+                                    setApprovalVisible(true);
+                                }}
+                            >办理</a>
+                        </Space>
+                    )
+                }
+
             }
         }
     ];
 
     const items: TabsProps['items'] = [
-        {
-            key: 'all',
-            label: '全部流程',
-            children: (
-                <Table
-                    rowKey={"id"}
-                    actionType={actionAll}
-                    columns={columns}
-                    request={(request) => {
-                        return list(request);
-                    }}
-                />
-            )
-        },
         {
             key: 'todo',
             label: '我的待办',
@@ -121,7 +115,35 @@ const TodoPage: React.FC = () => {
                     }}
                 />
             )
-        }
+        },
+        {
+            key: 'notify',
+            label: '我的抄送',
+            children: (
+                <Table
+                    rowKey={"id"}
+                    actionType={actionNotify}
+                    columns={columns}
+                    request={(request) => {
+                        return notify(request);
+                    }}
+                />
+            )
+        },
+        {
+            key: 'all',
+            label: '全部流程',
+            children: (
+                <Table
+                    rowKey={"id"}
+                    actionType={actionAll}
+                    columns={columns}
+                    request={(request) => {
+                        return list(request);
+                    }}
+                />
+            )
+        },
     ];
 
     const reloadCurrentTab = () => {
@@ -134,6 +156,9 @@ const TodoPage: React.FC = () => {
         if (currentTab === 'todo') {
             actionTodo.current?.reload();
         }
+        if (currentTab === 'notify') {
+            actionNotify.current?.reload();
+        }
     }
 
     React.useEffect(() => {
@@ -145,6 +170,7 @@ const TodoPage: React.FC = () => {
             <Tabs
                 items={items}
                 centered={true}
+                defaultActiveKey={currentTab}
                 onChange={(currentKey) => {
                    setCurrentTab(currentKey);
                 }}

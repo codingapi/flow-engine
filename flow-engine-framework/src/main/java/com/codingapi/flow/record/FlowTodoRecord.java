@@ -41,6 +41,11 @@ public class FlowTodoRecord {
     private String nodeType;
 
     /**
+     * 节点名称
+     */
+    private String nodeName;
+
+    /**
      * 消息标题
      */
     private String title;
@@ -113,6 +118,7 @@ public class FlowTodoRecord {
         this.workCode = flowRecord.getWorkCode();
         this.nodeId = flowRecord.getNodeId();
         this.nodeType = flowRecord.getNodeType();
+        this.nodeName = flowRecord.getNodeName();
         this.title = flowRecord.getTitle();
         this.readTime = flowRecord.getReadTime();
         this.currentOperatorId = flowRecord.getCurrentOperatorId();

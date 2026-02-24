@@ -177,6 +177,10 @@ public class FlowSession {
         return currentNode.getType();
     }
 
+    public String getCurrentNodeName() {
+        return currentNode.getName();
+    }
+
     /**
      * 获取下一节点列表
      *

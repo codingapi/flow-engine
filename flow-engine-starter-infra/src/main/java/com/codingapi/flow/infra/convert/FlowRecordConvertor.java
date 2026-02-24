@@ -17,6 +17,7 @@ public class FlowRecordConvertor {
                 entity.getWorkCode(),
                 entity.getNodeId(),
                 entity.getNodeType(),
+                entity.getNodeName(),
                 entity.getFromId(),
                 entity.getParentId(),
                 mapConvertor.convertToEntityAttribute(entity.getFormData()),
@@ -67,6 +68,7 @@ public class FlowRecordConvertor {
         entity.setWorkCode(record.getWorkCode());
         entity.setNodeId(record.getNodeId());
         entity.setNodeType(record.getNodeType());
+        entity.setNodeName(record.getNodeName());
         entity.setFromId(record.getFromId());
         entity.setParentId(record.getParentId());
         entity.setFormData(mapConvertor.convertToDatabaseColumn(record.getFormData()));

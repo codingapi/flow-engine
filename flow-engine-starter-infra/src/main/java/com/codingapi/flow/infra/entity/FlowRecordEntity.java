@@ -30,6 +30,10 @@ public class FlowRecordEntity {
      */
     private String nodeType;
     /**
+     * 节点名称
+     */
+    private String nodeName;
+    /**
      * 来源id
      */
     private Long fromId;
