@@ -4,7 +4,6 @@ import {detail} from "@/api/record";
 import {FlowContent} from "@/components/flow-approval/typings";
 import {ApprovalLayout} from "@/components/flow-approval/layout";
 
-
 interface ApprovalPanelProps {
     workflowCode?: string;
     recordId?:string;
@@ -16,7 +15,7 @@ export const ApprovalPanel: React.FC<ApprovalPanelProps> = (props) => {
     const [content,dispatch] = React.useState<FlowContent|undefined>(undefined);
 
     React.useEffect(()=>{
-        const id = props.workflowCode || props.recordId || '';
+        const id =   props.recordId || props.workflowCode || '';
         detail(id).then(res=>{
             if(res.success){
                 dispatch(res.data);

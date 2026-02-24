@@ -31,6 +31,13 @@ public class FlowActionRequest {
     private FlowAdviceBody advice;
 
 
+    public void updateOperatorId(long operatorId) {
+        if (advice != null) {
+            advice.setOperatorId(operatorId);
+        }
+    }
+
+
     public FlowAdvice toFlowAdvice(Workflow workflow, IFlowAction flowAction) {
         FlowAdvice flowAdvice = new FlowAdvice();
         flowAdvice.setAdvice(advice.getAdvice());

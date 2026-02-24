@@ -11,3 +11,7 @@ export const todo = (request: any) => {
 export const done = (request: any) => {
     return httpClient.page('/api/query/record/done', request, {}, {}, []);
 }
+
+export const notify = (request: any) => {
+    return httpClient.page('/api/query/record/notify', request, {}, {}, []);
+}

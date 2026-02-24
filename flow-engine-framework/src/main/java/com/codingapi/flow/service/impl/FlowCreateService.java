@@ -73,6 +73,13 @@ public class FlowCreateService {
 
         List<FlowRecord> flowRecords = currentNode.generateCurrentRecords(session);
 
+        // 如果存在父流程，则同步更新到该子流程上
+        if (this.request.isSubProcess()) {
+            flowRecords.forEach(flowRecord -> {
+                flowRecord.setParentId(this.request.getParentRecordId());
+            });
+        }
+
         currentNode.verifySession(session);
 
         if (flowRecords.size() > 1) {

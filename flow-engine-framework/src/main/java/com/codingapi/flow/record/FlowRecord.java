@@ -16,7 +16,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -60,10 +59,21 @@ public class FlowRecord {
      * 节点类型
      */
     private String nodeType;
+
     /**
-     * 父节点id
+     * 节点名称
+     */
+    private String nodeName;
+
+    /**
+     * 来源id
      */
     private long fromId;
+    /**
+     * 父节点id（用于子流程中）
+     */
+    private long parentId;
+
     /**
      * 表单数据
      */
@@ -250,6 +260,7 @@ public class FlowRecord {
         this.workBackupId = flowSession.getBackupId();
         this.nodeId = flowSession.getCurrentNodeId();
         this.nodeType = flowSession.getCurrentNodeType();
+        this.nodeName = flowSession.getCurrentNodeName();
         this.formData = flowSession.getFormData().toMapData();
         this.nodeOrder = nodeOrder;
         this.processId = RandomUtils.generateStringId();
@@ -295,6 +306,7 @@ public class FlowRecord {
             this.fromId = record.id;
             this.processId = record.processId;
             this.delegateId = record.delegateId;
+            this.parentId = record.getParentId();
         }
     }
 
@@ -557,7 +569,10 @@ public class FlowRecord {
      * @param advice 节点审批信息
      * @return FlowSession
      */
-    public FlowSession createFlowSession( Workflow workflow,IFlowOperator currentOperator,FormData formData, FlowAdvice advice) {
+    public FlowSession createFlowSession( Workflow workflow,
+                                          IFlowOperator currentOperator,
+                                          FormData formData,
+                                          FlowAdvice advice) {
         List<FlowRecord> currentRecords = RepositoryHolderContext.getInstance().findCurrentNodeRecords(this.getFromId(), this.getNodeId());
         IFlowNode currentNode = workflow.getFlowNode(nodeId);
         return new FlowSession(
@@ -571,5 +586,22 @@ public class FlowRecord {
                 this.workBackupId,
                 advice
         );
+    }
+
+    /**
+     * 设置为已读
+     */
+    public void read() {
+        this.readTime = System.currentTimeMillis();
+    }
+
+    /**
+     * 流程结束
+     */
+    public void over() {
+        this.title = "-";
+        this.readTime = System.currentTimeMillis();
+        this.currentOperatorId = -1;
+        this.recordState = SATE_RECORD_DONE;
     }
 }

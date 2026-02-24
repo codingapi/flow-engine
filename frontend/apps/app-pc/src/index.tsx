@@ -7,6 +7,7 @@ import zhCN from 'antd/locale/zh_CN';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 import "./index.css";
+import "./config/plugin-view";
 
 dayjs.locale('zh');
 

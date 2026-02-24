@@ -32,6 +32,11 @@ public class FlowRecordContent {
     private String nodeType;
 
     /**
+     * 节点名称
+     */
+    private String nodeName;
+
+    /**
      * 消息标题
      */
     private String title;
@@ -112,6 +117,7 @@ public class FlowRecordContent {
         content.setWorkCode(todoRecord.getWorkCode());
         content.setNodeId(todoRecord.getNodeId());
         content.setNodeType(todoRecord.getNodeType());
+        content.setNodeName(todoRecord.getNodeName());
         content.setTitle(todoRecord.getTitle());
         content.setReadTime(todoRecord.getReadTime());
         content.setCurrentOperatorId(todoRecord.getCurrentOperatorId());
@@ -138,6 +144,7 @@ public class FlowRecordContent {
         content.setWorkCode(record.getWorkCode());
         content.setNodeId(record.getNodeId());
         content.setNodeType(record.getNodeType());
+        content.setNodeName(record.getNodeName());
         content.setTitle(record.getTitle());
         content.setReadTime(record.getReadTime());
         content.setCurrentOperatorId(record.getCurrentOperatorId());

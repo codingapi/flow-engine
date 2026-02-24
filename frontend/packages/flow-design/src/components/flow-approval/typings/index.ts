@@ -18,7 +18,7 @@ export interface FlowMeta {
 export interface Body{
     recordId:number;
     title:string;
-    data:Map<string,any>;
+    data:Record<string,any>;
     recordState:number;
     flowState:number;
 }
@@ -30,7 +30,7 @@ export interface ActionDisplay{
 }
 
 export interface FlowAction{
-    id:number;
+    id:string;
     title:string;
     type:string;
     display:ActionDisplay;
@@ -53,18 +53,29 @@ export interface History{
     updateTime:number;
 }
 
+export interface FlowOperatorBody{
+    advice:string;
+    signKey:string;
+    approveTime:number;
+    flowOperator:FlowOperator;
+}
 
-export interface NextNode{
+export interface ProcessNode{
     nodeId:string;
     nodeName:string;
     nodeType:string;
-    operators:FlowOperator[];
+    history:boolean;
+    operators:FlowOperatorBody[]
 }
+
 
 export interface FlowContent {
     recordId:number;
-    workflowCode:string;
+    workId:string;
+    workCode:string;
     view:string;
+    adviceNullable:boolean;
+    signable:boolean;
     form:FlowMeta;
     todos:Body[];
     actions:FlowAction[];
@@ -74,7 +85,6 @@ export interface FlowContent {
     flowState:number;
     recordState:number;
     histories:History[];
-    nextNodes:NextNode[];
 }
 
 export interface ApprovalLayoutProps {
@@ -94,4 +104,9 @@ export const initStateData = {
 
 export interface FlowApprovalApi{
 
+    create(body:Record<string,any>):Promise<number>;
+
+    processNodes(body:Record<string,any>):Promise<ProcessNode[]>;
+
+    action(body:Record<string,any>):Promise<any>;
 }

@@ -42,9 +42,7 @@ public class EndNode extends BaseFlowNode {
 
     @Override
     public void fillNewRecord(FlowSession session, FlowRecord flowRecord) {
-        flowRecord.setTitle("over");
-        flowRecord.setCurrentOperatorId(-1);
-
+        flowRecord.over();
         IFlowAction currentAction = session.getCurrentAction();
         // 标记当前流程结束
         FlowRecord latestRecord = session.getCurrentRecord();

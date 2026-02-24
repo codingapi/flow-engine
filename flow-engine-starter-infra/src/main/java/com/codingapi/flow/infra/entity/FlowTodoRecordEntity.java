@@ -38,6 +38,10 @@ public class FlowTodoRecordEntity {
      * 节点类型
      */
     private String nodeType;
+    /**
+     * 节点名称
+     */
+    private String nodeName;
 
     /**
      * 消息标题

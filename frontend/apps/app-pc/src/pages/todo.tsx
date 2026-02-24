@@ -1,5 +1,5 @@
 import React from "react";
-import {done, list, todo} from "@/api/record.ts";
+import {done, list, notify, todo} from "@/api/record.ts";
 import {
     type ActionType,
     ApprovalPanelDrawer,
@@ -8,20 +8,24 @@ import {
     WorkflowSelectModal
 } from "@flow-engine/flow-design";
 import {Button, Space, Tabs, type TabsProps} from "antd";
+import dayjs from "dayjs";
 
 const TodoPage: React.FC = () => {
 
     const actionAll = React.useRef<ActionType>(null);
     const actionTodo = React.useRef<ActionType>(null);
     const actionDone = React.useRef<ActionType>(null);
+    const actionNotify = React.useRef<ActionType>(null);
 
     const [selectVisible, setSelectVisible] = React.useState(false);
     const [approvalVisible, setApprovalVisible] = React.useState(false);
     const [workflowCode, setWorkflowCode] = React.useState<string>('');
+    const [currentRecordId, setCurrentRecordId] = React.useState<string>('');
+    const [currentTab, setCurrentTab] = React.useState<string>('todo');
 
     const columns: TableProps<any>['columns'] = [
         {
-            dataIndex: 'id',
+            dataIndex: 'recordId',
             title: '编号',
         },
         {
@@ -31,49 +35,59 @@ const TodoPage: React.FC = () => {
         {
             dataIndex: 'readTime',
             title: '读取状态',
+            render: (value, record) => {
+                return value ? '已读' : '未读';
+            }
+        },
+        {
+            dataIndex: 'nodeName',
+            title: '节点名称',
         },
         {
             dataIndex: 'createTime',
             title: '创建时间',
+            render: (text, record) => {
+                return dayjs(text).format('YYYY-MM-DD HH:mm:ss');
+            }
         },
         {
             dataIndex: 'currentOperatorId',
+            title: '审批人',
+            hidden: true,
+        },
+        {
+            dataIndex: 'currentOperatorName',
             title: '审批人',
         },
         {
             dataIndex: 'recordState',
             title: '状态',
+            render: (text, record) => {
+                return text ? '已办' : '待办';
+            }
         },
         {
             dataIndex: 'option',
             title: '操作',
             render: (value, record) => {
-                return (
-                    <Space>
-                        <a onClick={() => {
+                if(currentTab==='todo'){
+                    return (
+                        <Space>
+                            <a
+                                onClick={() => {
+                                    setCurrentRecordId(record.recordId);
+                                    setApprovalVisible(true);
+                                }}
+                            >办理</a>
+                        </Space>
+                    )
+                }
 
-                        }}>办理</a>
-                    </Space>
-                )
             }
         }
     ];
 
     const items: TabsProps['items'] = [
-        {
-            key: 'all',
-            label: '全部流程',
-            children: (
-                <Table
-                    rowKey={"id"}
-                    actionType={actionAll}
-                    columns={columns}
-                    request={(request) => {
-                        return list(request);
-                    }}
-                />
-            )
-        },
         {
             key: 'todo',
             label: '我的待办',
@@ -101,24 +115,64 @@ const TodoPage: React.FC = () => {
                     }}
                 />
             )
+        },
+        {
+            key: 'notify',
+            label: '我的抄送',
+            children: (
+                <Table
+                    rowKey={"id"}
+                    actionType={actionNotify}
+                    columns={columns}
+                    request={(request) => {
+                        return notify(request);
+                    }}
+                />
+            )
+        },
+        {
+            key: 'all',
+            label: '全部流程',
+            children: (
+                <Table
+                    rowKey={"id"}
+                    actionType={actionAll}
+                    columns={columns}
+                    request={(request) => {
+                        return list(request);
+                    }}
+                />
+            )
+        },
+    ];
+
+    const reloadCurrentTab = () => {
+        if (currentTab === 'all') {
+            actionAll.current?.reload();
         }
-    ]
+        if (currentTab === 'done') {
+            actionDone.current?.reload();
+        }
+        if (currentTab === 'todo') {
+            actionTodo.current?.reload();
+        }
+        if (currentTab === 'notify') {
+            actionNotify.current?.reload();
+        }
+    }
+
+    React.useEffect(() => {
+        reloadCurrentTab();
+    },[currentTab]);
 
     return (
         <div>
             <Tabs
                 items={items}
                 centered={true}
+                defaultActiveKey={currentTab}
                 onChange={(currentKey) => {
-                    if (currentKey === 'all') {
-                        actionAll.current?.reload();
-                    }
-                    if (currentKey === 'done') {
-                        actionDone.current?.reload();
-                    }
-                    if (currentKey === 'todo') {
-                        actionTodo.current?.reload();
-                    }
+                   setCurrentTab(currentKey);
                 }}
                 tabBarExtraContent={{
                     right: (
@@ -147,8 +201,10 @@ const TodoPage: React.FC = () => {
             <ApprovalPanelDrawer
                 workflowCode={workflowCode}
                 open={approvalVisible}
+                recordId={currentRecordId}
                 onClose={() => {
                     setApprovalVisible(false);
+                    reloadCurrentTab();
                 }}
             />
         </div>
