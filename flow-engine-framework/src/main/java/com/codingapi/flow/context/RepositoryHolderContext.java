@@ -1,12 +1,11 @@
 package com.codingapi.flow.context;
 
+import com.codingapi.flow.context.service.FlowRecordSaveService;
 import com.codingapi.flow.domain.DelayTask;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.record.FlowTodoRecord;
-import com.codingapi.flow.record.FlowTodoMerge;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.service.FlowService;
 import com.codingapi.flow.service.impl.FlowActionService;
@@ -14,9 +13,11 @@ import com.codingapi.flow.service.impl.FlowDelayTriggerService;
 import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *  流程引擎仓库持有者上下文,负责持有流程引擎相关的仓库实例,并提供相关服务的构建方法
+ */
 public class RepositoryHolderContext {
 
     @Getter
@@ -156,13 +157,13 @@ public class RepositoryHolderContext {
 
 
     public void saveRecords(List<FlowRecord> flowRecords) {
-        FlowRecordRepositoryService flowRecordRepositoryService = new FlowRecordRepositoryService(flowRecords);
-        flowRecordRepositoryService.saveAll();
+        FlowRecordSaveService flowRecordSaveService = new FlowRecordSaveService(flowRecords);
+        flowRecordSaveService.saveAll();
     }
 
     public void saveRecord(FlowRecord flowRecord) {
-        FlowRecordRepositoryService flowRecordRepositoryService = new FlowRecordRepositoryService(flowRecord);
-        flowRecordRepositoryService.saveAll();
+        FlowRecordSaveService flowRecordSaveService = new FlowRecordSaveService(flowRecord);
+        flowRecordSaveService.saveAll();
     }
 
     public List<FlowRecord> findCurrentNodeRecords(long fromId, String nodeId) {
@@ -193,107 +194,5 @@ public class RepositoryHolderContext {
         return delayTaskRepository.findAll();
     }
 
-
-    private static class FlowRecordRepositoryService {
-
-        private final List<FlowRecord> flowRecords;
-        private final FlowTodoRecordRepository flowTodoRecordRepository;
-        private final FlowTodoMergeRepository flowTodoMergeRepository;
-        private final FlowRecordRepository flowRecordRepository;
-
-
-        public FlowRecordRepositoryService(List<FlowRecord> flowRecords) {
-            this.flowTodoRecordRepository = RepositoryHolderContext.getInstance().getFlowTodoRecordRepository();
-            this.flowTodoMergeRepository = RepositoryHolderContext.getInstance().getFlowTodoMergeRepository();
-            this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
-            this.flowRecords = flowRecords;
-        }
-
-        public FlowRecordRepositoryService(FlowRecord flowRecord) {
-            this.flowTodoRecordRepository = RepositoryHolderContext.getInstance().getFlowTodoRecordRepository();
-            this.flowTodoMergeRepository = RepositoryHolderContext.getInstance().getFlowTodoMergeRepository();
-            this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
-            this.flowRecords = new ArrayList<>();
-            this.flowRecords.add(flowRecord);
-        }
-
-
-        private void saveTodoMargeRecords() {
-            List<FlowTodoRecord> flowTodoRecords = new ArrayList<>();
-            for (FlowRecord flowRecord : flowRecords) {
-                if (flowRecord.isTodo()) {
-                    FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByMergeKey(flowRecord.getMergeKey());
-                    if (todoMargeRecord == null) {
-                        todoMargeRecord = new FlowTodoRecord(flowRecord);
-                    } else {
-                        todoMargeRecord.update(flowRecord);
-                        if (flowRecord.isMergeable()) {
-                            todoMargeRecord.addMergeCount();
-                        }
-                    }
-                    flowTodoRecords.add(todoMargeRecord);
-                }
-            }
-            if (!flowTodoRecords.isEmpty()) {
-                flowTodoRecordRepository.saveAll(flowTodoRecords);
-            }
-
-            if (!flowTodoRecords.isEmpty()) {
-                List<FlowTodoMerge> relationList = new ArrayList<>();
-                for (FlowTodoRecord margeRecord : flowTodoRecords) {
-                    if(margeRecord.isMergeable()) {
-                        relationList.add(new FlowTodoMerge(margeRecord));
-                    }
-                }
-                flowTodoMergeRepository.saveAll(relationList);
-            }
-        }
-
-        private void saveRecords() {
-            if (!flowRecords.isEmpty()) {
-                flowRecordRepository.saveAll(flowRecords);
-            }
-        }
-
-
-        private void removeTodoMergeRecords() {
-            for (FlowRecord flowRecord : flowRecords) {
-                if (flowRecord.isDone()) {
-                    if (flowRecord.isMergeable()) {
-                        FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByMergeKey(flowRecord.getMergeKey());
-                        if(todoMargeRecord!=null) {
-                            List<FlowTodoMerge> margeRelations = flowTodoMergeRepository.findByTodoId(todoMargeRecord.getId());
-                            if(margeRelations!=null && !margeRelations.isEmpty()) {
-                                for (FlowTodoMerge margeRelation : margeRelations) {
-                                    if (margeRelation.isRecord(flowRecord.getId())) {
-                                        flowTodoMergeRepository.remove(margeRelation);
-                                        todoMargeRecord.divMergeCount();
-                                        if (todoMargeRecord.hasMergeCount()) {
-                                            flowTodoRecordRepository.save(todoMargeRecord);
-                                        } else {
-                                            flowTodoRecordRepository.remove(todoMargeRecord);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByMergeKey(flowRecord.getMergeKey());
-                        if (todoMargeRecord != null) {
-                            flowTodoRecordRepository.remove(todoMargeRecord);
-                        }
-                    }
-                }
-            }
-        }
-
-        public void saveAll() {
-            this.saveRecords();
-            this.saveTodoMargeRecords();
-            this.removeTodoMergeRecords();
-        }
-
-
-    }
 
 }

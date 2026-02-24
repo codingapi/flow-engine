@@ -6,6 +6,7 @@ import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
@@ -603,5 +604,12 @@ public class FlowRecord {
         this.readTime = System.currentTimeMillis();
         this.currentOperatorId = -1;
         this.recordState = SATE_RECORD_DONE;
+    }
+
+    /**
+     *  判断是否结束节点的记录
+     */
+    public boolean isNotEndNode() {
+        return !EndNode.NODE_TYPE.equals(this.nodeType);
     }
 }

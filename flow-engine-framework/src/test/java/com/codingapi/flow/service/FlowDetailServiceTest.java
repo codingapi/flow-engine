@@ -163,8 +163,8 @@ public class FlowDetailServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -277,8 +277,8 @@ public class FlowDetailServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 }

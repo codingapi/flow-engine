@@ -213,8 +213,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -313,8 +313,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -402,8 +402,8 @@ class FlowSampleServiceTest {
         assertEquals(0, bossRecordList.size());
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(userRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
     }
 
 
@@ -533,8 +533,8 @@ class FlowSampleServiceTest {
         flowService.action(departRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(departRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -655,8 +655,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(5, records.size());
-        assertEquals(5, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(4, records.size());
+        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
     }
 
 
@@ -825,9 +825,9 @@ class FlowSampleServiceTest {
         flowService.action(bigBossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(departRecordList.get(0).getProcessId());
-        assertEquals(5, records.size());
+        assertEquals(4, records.size());
         assertEquals(0, records.stream().filter(FlowRecord::isTodo).toList().size());
-        assertEquals(5, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -1002,9 +1002,9 @@ class FlowSampleServiceTest {
         flowService.action(bigBossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(departRecordList.get(0).getProcessId());
-        assertEquals(5, records.size());
+        assertEquals(4, records.size());
         assertEquals(0, records.stream().filter(FlowRecord::isTodo).toList().size());
-        assertEquals(5, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -1164,8 +1164,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(userRecordList.get(0).getProcessId());
-        assertEquals(4, records.size());
-        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(3, records.size());
+        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -1276,8 +1276,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -1381,8 +1381,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -1482,8 +1482,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
         // 为老板再次创建一个待办流程
         bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
@@ -1599,8 +1599,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -1724,8 +1724,8 @@ class FlowSampleServiceTest {
         flowService.action(lorneRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(4, records.size());
-        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(3, records.size());
+        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -1840,8 +1840,8 @@ class FlowSampleServiceTest {
         flowService.action(lorneRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(lorneRecordList.get(0).getProcessId());
-        assertEquals(4, records.size());
-        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(3, records.size());
+        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -1961,8 +1961,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(5, records.size());
-        assertEquals(5, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(4, records.size());
+        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -2084,8 +2084,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(5, records.size());
-        assertEquals(5, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(4, records.size());
+        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -2183,8 +2183,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -2302,8 +2302,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(4, records.size());
-        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(3, records.size());
+        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -2409,8 +2409,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -2511,8 +2511,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -2614,8 +2614,8 @@ class FlowSampleServiceTest {
         flowService.action(lorneRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(lorneRecordList.get(0).getProcessId());
-        assertEquals(4, records.size());
-        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(3, records.size());
+        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
@@ -2720,8 +2720,8 @@ class FlowSampleServiceTest {
         flowService.action(bossRequest);
 
         List<FlowRecord> records = flowRecordRepository.findProcessRecords(lorneRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 }
