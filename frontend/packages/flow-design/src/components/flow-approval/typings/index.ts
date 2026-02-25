@@ -92,6 +92,14 @@ export interface ApprovalLayoutProps {
     onClose?:() => void;
 }
 
+// Layout constants
+export const ApprovalLayoutHeight = 64;
+export const ApprovalContentPaddingV = 24;
+export const ApprovalContentPaddingH = 24;
+export const ApprovalColumnGap = 16;
+export const ApprovalSidebarWidth = 400;
+export const ApprovalSidebarCollapsedWidth = 48;
+
 
 export type State  = {
     flow?:FlowContent;
