@@ -1,4 +1,4 @@
-import {ParamRequest, Result} from "@flow-engine/flow-pc-ui";
+import {ParamRequest, Result} from "@flow-engine/flow-core";
 import {DataType, DesignListApi} from "./types";
 import {list, remove,changeState} from "@/api/workflow";
 

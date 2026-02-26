@@ -1,6 +1,5 @@
 import React from "react"
-import {ActionType} from "@flow-engine/flow-pc-ui";
-import {PresenterHooks} from "@flow-engine/flow-core";
+import {PresenterHooks,ActionType} from "@flow-engine/flow-core";
 import {State} from "../types"
 import {Presenter} from "../presenter";
 import {DesignListApiImpl} from "../model";

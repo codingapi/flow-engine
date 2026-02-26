@@ -1,4 +1,4 @@
-import { ParamRequest, Result } from "@flow-engine/flow-pc-ui";
+import { ParamRequest, Result } from "@flow-engine/flow-core";
 
 export interface State {
     pageVersion: number;
