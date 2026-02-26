@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { Button, Space } from 'antd';
+import { Form, Button, Space } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import { Field, FieldRenderProps } from '@flowgram.ai/fixed-layout-editor';
 import { GroovyVariableService } from '@/services/groovy-variable-service';
@@ -64,47 +64,50 @@ export const NodeTitleStrategy: React.FC = () => {
 
   return (
     <>
-      <div style={{ width: '100%' }}>
-        <Field
-          name="NodeTitleStrategy.script"
-          render={({ field: { value, onChange } }: FieldRenderProps<any>) => {
-            // 保存 onChange 回调到 ref
-            onChangeRef.current = onChange;
+      <Form style={{ width: '100%' }} layout="vertical">
+        <Form.Item label="节点标题">
+          <Field
+            name="NodeTitleStrategy.script"
+            render={(props: FieldRenderProps<any>) => {
+              const { value, onChange } = props.field;
+              // 保存 onChange 回调到 ref
+              onChangeRef.current = onChange;
 
-            // 更新显示的脚本值（当编辑器状态改变时）
-            if (value !== displayScript) {
-              setDisplayScript(value || '');
-            }
+              // 更新显示的脚本值（当编辑器状态改变时）
+              if (value !== displayScript) {
+                setDisplayScript(value || '');
+              }
 
-            return (
-              <Space.Compact style={{ width: '100%' }}>
-                <div
-                  style={{
-                    flex: 1,
-                    padding: '4px 11px',
-                    backgroundColor: value ? '#fff' : '#fafafa',
-                    border: '1px solid #d9d9d9',
-                    borderRadius: '6px 0 0 6px',
-                    color: value ? 'rgba(0,0,0,0.88)' : 'rgba(0,0,0,0.25)',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {renderPreview(value)}
-                </div>
-                <Button
-                  icon={<EditOutlined />}
-                  onClick={handleOpenConfig}
-                  style={{ borderRadius: '0 6px 6px 0' }}
-                >
-                  编辑
-                </Button>
-              </Space.Compact>
-            );
-          }}
-        />
-      </div>
+              return (
+                <Space.Compact style={{ width: '100%' }}>
+                  <div
+                    style={{
+                      flex: 1,
+                      padding: '4px 11px',
+                      backgroundColor: value ? '#fff' : '#fafafa',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px 0 0 6px',
+                      color: value ? 'rgba(0,0,0,0.88)' : 'rgba(0,0,0,0.25)',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {renderPreview(value)}
+                  </div>
+                  <Button
+                    icon={<EditOutlined />}
+                    onClick={handleOpenConfig}
+                    style={{ borderRadius: '0 6px 6px 0' }}
+                  >
+                    编辑
+                  </Button>
+                </Space.Compact>
+              );
+            }}
+          />
+        </Form.Item>
+      </Form>
 
       {showConfigModal && (
         <TitleConfigModal

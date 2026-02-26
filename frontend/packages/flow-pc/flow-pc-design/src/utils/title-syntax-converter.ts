@@ -85,6 +85,16 @@ export class TitleSyntaxConverter {
     try {
       let result = groovyCode.trim();
 
+      // 特殊处理：检查是否为默认的 legacy 脚本
+      // 格式: def run(request){return '你有一条待办'}
+      if (this.isDefaultLegacyScript(result)) {
+        // 提取 return 语句中的字符串
+        const match = result.match(/return\s+['"]([^'"]*)['"]/);
+        if (match && match[1]) {
+          return match[1];
+        }
+      }
+
       // 检查是否有 @TITLE 注释
       if (!result.includes(TITLE_COMMENT)) {
         return null; // 无法解析
