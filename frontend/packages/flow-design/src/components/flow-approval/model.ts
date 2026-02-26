@@ -17,7 +17,7 @@ export class FlowApprovalApiImpl implements FlowApprovalApi {
     processNodes =async (body: Record<string, any>)=> {
         const response =  await postProcessNodes(body);
         if(response.success){
-            return response.data;
+            return response.data.list;
         }
     }
 

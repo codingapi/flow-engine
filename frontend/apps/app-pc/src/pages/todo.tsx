@@ -180,6 +180,7 @@ const TodoPage: React.FC = () => {
                             key={"create"}
                             type={'primary'}
                             onClick={() => {
+                                setCurrentRecordId('');
                                 setSelectVisible(true);
                             }}>发起流程</Button>
                     )

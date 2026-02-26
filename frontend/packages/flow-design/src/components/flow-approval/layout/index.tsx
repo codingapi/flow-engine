@@ -7,23 +7,29 @@ import {createApprovalContext} from "@/components/flow-approval/hooks/use-approv
 import {Header} from "@/components/flow-approval/layout/header";
 import {Body} from "@/components/flow-approval/layout/body";
 
-
 const ApprovalLayoutScope: React.FC<ApprovalLayoutProps> = (props) => {
     const {context} = createApprovalContext(props);
     return (
         <ApprovalContext.Provider value={context}>
-            <Header/>
-            <Body/>
+            <div style={{
+                width: '100%',
+                height: '100vh',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+            }}>
+                <Header/>
+                <Body/>
+            </div>
         </ApprovalContext.Provider>
     )
 }
 
 export const ApprovalLayout: React.FC<ApprovalLayoutProps> = (props) => {
-
     return (
         <Provider store={approvalStore}>
             <ApprovalLayoutScope {...props}/>
         </Provider>
     )
-};
+}
 

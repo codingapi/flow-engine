@@ -16,6 +16,11 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class ProcessNode {
+
+    public final static int STATE_HISTORY = -1;
+    public final static int STATE_CURRENT = 0;
+    public final static int STATE_NEXT = 1;
+
     /**
      * 节点名称
      */
@@ -30,9 +35,12 @@ public class ProcessNode {
     private String nodeType;
 
     /**
-     * 是否历史记录
+     * 记录状态
+     * -1 为历史状态
+     * 0 为当前状态
+     * 1 为后续状态
      */
-    private boolean history;
+    private int state;
 
     /**
      * 节点审批人
@@ -40,13 +48,17 @@ public class ProcessNode {
     private List<FlowOperatorBody> operators;
 
 
+    public boolean isHistory(){
+        return this.state == STATE_HISTORY;
+    }
+
     public ProcessNode(FlowRecord flowRecord, Workflow workflow) {
         this.nodeId = flowRecord.getNodeId();
         IFlowNode flowNode = workflow.getFlowNode(this.nodeId);
         this.nodeName = flowNode.getName();
         this.nodeType = flowNode.getType();
         this.operators = new ArrayList<>();
-        this.history = true;
+        this.state = STATE_HISTORY;
         this.operators.add(new FlowOperatorBody(flowRecord));
     }
 
@@ -56,7 +68,16 @@ public class ProcessNode {
         this.nodeName = flowNode.getName();
         this.nodeType = flowNode.getType();
         this.operators = operators.stream().map(FlowOperatorBody::new).toList();
-        this.history = false;
+        this.state = STATE_NEXT;
+    }
+
+
+    public boolean isFlowNode(IFlowNode currentNode) {
+        return this.nodeId.equals(currentNode.getId());
+    }
+
+    public void setCurrentState() {
+        this.state = STATE_CURRENT;
     }
 
 
