@@ -64,7 +64,7 @@ export interface ProcessNode{
     nodeId:string;
     nodeName:string;
     nodeType:string;
-    history:boolean;
+    state:number;
     operators:FlowOperatorBody[]
 }
 
@@ -96,8 +96,7 @@ export interface ApprovalLayoutProps {
 export const ApprovalLayoutHeight = 64;
 export const ApprovalContentPaddingV = 24;
 export const ApprovalContentPaddingH = 24;
-export const ApprovalColumnGap = 16;
-export const ApprovalSidebarWidth = 400;
+export const ApprovalSidebarWidth = 250;
 export const ApprovalSidebarCollapsedWidth = 48;
 
 

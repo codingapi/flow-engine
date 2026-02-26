@@ -6,27 +6,27 @@ import {ApprovalLayout} from "@/components/flow-approval/layout";
 
 interface ApprovalPanelProps {
     workflowCode?: string;
-    recordId?:string;
+    recordId?: string;
     onClose?: () => void;
 }
 
 export const ApprovalPanel: React.FC<ApprovalPanelProps> = (props) => {
 
-    const [content,dispatch] = React.useState<FlowContent|undefined>(undefined);
+    const [content, dispatch] = React.useState<FlowContent | undefined>(undefined);
 
-    React.useEffect(()=>{
-        const id =   props.recordId || props.workflowCode || '';
-        detail(id).then(res=>{
-            if(res.success){
+    React.useEffect(() => {
+        const id = props.recordId || props.workflowCode || '';
+        detail(id).then(res => {
+            if (res.success) {
                 dispatch(res.data);
             }
         });
-    },[]);
+    }, []);
 
     return (
-        <>
+        <div>
             {content && <ApprovalLayout content={content} onClose={props.onClose}/>}
-        </>
+        </div>
     )
 }
 
@@ -41,6 +41,12 @@ export const ApprovalPanelDrawer: React.FC<ApprovalPanelDrawerProps> = (props) =
         <Drawer
             open={props.open}
             onClose={props.onClose}
+            styles={{
+                body: {
+                    padding: 0,
+                    margin: 0,
+                }
+            }}
         >
             <ApprovalPanel
                 {...props}

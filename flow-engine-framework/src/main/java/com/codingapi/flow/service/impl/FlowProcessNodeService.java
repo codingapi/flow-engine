@@ -122,6 +122,9 @@ public class FlowProcessNodeService {
                 operators = operatorManager.getOperators();
             }
             ProcessNode processNode = new ProcessNode(flowNode,operators);
+            if(processNode.isFlowNode(this.currentNode)){
+                processNode.setCurrentState();
+            }
             this.nodeList.add(processNode);
             List<IFlowNode> nextNodes = workflow.nextNodes(flowNode);
             this.fetchNextNode(flowSession.updateSession(flowNode), nextNodes);
