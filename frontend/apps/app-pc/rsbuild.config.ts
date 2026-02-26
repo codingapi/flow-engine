@@ -1,7 +1,7 @@
-import {defineConfig} from '@rsbuild/core';
-import {pluginReact} from '@rsbuild/plugin-react';
-import {pluginLess} from '@rsbuild/plugin-less';
-import {pluginSass} from '@rsbuild/plugin-sass';
+import { defineConfig } from '@rsbuild/core';
+import { pluginReact } from '@rsbuild/plugin-react';
+import { pluginLess } from '@rsbuild/plugin-less';
+import { pluginSass } from '@rsbuild/plugin-sass';
 import * as path from "path";
 
 // Docs: https://rsbuild.rs/config/
@@ -38,6 +38,12 @@ export default defineConfig({
              * ignore warnings from @coze-design-editor/design-editor/language-typescript
              */
             ignoreWarnings: [/Critical dependency: the request of a dependency is an expression/],
+            // 添加 node 配置来模拟 __filename 和 __dirname
+            node: {
+                __filename: false,
+                __dirname: false,
+                global: true,
+            },
         },
     },
 });

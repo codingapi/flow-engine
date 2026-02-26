@@ -1,4 +1,5 @@
-import {ActionType, Table, TableProps} from "@flow-engine/flow-pc-ui";
+import {Table, TableProps} from "@flow-engine/flow-pc-ui";
+import {ActionType} from "@flow-engine/flow-core";
 import React from "react";
 import {DataType, DesignListProps} from "./types";
 import {usePresenter} from "./hooks/use-presenter";

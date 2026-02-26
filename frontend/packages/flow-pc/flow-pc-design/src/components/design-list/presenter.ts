@@ -1,5 +1,5 @@
 import {DesignListApi, State} from "./types";
-import {ParamRequest} from "@flow-engine/flow-pc-ui";
+import {ParamRequest} from "@flow-engine/flow-core";
 import {BasePresenter} from "@flow-engine/flow-core";
 
 export class Presenter extends BasePresenter<State, DesignListApi> {
