@@ -53,7 +53,7 @@ public class FlowCreateService {
         }
         workflow.verify();
         // 获取备份
-        WorkflowBackup workflowBackup = workflowBackupRepository.getByWorkId(workflow.getId(), workflow.getCreatedTime());
+        WorkflowBackup workflowBackup = workflowBackupRepository.getByWorkId(workflow.getId(), workflow.getUpdatedTime());
         if (workflowBackup == null) {
             workflowBackup = new WorkflowBackup(workflow);
             workflowBackupRepository.save(workflowBackup);
