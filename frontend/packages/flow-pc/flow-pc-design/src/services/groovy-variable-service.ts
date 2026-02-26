@@ -134,9 +134,14 @@ export class GroovyVariableService {
 
   /**
    * 检查是否为高级模式（无法解析回可视化）
-   * 通过检测 // @TITLE 注释
+   * 通过检测完整的 def run(request){// @TITLE ...} 格式
    */
   static isAdvancedMode(script: string): boolean {
-    return script.includes('// @TITLE');
+    // 检查是否包含 // @TITLE 注释
+    if (!script.includes('// @TITLE')) {
+      return false;
+    }
+    // 检查是否有完整的函数包装 def run(request){...}
+    return /def\s+run\s*\(\s*request\s*\)\s*\{[\s\S]*\/\/\s*@TITLE[\s\S]*\}/.test(script);
   }
 }

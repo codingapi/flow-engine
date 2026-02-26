@@ -69,8 +69,9 @@ export class TitleSyntaxConverter {
       groovyExpression = parts.join(' + ');
     }
 
-    // 添加 return 和标题注释
-    return `${TITLE_COMMENT}\nreturn ${groovyExpression}`;
+    // 添加 return 和标题注释，包装成完整的Groovy函数
+    // 后端期望格式: def run(request){// @TITLE\nreturn "..."}
+    return `def run(request){\n${TITLE_COMMENT}\nreturn ${groovyExpression}\n}`;
   }
 
   /**
@@ -98,6 +99,13 @@ export class TitleSyntaxConverter {
       // 检查是否有 @TITLE 注释
       if (!result.includes(TITLE_COMMENT)) {
         return null; // 无法解析
+      }
+
+      // 移除函数包装 def run(request){...}
+      // 提取函数体内容
+      const funcMatch = result.match(/def\s+run\s*\([^)]*\)\s*\{([\s\S]*)\}/);
+      if (funcMatch) {
+        result = funcMatch[1];
       }
 
       // 移除 @TITLE 注释
@@ -129,16 +137,11 @@ export class TitleSyntaxConverter {
         placeholders++;
       }
 
-      // 现在处理字符串拼接，移除引号和 +
-      // 移除所有 " + " (带空格的字符串拼接)
-      result = result.replace(/\s*\+\s*/g, '');
+      // 处理字符串拼接：移除引号之间的 + 连接符
+      // 使用更精确的正则来处理 "text" + expr + "text" 格式
+      result = result.replace(/"([^"]*)"\s*\+\s*/g, '$1');  // "text" +  -> text
+      result = result.replace(/\s*\+\s*"([^"]*)"/g, '$1');  //  + "text" -> text
 
-      // 移除引号，但保留占位符
-      result = result.replace(/^"([^"]*)"$/g, '$1'); // 单独的字符串
-      result = result.replace(/^"([^"]*)"(.*)"$/g, '$1$2'); // 开头的引号
-      result = result.replace(/^(.*?)"([^"]*)"$/g, '$1$2'); // 结尾的引号
-
-      // 还有一些情况需要处理，让我们用更简单的方法
       // 移除所有剩余的引号
       result = result.replace(/"/g, '');
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState, useCallback } from 'react';
 import { Form, Button, Space } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import { Field, FieldRenderProps } from '@flowgram.ai/fixed-layout-editor';
@@ -11,9 +11,8 @@ import { TitleConfigModal } from './TitleConfigModal';
  */
 export const NodeTitleStrategy: React.FC = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [currentScript, setCurrentScript] = useState('');
-  const [displayScript, setDisplayScript] = useState('');
-  // 使用 ref 保存 onChange 回调，以便在弹框确认后更新编辑器状态
+  const [modalScript, setModalScript] = useState('');
+  // 使用 ref 保存 onChange 回调
   const onChangeRef = useRef<((value: string) => void) | null>(null);
 
   // 获取表单字段（从context获取）
@@ -26,7 +25,7 @@ export const NodeTitleStrategy: React.FC = () => {
   const mappings = GroovyVariableService.getAllMappings(formFields);
 
   // 渲染预览内容
-  const renderPreview = (script: string) => {
+  const renderPreview = useCallback((script: string) => {
     if (!script) {
       return '（未配置）';
     }
@@ -44,23 +43,20 @@ export const NodeTitleStrategy: React.FC = () => {
     }
 
     return '（自定义配置）';
-  };
+  }, [mappings]);
 
-  const handleOpenConfig = () => {
-    // 使用当前显示的脚本值
-    setCurrentScript(displayScript);
+  const handleOpenConfig = (currentValue: string) => {
+    setModalScript(currentValue || '');
     setShowConfigModal(true);
   };
 
-  const handleConfirm = (script: string) => {
-    // 更新显示的脚本值
-    setDisplayScript(script);
-    // 关键修复：调用 onChange 回调更新编辑器状态
+  const handleConfirm = useCallback((script: string) => {
+    // 调用 onChange 回调更新编辑器状态
     if (onChangeRef.current) {
       onChangeRef.current(script);
     }
     setShowConfigModal(false);
-  };
+  }, []);
 
   return (
     <>
@@ -72,11 +68,6 @@ export const NodeTitleStrategy: React.FC = () => {
               const { value, onChange } = props.field;
               // 保存 onChange 回调到 ref
               onChangeRef.current = onChange;
-
-              // 更新显示的脚本值（当编辑器状态改变时）
-              if (value !== displayScript) {
-                setDisplayScript(value || '');
-              }
 
               return (
                 <Space.Compact style={{ width: '100%' }}>
@@ -93,11 +84,11 @@ export const NodeTitleStrategy: React.FC = () => {
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    {renderPreview(value)}
+                    {renderPreview(value || '')}
                   </div>
                   <Button
                     icon={<EditOutlined />}
-                    onClick={handleOpenConfig}
+                    onClick={() => handleOpenConfig(value || '')}
                     style={{ borderRadius: '0 6px 6px 0' }}
                   >
                     编辑
@@ -111,7 +102,7 @@ export const NodeTitleStrategy: React.FC = () => {
 
       {showConfigModal && (
         <TitleConfigModal
-          script={currentScript}
+          script={modalScript}
           formFields={formFields}
           onConfirm={handleConfirm}
           onCancel={() => setShowConfigModal(false)}
