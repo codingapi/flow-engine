@@ -1,6 +1,6 @@
 import React from "react";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
-import {ViewPlugin} from "@flow-engine/flow-types";
+import {ViewBindPlugin} from "@flow-engine/flow-types";
 import { Form } from "antd";
 
 interface FormViewComponentProps{
@@ -9,7 +9,7 @@ interface FormViewComponentProps{
 
 export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
     const {state, context} = useApprovalContext();
-    const ViewComponent = ViewPlugin.getInstance().get(state.flow?.view || 'default');
+    const ViewComponent = ViewBindPlugin.getInstance().get(state.flow?.view || 'default');
     // 是否可合并审批
     const mergeable = state.flow?.mergeable || false;
     const todos = state.flow?.todos || [];
@@ -54,7 +54,7 @@ export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
                 {viewForms.map((item, index) => (
                     <ViewComponent
                         key={index}
-                        form={item.instance}
+                        form={item.instance as any}
                         onValuesChange={props.onValuesChange}
                     />
                 ))}

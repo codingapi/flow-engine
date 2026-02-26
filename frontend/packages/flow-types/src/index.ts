@@ -1,2 +1,2 @@
-export * from '@/plugins/view';
+export * from '@/plugins';
 export * from '@/types';

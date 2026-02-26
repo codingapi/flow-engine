@@ -1,4 +1,4 @@
-import {FormInstance} from "antd";
+import {FormInstance} from "./form-instance";
 
 export type ViewComponentProps  = {
     form:FormInstance;

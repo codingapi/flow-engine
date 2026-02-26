@@ -4,7 +4,7 @@ import {ApprovalContext, ApprovalContextScope} from "../context";
 import {ApprovalReduxState, updateState} from "../store";
 import {Presenter} from "../presenters";
 import {FlowApprovalApiImpl} from "../model";
-import {ApprovalLayoutProps} from "@/components/flow-approval/typings";
+import {ApprovalLayoutProps} from "../typings";
 
 export const useApprovalContext = () => {
     const context = React.useContext(ApprovalContext);

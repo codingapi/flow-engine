@@ -11,7 +11,7 @@ export const FlowFormView: React.FC<ViewComponentProps> = (props) => {
 
     return (
         <Form
-            form={form}
+            form={form as any}
             layout={"vertical"}
             onBlur={()=>{
                 const latestValues = form.getFieldsValue();

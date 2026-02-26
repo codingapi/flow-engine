@@ -1,7 +1,7 @@
 import React from "react";
 import {Drawer} from "@flow-engine/flow-pc-ui";
 import {detail} from "@/api/record";
-import {FlowContent} from "@/components/flow-approval/typings";
+import {FlowContent} from "@flow-engine/flow-types";
 import {ApprovalLayout} from "@/components/flow-approval/layout";
 
 interface ApprovalPanelProps {

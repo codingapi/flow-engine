@@ -1,4 +1,4 @@
-import {ViewPlugin} from "@flow-engine/flow-types";
+import {ViewBindPlugin} from "@flow-engine/flow-types";
 import {LeaveView} from "@/views/leave.tsx";
 
-ViewPlugin.getInstance().register('default',LeaveView);
+ViewBindPlugin.getInstance().register('default',LeaveView);

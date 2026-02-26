@@ -1,5 +1,5 @@
 import React from "react";
-import {ApprovalLayoutProps} from "@/components/flow-approval/typings";
+import {ApprovalLayoutProps} from "../typings";
 import {Provider} from "react-redux";
 import {approvalStore} from "@/components/flow-approval/store";
 import {ApprovalContext} from "@/components/flow-approval/context";

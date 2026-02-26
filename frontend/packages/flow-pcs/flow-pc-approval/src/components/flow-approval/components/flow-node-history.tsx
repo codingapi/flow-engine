@@ -1,8 +1,8 @@
 import React from "react";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
-import {ProcessNode} from "@/components/flow-approval/typings";
+import {ProcessNode} from "@flow-engine/flow-types";
 import {Timeline, Tag, Empty, Typography} from "antd";
-import {CheckCircleFilled, ClockCircleOutlined, LoadingOutlined, SyncOutlined} from "@ant-design/icons";
+import {CheckCircleFilled, ClockCircleOutlined, SyncOutlined} from "@ant-design/icons";
 
 const {Text} = Typography;
 

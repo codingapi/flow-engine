@@ -1,5 +1,5 @@
 import React from "react";
-import {ApprovalLayoutProps, State} from "../typings";
+import {State,ApprovalLayoutProps} from "../typings";
 import {Presenter} from "../presenters";
 
 export class ApprovalContextScope {
