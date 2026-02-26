@@ -96,48 +96,46 @@ export class TitleSyntaxConverter {
       // 移除 return 关键字
       result = result.replace(/^return\s+/, '');
 
-      // 按expression长度降序排序
-      const sortedMappings = [...mappings].sort(
-        (a, b) => b.expression.length - a.expression.length
-      );
-
-      // 将 expression 替换为 ${label}
-      for (const mapping of sortedMappings) {
-        const escapedExpr = this.escapeRegex(mapping.expression);
-
-        // 处理各种模式
-        // 1. "text" + expression + "text" (最常见)
-        result = result.replace(
-          new RegExp(`"([^"]*)"\\s*\\+\\s*${escapedExpr}\\s*\\+\\s*"([^"]*)"`, 'g'),
-          (match, before, after) => {
-            return `${before}\${${mapping.label}}${after}`;
-          }
-        );
-
-        // 2. expression + "text"
-        result = result.replace(
-          new RegExp(`^${escapedExpr}\\s*\\+\\s*"([^"]*)"$`, 'g'),
-          (_, after) => `\${${mapping.label}}${after}`
-        );
-
-        // 3. "text" + expression
-        result = result.replace(
-          new RegExp(`^"([^"]*)"\\s*\\+\\s*${escapedExpr}$`, 'g'),
-          (_, before) => `${before}\${${mapping.label}}`
-        );
-
-        // 4. 单独的 expression
-        result = result.replace(
-          new RegExp(`^${escapedExpr}$`, 'g'),
-          `\${${mapping.label}}`
-        );
-
-        // 5. " + expression + " (空字符串)
-        result = result.replace(
-          new RegExp(`"\\s*\\+\\s*${escapedExpr}\\s*\\+\\s*"`, 'g'),
-          `\${${mapping.label}}`
-        );
+      // 创建表达式到标签的映射
+      const exprToLabel = new Map<string, string>();
+      for (const mapping of mappings) {
+        exprToLabel.set(mapping.expression, mapping.label);
       }
+
+      // 按expression长度降序排序（优先匹配长表达式）
+      const sortedExprs = Array.from(exprToLabel.keys()).sort((a, b) => b.length - a.length);
+
+      // 使用占位符方法处理表达式替换
+      let placeholders = 0;
+      const placeholderMap = new Map<string, string>();
+
+      // 首先替换所有表达式为占位符
+      for (const expr of sortedExprs) {
+        const escaped = this.escapeRegex(expr);
+        const placeholder = `___EXPR_PLACEHOLDER_${placeholders}___`;
+
+        result = result.replace(new RegExp(escaped, 'g'), placeholder);
+        placeholderMap.set(placeholder, exprToLabel.get(expr) || expr);
+        placeholders++;
+      }
+
+      // 现在处理字符串拼接，移除引号和 +
+      // 移除所有 " + " (带空格的字符串拼接)
+      result = result.replace(/\s*\+\s*/g, '');
+
+      // 移除引号，但保留占位符
+      result = result.replace(/^"([^"]*)"$/g, '$1'); // 单独的字符串
+      result = result.replace(/^"([^"]*)"(.*)"$/g, '$1$2'); // 开头的引号
+      result = result.replace(/^(.*?)"([^"]*)"$/g, '$1$2'); // 结尾的引号
+
+      // 还有一些情况需要处理，让我们用更简单的方法
+      // 移除所有剩余的引号
+      result = result.replace(/"/g, '');
+
+      // 还原占位符为 ${label}
+      placeholderMap.forEach((label, placeholder) => {
+        result = result.replace(new RegExp(this.escapeRegex(placeholder), 'g'), `\${${label}}`);
+      });
 
       return result;
     } catch (e) {
