@@ -21,21 +21,56 @@ export class TitleSyntaxConverter {
     // 按label长度降序排序，避免短label替换长label的一部分
     const sortedMappings = [...mappings].sort((a, b) => b.label.length - a.label.length);
 
-    // 将 ${label} 替换为 " + expression + "
+    // 将 ${label} 替换为唯一的占位符
+    const placeholders: Map<string, { expression: string; label: string }> = new Map();
+    let placeholderIndex = 0;
     for (const mapping of sortedMappings) {
       const labelPattern = `\${${mapping.label}}`;
-      result = result.split(labelPattern).join(`" + ${mapping.expression} + "`);
+      const placeholder = `__PLACEHOLDER_${placeholderIndex}__`;
+      placeholders.set(placeholder, { expression: mapping.expression, label: mapping.label });
+      result = result.split(labelPattern).join(placeholder);
+      placeholderIndex++;
     }
 
-    // 清理多余的空字符串拼接: "" +  或  + ""
-    result = result.replace(/"\s*\+\s*/g, '');
-    result = result.replace(/\s*\+\s*"/g, '');
+    // 按占位符分割字符串，构建表达式
+    const parts: string[] = [];
+    let lastIndex = 0;
+    const placeholderRegex = /__PLACEHOLDER_(\d+)__/g;
+    let match;
 
-    // 添加 return 和引号
-    result = `return "${result}"`;
+    while ((match = placeholderRegex.exec(result)) !== null) {
+      // 添加占位符之前的文本
+      if (match.index > lastIndex) {
+        const text = result.substring(lastIndex, match.index);
+        parts.push(`"${text}"`);
+      }
+      // 添加占位符对应的表达式
+      const placeholder = match[0];
+      const placeholderInfo = placeholders.get(placeholder);
+      if (placeholderInfo) {
+        parts.push(placeholderInfo.expression);
+      }
+      lastIndex = match.index + placeholder.length;
+    }
 
-    // 添加标题注释
-    return `${TITLE_COMMENT}\n${result}`;
+    // 添加最后一个占位符之后的文本
+    if (lastIndex < result.length) {
+      const text = result.substring(lastIndex);
+      parts.push(`"${text}"`);
+    }
+
+    // 组合成完整的Groovy表达式
+    let groovyExpression: string;
+    if (parts.length === 0) {
+      groovyExpression = '""';
+    } else if (parts.length === 1) {
+      groovyExpression = parts[0];
+    } else {
+      groovyExpression = parts.join(' + ');
+    }
+
+    // 添加 return 和标题注释
+    return `${TITLE_COMMENT}\nreturn ${groovyExpression}`;
   }
 
   /**
@@ -58,16 +93,8 @@ export class TitleSyntaxConverter {
       // 移除 @TITLE 注释
       result = result.replace(TITLE_COMMENT, '').trim();
 
-      // 提取 return "..." 中的内容
-      const returnMatch = result.match(/return\s+"([^"]*(?:\\"[^"]*)*)"/);
-      if (!returnMatch) {
-        return null; // 无法解析
-      }
-
-      result = returnMatch[1];
-
-      // 替换转义字符
-      result = result.replace(/\\"/g, '"');
+      // 移除 return 关键字
+      result = result.replace(/^return\s+/, '');
 
       // 按expression长度降序排序
       const sortedMappings = [...mappings].sort(
@@ -76,16 +103,40 @@ export class TitleSyntaxConverter {
 
       // 将 expression 替换为 ${label}
       for (const mapping of sortedMappings) {
-        // 匹配 " + expression + " 或 expression + " 或 " + expression
-        const patterns = [
-          new RegExp(`"\\s*\\+\\s*${this.escapeRegex(mapping.expression)}\\s*\\+\\s*"`, 'g'),
-          new RegExp(`${this.escapeRegex(mapping.expression)}\\s*\\+\\s*"`, 'g'),
-          new RegExp(`"\\s*\\+\\s*${this.escapeRegex(mapping.expression)}`, 'g'),
-        ];
+        const escapedExpr = this.escapeRegex(mapping.expression);
 
-        for (const pattern of patterns) {
-          result = result.replace(pattern, `\${${mapping.label}}`);
-        }
+        // 处理各种模式
+        // 1. "text" + expression + "text" (最常见)
+        result = result.replace(
+          new RegExp(`"([^"]*)"\\s*\\+\\s*${escapedExpr}\\s*\\+\\s*"([^"]*)"`, 'g'),
+          (match, before, after) => {
+            return `${before}\${${mapping.label}}${after}`;
+          }
+        );
+
+        // 2. expression + "text"
+        result = result.replace(
+          new RegExp(`^${escapedExpr}\\s*\\+\\s*"([^"]*)"$`, 'g'),
+          (_, after) => `\${${mapping.label}}${after}`
+        );
+
+        // 3. "text" + expression
+        result = result.replace(
+          new RegExp(`^"([^"]*)"\\s*\\+\\s*${escapedExpr}$`, 'g'),
+          (_, before) => `${before}\${${mapping.label}}`
+        );
+
+        // 4. 单独的 expression
+        result = result.replace(
+          new RegExp(`^${escapedExpr}$`, 'g'),
+          `\${${mapping.label}}`
+        );
+
+        // 5. " + expression + " (空字符串)
+        result = result.replace(
+          new RegExp(`"\\s*\\+\\s*${escapedExpr}\\s*\\+\\s*"`, 'g'),
+          `\${${mapping.label}}`
+        );
       }
 
       return result;
