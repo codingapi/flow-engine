@@ -79,7 +79,13 @@ importers:
         version: link:../../packages/flow-core
       '@flow-engine/flow-design':
         specifier: workspace:*
-        version: link:../../packages/flow-design
+        version: link:../../packages/flow-pcs/flow-design
+      '@flow-engine/flow-pc-approval':
+        specifier: workspace:*
+        version: link:../../packages/flow-pcs/flow-pc-approval
+      '@flow-engine/flow-pc-ui':
+        specifier: workspace:*
+        version: link:../../packages/flow-pcs/flow-pc-ui
       '@flow-engine/flow-types':
         specifier: workspace:*
         version: link:../../packages/flow-types
@@ -105,8 +111,8 @@ importers:
   packages/flow-core:
     dependencies:
       axios:
-        specifier: ^1.13.3
-        version: 1.13.3
+        specifier: ^1.13.5
+        version: 1.13.5
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -114,17 +120,20 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
 
-  packages/flow-design:
+  packages/flow-pcs/flow-design:
     dependencies:
       '@ant-design/icons':
         specifier: ~6.1.0
         version: 6.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@flow-engine/flow-core':
         specifier: workspace:*
-        version: link:../flow-core
+        version: link:../../flow-core
+      '@flow-engine/flow-pc-ui':
+        specifier: workspace:*
+        version: link:../flow-pc-ui
       '@flow-engine/flow-types':
         specifier: workspace:*
-        version: link:../flow-types
+        version: link:../../flow-types
       '@flowgram.ai/export-plugin':
         specifier: 1.0.7
         version: 1.0.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -181,11 +190,95 @@ importers:
         specifier: ^5.1.36
         version: 5.1.36
 
+  packages/flow-pcs/flow-form:
+    dependencies:
+      '@ant-design/icons':
+        specifier: ~6.1.0
+        version: 6.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@flow-engine/flow-core':
+        specifier: workspace:*
+        version: link:../../flow-core
+      '@flow-engine/flow-design':
+        specifier: workspace:*
+        version: link:../flow-design
+      '@flow-engine/flow-types':
+        specifier: workspace:*
+        version: link:../../flow-types
+      antd:
+        specifier: ^6.2.1
+        version: 6.2.1(date-fns@2.30.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: '>=18'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18'
+        version: 18.3.1(react@18.3.1)
+
+  packages/flow-pcs/flow-pc-approval:
+    dependencies:
+      '@ant-design/icons':
+        specifier: ~6.1.0
+        version: 6.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@flow-engine/flow-core':
+        specifier: workspace:*
+        version: link:../../flow-core
+      '@flow-engine/flow-design':
+        specifier: workspace:*
+        version: link:../flow-design
+      '@flow-engine/flow-pc-ui':
+        specifier: workspace:*
+        version: link:../flow-pc-ui
+      '@flow-engine/flow-types':
+        specifier: workspace:*
+        version: link:../../flow-types
+      '@reduxjs/toolkit':
+        specifier: ^2.11.2
+        version: 2.11.2(react-redux@9.2.0(@types/react@18.3.27)(react@18.3.1)(redux@5.0.1))(react@18.3.1)
+      antd:
+        specifier: ^6.2.1
+        version: 6.2.1(date-fns@2.30.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: '>=18'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18'
+        version: 18.3.1(react@18.3.1)
+      react-redux:
+        specifier: ^9.2.0
+        version: 9.2.0(@types/react@18.3.27)(react@18.3.1)(redux@5.0.1)
+
+  packages/flow-pcs/flow-pc-ui:
+    dependencies:
+      '@ant-design/icons':
+        specifier: ~6.1.0
+        version: 6.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@flow-engine/flow-core':
+        specifier: workspace:*
+        version: link:../../flow-core
+      '@flow-engine/flow-design':
+        specifier: workspace:*
+        version: link:../flow-design
+      antd:
+        specifier: ^6.2.1
+        version: 6.2.1(date-fns@2.30.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: '>=18'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18'
+        version: 18.3.1(react@18.3.1)
+
   packages/flow-types:
     dependencies:
       '@flow-engine/flow-core':
         specifier: workspace:*
         version: link:../flow-core
+      react:
+        specifier: '>=18'
+        version: 18.3.1
+      react-dom:
+        specifier: '>=18'
+        version: 18.3.1(react@18.3.1)
 
 packages:
 
@@ -1884,8 +1977,8 @@ packages:
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
 
-  axios@1.13.3:
-    resolution: {integrity: sha512-ERT8kdX7DZjtUm7IitEyV7InTHAF42iJuMArIiDIV5YtPanJkgw4hw5Dyg9fh0mihdWNn1GKaeIWErfe56UQ1g==}
+  axios@1.13.5:
+    resolution: {integrity: sha512-cz4ur7Vb0xS4/KUN0tPWe44eqxrIu31me+fbang3ijiNscE129POzipJJA6zniq2C/Z6sJCjMimjS8Lc/GAs8Q==}
 
   babel-plugin-styled-components@2.1.4:
     resolution: {integrity: sha512-Xgp9g+A/cG47sUyRwwYxGM4bR/jDRg5N6it/8+HxCnbT5XNKSKDT9xm4oag/osgqjC2It/vH0yXsomOG6k558g==}
@@ -5765,7 +5858,7 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios@1.13.3:
+  axios@1.13.5:
     dependencies:
       follow-redirects: 1.15.11
       form-data: 4.0.5

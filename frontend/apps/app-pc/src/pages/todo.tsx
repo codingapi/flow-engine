@@ -1,14 +1,10 @@
 import React from "react";
 import {done, list, notify, todo} from "@/api/record.ts";
-import {
-    type ActionType,
-    ApprovalPanelDrawer,
-    Table,
-    type TableProps,
-    WorkflowSelectModal
-} from "@flow-engine/flow-design";
+import {WorkflowSelectModal} from "@flow-engine/flow-design";
+import {type ActionType, Table, type TableProps} from "@flow-engine/flow-pc-ui";
 import {Button, Space, Tabs, type TabsProps} from "antd";
 import dayjs from "dayjs";
+import {ApprovalPanelDrawer} from "@flow-engine/flow-pc-approval";
 
 const TodoPage: React.FC = () => {
 

@@ -1,6 +1,7 @@
 {
   "name": "@flow-engine/flow-types",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
   "exports": {
     ".": {
@@ -15,6 +16,10 @@
   "scripts": {
     "build": "rslib build",
     "dev": "rslib build --watch"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
   },
   "dependencies": {
     "@flow-engine/flow-core": "workspace:*"

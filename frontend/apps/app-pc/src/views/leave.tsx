@@ -1,5 +1,5 @@
 import React from "react";
-import {type ViewComponentProps} from "@flow-engine/flow-design";
+import {type ViewComponentProps} from "@flow-engine/flow-types";
 import {Form, Input} from "antd";
 import {ObjectUtils} from "@flow-engine/flow-core";
 

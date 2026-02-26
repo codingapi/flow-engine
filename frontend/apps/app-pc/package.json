@@ -12,6 +12,8 @@
     "@flow-engine/flow-core": "workspace:*",
     "@flow-engine/flow-design": "workspace:*",
     "@flow-engine/flow-types": "workspace:*",
+    "@flow-engine/flow-pc-ui": "workspace:*",
+    "@flow-engine/flow-pc-approval":"workspace:*",
     "antd": "^6.2.1",
     "dayjs": "^1.11.19",
     "react": "^18.3.1",
