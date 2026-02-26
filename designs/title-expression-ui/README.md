@@ -1,5 +1,8 @@
 # 标题表达式交互式UI设计
 
+> **Status**: ✅ Implemented (2025-02-26)
+> **Plan**: `docs/plans/2025-02-26-title-expression-ui.md`
+
 ## 1. 需求概述
 
 将节点标题表达式的配置从"直接编写Groovy脚本"改为"交互式可视化配置"，同时保留高级用户直接编写脚本的能力。

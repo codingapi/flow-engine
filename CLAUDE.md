@@ -144,7 +144,12 @@ The workflow engine is organized into 8 layers:
 
 8. **Script Layer** (`com.codingapi.flow.script.runtime`)
    - `ScriptRuntimeContext` - Groovy script execution with thread-safe design and auto-cleanup
-   - `TitleGroovyRequest` - Context object for title expression scripts, providing access to operator info, workflow info, form data, and work code
+   - `TitleGroovyRequest` - Context object for title expression scripts, providing access to:
+     - Operator information: `operatorName`, `operatorId`, `isFlowManager`
+     - Workflow information: `workflowTitle`, `workflowCode`, `nodeName`, `nodeType`
+     - Creator information: `creatorName`
+     - Form data: `formData` map with `getFormData(key)` method
+     - Work code: `workCode`
    - Script types: OperatorMatchScript, OperatorLoadScript, NodeTitleScript, ConditionScript, RouterNodeScript, SubProcessScript, TriggerScript, ErrorTriggerScript, RejectActionScript, CustomScript
 
 ### Supporting Architectures
