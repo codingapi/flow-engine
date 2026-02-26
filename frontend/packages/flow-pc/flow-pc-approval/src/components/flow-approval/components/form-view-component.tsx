@@ -10,6 +10,9 @@ interface FormViewComponentProps{
 export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
     const {state, context} = useApprovalContext();
     const ViewComponent = ViewBindPlugin.getInstance().get(state.flow?.view || 'default');
+
+    const formMeta = state.flow?.form;
+
     // 是否可合并审批
     const mergeable = state.flow?.mergeable || false;
     const todos = state.flow?.todos || [];
@@ -41,7 +44,7 @@ export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
         });
     }, []);
 
-    if (ViewComponent) {
+    if (ViewComponent && formMeta) {
         if (mergeable) {
             return (
                 <div>
@@ -54,6 +57,7 @@ export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
                 {viewForms.map((item, index) => (
                     <ViewComponent
                         key={index}
+                        meta={formMeta}
                         form={item.instance as any}
                         onValuesChange={props.onValuesChange}
                     />

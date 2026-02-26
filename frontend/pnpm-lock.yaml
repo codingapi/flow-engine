@@ -79,13 +79,16 @@ importers:
         version: link:../../packages/flow-core
       '@flow-engine/flow-pc-approval':
         specifier: workspace:*
-        version: link:../../packages/flow-pcs/flow-pc-approval
+        version: link:../../packages/flow-pc/flow-pc-approval
       '@flow-engine/flow-pc-design':
         specifier: workspace:*
-        version: link:../../packages/flow-pcs/flow-pc-design
+        version: link:../../packages/flow-pc/flow-pc-design
+      '@flow-engine/flow-pc-form':
+        specifier: workspace:*
+        version: link:../../packages/flow-pc/flow-pc-form
       '@flow-engine/flow-pc-ui':
         specifier: workspace:*
-        version: link:../../packages/flow-pcs/flow-pc-ui
+        version: link:../../packages/flow-pc/flow-pc-ui
       '@flow-engine/flow-types':
         specifier: workspace:*
         version: link:../../packages/flow-types
@@ -120,7 +123,7 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
 
-  packages/flow-pcs/flow-pc-approval:
+  packages/flow-pc/flow-pc-approval:
     dependencies:
       '@ant-design/icons':
         specifier: ~6.1.0
@@ -153,7 +156,7 @@ importers:
         specifier: ^9.2.0
         version: 9.2.0(@types/react@18.3.27)(react@18.3.1)(redux@5.0.1)
 
-  packages/flow-pcs/flow-pc-design:
+  packages/flow-pc/flow-pc-design:
     dependencies:
       '@ant-design/icons':
         specifier: ~6.1.0
@@ -223,7 +226,7 @@ importers:
         specifier: ^5.1.36
         version: 5.1.36
 
-  packages/flow-pcs/flow-pc-form:
+  packages/flow-pc/flow-pc-form:
     dependencies:
       '@ant-design/icons':
         specifier: ~6.1.0
@@ -244,14 +247,11 @@ importers:
         specifier: '>=18'
         version: 18.3.1(react@18.3.1)
 
-  packages/flow-pcs/flow-pc-ui:
+  packages/flow-pc/flow-pc-ui:
     dependencies:
       '@ant-design/icons':
         specifier: ~6.1.0
         version: 6.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@flow-engine/flow-core':
-        specifier: workspace:*
-        version: link:../../flow-core
       antd:
         specifier: ^6.2.1
         version: 6.2.1(date-fns@2.30.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

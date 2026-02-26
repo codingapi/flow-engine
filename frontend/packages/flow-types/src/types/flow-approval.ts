@@ -6,7 +6,7 @@ export interface FlowFormFieldMeta {
     name:string;
     code:string;
     type:string;
-    require:boolean;
+    required:boolean;
     defaultValue:string;
 }
 

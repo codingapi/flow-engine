@@ -1,7 +1,8 @@
 import React from "react";
 import {type ViewComponentProps} from "@flow-engine/flow-types";
-import {Form, Input} from "antd";
+import {Form} from "antd";
 import {ObjectUtils} from "@flow-engine/flow-core";
+import {FormItemFactory} from "@/components/factory/form-item-factory";
 
 export const FlowFormView: React.FC<ViewComponentProps> = (props) => {
 
@@ -9,32 +10,34 @@ export const FlowFormView: React.FC<ViewComponentProps> = (props) => {
 
     const form = props.form;
 
+    const meta = props.meta;
+
+    const fields = meta.fields || [];
+
     return (
         <Form
             form={form as any}
             layout={"vertical"}
-            onBlur={()=>{
+            onBlur={() => {
                 const latestValues = form.getFieldsValue();
-                if(ObjectUtils.isEqual(values,latestValues)){
+                if (ObjectUtils.isEqual(values, latestValues)) {
                     return;
                 }
                 setValues(latestValues);
                 props.onValuesChange?.(latestValues);
             }}
         >
-            <Form.Item
-                name={"days"}
-                label={"请假天数"}
-            >
-                <Input/>
-            </Form.Item>
-
-            <Form.Item
-                name={"desc"}
-                label={"请假理由"}
-            >
-                <Input/>
-            </Form.Item>
+            {fields.map((field, i) => {
+                const FormItem = FormItemFactory.getInstance().createFrom(field.type);
+                if (FormItem) {
+                    return (
+                        <FormItem
+                            key={field.id}
+                            {...field}
+                        />
+                    );
+                }
+            })}
         </Form>
     )
 };
