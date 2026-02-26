@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { Form, Button, Space } from 'antd';
+import React, { useState, useMemo, useRef } from 'react';
+import { Button, Space } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import { Field, FieldRenderProps } from '@flowgram.ai/fixed-layout-editor';
 import { GroovyVariableService } from '@/services/groovy-variable-service';
@@ -10,9 +10,11 @@ import { TitleConfigModal } from './TitleConfigModal';
  * 节点标题策略配置
  */
 export const NodeTitleStrategy: React.FC = () => {
-  const [form] = Form.useForm();
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [currentScript, setCurrentScript] = useState('');
+  const [displayScript, setDisplayScript] = useState('');
+  // 使用 ref 保存 onChange 回调，以便在弹框确认后更新编辑器状态
+  const onChangeRef = useRef<((value: string) => void) | null>(null);
 
   // 获取表单字段（从context获取）
   const formFields = useMemo(() => {
@@ -45,23 +47,36 @@ export const NodeTitleStrategy: React.FC = () => {
   };
 
   const handleOpenConfig = () => {
-    const script = form.getFieldValue(['NodeTitleStrategy', 'script']) || '';
-    setCurrentScript(script);
+    // 使用当前显示的脚本值
+    setCurrentScript(displayScript);
     setShowConfigModal(true);
   };
 
   const handleConfirm = (script: string) => {
-    form.setFieldValue(['NodeTitleStrategy', 'script'], script);
+    // 更新显示的脚本值
+    setDisplayScript(script);
+    // 关键修复：调用 onChange 回调更新编辑器状态
+    if (onChangeRef.current) {
+      onChangeRef.current(script);
+    }
     setShowConfigModal(false);
   };
 
   return (
     <>
-      <Form form={form} style={{ width: '100%' }} layout="vertical">
-        <Form.Item label="节点标题" name="NodeTitleStrategy.script" initialValue="def run(request){return '你有一条待办'}">
-          <Field
-            name="NodeTitleStrategy.script"
-            render={({ field: { value } }: FieldRenderProps<any>) => (
+      <div style={{ width: '100%' }}>
+        <Field
+          name="NodeTitleStrategy.script"
+          render={({ field: { value, onChange } }: FieldRenderProps<any>) => {
+            // 保存 onChange 回调到 ref
+            onChangeRef.current = onChange;
+
+            // 更新显示的脚本值（当编辑器状态改变时）
+            if (value !== displayScript) {
+              setDisplayScript(value || '');
+            }
+
+            return (
               <Space.Compact style={{ width: '100%' }}>
                 <div
                   style={{
@@ -86,10 +101,10 @@ export const NodeTitleStrategy: React.FC = () => {
                   编辑
                 </Button>
               </Space.Compact>
-            )}
-          />
-        </Form.Item>
-      </Form>
+            );
+          }}
+        />
+      </div>
 
       {showConfigModal && (
         <TitleConfigModal
