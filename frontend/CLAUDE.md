@@ -27,13 +27,18 @@ pnpm -F @flow-engine/flow-design add <package>
 pnpm run build
 
 # Build individual packages
-pnpm run build:flow-types      # Build types first (no dependencies)
-pnpm run build:flow-core       # Build core API library
-pnpm run build:flow-engine     # Build flow-design (depends on flow-types, flow-core)
-pnpm run build:app-pc          # Build PC application
+pnpm run build:flow-types         # Build types first (no dependencies)
+pnpm run build:flow-core          # Build core API library
+pnpm run build:flow-pc-design     # Build flow-pc-design
+pnpm run build:flow-pc-form       # Build flow-pc-form
+pnpm run build:flow-pc-ui         # Build flow-pc-ui
+pnpm run build:flow-pc-approval   # Build flow-pc-approval
+pnpm run build:flow-pc            # Build all flow-pc packages
+pnpm run build:app-pc             # Build PC application
 
 # Watch mode for development
-pnpm run watch:flow-design     # Rebuild flow-design on changes
+pnpm run watch:flow-pc-design     # Rebuild flow-pc-design on changes
+pnpm run watch:flow-pc-form       # Rebuild flow-pc-form on changes
 ```
 
 ### Development
@@ -64,7 +69,11 @@ frontend/
 ├── packages/               # Shared libraries
 │   ├── flow-types/         # TypeScript definitions (no dependencies)
 │   ├── flow-core/          # API client + service interfaces
-│   └── flow-design/        # Workflow designer component library
+│   └── flow-pc/            # PC component libraries
+│       ├── flow-pc-design/      # Workflow designer component library
+│       ├── flow-pc-form/        # Form components
+│       ├── flow-pc-ui/          # UI components
+│       └── flow-pc-approval/    # Approval components
 │
 └── pnpm-workspace.yaml     # Workspace configuration
 ```
@@ -76,15 +85,15 @@ flow-types (no dependencies)
     ↓
 flow-core (depends on: flow-types)
     ↓
-flow-design (depends on: flow-types, flow-core)
+flow-pc/* (depends on: flow-types, flow-core)
     ↓                    ↓
 app-pc               app-mobile
 ```
 
 When making changes:
 1. **flow-types**: Rebuild everything that depends on it
-2. **flow-core**: Rebuild flow-design and apps
-3. **flow-design**: Rebuild apps
+2. **flow-core**: Rebuild flow-pc/* and apps
+3. **flow-pc/***: Rebuild apps
 
 ## Architecture
 
@@ -161,35 +170,47 @@ ApprovalLayout
 
 ## Key Components
 
-### flow-design Package
+### flow-pc/flow-pc-design Package
 
 **Directory Structure**:
 ```
-packages/flow-design/src/components/
-├── design-panel/         # Main design panel
-│   ├── layout/           # Layout components (Header, Body, Footer)
-│   ├── tabs/             # Tab content components
-│   ├── context/          # DesignPanelContext
-│   ├── hooks/            # use-design-context
-│   ├── store/            # Redux store and slices
-│   └── types.ts          # TypeScript interfaces
+packages/flow-pc/flow-pc-design/src/
+├── components/
+│   ├── design-panel/         # Main design panel
+│   │   ├── layout/           # Layout components (Header, Body, Footer)
+│   │   ├── tabs/             # Tab content components
+│   │   ├── context/          # DesignPanelContext
+│   │   ├── hooks/            # use-design-context
+│   │   ├── store/            # Redux store and slices
+│   │   └── types.ts          # TypeScript interfaces
+│   │
+│   ├── design-editor/        # @flowgram.ai editor wrapper
+│   │   └── index.tsx         # Editor initialization
+│   │
+│   ├── flow-approval/        # Approval workflow components
+│   │   ├── layout/           # ApprovalLayout (Header, Body)
+│   │   ├── components/       # FormViewComponent, FlowNodeHistory
+│   │   ├── context/          # ApprovalContext
+│   │   ├── hooks/            # use-approval-context
+│   │   └── typings/          # TypeScript interfaces
+│   │
+│   └── node-components/      # Node configuration components
+│       └── strategy/         # Node strategy components
+│           └── node-title.tsx # Node title configuration
 │
-├── design-editor/        # @flowgram.ai editor wrapper
-│   └── index.tsx         # Editor initialization
+├── services/
+│   └── groovy-variable-service.ts  # Variable mapping service
 │
-└── flow-approval/        # Approval workflow components
-    ├── layout/           # ApprovalLayout (Header, Body)
-    ├── components/       # FormViewComponent, FlowNodeHistory
-    ├── context/          # ApprovalContext
-    ├── hooks/            # use-approval-context
-    └── typings/          # TypeScript interfaces
+└── utils/
+    └── title-syntax-converter.ts   # Title expression syntax converter
 ```
 
 ### Type Definitions (flow-types)
 
-**Critical Types** in `packages/flow-types/src/pages/design-panel/types.ts`:
+**Critical Types** in `packages/flow-types/src/`:
 
 ```typescript
+// src/types/index.ts
 interface Workflow {
     id: string;
     title: string;
@@ -442,8 +463,8 @@ const client = axios.create({
 
 ### Adding New Node Types
 
-1. Update `NodeType` in `flow-types/src/pages/design-panel/types.ts`
-2. Create node configuration component in `flow-design/src/components/design-editor/`
+1. Update `NodeType` in `flow-types/src/types/`
+2. Create node configuration component in `flow-pc/flow-pc-design/src/components/design-editor/node-components/`
 3. Register in `@flowgram.ai` editor materials
 
 ### Adding New Layout Components
@@ -456,10 +477,29 @@ Follow Ant Design patterns:
 5. Use Typography for text styling
 6. Follow existing component patterns in flow-approval/layout/
 
+### Node Title Configuration
+
+The node title expression supports two modes:
+
+**Normal Mode**: Visual editor with variable picker
+- Use `${label}` format: `${当前操作人}的审批`
+- Insert variables via picker
+- Auto-converts to Groovy script
+
+**Advanced Mode**: Direct Groovy script editing
+- Write raw Groovy code
+- Must include `// @TITLE` comment
+- Cannot parse back to visual mode
+
+**Services**:
+- `GroovyVariableService` - Variable mappings management (`flow-pc/flow-pc-design/src/services/groovy-variable-service.ts`)
+- `TitleSyntaxConverter` - Syntax conversion utilities (`flow-pc/flow-pc-design/src/utils/title-syntax-converter.ts`)
+
 ## Documentation References
 
-- **flow-design/README.md** - Component library documentation
+- **packages/flow-pc/flow-pc-design/README.md** - Component library documentation
 - **apps/app-pc/AGENTS.md** - App development guidelines
+- **../designs/title-expression-ui/README.md** - Title expression UI design
 - **Ant Design**: https://ant.design/components/overview-cn/
 - **Rsbuild**: https://rsbuild.rs/llms.txt
 - **Rspack**: https://rspack.rs/llms.txt

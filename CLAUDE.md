@@ -2,6 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+# currentDate
+Today's date is 2025-02-26.
+
 ## Project Overview
 
 Flow Engine is an enterprise workflow engine built with Java 17 and Spring Boot 3.5.9, with a React/TypeScript frontend. It supports workflow design, form configuration, node management, and script execution (Groovy).
@@ -36,10 +39,19 @@ Flow Engine is an enterprise workflow engine built with Java 17 and Spring Boot 
 cd frontend
 pnpm install
 
-# Build the design library
-pnpm run build:flow-engine
+# Build all packages
+pnpm run build
 
-# Run PC app in dev mode
+# Build individual packages (order matters: types → core → design → apps)
+pnpm run build:flow-types      # Build types first (no dependencies)
+pnpm run build:flow-core       # Build core API library
+pnpm run build:flow-design     # Build flow-design component library
+pnpm run build:app-pc          # Build PC application
+
+# Watch mode for development
+pnpm run watch:flow-design     # Rebuild flow-design on changes
+
+# Run PC app in dev mode (proxies to localhost:8090)
 pnpm run dev:app-pc
 ```
 
@@ -132,6 +144,7 @@ The workflow engine is organized into 8 layers:
 
 8. **Script Layer** (`com.codingapi.flow.script.runtime`)
    - `ScriptRuntimeContext` - Groovy script execution with thread-safe design and auto-cleanup
+   - `TitleGroovyRequest` - Context object for title expression scripts, providing access to operator info, workflow info, form data, and work code
    - Script types: OperatorMatchScript, OperatorLoadScript, NodeTitleScript, ConditionScript, RouterNodeScript, SubProcessScript, TriggerScript, ErrorTriggerScript, RejectActionScript, CustomScript
 
 ### Supporting Architectures
@@ -278,6 +291,10 @@ All framework exceptions extend `FlowException` (RuntimeException). Exception co
 ## Documentation References
 
 - **Design.md** (root) - Comprehensive architecture documentation with class design, lifecycle diagrams, design patterns, and key implementation details
+- **PRD.md** (root) - Product requirements document
+- **designs/** (directory) - Design documents for specific features
+  - `title-expression-ui/README.md` - Title expression interactive UI design
 - **frontend/apps/app-pc/AGENTS.md** - Frontend app development guidelines
+- **frontend/CLAUDE.md** - Frontend-specific architecture and conventions
 - **Rsbuild**: https://rsbuild.rs/llms.txt
 - **Rspack**: https://rspack.rs/llms.txt
