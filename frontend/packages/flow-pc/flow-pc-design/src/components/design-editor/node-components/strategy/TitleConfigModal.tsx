@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Input, Alert, Button, Space, message } from 'antd';
 import { EditOutlined, CodeOutlined, RollbackOutlined } from '@ant-design/icons';
 import { GroovyVariableMapping } from '@flow-engine/flow-types';
@@ -33,16 +33,27 @@ export const TitleConfigModal: React.FC<TitleConfigModalProps> = ({
   const [content, setContent] = useState('');
   const [showVariablePicker, setShowVariablePicker] = useState(false);
 
+  // 标记用户是否手动修改了模式（防止 useEffect 覆盖用户操作）
+  const userModifiedModeRef = useRef(false);
+
   // 获取变量映射
   const mappings = GroovyVariableService.getAllMappings(formFields);
 
   useEffect(() => {
-    // 解析当前脚本模式
+    // 如果用户手动修改了模式，不再覆盖
+    if (userModifiedModeRef.current) {
+      return;
+    }
+
+    // 只在 script 改变时重新解析（初始化）
     const parsedMode = TitleSyntaxConverter.parseMode(script);
 
     if (parsedMode === 'normal') {
       // 尝试解析为标签表达式
       const labelExpr = TitleSyntaxConverter.toLabelExpression(script, mappings);
+      // 如果是默认 legacy 脚本，显示空内容（让用户重新输入）
+      // 如果能解析成标签表达式，显示解析结果
+      // 否则显示空内容
       setContent(labelExpr || '');
     } else {
       // 高级模式，直接使用原脚本
@@ -50,7 +61,7 @@ export const TitleConfigModal: React.FC<TitleConfigModalProps> = ({
     }
 
     setMode(parsedMode);
-  }, [script, mappings]);
+  }, [script]);
 
   // 插入变量
   const handleInsertVariable = (mapping: GroovyVariableMapping) => {
@@ -59,6 +70,7 @@ export const TitleConfigModal: React.FC<TitleConfigModalProps> = ({
 
   // 切换到高级模式
   const handleSwitchToAdvanced = () => {
+    userModifiedModeRef.current = true;
     if (mode === 'normal') {
       // 转换为Groovy脚本
       const groovyScript = TitleSyntaxConverter.toGroovySyntax(content, mappings);
@@ -69,6 +81,7 @@ export const TitleConfigModal: React.FC<TitleConfigModalProps> = ({
 
   // 重置为普通模式
   const handleResetToNormal = () => {
+    userModifiedModeRef.current = true;
     setContent('');
     setMode('normal');
   };

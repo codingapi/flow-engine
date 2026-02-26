@@ -157,6 +157,12 @@ export class TitleSyntaxConverter {
    * 解析脚本模式
    */
   static parseMode(script: string): 'normal' | 'advanced' {
+    // 特殊处理：检测是否为默认的 legacy 脚本
+    // 如果是默认脚本，视为 normal 模式（可以重新编辑）
+    if (this.isDefaultLegacyScript(script)) {
+      return 'normal';
+    }
+
     if (GroovyVariableService.isAdvancedMode(script)) {
       // 尝试解析为正常模式
       const mappings = GroovyVariableService.getPredefinedMappings();
@@ -165,6 +171,15 @@ export class TitleSyntaxConverter {
     }
     // 旧脚本或无注释脚本，视为高级模式
     return 'advanced';
+  }
+
+  /**
+   * 检查是否为默认的 legacy 脚本
+   */
+  private static isDefaultLegacyScript(script: string): boolean {
+    const trimmed = script.trim();
+    // 匹配默认脚本格式: def run(request){return '你有一条待办'}
+    return /^\s*def\s+run\s*\(\s*request\s*\)\s*\{\s*return\s+'[^']*'\s*\}\s*$/.test(trimmed);
   }
 
   /**
