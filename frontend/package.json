@@ -6,12 +6,17 @@
   "scripts": {
     "build:flow-core": "pnpm -F  @flow-engine/flow-core build",
     "build:flow-types": "pnpm -F  @flow-engine/flow-types build",
-    "build:flow-engine": "pnpm -F  @flow-engine/flow-design build",
-    "build": "pnpm run build:flow-core && pnpm run  build:flow-types && pnpm run build:flow-engine ",
+    "build:flow-pc-design": "pnpm -F  @flow-engine/flow-pc-design build",
+    "build:flow-pc-form": "pnpm -F  @flow-engine/flow-pc-form build",
+    "build:flow-pc-ui": "pnpm -F  @flow-engine/flow-pc-ui build",
+    "build:flow-pc-approval": "pnpm -F  @flow-engine/flow-pc-approval build",
+    "build:flow-pc": "pnpm -F  pnpm run build:flow-pc-ui && pnpm run build:flow-pc-form && pnpm run build:flow-pc-approval && pnpm run build:flow-pc-design",
+    "build": "pnpm run build:flow-core && pnpm run  build:flow-types && pnpm run build:flow-pc ",
     "build:app-pc": "pnpm -F  @flow-engine/app-pc build",
     "dev:app-pc": "pnpm -F  @flow-engine/app-pc dev",
     "dev:app-mobile": "pnpm -F  @flow-engine/app-mobile dev",
-    "watch:flow-design": "pnpm -F  @flow-engine/flow-design dev"
+    "watch:flow-pc-design": "pnpm -F  @flow-engine/flow-pc-design dev",
+    "watch:flow-pc-form": "pnpm -F  @flow-engine/flow-pc-form dev"
   },
   "keywords": [],
   "author": "",

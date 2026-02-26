@@ -1,5 +1,5 @@
 import React from "react";
-import {type ActionType, Table, type TableProps} from "@flow-engine/flow-design";
+import {type ActionType, Table, type TableProps} from "@flow-engine/flow-pc-ui";
 import {Button, Form, Input, message, Modal, Popconfirm, Space, Switch} from "antd";
 import {list, remove, save} from "@/api/user.ts";
 
