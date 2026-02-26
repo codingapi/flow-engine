@@ -1,5 +1,5 @@
 {
-  "name": "@flow-engine/flow-design",
+  "name": "@flow-engine/flow-pc-design",
   "version": "1.0.0",
   "type": "module",
   "exports": {
