@@ -93,6 +93,14 @@ export class GroovyVariableService {
     }));
   }
 
+  // tag 排序权重（数值越小越靠前）
+  private static readonly TAG_ORDER: Record<string, number> = {
+    '操作人相关': 1,
+    '流程相关': 2,
+    '流程编号': 3,
+    '表单字段': 4, // 表单字段放在最后
+  };
+
   /**
    * 获取所有变量映射（预定义 + 表单字段）
    */
@@ -103,9 +111,11 @@ export class GroovyVariableService {
       mappings.push(...this.getFormFieldMappings(formFields));
     }
 
-    // 按tag和order排序
+    // 按tag权重和order排序
     return mappings.sort((a, b) => {
-      if (a.tag !== b.tag) return a.tag.localeCompare(b.tag);
+      const tagOrderA = this.TAG_ORDER[a.tag] ?? 99;
+      const tagOrderB = this.TAG_ORDER[b.tag] ?? 99;
+      if (tagOrderA !== tagOrderB) return tagOrderA - tagOrderB;
       return a.order - b.order;
     });
   }
@@ -134,14 +144,14 @@ export class GroovyVariableService {
 
   /**
    * 检查是否为高级模式（无法解析回可视化）
-   * 通过检测完整的 def run(request){// @TITLE ...} 格式
+   * 通过检测完整的 def run(request){// @CUSTOM_SCRIPT ...} 格式
    */
   static isAdvancedMode(script: string): boolean {
-    // 检查是否包含 // @TITLE 注释
-    if (!script.includes('// @TITLE')) {
+    // 检查是否包含 // @CUSTOM_SCRIPT 注释
+    if (!script.includes('// @CUSTOM_SCRIPT')) {
       return false;
     }
     // 检查是否有完整的函数包装 def run(request){...}
-    return /def\s+run\s*\(\s*request\s*\)\s*\{[\s\S]*\/\/\s*@TITLE[\s\S]*\}/.test(script);
+    return /def\s+run\s*\(\s*request\s*\)\s*\{[\s\S]*\/\/\s*@CUSTOM_SCRIPT[\s\S]*\}/.test(script);
   }
 }

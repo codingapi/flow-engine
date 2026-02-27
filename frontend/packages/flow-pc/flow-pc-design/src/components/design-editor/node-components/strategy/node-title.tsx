@@ -2,6 +2,8 @@ import React, { useMemo, useRef, useState, useCallback } from 'react';
 import { Form, Button, Space } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import { Field, FieldRenderProps } from '@flowgram.ai/fixed-layout-editor';
+import { useDesignContext } from '@/components/design-panel/hooks/use-design-context';
+import { WorkflowFormManager } from '@/components/design-panel/manager/form';
 import { GroovyVariableService } from '@/services/groovy-variable-service';
 import { TitleSyntaxConverter } from '@/utils/title-syntax-converter';
 import { TitleConfigModal } from './TitleConfigModal';
@@ -15,11 +17,31 @@ export const NodeTitleStrategy: React.FC = () => {
   // 使用 ref 保存 onChange 回调
   const onChangeRef = useRef<((value: string) => void) | null>(null);
 
-  // 获取表单字段（从context获取）
+  // 从 design context 获取表单字段
+  const { state } = useDesignContext();
+
+  // 获取表单字段（从 workflow form 中提取）
   const formFields = useMemo(() => {
-    // TODO: 从 design context 获取当前流程的表单字段
-    return [];
-  }, []);
+    const fields: Array<{ name: string; code: string }> = [];
+    if (!state?.workflow?.form) {
+      return fields;
+    }
+    const formManager = new WorkflowFormManager(state.workflow.form);
+    // 获取主表单字段
+    const mainFields = formManager.getFormFields(state.workflow.form.code);
+    for (const field of mainFields) {
+      fields.push({ name: field.name, code: field.code });
+    }
+    // 获取子表单字段
+    const subForms = state.workflow.form.subForms || [];
+    for (const subForm of subForms) {
+      const subFields = formManager.getFormFields(subForm.code);
+      for (const field of subFields) {
+        fields.push({ name: `${subForm.name}.${field.name}`, code: field.code });
+      }
+    }
+    return fields;
+  }, [state?.workflow?.form]);
 
   // 获取变量映射
   const mappings = GroovyVariableService.getAllMappings(formFields);
@@ -32,16 +54,12 @@ export const NodeTitleStrategy: React.FC = () => {
 
     const mode = TitleSyntaxConverter.parseMode(script);
     if (mode === 'normal') {
+      // Normal 模式：尝试解析为标签表达式
       const labelExpr = TitleSyntaxConverter.toLabelExpression(script, mappings);
-      return labelExpr || script;
+      return labelExpr || '（未配置）';
     }
 
-    // 尝试解析高级脚本
-    const labelExpr = TitleSyntaxConverter.toLabelExpression(script, mappings);
-    if (labelExpr !== null) {
-      return labelExpr;
-    }
-
+    // Advanced 模式：显示"用户自定义配置"，不显示代码
     return '（自定义配置）';
   }, [mappings]);
 

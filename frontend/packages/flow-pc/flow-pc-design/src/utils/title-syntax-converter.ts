@@ -1,7 +1,7 @@
 import { GroovyVariableMapping } from '@flow-engine/flow-types';
 import { GroovyVariableService } from '@/services/groovy-variable-service';
 
-const TITLE_COMMENT = '// @TITLE';
+const TITLE_COMMENT = '// @CUSTOM_SCRIPT';
 
 /**
  * 标题表达式语法转换工具
@@ -137,10 +137,11 @@ export class TitleSyntaxConverter {
         placeholders++;
       }
 
-      // 处理字符串拼接：移除引号之间的 + 连接符
-      // 使用更精确的正则来处理 "text" + expr + "text" 格式
-      result = result.replace(/"([^"]*)"\s*\+\s*/g, '$1');  // "text" +  -> text
-      result = result.replace(/\s*\+\s*"([^"]*)"/g, '$1');  //  + "text" -> text
+      // 处理字符串拼接：移除 + 连接符
+      // 情况1：expr + "text" -> expr text（删除 " 前面的 + 和空格）
+      result = result.replace(/\s*\+\s*"/g, '"');
+      // 情况2："text" + expr -> text expr（删除 " 后面的 + 和空格）
+      result = result.replace(/"\s*\+\s*/g, '"');
 
       // 移除所有剩余的引号
       result = result.replace(/"/g, '');
@@ -149,6 +150,10 @@ export class TitleSyntaxConverter {
       placeholderMap.forEach((label, placeholder) => {
         result = result.replace(new RegExp(this.escapeRegex(placeholder), 'g'), `\${${label}}`);
       });
+
+      // 处理连续变量之间剩余的 + 号（如 ${变量1} + ${变量2} -> ${变量1}${变量2}）
+      // 先把 ${xxx} 替换为占位符，处理中间的 + 号，再还原
+      result = result.replace(/\$\{([^}]+)\}\s*\+\s*\$\{/g, '\$\{$1\}\$\{');
 
       return result;
     } catch (e) {

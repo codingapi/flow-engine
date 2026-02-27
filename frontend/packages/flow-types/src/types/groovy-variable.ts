@@ -23,7 +23,7 @@ export interface GroovyVariableMapping {
 export enum VariableTag {
   OPERATOR = '操作人相关',
   WORKFLOW = '流程相关',
-  FORM_FIELD = '表单字段（当前表单）',
+  FORM_FIELD = '表单字段',
   WORK_CODE = '流程编号',
 }
 
