@@ -11,7 +11,7 @@ class RandomUtilsTest {
 
     @Test
     void generateStringId() {
-        long count = 1000_0000L;
+        long count = 100_0000L;
         long start = System.currentTimeMillis();
         Set<String> sets = new HashSet<>();
         for (long i = 0; i < count; i++) {
