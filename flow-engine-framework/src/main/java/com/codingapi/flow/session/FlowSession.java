@@ -8,6 +8,7 @@ import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.script.request.TitleGroovyRequest;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Getter;
 import lombok.Setter;
@@ -234,5 +235,13 @@ public class FlowSession {
      */
     public FlowSession updateSession(IFlowOperator currentOperator) {
         return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
+    }
+
+    /**
+     * 创建标题请求对象
+     * 从当前session构建TitleGroovyRequest
+     */
+    public TitleGroovyRequest createTitleRequest() {
+        return new TitleGroovyRequest(this);
     }
 }
