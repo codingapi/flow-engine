@@ -1,11 +1,16 @@
 package com.codingapi.flow.integration;
 
+import com.codingapi.flow.form.FormData;
+import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FormMetaBuilder;
+import com.codingapi.flow.node.nodes.EndNode;
+import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.script.node.NodeTitleScript;
-import com.codingapi.flow.script.runtime.TitleGroovyRequest;
+import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.user.User;
+import com.codingapi.flow.workflow.Workflow;
+import com.codingapi.flow.workflow.WorkflowBuilder;
 import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,10 +26,10 @@ class NodeTitleIntegrationTest {
             "def run(request){return \"审批人：\" + request.getOperatorName()}"
         );
 
-        TitleGroovyRequest request = new TitleGroovyRequest();
-        request.setOperatorName("张三");
+        User user = new User(1, "张三");
+        FlowSession session = new FlowSession(user, null, null, null, null, null, null, 0, null);
 
-        String result = script.execute(request);
+        String result = script.execute(session);
         assertEquals("审批人：张三", result);
     }
 
@@ -34,12 +39,30 @@ class NodeTitleIntegrationTest {
             "def run(request){return \"请假\" + request.getFormData(\"days\") + \"天\"}"
         );
 
-        TitleGroovyRequest request = new TitleGroovyRequest();
-        Map<String, Object> formData = new HashMap<>();
-        formData.put("days", 5);
-        request.setFormData(formData);
+        User user = new User(1, "张三");
+        FormMeta form = FormMetaBuilder.builder()
+                .name("请假流程")
+                .code("leave")
+                .addField("请假天数", "days", "int")
+                .build();
 
-        String result = script.execute(request);
+        StartNode startNode = StartNode.builder().build();
+        EndNode endNode = EndNode.builder().build();
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("请假流程")
+                .code("leave")
+                .createdOperator(user)
+                .form(form)
+                .addNode(startNode)
+                .addNode(endNode)
+                .build();
+
+        FormData data = new FormData(form);
+        data.getDataBody().set("days", 5);
+
+        FlowSession session = new FlowSession(user, workflow, startNode, startNode.getActions().get(0), data, null, null, 0, null);
+
+        String result = script.execute(session);
         assertEquals("请假5天", result);
     }
 
@@ -49,13 +72,30 @@ class NodeTitleIntegrationTest {
             "def run(request){return \"你好，\" + request.getOperatorName() + \"，请假\" + request.getFormData(\"days\") + \"天\"}"
         );
 
-        TitleGroovyRequest request = new TitleGroovyRequest();
-        request.setOperatorName("李四");
-        Map<String, Object> formData = new HashMap<>();
-        formData.put("days", 3);
-        request.setFormData(formData);
+        User user = new User(1, "李四");
+        FormMeta form = FormMetaBuilder.builder()
+                .name("请假流程")
+                .code("leave")
+                .addField("请假天数", "days", "int")
+                .build();
 
-        String result = script.execute(request);
+        StartNode startNode = StartNode.builder().build();
+        EndNode endNode = EndNode.builder().build();
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("请假流程")
+                .code("leave")
+                .createdOperator(user)
+                .form(form)
+                .addNode(startNode)
+                .addNode(endNode)
+                .build();
+
+        FormData data = new FormData(form);
+        data.getDataBody().set("days", 3);
+
+        FlowSession session = new FlowSession(user, workflow, startNode, startNode.getActions().get(0), data, null, null, 0, null);
+
+        String result = script.execute(session);
         assertEquals("你好，李四，请假3天", result);
     }
 
@@ -65,9 +105,10 @@ class NodeTitleIntegrationTest {
             "def run(request){return \"你有一条待办\"}"
         );
 
-        TitleGroovyRequest request = new TitleGroovyRequest();
+        User user = new User(1, "张三");
+        FlowSession session = new FlowSession(user, null, null, null, null, null, null, 0, null);
 
-        String result = script.execute(request);
+        String result = script.execute(session);
         assertEquals("你有一条待办", result);
     }
 
@@ -77,11 +118,27 @@ class NodeTitleIntegrationTest {
             "def run(request){return request.getWorkflowTitle() + \" - \" + request.getOperatorName()}"
         );
 
-        TitleGroovyRequest request = new TitleGroovyRequest();
-        request.setWorkflowTitle("请假审批");
-        request.setOperatorName("王五");
+        User user = new User(1, "王五");
+        FormMeta form = FormMetaBuilder.builder()
+                .name("请假流程")
+                .code("leave")
+                .addField("请假人", "name", "string")
+                .build();
 
-        String result = script.execute(request);
+        StartNode startNode = StartNode.builder().build();
+        EndNode endNode = EndNode.builder().build();
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("请假审批")
+                .code("leave")
+                .createdOperator(user)
+                .form(form)
+                .addNode(startNode)
+                .addNode(endNode)
+                .build();
+
+        FlowSession session = new FlowSession(user, workflow, startNode, startNode.getActions().get(0), null, null, null, 0, null);
+
+        String result = script.execute(session);
         assertEquals("请假审批 - 王五", result);
     }
 }

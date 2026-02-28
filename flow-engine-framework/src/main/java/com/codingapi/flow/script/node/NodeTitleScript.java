@@ -1,7 +1,7 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
-import com.codingapi.flow.script.runtime.TitleGroovyRequest;
+import com.codingapi.flow.script.request.TitleGroovyRequest;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,16 +18,7 @@ public class NodeTitleScript {
     private final String script;
 
     public String execute(FlowSession session) {
-        TitleGroovyRequest request = session.createTitleRequest();
-        return execute(request);
-    }
-
-    /**
-     * 执行标题脚本（直接使用TitleGroovyRequest）
-     * @param request 标题请求对象
-     * @return 标题字符串
-     */
-    public String execute(TitleGroovyRequest request) {
+        TitleGroovyRequest request = new TitleGroovyRequest(session);
         return ScriptRuntimeContext.getInstance().run(script, String.class, request);
     }
 
