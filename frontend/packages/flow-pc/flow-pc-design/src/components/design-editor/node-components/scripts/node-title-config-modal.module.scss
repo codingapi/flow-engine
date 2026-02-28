@@ -1,0 +1,80 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.preview {
+  padding: 12px;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-radius: 4px;
+  min-height: 40px;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.hint {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 8px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.pickerContainer {
+  width: 400px;
+  max-height: 300px;
+  overflow: auto;
+}
+
+.pickerList {
+  max-height: 250px;
+  overflow: auto;
+}
+
+.pickerGroupTitle {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.45);
+  padding: 8px 0 4px;
+}
+
+.pickerItems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pickerItem {
+  padding: 4px 8px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pickerItemLabel {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.88);
+}
+
+.pickerItemValue {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.45);
+}

@@ -1,283 +1,198 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+本文件为 Claude Code (claude.ai/code) 在本项目中工作时提供指导。
 
-## Project Overview
+## 项目概述
 
-Flow Engine is an enterprise workflow engine built with Java 17 and Spring Boot 3.5.9, with a React/TypeScript frontend. It supports workflow design, form configuration, node management, and script execution (Groovy).
+Flow Engine 是一个企业级工作流引擎，基于 Java 17 和 Spring Boot 3.5.9 构建。提供可视化流程设计、动态表单配置、多节点类型流转以及脚本扩展功能。项目采用前后端分离架构，支持 PC 端和移动端客户端。
 
-## Common Commands
+## 常用命令
 
-### Backend (Maven)
+### 后端 (Java/Maven)
 
 ```bash
-# Build entire project
+# 构建整个项目
 ./mvnw clean install
 
-# Run all tests
+# 运行所有测试
 ./mvnw test
 
-# Run tests for specific module
+# 运行特定模块的测试
 ./mvnw test -pl flow-engine-framework
 
-# Run single test class
-./mvnw test -Dtest=RandomUtilsTest
+# 运行特定的测试类
+./mvnw test -Dtest=ScriptRuntimeContextTest
 
-# Run single test method
-./mvnw test -Dtest=RandomUtilsTest#generateCode
-
-# Skip tests during build
-./mvnw clean install -DskipTests
+# 运行示例应用
+cd flow-engine-example && mvn spring-boot:run
 ```
 
-### Frontend (pnpm)
+### 前端 (React/pnpm)
 
 ```bash
-cd frontend
-pnpm install
+# 安装依赖（使用 pnpm，而非 npm）
+cd frontend && pnpm install
 
-# Build the design library
-pnpm run build:flow-engine
+# 构建所有包
+pnpm run build
 
-# Run PC app in dev mode
-pnpm run dev:app-pc
+# 构建特定应用
+pnpm run build:app-pc
+
+# 构建特定包
+pnpm run build:flow-core   # 构建核心 API 库
+pnpm run build:flow-types # 构建类型定义库
+pnpm run build:flow-pc    # 构建 PC 端组件库
+
+# 开发模式
+pnpm run dev:app-pc    # PC 端应用
+pnpm run dev:app-mobile # 移动端应用
 ```
 
-## Architecture
+## 架构
 
-### Backend Modules
+### 后端分层架构（8 层架构）
 
-- **flow-engine-framework** - Core framework with workflow engine, node types, form system, script execution
-- **flow-engine-starter** - Spring Boot starter for web applications
-- **flow-engine-starter-infra** - Infrastructure persistence layer with JPA entities, convertors, and repository implementations
-  - `entity/` - JPA entities (WorkflowEntity, FlowRecordEntity, DelayTaskEntity, etc.)
-  - `convert/` - Entity-Domain convertors
-  - `jpa/` - Spring Data JPA repositories
-  - `repository/impl/` - Repository interface implementations
-- **flow-engine-example** - Example application
+1. **工作流层** - 流程定义
+2. **节点层** - 15 种节点类型（StartNode、EndNode、ApprovalNode、HandleNode、NotifyNode、RouterNode、SubProcessNode、DelayNode、TriggerNode、ConditionNode、ParallelNode、InclusiveNode 及其分支变体）
+3. **动作层** - 8 种动作类型（Pass、Reject、Save、AddAudit、Delegate、Return、Transfer、Custom）
+4. **记录层** - 流程实例记录
+5. **会话层** - 会话管理
+6. **管理器层** - 业务管理器（NodeStrategyManager、OperatorManager、ActionManager 等）
+7. **策略层** - 策略驱动的配置
+8. **脚本层** - Groovy 脚本运行时
 
-### Frontend Structure
+### 设计模式
 
-- **apps/app-pc** - PC client application
-- **apps/app-mobile** - Mobile client application (in development)
-- **packages/flow-design** - Flow designer component library using @flowgram.ai fixed-layout-editor
-- **packages/flow-core** - Core API library with HTTP client and service interfaces
-- **packages/flow-types** - TypeScript type definitions for the entire frontend
-  - `pages/design-panel/types.ts` - TypeScript interfaces for Workflow, FlowNode, FlowForm
-  - `FlowNode.blocks?: FlowNode[]` - Child nodes for hierarchical structure
-  - `FlowNode.strategies` - Node strategies configuration
-  - `FlowNode.actions` - Node actions configuration
+- **建造者模式** - WorkflowBuilder、NodeBuilder、FormMetaBuilder
+- **工厂模式** - FlowActionFactory
+- **策略模式** - NodeStrategy、WorkflowStrategy
+- **模板方法模式** - BaseAction、BaseNodeBuilder
+- **责任链模式** - 动作执行链
+- **组合模式** - 带 blocks 的节点层级结构
 
-Note: `app-mobile` is currently in development. `flow-pc` and `flow-mobile` packages are planned but not yet implemented.
+### 模块结构
 
-### Data Structure: Blocks vs Edges
+#### 后端模块
 
-**Critical**: This project uses a hierarchical node structure via `blocks`, NOT edge-based connections.
+| 模块 | 描述 |
+|--------|-------------|
+| `flow-engine-framework` | 核心工作流引擎框架 |
+| `flow-engine-starter` | Spring Boot 启动器 |
+| `flow-engine-starter-api` | API 层 |
+| `flow-engine-starter-infra` | 基础设施层 |
+| `flow-engine-starter-query` | 查询层 |
+| `flow-engine-example` | 示例应用 |
 
-**Backend (Java)**:
-- `IFlowNode.blocks()` returns `List<IFlowNode>` - child nodes
-- Block nodes: `ConditionNode`, `ParallelNode`, `InclusiveNode` contain branch nodes
-- Branch nodes: `ConditionBranchNode`, `ParallelBranchNode`, `InclusiveBranchNode` are children
-- `FlowNodeEdgeManager` traverses blocks recursively to find next nodes
+#### 前端模块
 
-**Frontend (TypeScript)**:
-- `FlowNode.blocks?: FlowNode[]` - optional child nodes array
-- Legacy `FlowEdge` interface exists but is deprecated
-- @flowgram.ai fixed-layout-editor handles the visual representation
+| 模块 | 描述 | 依赖 |
+|--------|-------------|------|
+| `flow-core` | 核心框架库（HTTP、Hooks、Presenter 等），不包含 UI 组件 | 无 |
+| `flow-types` | TypeScript 类型定义（流程实例、表单、审批等业务类型） | flow-core |
+| `flow-pc-ui` | PC 端基础 UI 组件库（按钮、输入框等原子组件） | 无 |
+| `flow-pc-form` | PC 端表单相关组件（表单设计器、表单渲染等） | flow-core, flow-types |
+| `flow-pc-design` | PC 端流程设计器组件（节点配置、属性面板等） | flow-core, flow-types, flow-pc-ui |
+| `flow-pc-approval` | PC 端审批页面（待办/已办/审批处理等） | flow-pc-design, flow-pc-ui |
 
-### Core Layered Architecture
+**前端模块依赖关系**：
 
-The workflow engine is organized into 8 layers:
+```
+flow-core (无UI)
+    ↑
+flow-types (类型定义)
+    ↑       ↑
+    │       └── flow-pc-form
+    │               ↑
+    └───────→ flow-pc-design ──→ flow-pc-approval
+                    ↑
+            flow-pc-ui (基础UI)
+```
 
-1. **Workflow Layer** (`com.codingapi.flow.workflow`)
-   - `Workflow` - Top-level container with nodes, form definition
-   - `WorkflowBuilder` - Builder pattern for workflow construction
+**模块划分原则**：
 
-2. **Node Layer** (`com.codingapi.flow.node`)
-   - `IFlowNode` - Interface defining node lifecycle methods, includes `blocks()` method for child nodes
-   - `BaseFlowNode` - Abstract base for all nodes, manages actions, strategies, and blocks
-   - `BaseAuditNode` - Abstract base for audit nodes (ApprovalNode, HandleNode)
-   - 15 node types: StartNode, EndNode, ApprovalNode, HandleNode, NotifyNode, ConditionBranchNode, ParallelBranchNode, RouterNode, InclusiveBranchNode, SubProcessNode, DelayNode, TriggerNode, ConditionNode, ParallelNode, InclusiveNode
-   - **Block nodes** (containers with child blocks): ConditionNode, ParallelNode, InclusiveNode
-   - **Branch nodes** (child nodes in blocks): ConditionBranchNode, ParallelBranchNode, InclusiveBranchNode
+- **flow-core**：全局框架依赖，只包含与 UI 无关的基础能力（HTTP、状态管理、工具函数等）
+- **flow-types**：全局类型定义，包含流程审批相关的业务类型（手机端和 PC 端共用）
+- **flow-pc-ui**：PC 端基础 UI 组件库，提供原子化组件
+- **flow-pc-form**：表单相关功能，依赖 flow-core + flow-types
+- **flow-pc-design**：流程设计器功能，包含节点配置、属性面板、脚本配置等（本次优化的主要模块）
+- **flow-pc-approval**：审批页面功能，依赖 flow-pc-design
 
-3. **Action Layer** (`com.codingapi.flow.action`, `com.codingapi.flow.action.actions`)
-   - `IFlowAction` - Interface for node actions with `copy()` method
-   - `BaseAction` - Abstract base with `triggerNode()` for recursive traversal
-   - 8 action types (enum): PassAction, RejectAction, SaveAction, ReturnAction, TransferAction, AddAuditAction, DelegateAction, CustomAction
+### 技术栈
 
-4. **Record Layer** (`com.codingapi.flow.record`)
-   - `FlowRecord` - Execution record with states (TODO/DONE, RUNNING/FINISH/ERROR/DELETE)
-   - `FlowTodoRecord` - Todo record for pending tasks
-   - `FlowTodoMerge` - Todo merge record for aggregation
-   - Tracks processId, nodeId, currentOperatorId, formData, parallel branch info
+- **后端**：Java 17、Spring Boot 3.5.9、Groovy
+- **前端**：React 18、TypeScript、pnpm、Rsbuild、Rslib、Antd
 
-5. **Session Layer** (`com.codingapi.flow.session`)
-   - `FlowSession` - Execution context (currentOperator, workflow, currentNode, currentAction, currentRecord, formData, advice)
-   - `FlowAdvice` - Approval parameters (advice, signKey, backNode, transferOperators)
+## 关键包
 
-6. **Manager Layer** (`com.codingapi.flow.manager`)
-   - `ActionManager` - Manages node actions, provides `getAction(Class)`, `verifySession()`
-   - `OperatorManager` - Manages node operators
-   - `NodeStrategyManager` - Manages node strategies, provides `loadOperators()`, `generateTitle()`, `verifySession()`, `getTimeoutTime()`, `isDone()`
-   - `WorkflowStrategyManager` - Manages workflow strategies
-   - `FlowNodeManager` - Node management functionality
-   - `FlowNodeState` - Classifies nodes as block nodes or branch nodes for traversal
-   - `FlowNodeEdgeManager` - Traverses hierarchical node structure via blocks to find next nodes
+- `com.codingapi.flow.node` - 节点实现（15 种类型）
+- `com.codingapi.flow.action` - 动作实现（8 种类型）
+- `com.codingapi.flow.strategy` - 策略接口和实现
+- `com.codingapi.flow.repository` - 数据访问层
+- `com.codingapi.flow.service` - 业务服务层
+- `com.codingapi.flow.script` - Groovy 脚本运行时
 
-7. **Strategy Layer** (`com.codingapi.flow.strategy`)
-   - `INodeStrategy` - Interface with `copy()`, `getId()`, `strategyType()`
-   - **Node strategies** (16 types): MultiOperatorAuditStrategy, TimeoutStrategy, SameOperatorAuditStrategy, RecordMergeStrategy, ResubmitStrategy, AdviceStrategy, OperatorLoadStrategy, ErrorTriggerStrategy, NodeTitleStrategy, FormFieldPermissionStrategy, DelayStrategy, TriggerStrategy, RouterStrategy, SubProcessStrategy, RevokeStrategy
-   - **Workflow strategies** (2 types): InterfereStrategy, UrgeStrategy
+## 开发规范
 
-8. **Script Layer** (`com.codingapi.flow.script.runtime`)
-   - `ScriptRuntimeContext` - Groovy script execution with thread-safe design and auto-cleanup
-   - Script types: OperatorMatchScript, OperatorLoadScript, NodeTitleScript, ConditionScript, RouterNodeScript, SubProcessScript, TriggerScript, ErrorTriggerScript, RejectActionScript, CustomScript
+- **与用户沟通及编写文档时，所有内容必须使用中文表述**
+- **在每次修改代码以后，要执行本地化的编译验证确保代码没有错误**
+- 前端包管理使用 pnpm（根据用户配置）
+- 前端文件命名规范：使用小写字母 + 下划线组合（如 `script_editor.tsx`、`variable_picker.tsx`）
+- **前端导入规范**：引入当前文件夹下的内容使用 `./` 相对路径，引入其他模块的代码使用 `@/` 路径别名
+- **前端样式规范**：组件样式使用 `.module.scss` 模块化方式引入，禁止在 TSX 文件中使用内联 `style` 对象定义样式
+- 设计涉及流程或 UML 图形的解决方案时，使用 Mermaid Markdown 语法
+- 在编写计划的时候要遵循 TDD 的开发规范，务必要在方案中进行对实现代码逻辑的单元测试设计。
+- 在设计计划方案或执行方案过程中，对于代码的设计规划与调整修改要遵循本项目的代码风格和架构设计规则
+- 设计的计划要保存到本地的 `docs/` 目录下，每一个计划以时间+标题的方式命名创建文件夹，例如 `2026-02-26-xxxx`，文件夹下内容分为 `plan.md` 以及其他设计文件（如设计文件 xxx.pen 或其他设计内容信息）
 
-### Supporting Architectures
+```typescript
+// ✅ 正确：使用 @/ 路径别名引入其他模块的代码
+import { GroovySyntaxConverter } from '@/components/design-editor/script/service/groovy-syntax-converter';
+import { ScriptType } from '@/components/design-editor/typings/groovy-script';
 
-- **Common Interfaces** (`com.codingapi.flow.common`)
-   - `ICopyAbility` - Interface for copy capability (used by strategies and actions)
-   - `IMapConvertor` - Interface for Map conversion (used by strategies and actions)
-- **Repository Pattern** (`com.codingapi.flow.repository`) - Abstraction for data persistence, isolates framework from implementation. Includes: WorkflowRepository, FlowRecordRepository, WorkflowBackupRepository, ParallelBranchRepository, DelayTaskRepository, UrgeIntervalRepository, FlowTodoRecordRepository, FlowTodoMergeRepository. Implementations are in `flow-engine-starter-infra` under `com.codingapi.flow.infra.repository.impl`. Access via `RepositoryHolderContext` singleton. Pattern: Interface in framework, implementation in infra using JPA entities and convertors.
-- **Gateway Pattern** (`com.codingapi.flow.gateway`) - Anti-corruption layer for external system integration (operators, users). Access via `GatewayContext` singleton.
-- **Domain Objects** (`com.codingapi.flow.domain`) - DelayTask, DelayTaskManager, UrgeInterval
-- **Event System** (`com.codingapi.flow.event`) - 5 event types: FlowRecordStartEvent, FlowRecordTodoEvent, FlowRecordDoneEvent, FlowRecordFinishEvent, FlowRecordUrgeEvent
-- **Backup System** (`com.codingapi.flow.backup`) - WorkflowBackup for workflow versioning
+// ✅ 正确：引入当前文件夹下的内容使用相对路径
+import { LocalHelper } from './local-helper';
+import { AnotherUtil } from './utils/another-util';
 
-### Node Lifecycle (Critical for Understanding Flow)
+// ❌ 错误：避免跨目录使用相对路径
+import { GroovySyntaxConverter } from '../../../src/components/...';
+```
 
-When a node is executed, methods are called in this order:
-1. `verifySession(session)` - Delegates to ActionManager and StrategyManager
-2. `continueTrigger(session)` - Returns true to continue, false to generate records
-3. `generateCurrentRecords(session)` - Generate FlowRecords (uses StrategyManager.loadOperators() for audit nodes)
-4. `fillNewRecord(session, record)` - Fill record data (uses StrategyManager for audit nodes)
-5. `isDone(session)` - Check if complete (uses StrategyManager for multi-person approval)
+### 面向对象开发规范
 
-### Flow Execution Lifecycle
+TypeScript 代码根据类型和复杂度选择合适的开发风格：
 
-**FlowCreateService** (starting a workflow):
-1. Validate request → Get workflow → Verify workflow → Create backup → Validate creator → Build form data → Create start session → Verify session → Generate records → Save records → Push events
+- **Hooks**：使用函数式方式定义，遵循 React Hooks 规范
+- **业务处理类**（Service、Context、Converter、Utils 等）：根据复杂度选择，复杂逻辑使用 class 便于扩展和维护，简单功能可用函数式
+- **工具函数**：根据场景选择，复杂逻辑使用 class，简单工具可用函数式
 
-**FlowActionService** (executing an action):
-1. Validate request → Validate operator → Get record → Validate state → Load workflow → Get current node → Get action → Build form data → Create session → Verify session → Execute action
+```typescript
+// ✅ 正确：Hooks 使用函数式定义
+export const useFlowDesigner = () => {
+  const [nodes, setNodes] = useState<Node[]>([]);
+  // ...
+  return { nodes, setNodes };
+};
 
-**FlowDetailService** (querying workflow details):
-1. Fetch workflow details by processId → Include workflow definition, current records, form data
+// ✅ 正确：复杂业务逻辑使用 class 便于扩展
+export class GroovySyntaxConverter {
+  private adapters: Map<ScriptType, ScriptAdapter> = new Map();
 
-**PassAction.run()** (typical action):
-1. Check if node done (StrategyManager) → Update current record → Generate subsequent records → Trigger next nodes → Save records → Push events
+  public registerAdapter(adapter: ScriptAdapter): void {
+    this.adapters.set(adapter.scriptType, adapter);
+  }
 
-### Parallel Branch Execution
+  public toScript(...): string { ... }
+}
 
-When encountering `ParallelBranchNode`:
-1. `filterBranches()` finds the convergence end node
-2. Record parallel info (parallelBranchNodeId, parallelBranchTotal, parallelId) in FlowRecord
-3. Execute all branches simultaneously
-4. At convergence, `isWaitParallelRecord()` checks if all branches arrived
-5. Once all arrive, clear parallel info and continue
+// ✅ 正确：简单的工具函数可用函数式
+export const formatDate = (date: Date): string => {
+  return date.toLocaleDateString();
+};
 
-### Delay and Trigger Nodes
+// ✅ 正确：简单的业务处理也可用函数式
+export const createDefaultMappings = (): GroovyVariableMapping[] => {
+  return [...];
+};
+```
 
-**DelayNode**: Uses `DelayStrategy` with time units (SECOND/MINUTE/HOUR/DAY). Creates `DelayTask` which is managed by `DelayTaskManager` using `java.util.Timer` for scheduled execution. On trigger, `FlowDelayTriggerService` resumes the flow.
-
-**TriggerNode**: Uses `TriggerStrategy` with `TriggerScript`. Executes trigger script via `ScriptRuntimeContext` when node is reached.
-
-### Workflow-Level Features
-
-**Urge (催办)**: `UrgeStrategy` with configurable interval (default 60 seconds). Uses `UrgeInterval` domain object to track timing. Triggers `FlowRecordUrgeEvent` when interval expires. Used for automatic reminders of pending tasks.
-
-**Interfere (干预)**: `InterfereStrategy` controls whether admin intervention is allowed in the workflow. Enable/disable at workflow level.
-
-**Revoke (撤回)**: `RevokeStrategy` at node level supports two types:
-- `REVOKE_NEXT`: Revoke subordinates, delete subsequent pending records, return to current node
-- `REVOKE_CURRENT`: Revoke to current node, restore current node to pending state
-
-Key difference from Return (退回): Return is executed by current approver to go back to previous completed nodes; Revoke is executed by approved personnel to revoke subordinates or restore current node.
-
-### Key Design Patterns
-
-- **Builder**: `WorkflowBuilder`, `BaseNodeBuilder` with singleton `builder()` method
-- **Factory**: `NodeFactory.getInstance()` (reflection + static `formMap()`), `NodeStrategyFactory`, `FlowActionFactory`
-- **Strategy**: `INodeStrategy` with `StrategyManager` - strategy-driven configuration
-- **Template Method**: `BaseFlowNode` (node lifecycle), `BaseAction` (action execution), `BaseStrategy` (strategy template)
-- **Singleton**: `NodeFactory`, `ScriptRuntimeContext`, `RepositoryHolderContext`, `GatewayContext` (static final instance)
-- **Chain of Responsibility**: `triggerNode()` recursive traversal, `StrategyManager` strategy iteration
-- **Composite**: Nodes contain multiple strategies and actions
-- **Copy Pattern**: `INodeStrategy.copy()`, `IFlowAction.copy()`, `BaseFlowNode.setActions()`, `BaseFlowNode.setStrategies()`
-
-### Strategy-Driven Node Configuration (Critical Architecture)
-
-All node configurations are implemented through strategies:
-- **Operator loading**: `OperatorLoadStrategy` with Groovy script
-- **Node title**: `NodeTitleStrategy` with Groovy script
-- **Timeout**: `TimeoutStrategy` with timeout value and type
-- **Permissions**: `FormFieldPermissionStrategy` with field permissions
-- **Error handling**: `ErrorTriggerStrategy` with Groovy script
-- **Multi-person approval**: `MultiOperatorAuditStrategy` with type (SEQUENCE/MERGE/ANY/RANDOM_ONE)
-
-`StrategyManager` provides unified access: `loadOperators()`, `generateTitle()`, `getTimeoutTime()`, `verifySession()`
-
-### Multi-Person Approval Modes
-
-`MultiOperatorAuditStrategy.Type` enum:
-- **SEQUENCE**: Sequential, hides subsequent records
-- **MERGE**: Concurrent, requires percentage completion
-- **ANY**: Any one person, completes on first approval
-- **RANDOM_ONE**: Randomly selects one person
-
-Implemented in `BaseAuditNode.isDone()`.
-
-### ScriptRuntimeContext Auto-Cleanup
-
-Thread-safe Groovy script execution with dual auto-cleanup:
-- **Threshold-based**: Triggers when `SCRIPT_LOCKS.size() > maxLockCacheSize` (default 1000)
-- **Scheduled**: Periodic cleanup every `CLEANUP_INTERVAL_SECONDS` (default 300s)
-- **Configuration**: JVM property `-Dflow.script.cleanup.interval`, or `setMaxLockCacheSize(int)`
-- **Lifecycle**: Auto-starts on singleton init, registers shutdown hook, supports runtime enable/disable
-
-Thread safety: Each execution creates independent GroovyClassLoader/GroovyShell. Fine-grained synchronization using script hashCode as lock key - same script serializes, different scripts run concurrently.
-
-### Framework Exception Hierarchy
-
-All framework exceptions extend `FlowException` (RuntimeException). Exception codes follow the format `category.subcategory.errorType`.
-
-**Exception types**:
-- `FlowValidationException` - Parameter validation (e.g., `validation.field.required`)
-- `FlowNotFoundException` - Resource not found (e.g., `notFound.workflow.definition`)
-- `FlowStateException` - Invalid state (e.g., `state.record.alreadyDone`)
-- `FlowPermissionException` - Permission issues (e.g., `permission.field.readOnly`)
-- `FlowConfigException` - Configuration errors (e.g., `config.node.strategies.required`)
-- `FlowExecutionException` - Execution errors (e.g., `execution.script.error`)
-
-**Critical exception rules**:
-- MUST use static factory methods: `FlowValidationException.required("fieldName")`
-- NEVER use `new FlowXXXException()` directly
-- NEVER use `ERROR_CODE_PREFIX` constants
-- All exception messages MUST be in English
-
-## Code Conventions
-
-- Base package: `com.codingapi.flow`
-- Interfaces prefixed with `I`: `IFlowNode`, `IFlowOperator`
-- Builders use singleton pattern with static `builder()` method
-- All comments and documentation in Chinese
-- Lombok annotations for boilerplate (`@Data`, `@Getter`, `@Setter`)
-- JUnit 5 with static assertions: `import static org.junit.jupiter.api.Assertions.*;`
-
-## Extension Points
-
-- **Custom Nodes**: Extend `BaseFlowNode` or `BaseAuditNode`, implement `IFlowNode`
-- **Custom Actions**: Extend `BaseAction`, implement `IFlowAction`
-- **Custom Strategies**: Extend `BaseStrategy`, implement `INodeStrategy` for node strategies or `IWorkflowStrategy` for workflow strategies
-- **Custom Scripts**: Use `ScriptRuntimeContext` for Groovy execution
-- **Event Listeners**: Listen to `FlowRecordStartEvent`, `FlowRecordTodoEvent`, `FlowRecordDoneEvent`, `FlowRecordFinishEvent`, `FlowRecordUrgeEvent`
-- **Repository Implementations**: Implement repository interfaces in infra layer for persistence
-- **Gateway Implementations**: Implement gateway interfaces for system integration
-
-## Documentation References
-
-- **Design.md** (root) - Comprehensive architecture documentation with class design, lifecycle diagrams, design patterns, and key implementation details
-- **frontend/apps/app-pc/AGENTS.md** - Frontend app development guidelines
-- **Rsbuild**: https://rsbuild.rs/llms.txt
-- **Rspack**: https://rspack.rs/llms.txt

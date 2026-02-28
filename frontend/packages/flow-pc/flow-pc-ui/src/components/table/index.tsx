@@ -1,11 +1,13 @@
 import React from "react";
-import { Table as AntdTable, TableProps as AntdTableProps,Flex,Space,Card } from "antd";
-import {type ActionType,type ParamRequest,type Result } from "@flow-engine/flow-core";
+import {Card, Flex, Space, Table as AntdTable, TableProps as AntdTableProps} from "antd";
+import {ActionType, ParamRequest, Result} from "@flow-engine/flow-core";
 
 export interface TableProps<RecordType> extends AntdTableProps<RecordType> {
     actionType?: React.Ref<ActionType>;
+
     request?(params: ParamRequest): Promise<Result<any>>;
-    toolBarRender?():React.ReactElement[]
+
+    toolBarRender?(): React.ReactElement[]
 }
 
 export function Table<RecordType extends object = any>(props: TableProps<RecordType>) {
@@ -56,38 +58,38 @@ export function Table<RecordType extends object = any>(props: TableProps<RecordT
         <div style={{
             width: '100%'
         }}>
-           <Card>
-               <Flex justify={"end"} style={{
-                   paddingLeft: 20,
-                   marginBottom:10
-               }}>
-                   <Space>
-                       {props.toolBarRender && props.toolBarRender()}
-                   </Space>
-               </Flex>
-               <AntdTable<RecordType>
-                   dataSource={dataSource}
-                   pagination={
-                       {
-                           pageSize: pageSize,
-                           current: current,
-                           total: total,
-                           showSizeChanger: true,
-                           showQuickJumper: true,
-                           defaultCurrent: defaultCurrent,
-                           defaultPageSize: defaultPageSize,
-                           onChange: (pageSize, current) => {
-                               requestData({
-                                   current,
-                                   pageSize
-                               });
-                           },
-                           ...props.pagination
-                       }
-                   }
-                   {...props}
-               />
-           </Card>
+            <Card>
+                <Flex justify={"end"} style={{
+                    paddingLeft: 20,
+                    marginBottom: 10
+                }}>
+                    <Space>
+                        {props.toolBarRender && props.toolBarRender()}
+                    </Space>
+                </Flex>
+                <AntdTable<RecordType>
+                    dataSource={dataSource}
+                    pagination={
+                        {
+                            pageSize: pageSize,
+                            current: current,
+                            total: total,
+                            showSizeChanger: true,
+                            showQuickJumper: true,
+                            defaultCurrent: defaultCurrent,
+                            defaultPageSize: defaultPageSize,
+                            onChange: (pageSize, current) => {
+                                requestData({
+                                    current,
+                                    pageSize
+                                });
+                            },
+                            ...props.pagination
+                        }
+                    }
+                    {...props}
+                />
+            </Card>
         </div>
     );
 }
