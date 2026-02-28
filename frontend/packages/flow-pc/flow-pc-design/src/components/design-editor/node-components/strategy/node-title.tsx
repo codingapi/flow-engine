@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { Form, Button, Space } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import { Field, FieldRenderProps } from '@flowgram.ai/fixed-layout-editor';
@@ -14,8 +14,7 @@ import { TitleConfigModal } from './TitleConfigModal';
 export const NodeTitleStrategy: React.FC = () => {
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [modalScript, setModalScript] = useState('');
-  // 使用 ref 保存 onChange 回调
-  const onChangeRef = useRef<((value: string) => void) | null>(null);
+  const [currentOnChange, setCurrentOnChange] = useState<((value: string) => void) | null>(null);
 
   // 从 design context 获取表单字段
   const { state } = useDesignContext();
@@ -63,18 +62,19 @@ export const NodeTitleStrategy: React.FC = () => {
     return '（自定义配置）';
   }, [mappings]);
 
-  const handleOpenConfig = (currentValue: string) => {
+  const handleOpenConfig = useCallback((currentValue: string, onChange: (value: string) => void) => {
+    setCurrentOnChange(() => onChange);
     setModalScript(currentValue || '');
     setShowConfigModal(true);
-  };
+  }, []);
 
   const handleConfirm = useCallback((script: string) => {
     // 调用 onChange 回调更新编辑器状态
-    if (onChangeRef.current) {
-      onChangeRef.current(script);
+    if (currentOnChange) {
+      currentOnChange(script);
     }
     setShowConfigModal(false);
-  }, []);
+  }, [currentOnChange]);
 
   return (
     <>
@@ -84,8 +84,6 @@ export const NodeTitleStrategy: React.FC = () => {
             name="NodeTitleStrategy.script"
             render={(props: FieldRenderProps<any>) => {
               const { value, onChange } = props.field;
-              // 保存 onChange 回调到 ref
-              onChangeRef.current = onChange;
 
               return (
                 <Space.Compact style={{ width: '100%' }}>
@@ -106,7 +104,7 @@ export const NodeTitleStrategy: React.FC = () => {
                   </div>
                   <Button
                     icon={<EditOutlined />}
-                    onClick={() => handleOpenConfig(value || '')}
+                    onClick={() => handleOpenConfig(value || '', onChange)}
                     style={{ borderRadius: '0 6px 6px 0' }}
                   >
                     编辑

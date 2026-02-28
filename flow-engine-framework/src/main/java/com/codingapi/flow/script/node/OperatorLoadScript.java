@@ -1,6 +1,7 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.script.request.OperatorLoadGroovyRequest;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,8 @@ public class OperatorLoadScript {
     private final String script;
 
     @SuppressWarnings("unchecked")
-    public List<IFlowOperator> execute(FlowSession request) {
+    public List<IFlowOperator> execute(FlowSession session) {
+        OperatorLoadGroovyRequest request = new OperatorLoadGroovyRequest(session);
         return ScriptRuntimeContext.getInstance().run(script, List.class, request);
     }
 

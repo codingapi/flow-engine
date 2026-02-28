@@ -8,7 +8,7 @@ import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.script.runtime.TitleGroovyRequest;
+import com.codingapi.flow.script.request.TitleGroovyRequest;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Getter;
 import lombok.Setter;
@@ -242,40 +242,6 @@ public class FlowSession {
      * 从当前session构建TitleGroovyRequest
      */
     public TitleGroovyRequest createTitleRequest() {
-        TitleGroovyRequest request = new TitleGroovyRequest();
-
-        // 操作人信息
-        if (currentOperator != null) {
-            request.setOperatorName(currentOperator.getName());
-            request.setOperatorId((int) currentOperator.getUserId());
-            request.setIsFlowManager(currentOperator.isFlowManager());
-        }
-
-        // 流程信息
-        if (workflow != null) {
-            request.setWorkflowTitle(workflow.getTitle());
-            request.setWorkflowCode(workflow.getCode());
-        }
-
-        // 节点信息
-        if (currentNode != null) {
-            request.setNodeName(currentNode.getName());
-            request.setNodeType(currentNode.getType());
-        }
-
-        // 创建人信息
-        if (workflow != null && workflow.getCreatedOperator() != null) {
-            request.setCreatorName(workflow.getCreatedOperator().getName());
-        }
-
-        // 表单数据
-        request.setFormData(formData != null ? formData.toMapData() : null);
-
-        // 流程编号（从record获取）
-        if (currentRecord != null) {
-            request.setWorkCode(currentRecord.getWorkCode());
-        }
-
-        return request;
+        return new TitleGroovyRequest(this);
     }
 }

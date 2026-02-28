@@ -5,7 +5,7 @@ import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
-import com.codingapi.flow.script.runtime.TitleGroovyRequest;
+import com.codingapi.flow.script.request.TitleGroovyRequest;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;

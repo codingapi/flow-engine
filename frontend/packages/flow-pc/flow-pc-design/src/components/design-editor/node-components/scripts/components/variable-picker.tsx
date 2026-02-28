@@ -2,8 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { Modal, Input, Empty } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { GroovyVariableMapping } from '@flow-engine/flow-types';
-import { GroovyVariableService } from '@/services/groovy-variable-service';
-import styles from './VariablePicker.module.less';
+import { groovyVariableService } from '@/components/design-editor/script/service/groovy-variable-service';
+import styles from './variable-picker.module.less';
 
 export interface VariablePickerProps {
   /** 变量映射列表 */
@@ -18,7 +18,7 @@ export interface VariablePickerProps {
 
 /**
  * 变量选择器组件
- * 用于在标题表达式中插入变量
+ * 用于在脚本表达式中插入变量
  */
 export const VariablePicker: React.FC<VariablePickerProps> = ({
   mappings,
@@ -43,7 +43,7 @@ export const VariablePicker: React.FC<VariablePickerProps> = ({
 
   // 按tag分组
   const groupedMappings = useMemo(() => {
-    return GroovyVariableService.groupByTag(filteredMappings);
+    return groovyVariableService.groupByTag(filteredMappings);
   }, [filteredMappings]);
 
   const handleVariableClick = (mapping: GroovyVariableMapping) => {
