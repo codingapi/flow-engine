@@ -137,31 +137,35 @@ flow-types (类型定义)
 - **与用户沟通及编写文档时，所有内容必须使用中文表述**
 - 前端包管理使用 pnpm（根据用户配置）
 - 前端文件命名规范：使用小写字母 + 下划线组合（如 `script_editor.tsx`、`variable_picker.tsx`）
-- **前端导入规范**：使用 `@/` 路径别名导入项目内部模块，避免使用相对路径导入
+- **前端导入规范**：引入当前文件夹下的内容使用 `./` 相对路径，引入其他模块的代码使用 `@/` 路径别名
 - 设计涉及流程或 UML 图形的解决方案时，使用 Mermaid Markdown 语法
 - 在编写计划的时候要遵循 TDD 的开发规范，务必要在方案中进行对实现代码逻辑的单元测试设计。
 - 在设计计划方案或执行方案过程中，对于代码的设计规划与调整修改要遵循本项目的代码风格和架构设计规则
 - 设计的计划要保存到本地的 `docs/` 目录下，每一个计划以时间+标题的方式命名创建文件夹，例如 `2026-02-26-xxxx`，文件夹下内容分为 `plan.md` 以及其他设计文件（如设计文件 xxx.pen 或其他设计内容信息）
 
 ```typescript
-// ✅ 正确：使用 @/ 路径别名
+// ✅ 正确：使用 @/ 路径别名引入其他模块的代码
 import { GroovySyntaxConverter } from '@/components/design-editor/script/service/groovy-syntax-converter';
 import { ScriptType } from '@/components/design-editor/typings/groovy-script';
 
-// ❌ 错误：避免使用相对路径
+// ✅ 正确：引入当前文件夹下的内容使用相对路径
+import { LocalHelper } from './local-helper';
+import { AnotherUtil } from './utils/another-util';
+
+// ❌ 错误：避免跨目录使用相对路径
 import { GroovySyntaxConverter } from '../../../src/components/...';
 ```
 
 ### 面向对象开发规范
 
-除前端 **.tsx 组件** 以外的所有代码（Java 后端、TypeScript 非组件文件）均采用面向对象方式开发：
+TypeScript 代码根据类型采用不同的开发风格：
 
-- **Service 层**：使用 class 定义，通过依赖注入或单例模式使用
-- **工具类**：使用 class 定义，提供实例方法或静态方法
-- **适配器/转换器**：使用 class 实现，支持扩展
+- **Service、Context、Convert、Utils 等业务处理类**：使用 class 面向对象方式定义，支持依赖注入和扩展
+- **Hooks**：使用函数式方式定义，遵循 React Hooks 规范
+- **工具函数**：根据场景选择，复杂逻辑使用 class，简单工具可用函数式
 
 ```typescript
-// ✅ 正确：使用 class 定义 Service
+// ✅ 正确：使用 class 定义业务处理类
 export class GroovySyntaxConverter {
   private adapters: Map<ScriptType, ScriptAdapter> = new Map();
 
@@ -172,8 +176,16 @@ export class GroovySyntaxConverter {
   public toScript(...): string { ... }
 }
 
-// ❌ 错误：避免直接使用函数导出
-export function toScript(...): string { ... }
-export const toScript = (...): string => { ... };
+// ✅ 正确：Hooks 使用函数式定义
+export const useFlowDesigner = () => {
+  const [nodes, setNodes] = useState<Node[]>([]);
+  // ...
+  return { nodes, setNodes };
+};
+
+// ✅ 正确：简单的工具函数可用函数式
+export const formatDate = (date: Date): string => {
+  return date.toLocaleDateString();
+};
 ```
 
