@@ -1,30 +1,30 @@
-# Title Expression UI Implementation Plan
+# 标题表达式 UI 实现计划
 
-> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+> **给 Claude 的提示：** 必须使用 superpowers:executing-plans 技能来逐任务实现此计划。
 
-**Goal:** Build an interactive UI for node title expression configuration, replacing direct Groovy script editing with a user-friendly visual interface.
+**目标：** 为节点标题表达式配置构建交互式 UI，用用户友好的可视化界面替代直接的 Groovy 脚本编辑。
 
-**Architecture:**
-- Frontend maintains variable mappings (predefined + dynamic form fields)
-- Backend provides `TitleGroovyRequest` for script execution
-- Syntax conversion between display format (`${label}`) and Groovy code
-- Two modes: Normal (visual) and Advanced (raw Groovy)
+**架构：**
+- 前端维护变量映射（预定义 + 动态表单字段）
+- 后端提供 `TitleGroovyRequest` 用于脚本执行
+- 语法转换：显示格式（`${label}`）与 Groovy 代码之间转换
+- 两种模式：普通模式（可视化）和高级模式（原始 Groovy）
 
-**Tech Stack:**
-- Backend: Java 17, Spring Boot 3.5.9, Groovy ScriptRuntimeContext
-- Frontend: React, TypeScript, Ant Design 6.x, @flowgram.ai/fixed-layout-editor
+**技术栈：**
+- 后端：Java 17、Spring Boot 3.5.9、Groovy ScriptRuntimeContext
+- 前端：React、TypeScript、Ant Design 6.x、@flowgram.ai/fixed-layout-editor
 
 ---
 
-## Phase 1: Backend Foundation
+## 阶段一：后端基础设施
 
-### Task 1: Create TitleGroovyRequest
+### 任务 1：创建 TitleGroovyRequest
 
-**Files:**
-- Create: `flow-engine-framework/src/main/java/com/codingapi/flow/script/runtime/TitleGroovyRequest.java`
-- Test: `flow-engine-framework/src/test/java/com/codingapi/flow/script/runtime/TitleGroovyRequestTest.java`
+**文件：**
+- 创建：`flow-engine-framework/src/main/java/com/codingapi/flow/script/runtime/TitleGroovyRequest.java`
+- 测试：`flow-engine-framework/src/test/java/com/codingapi/flow/script/runtime/TitleGroovyRequestTest.java`
 
-**Step 1: Write the failing test**
+**步骤 1：编写失败的测试**
 
 ```java
 package com.codingapi.flow.script.runtime;
@@ -52,12 +52,12 @@ class TitleGroovyRequestTest {
 }
 ```
 
-**Step 2: Run test to verify it fails**
+**步骤 2：运行测试验证失败**
 
-Run: `./mvnw test -Dtest=TitleGroovyRequestTest -pl flow-engine-framework`
-Expected: FAIL with "TitleGroovyRequest not found"
+运行：`./mvnw test -Dtest=TitleGroovyRequestTest -pl flow-engine-framework`
+预期：FAIL with "TitleGroovyRequest not found"
 
-**Step 3: Write minimal implementation**
+**步骤 3：编写最小化实现**
 
 ```java
 package com.codingapi.flow.script.runtime;
@@ -139,12 +139,12 @@ public class TitleGroovyRequest {
 }
 ```
 
-**Step 4: Run test to verify it passes**
+**步骤 4：运行测试验证通过**
 
-Run: `./mvnw test -Dtest=TitleGroovyRequestTest -pl flow-engine-framework`
-Expected: PASS
+运行：`./mvnw test -Dtest=TitleGroovyRequestTest -pl flow-engine-framework`
+预期：PASS
 
-**Step 5: Commit**
+**步骤 5：提交**
 
 ```bash
 git add flow-engine-framework/src/main/java/com/codingapi/flow/script/runtime/TitleGroovyRequest.java
@@ -154,12 +154,12 @@ git commit -m "feat: add TitleGroovyRequest for node title expression"
 
 ---
 
-### Task 2: Create GroovyVariableMapping DTO
+### 任务 2：创建 GroovyVariableMapping DTO
 
-**Files:**
-- Create: `flow-engine-starter/src/main/java/com/codingapi/flow/web/dto/GroovyVariableMapping.java`
+**文件：**
+- 创建：`flow-engine-starter/src/main/java/com/codingapi/flow/web/dto/GroovyVariableMapping.java`
 
-**Step 1: Create the DTO class**
+**步骤 1：创建 DTO 类**
 
 ```java
 package com.codingapi.flow.web.dto;
@@ -206,7 +206,7 @@ public class GroovyVariableMapping {
 }
 ```
 
-**Step 2: Commit**
+**步骤 2：提交**
 
 ```bash
 git add flow-engine-starter/src/main/java/com/codingapi/flow/web/dto/GroovyVariableMapping.java
@@ -215,13 +215,13 @@ git commit -m "feat: add GroovyVariableMapping DTO"
 
 ---
 
-### Task 3: Update NodeTitleScript to use TitleGroovyRequest
+### 任务 3：更新 NodeTitleScript 使用 TitleGroovyRequest
 
-**Files:**
-- Modify: `flow-engine-framework/src/main/java/com/codingapi/flow/script/node/NodeTitleScript.java`
-- Test: `flow-engine-framework/src/test/java/com/codingapi/flow/script/node/NodeTitleScriptTest.java`
+**文件：**
+- 修改：`flow-engine-framework/src/main/java/com/codingapi/flow/script/node/NodeTitleScript.java`
+- 测试：`flow-engine-framework/src/test/java/com/codingapi/flow/script/node/NodeTitleScriptTest.java`
 
-**Step 1: Write the failing test**
+**步骤 1：编写失败的测试**
 
 ```java
 package com.codingapi.flow.script.node;
@@ -256,16 +256,16 @@ class NodeTitleScriptTest {
 }
 ```
 
-**Step 2: Run test to verify it fails**
+**步骤 2：运行测试验证失败**
 
-Run: `./mvnw test -Dtest=NodeTitleScriptTest -pl flow-engine-framework`
-Expected: Current tests may pass, new test needs session setup
+运行：`./mvnw test -Dtest=NodeTitleScriptTest -pl flow-engine-framework`
+预期：当前测试可能通过，新测试需要设置 session
 
-**Step 3: Update FlowSession to include title request data**
+**步骤 3：更新 FlowSession 包含标题请求数据**
 
-Review: `flow-engine-framework/src/main/java/com/codingapi/flow/session/FlowSession.java`
+查看：`flow-engine-framework/src/main/java/com/codingapi/flow/session/FlowSession.java`
 
-Add method to FlowSession for creating TitleGroovyRequest:
+添加创建 TitleGroovyRequest 的方法：
 
 ```java
 /**
@@ -305,7 +305,7 @@ public TitleGroovyRequest createTitleRequest() {
 }
 ```
 
-**Step 4: Update NodeTitleScript to use TitleGroovyRequest**
+**步骤 4：更新 NodeTitleScript 使用 TitleGroovyRequest**
 
 ```java
 public String execute(FlowSession session) {
@@ -314,12 +314,12 @@ public String execute(FlowSession session) {
 }
 ```
 
-**Step 5: Run tests to verify they pass**
+**步骤 5：运行测试验证通过**
 
-Run: `./mvnw test -Dtest=NodeTitleScriptTest -pl flow-engine-framework`
-Expected: PASS
+运行：`./mvnw test -Dtest=NodeTitleScriptTest -pl flow-engine-framework`
+预期：PASS
 
-**Step 6: Commit**
+**步骤 6：提交**
 
 ```bash
 git add flow-engine-framework/src/main/java/com/codingapi/flow/session/FlowSession.java
@@ -330,14 +330,14 @@ git commit -m "feat: update NodeTitleScript to use TitleGroovyRequest"
 
 ---
 
-## Phase 2: Frontend Foundation
+## 阶段二：前端基础设施
 
-### Task 4: Create TypeScript types for variable mapping
+### 任务 4：创建变量映射的 TypeScript 类型定义
 
-**Files:**
-- Create: `frontend/packages/flow-types/src/pages/design-panel/groovy-variable.ts`
+**文件：**
+- 创建：`frontend/packages/flow-types/src/pages/design-panel/groovy-variable.ts`
 
-**Step 1: Create the type definitions**
+**步骤 1：创建类型定义**
 
 ```typescript
 /**
@@ -373,19 +373,19 @@ export const enum VariableTag {
 export type TitleExpressionMode = 'normal' | 'advanced';
 ```
 
-**Step 2: Export from flow-types index**
+**步骤 2：从 flow-types 导出**
 
-Modify: `frontend/packages/flow-types/src/pages/design-panel/index.ts`
+修改：`frontend/packages/flow-types/src/pages/design-panel/index.ts`
 
 ```typescript
 export * from './groovy-variable';
 ```
 
-**Step 3: Build flow-types**
+**步骤 3：构建 flow-types**
 
-Run: `pnpm run build:flow-types`
+运行：`pnpm run build:flow-types`
 
-**Step 4: Commit**
+**步骤 4：提交**
 
 ```bash
 git add frontend/packages/flow-types/src/pages/design-panel/groovy-variable.ts
@@ -395,12 +395,12 @@ git commit -m "feat(flow-types): add GroovyVariableMapping types"
 
 ---
 
-### Task 5: Create predefined variable mappings service
+### 任务 5：创建预定义变量映射服务
 
-**Files:**
-- Create: `frontend/packages/flow-design/src/services/groovy-variable-service.ts`
+**文件：**
+- 创建：`frontend/packages/flow-design/src/services/groovy-variable-service.ts`
 
-**Step 1: Create the variable service**
+**步骤 1：创建变量服务**
 
 ```typescript
 import { GroovyVariableMapping, VariableTag } from '@flow-engine/flow-types';
@@ -547,15 +547,15 @@ export class GroovyVariableService {
 }
 ```
 
-**Step 2: Export from services index**
+**步骤 2：从 services 索引导出**
 
-Modify: `frontend/packages/flow-design/src/services/index.ts`
+修改：`frontend/packages/flow-design/src/services/index.ts`
 
 ```typescript
 export * from './groovy-variable-service';
 ```
 
-**Step 3: Commit**
+**步骤 3：提交**
 
 ```bash
 git add frontend/packages/flow-design/src/services/groovy-variable-service.ts
@@ -565,12 +565,12 @@ git commit -m "feat(flow-design): add GroovyVariableService for variable mapping
 
 ---
 
-### Task 6: Create syntax conversion utilities
+### 任务 6：创建语法转换工具
 
-**Files:**
-- Create: `frontend/packages/flow-design/src/utils/title-syntax-converter.ts`
+**文件：**
+- 创建：`frontend/packages/flow-design/src/utils/title-syntax-converter.ts`
 
-**Step 1: Create the converter utility**
+**步骤 1：创建转换器工具**
 
 ```typescript
 import { GroovyVariableMapping } from '@flow-engine/flow-types';
@@ -722,15 +722,15 @@ export class TitleSyntaxConverter {
 }
 ```
 
-**Step 2: Export from utils index**
+**步骤 2：从 utils 索引导出**
 
-Modify: `frontend/packages/flow-design/src/utils/index.ts`
+修改：`frontend/packages/flow-design/src/utils/index.ts`
 
 ```typescript
 export * from './title-syntax-converter';
 ```
 
-**Step 3: Commit**
+**步骤 3：提交**
 
 ```bash
 git add frontend/packages/flow-design/src/utils/title-syntax-converter.ts
@@ -740,15 +740,15 @@ git commit -m "feat(flow-design): add TitleSyntaxConverter for expression conver
 
 ---
 
-## Phase 3: UI Components
+## 阶段三：UI 组件
 
-### Task 7: Create VariablePicker component
+### 任务 7：创建 VariablePicker 组件
 
-**Files:**
-- Create: `frontend/packages/flow-design/src/components/design-editor/node-components/strategy/VariablePicker.tsx`
-- Create: `frontend/packages/flow-design/src/components/design-editor/node-components/strategy/VariablePicker.module.less`
+**文件：**
+- 创建：`frontend/packages/flow-design/src/components/design-editor/node-components/strategy/VariablePicker.tsx`
+- 创建：`frontend/packages/flow-design/src/components/design-editor/node-components/strategy/VariablePicker.module.less`
 
-**Step 1: Write tests for VariablePicker**
+**步骤 1：编写 VariablePicker 测试**
 
 ```typescript
 // VariablePicker.test.tsx
@@ -778,7 +778,7 @@ describe('VariablePicker', () => {
 });
 ```
 
-**Step 2: Create VariablePicker component**
+**步骤 2：创建 VariablePicker 组件**
 
 ```typescript
 // VariablePicker.tsx
@@ -883,7 +883,7 @@ export const VariablePicker: React.FC<VariablePickerProps> = ({
 };
 ```
 
-**Step 3: Create styles**
+**步骤 3：创建样式**
 
 ```less
 // VariablePicker.module.less
@@ -951,14 +951,14 @@ export const VariablePicker: React.FC<VariablePickerProps> = ({
 }
 ```
 
-**Step 3: Run tests**
+**步骤 4：运行测试**
 
 ```bash
 cd frontend/packages/flow-design
 pnpm run test VariablePicker.test.tsx
 ```
 
-**Step 4: Commit**
+**步骤 5：提交**
 
 ```bash
 git add frontend/packages/flow-design/src/components/design-editor/node-components/strategy/VariablePicker.tsx
@@ -969,13 +969,13 @@ git commit -m "feat(flow-design): add VariablePicker component"
 
 ---
 
-### Task 8: Update NodeTitleStrategy component
+### 任务 8：更新 NodeTitleStrategy 组件
 
-**Files:**
-- Modify: `frontend/packages/flow-pc/flow-pc-design/src/components/design-editor/node-components/strategy/node-title.tsx`
-- Create: `frontend/packages/flow-pc/flow-pc-design/src/components/design-editor/node-components/strategy/TitleConfigModal.tsx`
+**文件：**
+- 修改：`frontend/packages/flow-pc/flow-pc-design/src/components/design-editor/node-components/strategy/node-title.tsx`
+- 创建：`frontend/packages/flow-pc/flow-pc-design/src/components/design-editor/node-components/strategy/TitleConfigModal.tsx`
 
-**Step 1: Create TitleConfigModal component**
+**步骤 1：创建 TitleConfigModal 组件**
 
 ```typescript
 // TitleConfigModal.tsx
@@ -1167,7 +1167,7 @@ export const TitleConfigModal: React.FC<TitleConfigModalProps> = ({
               <TextArea
                 value={content}
                 onChange={e => setContent(e.target.value)}
-                placeholder="// @TITLE&#10;return &quot;审批：&quot; + request.getOperatorName()"
+                placeholder="// @TITLE&#10;return \"审批：\" + request.getOperatorName()"
                 autoSize={{ minRows: 6, maxRows: 10 }}
                 style={{ fontFamily: 'Courier New, monospace' }}
               />
@@ -1187,7 +1187,7 @@ export const TitleConfigModal: React.FC<TitleConfigModalProps> = ({
 };
 ```
 
-**Step 2: Create styles**
+**步骤 2：创建样式**
 
 ```less
 // title-config-modal.module.less
@@ -1226,7 +1226,7 @@ export const TitleConfigModal: React.FC<TitleConfigModalProps> = ({
 }
 ```
 
-**Step 3: Update node-title.tsx**
+**步骤 3：更新 node-title.tsx**
 
 ```typescript
 // node-title.tsx
@@ -1336,7 +1336,7 @@ export const NodeTitleStrategy: React.FC = () => {
 };
 ```
 
-**Step 4: Commit**
+**步骤 4：提交**
 
 ```bash
 git add frontend/packages/flow-pc/flow-pc-design/src/components/design-editor/node-components/strategy/TitleConfigModal.tsx
@@ -1347,15 +1347,15 @@ git commit -m "feat(flow-pc-design): update NodeTitleStrategy with interactive U
 
 ---
 
-## Phase 4: Testing & Documentation
+## 阶段四：测试与文档
 
-### Task 9: Write integration tests
+### 任务 9：编写集成测试
 
-**Files:**
-- Create: `frontend/packages/flow-design/src/utils/__tests__/title-syntax-converter.test.ts`
-- Test: `flow-engine-framework/src/test/java/com/codingapi/flow/integration/NodeTitleIntegrationTest.java`
+**文件：**
+- 创建：`frontend/packages/flow-design/src/utils/__tests__/title-syntax-converter.test.ts`
+- 测试：`flow-engine-framework/src/test/java/com/codingapi/flow/integration/NodeTitleIntegrationTest.java`
 
-**Step 1: Write frontend converter tests**
+**步骤 1：编写前端转换器测试**
 
 ```typescript
 import { GroovyVariableMapping } from '@flow-engine/flow-types';
@@ -1415,7 +1415,7 @@ describe('TitleSyntaxConverter', () => {
 });
 ```
 
-**Step 2: Write backend integration test**
+**步骤 2：编写后端集成测试**
 
 ```java
 package com.codingapi.flow.integration;
@@ -1458,18 +1458,18 @@ class NodeTitleIntegrationTest {
 }
 ```
 
-**Step 3: Run all tests**
+**步骤 3：运行所有测试**
 
 ```bash
-# Backend
+# 后端
 ./mvnw test -pl flow-engine-framework
 
-# Frontend
+# 前端
 cd frontend/packages/flow-design
 pnpm run test
 ```
 
-**Step 4: Commit**
+**步骤 4：提交**
 
 ```bash
 git add frontend/packages/flow-design/src/utils/__tests__/title-syntax-converter.test.ts
@@ -1479,66 +1479,66 @@ git commit -m "test: add integration tests for title expression"
 
 ---
 
-### Task 10: Update documentation
+### 任务 10：更新文档
 
-**Files:**
-- Modify: `CLAUDE.md`
-- Modify: `frontend/CLAUDE.md`
-- Update: `designs/title-expression-ui/README.md`
+**文件：**
+- 修改：`CLAUDE.md`
+- 修改：`frontend/CLAUDE.md`
+- 更新：`designs/title-expression-ui/README.md`
 
-**Step 1: Update backend CLAUDE.md**
+**步骤 1：更新后端 CLAUDE.md**
 
-Add section about TitleGroovyRequest in Script Layer:
+在 Script Layer 部分添加关于 TitleGroovyRequest 的说明：
 
 ```markdown
 ### Script Layer
 
 ...
 
-**TitleGroovyRequest**: Context object for title expression scripts, providing access to:
-- Operator information (operatorName, operatorId, isFlowManager)
-- Workflow information (workflowTitle, workflowCode, nodeName, nodeType)
-- Creator information (creatorName)
-- Form data (formData with getFormData(key) method)
-- Work code (workCode)
+**TitleGroovyRequest**: 标题表达式脚本的上下文对象，提供以下访问：
+- 操作人信息（operatorName, operatorId, isFlowManager）
+- 流程信息（workflowTitle, workflowCode, nodeName, nodeType）
+- 创建人信息（creatorName）
+- 表单数据（formData 带 getFormData(key) 方法）
+- 流程编号（workCode）
 ```
 
-**Step 2: Update frontend CLAUDE.md**
+**步骤 2：更新前端 CLAUDE.md**
 
-Add section about title expression UI:
+添加关于标题表达式 UI 的说明：
 
 ```markdown
-### Node Title Configuration
+### 节点标题配置
 
-The node title expression supports two modes:
+节点标题表达式支持两种模式：
 
-**Normal Mode**: Visual editor with variable picker
-- Use `${label}` format: `${当前操作人}的审批`
-- Insert variables via picker
-- Auto-converts to Groovy script
+**普通模式**：带变量选择器的可视化编辑器
+- 使用 `${label}` 格式：`${当前操作人}的审批`
+- 通过选择器插入变量
+- 自动转换为 Groovy 脚本
 
-**Advanced Mode**: Direct Groovy script editing
-- Write raw Groovy code
-- Must include `// @TITLE` comment
-- Cannot parse back to visual mode
+**高级模式**：直接编辑 Groovy 脚本
+- 编写原始 Groovy 代码
+- 必须包含 `// @TITLE` 注释
+- 无法解析回可视化模式
 
-**Services**:
-- `GroovyVariableService` - Variable mappings management
-- `TitleSyntaxConverter` - Syntax conversion utilities
+**服务：**
+- `GroovyVariableService` - 变量映射管理
+- `TitleSyntaxConverter` - 语法转换工具
 ```
 
-**Step 3: Mark design doc as implemented**
+**步骤 3：标记设计文档为已实现**
 
-Update: `designs/title-expression-ui/README.md`
+更新：`designs/title-expression-ui/README.md`
 
-Add at top:
+在顶部添加：
 
 ```markdown
-> **Status**: ✅ Implemented (2025-02-26)
-> **Plan**: `docs/plans/2025-02-26-title-expression-ui.md`
+> **状态**: ✅ 已实现 (2025-02-26)
+> **计划**: `docs/plans/2025-02-26-title-expression-ui.md`
 ```
 
-**Step 4: Commit**
+**步骤 4：提交**
 
 ```bash
 git add CLAUDE.md frontend/CLAUDE.md designs/title-expression-ui/README.md
@@ -1547,19 +1547,19 @@ git commit -m "docs: update documentation for title expression feature"
 
 ---
 
-## Phase 5: Build & Verification
+## 阶段五：构建与验证
 
-### Task 11: Build and verify
+### 任务 11：构建并验证
 
-**Step 1: Build backend**
+**步骤 1：构建后端**
 
 ```bash
 ./mvnw clean install -DskipTests
 ```
 
-Expected: BUILD SUCCESS
+预期：BUILD SUCCESS
 
-**Step 2: Build frontend**
+**步骤 2：构建前端**
 
 ```bash
 cd frontend
@@ -1567,34 +1567,34 @@ pnpm install
 pnpm run build
 ```
 
-Expected: All packages build successfully
+预期：所有包构建成功
 
-**Step 3: Run application**
+**步骤 3：运行应用**
 
 ```bash
-# Backend
+# 后端
 cd flow-engine-example
 ./mvnw spring-boot:run
 
-# Frontend (new terminal)
+# 前端（新终端）
 cd frontend
 pnpm run dev:app-pc
 ```
 
-**Step 4: Manual verification checklist**
+**步骤 4：手动验证清单**
 
-- [ ] Open node properties panel
-- [ ] Click "Edit" button on node title
-- [ ] Verify variable picker shows predefined variables
-- [ ] Insert a variable and verify preview updates
-- [ ] Switch to advanced mode
-- [ ] Write custom Groovy script
-- [ ] Verify preview shows warning
-- [ ] Reset to normal mode
-- [ ] Save and verify title is persisted
-- [ ] Test with workflow execution
+- [ ] 打开节点属性面板
+- [ ] 点击节点标题的"编辑"按钮
+- [ ] 验证变量选择器显示预定义变量
+- [ ] 插入变量并验证预览更新
+- [ ] 切换到高级模式
+- [ ] 编写自定义 Groovy 脚本
+- [ ] 验证预览显示警告
+- [ ] 重置为普通模式
+- [ ] 保存并验证标题已持久化
+- [ ] 测试流程执行
 
-**Step 5: Final commit**
+**步骤 5：最终提交**
 
 ```bash
 git add .
@@ -1603,19 +1603,19 @@ git commit -m "feat: complete title expression UI implementation"
 
 ---
 
-## Summary
+## 总结
 
-This plan implements the title expression UI feature in 11 tasks:
+此计划通过 11 个任务实现标题表达式 UI 功能：
 
-1. **Backend Foundation (Tasks 1-3)**: Create TitleGroovyRequest, GroovyVariableMapping DTO, update NodeTitleScript
-2. **Frontend Foundation (Tasks 4-6)**: Create types, variable service, syntax converter utilities
-3. **UI Components (Tasks 7-8)**: Create VariablePicker and update NodeTitleStrategy component
-4. **Testing (Task 9)**: Integration tests for both frontend and backend
-5. **Documentation (Task 10)**: Update CLAUDE.md files
-6. **Verification (Task 11)**: Build and manual verification
+1. **后端基础设施（任务 1-3）**：创建 TitleGroovyRequest、GroovyVariableMapping DTO、更新 NodeTitleScript
+2. **前端基础设施（任务 4-6）**：创建类型定义、变量服务、语法转换工具
+3. **UI 组件（任务 7-8）**：创建 VariablePicker 并更新 NodeTitleStrategy 组件
+4. **测试（任务 9）**：前后端集成测试
+5. **文档（任务 10）**：更新 CLAUDE.md 文件
+6. **验证（任务 11）**：构建和手动验证
 
-**Key Design Decisions:**
-- **Frontend maintains variable mappings**: Faster, simpler, sufficient for design-time
-- **Backend provides TitleGroovyRequest**: For runtime script execution
-- **Two-mode UI**: Normal (visual) and Advanced (raw Groovy)
-- **Syntax conversion**: Between `${label}` display and Groovy string concatenation
+**关键设计决策：**
+- **前端维护变量映射**：更快、更简单，足以满足设计时需求
+- **后端提供 TitleGroovyRequest**：用于运行时脚本执行
+- **双模式 UI**：普通模式（可视化）和高级模式（原始 Groovy）
+- **语法转换**：`${label}` 显示与 Groovy 字符串拼接之间转换
