@@ -2,7 +2,7 @@ import React from 'react';
 import { GroovyVariableMapping } from '@flow-engine/flow-types';
 import { ScriptConfigModal, ScriptConfigModalProps } from './components/script-config-modal';
 import { ScriptType } from '@/components/design-editor/typings/groovy-script';
-import { groovyVariableService } from '@/components/design-editor/script/service/groovy-variable-service';
+import { GroovyVariableService } from '@/components/design-editor/script/service/groovy-variable-service';
 
 export interface ConditionConfigModalProps extends Omit<ScriptConfigModalProps, 'scriptType' | 'title'> {
   /** 额外的变量（可选） */
@@ -21,7 +21,7 @@ export const ConditionConfigModal: React.FC<ConditionConfigModalProps> = ({
   extraVariables = [],
 }) => {
   // 获取系统变量
-  const systemVariables = groovyVariableService.getSystemVariables(ScriptType.CONDITION);
+  const systemVariables = GroovyVariableService.getSystemVariables(ScriptType.CONDITION);
 
   // 合并变量
   const allVariables = [...systemVariables, ...extraVariables];

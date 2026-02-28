@@ -2,8 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { Modal, Input, Empty } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { GroovyVariableMapping } from '@flow-engine/flow-types';
-import { groovyVariableService } from '@/components/design-editor/script/service/groovy-variable-service';
-import styles from './variable-picker.module.less';
+import { GroovyVariableService } from '@/components/design-editor/script/service/groovy-variable-service';
+import styles from './variable-picker.module.scss';
 
 export interface VariablePickerProps {
   /** 变量映射列表 */
@@ -43,7 +43,7 @@ export const VariablePicker: React.FC<VariablePickerProps> = ({
 
   // 按tag分组
   const groupedMappings = useMemo(() => {
-    return groovyVariableService.groupByTag(filteredMappings);
+    return GroovyVariableService.groupByTag(filteredMappings);
   }, [filteredMappings]);
 
   const handleVariableClick = (mapping: GroovyVariableMapping) => {
@@ -75,11 +75,11 @@ export const VariablePicker: React.FC<VariablePickerProps> = ({
         {groupedMappings.size === 0 ? (
           <Empty description="未找到匹配的变量" />
         ) : (
-          Array.from(groupedMappings.entries()).map(([tag, variables]) => (
+          Array.from(groupedMappings.entries()).map(([tag, variables]: [string, GroovyVariableMapping[]]) => (
             <div key={tag} className={styles.variableGroup}>
               <div className={styles.groupTitle}>{tag}</div>
               <div className={styles.variableItems}>
-                {variables.map(variable => (
+                {variables.map((variable: GroovyVariableMapping) => (
                   <div
                     key={variable.label}
                     className={styles.variableItem}

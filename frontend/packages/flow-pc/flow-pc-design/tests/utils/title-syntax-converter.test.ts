@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@rstest/core';
 import { GroovyVariableMapping } from '@flow-engine/flow-types';
-import { TitleSyntaxConverter } from '@/utils/title-syntax-converter';
+import { TitleSyntaxConverter } from '@/components/design-editor/script/service/title-syntax-converter';
 
 describe('TitleSyntaxConverter', () => {
   const mappings: GroovyVariableMapping[] = [

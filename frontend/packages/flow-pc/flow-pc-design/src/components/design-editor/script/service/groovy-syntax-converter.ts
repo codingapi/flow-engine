@@ -9,11 +9,21 @@ const CUSTOM_COMMENT = '// @CUSTOM_SCRIPT';
  * 负责脚本语法与可视化表达式之间的转换
  */
 export class GroovySyntaxConverter {
+  /** 静态适配器注册表 */
+  private static staticAdapters: Map<ScriptType, ScriptAdapter> = new Map();
+
   /** 脚本适配器注册表 */
   private adapters: Map<ScriptType, ScriptAdapter> = new Map();
 
   /** 是否已初始化 */
   private initialized = false;
+
+  /**
+   * 静态方法：注册脚本适配器
+   */
+  static registerAdapter(adapter: ScriptAdapter): void {
+    this.staticAdapters.set(adapter.scriptType, adapter);
+  }
 
   /**
    * 注册脚本适配器

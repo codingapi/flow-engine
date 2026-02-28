@@ -4,9 +4,9 @@ import { EditOutlined } from '@ant-design/icons';
 import { Field, FieldRenderProps } from '@flowgram.ai/fixed-layout-editor';
 import { useDesignContext } from '@/components/design-panel/hooks/use-design-context';
 import { WorkflowFormManager } from '@/components/design-panel/manager/form';
-import { GroovyVariableService } from '@/services/groovy-variable-service';
-import { TitleSyntaxConverter } from '@/utils/title-syntax-converter';
-import { TitleConfigModal } from './TitleConfigModal';
+import { GroovyVariableService } from '@/components/design-editor/script/service/groovy-variable-service';
+import { TitleSyntaxConverter } from '@/components/design-editor/script/service/title-syntax-converter';
+import { NodeTitleConfigModal } from '../scripts/node-title-config-modal';
 
 /**
  * 节点标题策略配置
@@ -117,7 +117,7 @@ export const NodeTitleStrategy: React.FC = () => {
       </Form>
 
       {showConfigModal && (
-        <TitleConfigModal
+        <NodeTitleConfigModal
           script={modalScript}
           formFields={formFields}
           onConfirm={handleConfirm}

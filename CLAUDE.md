@@ -135,9 +135,11 @@ flow-types (类型定义)
 ## 开发规范
 
 - **与用户沟通及编写文档时，所有内容必须使用中文表述**
+- **在每次修改代码以后，要执行本地化的编译验证确保代码没有错误**
 - 前端包管理使用 pnpm（根据用户配置）
 - 前端文件命名规范：使用小写字母 + 下划线组合（如 `script_editor.tsx`、`variable_picker.tsx`）
 - **前端导入规范**：引入当前文件夹下的内容使用 `./` 相对路径，引入其他模块的代码使用 `@/` 路径别名
+- **前端样式规范**：组件样式使用 `.module.scss` 模块化方式引入，禁止在 TSX 文件中使用内联 `style` 对象定义样式
 - 设计涉及流程或 UML 图形的解决方案时，使用 Mermaid Markdown 语法
 - 在编写计划的时候要遵循 TDD 的开发规范，务必要在方案中进行对实现代码逻辑的单元测试设计。
 - 在设计计划方案或执行方案过程中，对于代码的设计规划与调整修改要遵循本项目的代码风格和架构设计规则
@@ -158,14 +160,21 @@ import { GroovySyntaxConverter } from '../../../src/components/...';
 
 ### 面向对象开发规范
 
-TypeScript 代码根据类型采用不同的开发风格：
+TypeScript 代码根据类型和复杂度选择合适的开发风格：
 
-- **Service、Context、Convert、Utils 等业务处理类**：使用 class 面向对象方式定义，支持依赖注入和扩展
 - **Hooks**：使用函数式方式定义，遵循 React Hooks 规范
+- **业务处理类**（Service、Context、Converter、Utils 等）：根据复杂度选择，复杂逻辑使用 class 便于扩展和维护，简单功能可用函数式
 - **工具函数**：根据场景选择，复杂逻辑使用 class，简单工具可用函数式
 
 ```typescript
-// ✅ 正确：使用 class 定义业务处理类
+// ✅ 正确：Hooks 使用函数式定义
+export const useFlowDesigner = () => {
+  const [nodes, setNodes] = useState<Node[]>([]);
+  // ...
+  return { nodes, setNodes };
+};
+
+// ✅ 正确：复杂业务逻辑使用 class 便于扩展
 export class GroovySyntaxConverter {
   private adapters: Map<ScriptType, ScriptAdapter> = new Map();
 
@@ -176,16 +185,14 @@ export class GroovySyntaxConverter {
   public toScript(...): string { ... }
 }
 
-// ✅ 正确：Hooks 使用函数式定义
-export const useFlowDesigner = () => {
-  const [nodes, setNodes] = useState<Node[]>([]);
-  // ...
-  return { nodes, setNodes };
-};
-
 // ✅ 正确：简单的工具函数可用函数式
 export const formatDate = (date: Date): string => {
   return date.toLocaleDateString();
+};
+
+// ✅ 正确：简单的业务处理也可用函数式
+export const createDefaultMappings = (): GroovyVariableMapping[] => {
+  return [...];
 };
 ```
 

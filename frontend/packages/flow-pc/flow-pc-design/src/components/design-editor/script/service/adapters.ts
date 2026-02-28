@@ -202,32 +202,15 @@ export class TitleAdapter implements ScriptAdapter {
  * 初始化所有脚本适配器
  */
 export class ScriptAdapterManager {
-  private syntaxConverter: GroovySyntaxConverter;
-  private variableService: GroovyVariableService;
-
-  constructor(
-    syntaxConverter: GroovySyntaxConverter,
-    variableService: GroovyVariableService
-  ) {
-    this.syntaxConverter = syntaxConverter;
-    this.variableService = variableService;
-  }
-
   public initialize(): void {
     const titleAdapter = new TitleAdapter();
-    this.syntaxConverter.registerAdapter(titleAdapter);
-    this.variableService.registerAdapter(titleAdapter);
+    GroovySyntaxConverter.registerAdapter(titleAdapter);
+    GroovyVariableService.registerAdapter(titleAdapter);
   }
 }
 
 // 使用已导出的单例实例
-import { groovySyntaxConverter } from './groovy-syntax-converter';
-import { groovyVariableService } from './groovy-variable-service';
-
-export const scriptAdapterManager = new ScriptAdapterManager(
-  groovySyntaxConverter,
-  groovyVariableService
-);
+export const scriptAdapterManager = new ScriptAdapterManager();
 
 // 自动初始化适配器 - 确保在任何地方使用服务前完成初始化
 scriptAdapterManager.initialize();

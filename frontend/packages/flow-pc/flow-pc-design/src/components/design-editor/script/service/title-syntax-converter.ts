@@ -1,5 +1,5 @@
 import { GroovyVariableMapping } from '@flow-engine/flow-types';
-import { GroovyVariableService } from '@/services/groovy-variable-service';
+import { GroovyVariableService } from './groovy-variable-service';
 
 const TITLE_COMMENT = '// @CUSTOM_SCRIPT';
 
