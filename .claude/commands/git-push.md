@@ -1,6 +1,6 @@
 ---
 name: git push command
-
+description: git 代码自动化分析并提交
 ---
 
 # git push command
