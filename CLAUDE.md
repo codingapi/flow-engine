@@ -73,6 +73,8 @@ pnpm run dev:app-mobile # 移动端应用
 
 ### 模块结构
 
+#### 后端模块
+
 | 模块 | 描述 |
 |--------|-------------|
 | `flow-engine-framework` | 核心工作流引擎框架 |
@@ -81,11 +83,40 @@ pnpm run dev:app-mobile # 移动端应用
 | `flow-engine-starter-infra` | 基础设施层 |
 | `flow-engine-starter-query` | 查询层 |
 | `flow-engine-example` | 示例应用 |
-| `frontend/apps/app-pc` | PC 端流程设计器和管理后台 |
-| `frontend/apps/app-mobile` | 移动端待办/已办页面 |
-| `frontend/packages/flow-core` | 核心 API 库 |
-| `frontend/packages/flow-types` | TypeScript 类型定义库 |
-| `frontend/packages/flow-pc` | PC 端组件库 |
+
+#### 前端模块
+
+| 模块 | 描述 | 依赖 |
+|--------|-------------|------|
+| `flow-core` | 核心框架库（HTTP、Hooks、Presenter 等），不包含 UI 组件 | 无 |
+| `flow-types` | TypeScript 类型定义（流程实例、表单、审批等业务类型） | flow-core |
+| `flow-pc-ui` | PC 端基础 UI 组件库（按钮、输入框等原子组件） | 无 |
+| `flow-pc-form` | PC 端表单相关组件（表单设计器、表单渲染等） | flow-core, flow-types |
+| `flow-pc-design` | PC 端流程设计器组件（节点配置、属性面板等） | flow-core, flow-types, flow-pc-ui |
+| `flow-pc-approval` | PC 端审批页面（待办/已办/审批处理等） | flow-pc-design, flow-pc-ui |
+
+**前端模块依赖关系**：
+
+```
+flow-core (无UI)
+    ↑
+flow-types (类型定义)
+    ↑       ↑
+    │       └── flow-pc-form
+    │               ↑
+    └───────→ flow-pc-design ──→ flow-pc-approval
+                    ↑
+            flow-pc-ui (基础UI)
+```
+
+**模块划分原则**：
+
+- **flow-core**：全局框架依赖，只包含与 UI 无关的基础能力（HTTP、状态管理、工具函数等）
+- **flow-types**：全局类型定义，包含流程审批相关的业务类型（手机端和 PC 端共用）
+- **flow-pc-ui**：PC 端基础 UI 组件库，提供原子化组件
+- **flow-pc-form**：表单相关功能，依赖 flow-core + flow-types
+- **flow-pc-design**：流程设计器功能，包含节点配置、属性面板、脚本配置等（本次优化的主要模块）
+- **flow-pc-approval**：审批页面功能，依赖 flow-pc-design
 
 ### 技术栈
 
@@ -105,6 +136,7 @@ pnpm run dev:app-mobile # 移动端应用
 
 - **与用户沟通及编写文档时，所有内容必须使用中文表述**
 - 前端包管理使用 pnpm（根据用户配置）
+- 前端文件命名规范：使用小写字母 + 下划线组合（如 `script_editor.tsx`、`variable_picker.tsx`）
 - 设计涉及流程或 UML 图形的解决方案时，使用 Mermaid Markdown 语法
 - 在编写计划的时候要遵循 TDD 的开发规范，务必要在方案中进行对实现代码逻辑的单元测试设计。
 - 在设计计划方案或执行方案过程中，对于代码的设计规划与调整修改要遵循本项目的代码风格和架构设计规则
