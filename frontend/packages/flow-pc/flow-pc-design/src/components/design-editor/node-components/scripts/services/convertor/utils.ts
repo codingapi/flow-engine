@@ -12,17 +12,17 @@ export interface GroovyScriptConverter {
     /**
      * 转换为完整Groovy脚本（编辑时）
      */
-    toScript():string;
+    toScript(): string;
 
     /**
      * 转换为可视化表达式（回显时）
      */
-    toExpression():string;
+    toExpression(): string;
 
     /**
      * 获取默认脚本模板
      */
-    getDefaultScript():string;
+    getDefaultScript(): string;
 
     /**
      * 添加变量到脚本中
@@ -34,7 +34,7 @@ export interface GroovyScriptConverter {
      * 重置脚本中的表达式部分（编辑时）
      * @param value
      */
-    resetExpression(value:string):void;
+    resetExpression(value: string): void;
 }
 
 
@@ -92,6 +92,65 @@ export class GroovyScriptUtil {
         }
     }
 
+    /**
+     * 将可视化表达式转换为Groovy表达式（编辑时）
+     * @param expression
+     * @param mappings
+     */
+    public static toScript(expression: string, mappings: GroovyVariableMapping[]): string {
+
+        let result = expression;
+
+        // 按label长度降序排序，避免短label替换长label的一部分
+        const sortedMappings = [...mappings].sort((a, b) => b.label.length - a.label.length);
+
+        // 将 ${label} 替换为唯一的占位符
+        const placeholders: Map<string, string> = new Map();
+        let placeholderIndex = 0;
+        for (const mapping of sortedMappings) {
+            const labelPattern = `\${${mapping.label}}`;
+            const placeholder = `__PLACEHOLDER_${placeholderIndex}__`;
+            placeholders.set(placeholder, mapping.value);
+            result = result.split(labelPattern).join(placeholder);
+            placeholderIndex++;
+        }
+
+        // 按占位符分割字符串，构建表达式
+        const parts: string[] = [];
+        let lastIndex = 0;
+        const placeholderRegex = /__PLACEHOLDER_(\d+)__/g;
+        let match;
+
+        while ((match = placeholderRegex.exec(result)) !== null) {
+            if (match.index > lastIndex) {
+                const text = result.substring(lastIndex, match.index);
+                parts.push(`"${text}"`);
+            }
+            const placeholder = match[0];
+            const placeholderInfo = placeholders.get(placeholder);
+            if (placeholderInfo) {
+                parts.push(placeholderInfo);
+            }
+            lastIndex = match.index + placeholder.length;
+        }
+
+        if (lastIndex < result.length) {
+            const text = result.substring(lastIndex);
+            parts.push(`"${text}"`);
+        }
+
+        let groovyExpression: string;
+        if (parts.length === 0) {
+            groovyExpression = '""';
+        } else if (parts.length === 1) {
+            groovyExpression = parts[0];
+        } else {
+            groovyExpression = parts.join(' + ');
+        }
+
+        return groovyExpression;
+    }
+
 
     /**
      * 将Groovy表达式转换为可视化表达式（回显时）
@@ -102,7 +161,7 @@ export class GroovyScriptUtil {
         let result = script;
         const exprToLabel = new Map<string, string>();
         for (const mapping of mappings) {
-            exprToLabel.set(mapping.expression, mapping.label);
+            exprToLabel.set(mapping.value, mapping.label);
         }
 
         const sortedExprs = Array.from(exprToLabel.keys()).sort((a, b) => b.length - a.length);

@@ -37,7 +37,7 @@ describe('NodeTitleGroovyConvertor', () => {
 
 
 
-    describe('toScript', () => {
+    describe('toExpression', () => {
         it('should convert simple text to groovy script', () => {
             const script = `
 // @CUSTOM_SCRIPT 
@@ -48,6 +48,21 @@ def run(request){
             const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(script, nodeTitleVariableAdapter.getVariables());
             const result = nodeTitleGroovyConvertor.toExpression()
             expect(result).toEqual("你有一条${当前操作人}的${流程标题}待办消息 【${当前节点}】");
+        });
+    });
+
+
+    describe('resetExpression', () => {
+        it('should convert simple text to groovy script', () => {
+            const script = `
+// @CUSTOM_SCRIPT 
+def run(request){
+    return "你有一条" + request.getOperatorName() + "的" + request.getWorkflowTitle() + "待办消息 【" + request.getNodeName() + "】"
+}
+`
+            const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(script, nodeTitleVariableAdapter.getVariables());
+            const result = nodeTitleGroovyConvertor.resetExpression('你有一条${当前操作人}的${流程标题}待办消息 【${当前节点}】')
+            expect(result).toEqual(script);
         });
     });
 });

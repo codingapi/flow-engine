@@ -17,29 +17,29 @@ export class GroovyVariableUtil {
             // ========== 操作人相关 ==========
             {
                 label: '当前操作人',
-                value: 'request.operatorName',
-                expression: 'request.getOperatorName()',
+                value: 'request.getOperatorName()',
+                expression: "${当前操作人}",
                 tag: VariableTag.OPERATOR,
                 order: 1,
             },
             {
                 label: '当前操作人ID',
-                value: 'request.operatorId',
-                expression: 'request.getOperatorId()',
+                value: 'request.getOperatorId()',
+                expression: '${当前操作人ID}',
                 tag: VariableTag.OPERATOR,
                 order: 2,
             },
             {
                 label: '是否管理员',
-                value: 'request.isFlowManager',
-                expression: 'request.getIsFlowManager()',
+                value: 'request.getIsFlowManager()',
+                expression: '${是否管理员}',
                 tag: VariableTag.OPERATOR,
                 order: 3,
             },
             {
                 label: '流程创建人',
-                value: 'request.creatorName',
-                expression: 'request.getCreatorName()',
+                value: 'request.getCreatorName()',
+                expression: '${流程创建人}',
                 tag: VariableTag.OPERATOR,
                 order: 4,
             },
@@ -47,29 +47,29 @@ export class GroovyVariableUtil {
             // ========== 流程相关 ==========
             {
                 label: '流程标题',
-                value: 'request.workflowTitle',
-                expression: 'request.getWorkflowTitle()',
+                value: 'request.getWorkflowTitle()',
+                expression: '${流程标题}',
                 tag: VariableTag.WORKFLOW,
                 order: 10,
             },
             {
                 label: '流程编码',
-                value: 'request.workflowCode',
-                expression: 'request.getWorkflowCode()',
+                value: 'request.getWorkflowCode()',
+                expression: '${流程编码}',
                 tag: VariableTag.WORKFLOW,
                 order: 11,
             },
             {
                 label: '当前节点',
-                value: 'request.nodeName',
-                expression: 'request.getNodeName()',
+                value: 'request.getNodeName()',
+                expression: '${当前节点}',
                 tag: VariableTag.WORKFLOW,
                 order: 12,
             },
             {
                 label: '节点类型',
-                value: 'request.nodeType',
-                expression: 'request.getNodeType()',
+                value: 'request.getNodeType()',
+                expression: '${节点类型}',
                 tag: VariableTag.WORKFLOW,
                 order: 13,
             },
@@ -77,8 +77,8 @@ export class GroovyVariableUtil {
             // ========== 流程编号 ==========
             {
                 label: '流程编号',
-                value: 'request.workCode',
-                expression: 'request.getWorkCode()',
+                value: 'request.getWorkCode()',
+                expression: '${流程编号}',
                 tag: VariableTag.WORK_CODE,
                 order: 20,
             }
@@ -92,8 +92,8 @@ export class GroovyVariableUtil {
 
         return formMeta.fields.map((field, index) => ({
             label: `${field.name}`,
-            value: `request.formData(${field.code})`,
-            expression: `request.getFormData('${field.name}')`,
+            value: `request.getFormData('${field.code}')`,
+            expression: `${field.name}`,
             tag: VariableTag.FORM_FIELD,
             order: 100 + index,
         }));

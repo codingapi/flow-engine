@@ -34,6 +34,7 @@ export class NodeTitleGroovyConvertor implements GroovyScriptConverter {
 
     resetExpression(value:string) {
         const returnExpression = GroovyScriptUtil.getReturnExpression(this.script);
-        return this.script.replace(returnExpression, `"${value}"`);
+        const script = GroovyScriptUtil.toScript(value, this.mappings);
+        return this.script.replace(returnExpression, `${script}`);
     }
 }

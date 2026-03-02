@@ -3,7 +3,7 @@ import {GroovyScriptUtil} from "@/components/design-editor/node-components/scrip
 
 describe('GroovyScriptUtil', () => {
 
-    describe('toScript', () => {
+    describe('getReturnExpression', () => {
         it('should convert simple text to groovy script', () => {
             const script = ` def run(request){
 // @CUSTOM_SCRIPT
