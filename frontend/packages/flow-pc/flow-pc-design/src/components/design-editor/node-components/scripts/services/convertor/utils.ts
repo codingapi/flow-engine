@@ -70,7 +70,6 @@ export class GroovyScriptConverterContext {
     }
 
     private initializeDefaultConverters() {
-        // 在这里注册默认的转换器
         try {
             this.register(ScriptType.TITLE, NodeTitleGroovyConvertor);
         } catch (e) {
@@ -229,6 +228,11 @@ export class GroovyScriptConvertorUtil {
         result = result.replace(/\s*\+\s*"/g, '"');
         result = result.replace(/"\s*\+\s*/g, '"');
         result = result.replace(/"/g, '');
+
+        // 在替换占位符之前，先移除占位符之间的 + 符号
+        result = result.replace(/___\w+___\s*\+\s*___\w+___/g, (match) => {
+            return match.replace(/\s*\+\s*/g, '');
+        });
 
         placeholderMap.forEach((label, placeholder) => {
             result = result.replace(new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), `\${${label}}`);
