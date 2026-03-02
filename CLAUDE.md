@@ -36,16 +36,22 @@ cd frontend && pnpm install
 # 构建所有包
 pnpm run build
 
+# 构建 PC 端所有组件库
+pnpm run build:flow-pc
+
+# 构建特定包
+pnpm run build:flow-core          # 核心 API 库
+pnpm run build:flow-types         # 类型定义库
+pnpm run build:flow-pc-ui        # 基础 UI 组件库
+pnpm run build:flow-pc-form      # 表单组件库
+pnpm run build:flow-pc-design    # 设计器组件库
+pnpm run build:flow-pc-approval  # 审批组件库
+
 # 构建特定应用
 pnpm run build:app-pc
 
-# 构建特定包
-pnpm run build:flow-core   # 构建核心 API 库
-pnpm run build:flow-types # 构建类型定义库
-pnpm run build:flow-pc    # 构建 PC 端组件库
-
 # 开发模式
-pnpm run dev:app-pc    # PC 端应用
+pnpm run dev:app-pc     # PC 端应用
 pnpm run dev:app-mobile # 移动端应用
 ```
 
@@ -115,8 +121,15 @@ flow-types (类型定义)
 - **flow-types**：全局类型定义，包含流程审批相关的业务类型（手机端和 PC 端共用）
 - **flow-pc-ui**：PC 端基础 UI 组件库，提供原子化组件
 - **flow-pc-form**：表单相关功能，依赖 flow-core + flow-types
-- **flow-pc-design**：流程设计器功能，包含节点配置、属性面板、脚本配置等（本次优化的主要模块）
+- **flow-pc-design**：流程设计器功能，包含节点配置、属性面板、脚本配置等
 - **flow-pc-approval**：审批页面功能，依赖 flow-pc-design
+
+#### 前端应用
+
+| 应用 | 描述 |
+|--------|-------------|
+| `app-pc` | PC 端应用 |
+| `app-mobile` | 移动端应用 |
 
 ### 技术栈
 
