@@ -1,364 +1,127 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Modal, Input, Alert, Button, Space, message, Popover, Empty } from 'antd';
-import { EditOutlined, CodeOutlined, RollbackOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons';
-import { GroovyVariableMapping } from '@flow-engine/flow-types';
-import { GroovyVariableService } from '@/components/design-editor/script/service/groovy-variable-service';
-import { TitleSyntaxConverter } from '@/components/design-editor/script/service/title-syntax-converter';
-import styles from './node-title-config-modal.module.scss';
+import React from 'react';
+import {Button, Input, Space} from 'antd';
+import {GroovyVariableMapping, ScriptType} from "@/components/design-editor/typings/script";
+import {GroovyScriptContent, GroovyScriptModal} from "./components/groovy-script-modal";
+import {GroovyScriptPreview} from "@/components/design-editor/node-components/scripts/components/groovy-script-preview";
+import {CodeOutlined, DeleteOutlined} from "@ant-design/icons";
+import {NodeTitleGroovyConvertor} from "./services/convertor/node-title";
+import {AdvancedScriptEditor} from "@/components/design-editor/node-components/scripts/components/advanced-script-editor";
+import {GroovyScriptConvertorUtil} from "@/components/design-editor/node-components/scripts/services/convertor/utils";
+import {VariablePicker} from "@/components/design-editor/node-components/scripts/components/variable-picker";
 
-const { TextArea } = Input;
+const {TextArea} = Input;
 
 export interface NodeTitleConfigModalProps {
-  /** 当前脚本 */
-  script: string;
-  /** 表单字段（用于动态生成变量） */
-  formFields?: Array<{ name: string; code: string }>;
-  /** 确认回调 */
-  onConfirm: (script: string) => void;
-  /** 取消回调 */
-  onCancel: () => void;
+    open: boolean;
+    /** 当前脚本 */
+    script: string;
+    /** 表单字段（用于动态生成变量） */
+    variables?: GroovyVariableMapping[];
+    /** 取消回调 */
+    onCancel: () => void;
+    /** 确认回调 */
+    onConfirm: (script: string) => void;
+}
+
+
+const NodeTitleDefaultContent: React.FC<GroovyScriptContent> = (props) => {
+
+    const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(props.content, props.variables);
+
+    return (
+        <div>
+            <div>
+                预览
+                <GroovyScriptPreview
+                    script={props.content}
+                    variables={props.variables}
+                    type={ScriptType.TITLE}
+                    multiline={true}
+                />
+            </div>
+
+
+            <div>
+                内容
+                <TextArea
+                    value={nodeTitleGroovyConvertor.toExpression()}
+                    onChange={(e) => {
+                        props.onChange(nodeTitleGroovyConvertor.resetExpression(e.target.value));
+                    }}
+                    placeholder="请输入标题配置脚本，支持使用变量"
+                    autoSize={{minRows: 3, maxRows: 12}}
+                />
+            </div>
+
+            <Space
+                style={{
+                    marginTop: 8
+                }}
+            >
+                <VariablePicker
+                    mappings={props.variables}
+                    onSelect={(variable) => {
+                        props.onChange(nodeTitleGroovyConvertor.addVariable(variable));
+                    }}
+                />
+                <Button
+                    icon={<CodeOutlined/>}
+                    onClick={() => {
+                        props.onChange(GroovyScriptConvertorUtil.toCustomScript(props.content));
+                    }}
+                >
+                    高级配置
+                </Button>
+                <Button
+                    icon={<DeleteOutlined/>}
+                    danger={true}
+                    onClick={() => {
+                        props.onChange(nodeTitleGroovyConvertor.getDefaultScript());
+                    }}
+                >
+                    重置配置
+                </Button>
+            </Space>
+        </div>
+    );
+}
+
+
+const NodeTitleConfigContent: React.FC<GroovyScriptContent> = (props) => {
+    const isAdvance = GroovyScriptConvertorUtil.isCustomScript(props.content);
+
+    console.log('NodeTitleConfigContent script', props.content);
+
+    return (
+        <>
+            {isAdvance && (
+                <AdvancedScriptEditor {...props} />
+            )}
+            {!isAdvance && (
+                <NodeTitleDefaultContent {...props} />
+            )}
+        </>
+    );
 }
 
 /**
  * 标题配置弹框
  * 支持普通模式和高级模式
  */
-export const NodeTitleConfigModal: React.FC<NodeTitleConfigModalProps> = ({
-  script,
-  formFields,
-  onConfirm,
-  onCancel,
-}) => {
-  const [mode, setMode] = useState<'normal' | 'advanced'>('normal');
-  const [content, setContent] = useState('');
-  const [cursorPosition, setCursorPosition] = useState(0);
-  const [variablePickerOpen, setVariablePickerOpen] = useState(false);
-  const textareaRef = useRef<any>(null);
+export const NodeTitleConfigModal: React.FC<NodeTitleConfigModalProps> = (props) => {
 
-  // 标记用户是否手动修改了模式（防止 useEffect 覆盖用户操作）
-  const userModifiedModeRef = useRef(false);
-
-  // 获取变量映射
-  const mappings = GroovyVariableService.getAllMappings(formFields);
-
-  useEffect(() => {
-    // 如果用户手动修改了模式，不再覆盖
-    if (userModifiedModeRef.current) {
-      return;
-    }
-
-    // 只在 script 改变时重新解析（初始化）
-    const parsedMode = TitleSyntaxConverter.parseMode(script);
-
-    if (parsedMode === 'normal') {
-      // 尝试解析为标签表达式
-      const labelExpr = TitleSyntaxConverter.toLabelExpression(script, mappings);
-      // 如果是默认 legacy 脚本，显示空内容（让用户重新输入）
-      // 如果能解析成标签表达式，显示解析结果
-      // 否则显示空内容
-      setContent(labelExpr || '');
-    } else {
-      // 高级模式，直接使用原脚本
-      setContent(script);
-    }
-
-    setMode(parsedMode);
-  }, [script]);
-
-  // 插入变量到光标位置
-  const handleInsertVariable = (mapping: GroovyVariableMapping) => {
-    const variableText = `\${${mapping.label}}`;
-    // 使用之前保存的光标位置插入变量
-    const start = cursorPosition;
-    const newContent = content.substring(0, start) + variableText + content.substring(start);
-    setContent(newContent);
-    // 设置光标位置到插入变量之后
-    setCursorPosition(start + variableText.length);
-    // 聚焦到 textarea
-    setTimeout(() => {
-      if (textareaRef.current) {
-        textareaRef.current.focus();
-        textareaRef.current.setSelectionRange(start + variableText.length, start + variableText.length);
-      }
-    }, 0);
-  };
-
-  // 处理文本框变化时更新光标位置
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value);
-    setCursorPosition(e.target.selectionStart || 0);
-  };
-
-  // 处理文本框聚焦时更新光标位置
-  const handleTextareaFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
-    setCursorPosition(e.target.selectionStart || 0);
-  };
-
-  // 切换到高级模式
-  const handleSwitchToAdvanced = () => {
-    userModifiedModeRef.current = true;
-    if (mode === 'normal') {
-      // 转换为Groovy脚本
-      const groovyScript = TitleSyntaxConverter.toGroovySyntax(content, mappings);
-      setContent(groovyScript);
-    }
-    setMode('advanced');
-  };
-
-  // 切换回普通模式
-  const handleSwitchToNormal = () => {
-    userModifiedModeRef.current = true;
-    // 尝试解析当前高级脚本为标签表达式
-    const labelExpr = TitleSyntaxConverter.toLabelExpression(content, mappings);
-    if (labelExpr !== null) {
-      // 能解析，切换到普通模式并显示解析后的内容
-      setContent(labelExpr);
-      setMode('normal');
-    } else {
-      // 无法解析，提示用户确认
-      Modal.confirm({
-        title: '切换回普通模式',
-        content: '当前自定义代码无法解析为可视化标签表达式，切换后将丢失这些配置。是否继续？',
-        okText: '确定',
-        cancelText: '取消',
-        onOk: () => {
-          setContent('');
-          setMode('normal');
-        },
-      });
-    }
-  };
-
-  // 确认
-  const handleConfirm = () => {
-    let finalScript = content;
-
-    if (mode === 'normal') {
-      if (!content.trim()) {
-        message.error('请输入标题内容');
-        return;
-      }
-      // 转换为Groovy脚本
-      finalScript = TitleSyntaxConverter.toGroovySyntax(content, mappings);
-    } else {
-      // 验证Groovy语法
-      const validation = TitleSyntaxConverter.validateGroovySyntax(content);
-      if (!validation.valid) {
-        message.error(`语法错误: ${validation.error}`);
-        return;
-      }
-    }
-
-    onConfirm(finalScript);
-  };
-
-  // 预览内容
-  const renderPreview = () => {
-    if (mode === 'normal') {
-      return <div className={styles.preview}>{content || '（空）'}</div>;
-    } else {
-      // 尝试解析高级脚本
-      const labelExpr = TitleSyntaxConverter.toLabelExpression(content, mappings);
-      if (labelExpr !== null) {
-        return <div className={styles.preview}>{labelExpr}</div>;
-      }
-      return (
-        <Alert
-          message="用户自定义配置，无法预览"
-          type="warning"
-          showIcon
-          style={{ margin: 0 }}
+    return (
+        <GroovyScriptModal
+            scriptType={ScriptType.TITLE}
+            open={props.open}
+            script={props.script}
+            variables={props.variables || []}
+            onConfirm={props.onConfirm}
+            onCancel={props.onCancel}
+            title="标题配置"
+            content={NodeTitleConfigContent}
         />
-      );
-    }
-  };
-
-  return (
-    <>
-      <Modal
-        title="标题配置"
-        open={true}
-        onCancel={onCancel}
-        width={600}
-        footer={
-          <Space>
-            <Button onClick={onCancel}>取消</Button>
-            <Button type="primary" onClick={handleConfirm}>
-              确定
-            </Button>
-          </Space>
-        }
-      >
-        <div className={styles.container}>
-          {/* 预览区 */}
-          <div className={styles.section}>
-            <div className={styles.sectionLabel}>预览</div>
-            {renderPreview()}
-          </div>
-
-          {/* 操作按钮 */}
-          <div className={styles.section}>
-            {mode === 'normal' ? (
-              <Space>
-                <Popover
-                  content={
-                    <VariablePickerContent
-                      mappings={mappings}
-                      onSelect={handleInsertVariable}
-                    />
-                  }
-                  trigger="click"
-                  placement="bottomLeft"
-                  open={variablePickerOpen}
-                  onOpenChange={setVariablePickerOpen}
-                  getPopupContainer={(trigger) => trigger.parentElement || document.body}
-                >
-                  <Button
-                    icon={<EditOutlined />}
-                    onClick={() => setVariablePickerOpen(true)}
-                  >
-                    插入变量
-                  </Button>
-                </Popover>
-                <Button
-                  icon={<CodeOutlined />}
-                  onClick={handleSwitchToAdvanced}
-                >
-                  高级配置
-                </Button>
-              </Space>
-            ) : (
-              <Button
-                icon={<RollbackOutlined />}
-                onClick={handleSwitchToNormal}
-              >
-                返回普通模式
-              </Button>
-            )}
-          </div>
-
-          {/* 内容编辑区 */}
-          <div className={styles.section}>
-            <div className={styles.sectionLabel}>内容</div>
-            {mode === 'normal' ? (
-              <>
-                <TextArea
-                  ref={textareaRef}
-                  value={content}
-                  onChange={handleContentChange}
-                  onFocus={handleTextareaFocus}
-                  placeholder="点击上方按钮插入变量，或直接输入文字内容"
-                  autoSize={{ minRows: 3, maxRows: 6 }}
-                />
-                <div className={styles.hint}>
-                  {'示例：你好，${当前操作人}，有一笔${请假天数}元的审批'}
-                </div>
-              </>
-            ) : (
-              <TextArea
-                ref={textareaRef}
-                value={content}
-                onChange={handleContentChange}
-                onFocus={handleTextareaFocus}
-                placeholder='// @CUSTOM_SCRIPT\ndef run(request){\n    return "审批：" + request.getOperatorName()\n}'
-                autoSize={{ minRows: 6, maxRows: 10 }}
-                style={{ fontFamily: 'Courier New, monospace' }}
-              />
-            )}
-          </div>
-
-          {/* 底部操作区 */}
-          <div className={styles.footer}>
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              onClick={() => {
-                Modal.confirm({
-                  title: '重置设置',
-                  content: '确定要清除所有标题配置吗？',
-                  okText: '确定',
-                  cancelText: '取消',
-                  onOk: () => {
-                    userModifiedModeRef.current = true;
-                    setContent('');
-                    setMode('normal');
-                  },
-                });
-              }}
-            >
-              重置设置
-            </Button>
-          </div>
-        </div>
-      </Modal>
-    </>
-  );
-};
-
-// Popover 版本的变量选择器内容
-const VariablePickerContent: React.FC<{
-  mappings: GroovyVariableMapping[];
-  onSelect: (mapping: GroovyVariableMapping) => void;
-}> = ({ mappings, onSelect }) => {
-  const [searchText, setSearchText] = useState('');
-
-  // 阻止事件冒泡，防止 Popover 关闭
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.stopPropagation();
-    setSearchText(e.target.value);
-  };
-
-  const filteredMappings = useMemo(() => {
-    if (!searchText) {
-      return mappings;
-    }
-    const lowerSearch = searchText.toLowerCase();
-    return mappings.filter(
-      m =>
-        m.label.toLowerCase().includes(lowerSearch) ||
-        m.value.toLowerCase().includes(lowerSearch)
     );
-  }, [mappings, searchText]);
-
-  const groupedMappings = useMemo(() => {
-    return GroovyVariableService.groupByTag(filteredMappings);
-  }, [filteredMappings]);
-
-  return (
-    <div className={styles.pickerContainer} onClick={e => e.stopPropagation()}>
-      <Input
-        placeholder="搜索变量..."
-        prefix={<SearchOutlined style={{ color: '#999' }} />}
-        value={searchText}
-        onChange={handleInputChange}
-        allowClear
-        style={{ marginBottom: 8 }}
-      />
-      <div className={styles.pickerList}>
-        {groupedMappings.size === 0 ? (
-          <Empty description="未找到匹配的变量" image={Empty.PRESENTED_IMAGE_SIMPLE} />
-        ) : (
-          Array.from(groupedMappings.entries()).map(([tag, variables]: [string, GroovyVariableMapping[]]) => (
-            <div key={tag}>
-              <div className={styles.pickerGroupTitle}>{tag}</div>
-              <div className={styles.pickerItems}>
-                {variables.map((variable: GroovyVariableMapping) => (
-                  <div
-                    key={variable.label}
-                    className={styles.pickerItem}
-                    onClick={() => onSelect(variable)}
-                  >
-                    <span className={styles.pickerItemLabel}>{variable.label}</span>
-                    <span className={styles.pickerItemValue}>{variable.value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
 };
 
-export default NodeTitleConfigModal;
+

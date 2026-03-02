@@ -1,99 +1,146 @@
-import React, { useMemo, useState } from 'react';
-import { Modal, Input, Empty } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import { GroovyVariableMapping } from '@flow-engine/flow-types';
-import { GroovyVariableService } from '@/components/design-editor/script/service/groovy-variable-service';
-import styles from './variable-picker.module.scss';
+import React, {useState} from 'react';
+import {Button, Col, Empty, Input, Popover, Row} from "antd";
+import {EditOutlined, SearchOutlined} from "@ant-design/icons";
+import {GroovyVariableMapping} from "@/components/design-editor/typings/script";
 
 export interface VariablePickerProps {
-  /** 变量映射列表 */
-  mappings: GroovyVariableMapping[];
-  /** 选中变量回调 */
-  onSelect: (mapping: GroovyVariableMapping) => void;
-  /** 是否显示 */
-  visible: boolean;
-  /** 关闭回调 */
-  onClose: () => void;
+    /** 变量映射列表 */
+    mappings: GroovyVariableMapping[];
+    /** 选中变量回调 */
+    onSelect: (mapping: GroovyVariableMapping) => void;
+}
+
+
+const VariablePickerContent: React.FC<VariablePickerProps> = (props) => {
+    const [searchText, setSearchText] = useState('');
+
+    const mappings = React.useMemo(() => {
+        const groups = new Map<string, GroovyVariableMapping[]>();
+
+        for (const mapping of props.mappings) {
+            const existing = groups.get(mapping.tag) || [];
+            existing.push(mapping);
+            groups.set(mapping.tag, existing);
+        }
+
+        return groups;
+    }, []);
+
+    // 阻止事件冒泡，防止 Popover 关闭
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.stopPropagation();
+        setSearchText(e.target.value);
+    };
+
+    return (
+        <div style={{maxHeight: 300, overflowY: 'auto', width: 400}}>
+            <Input
+                placeholder="搜索变量..."
+                prefix={<SearchOutlined style={{color: '#999'}}/>}
+                value={searchText}
+                onChange={handleInputChange}
+                allowClear
+                style={{marginBottom: 8}}
+            />
+
+            {mappings.size === 0 && (
+                <Empty description="未找到匹配的变量" image={Empty.PRESENTED_IMAGE_SIMPLE}/>
+            )}
+
+            {Array.from(mappings.entries()).map(([tag, group]) => {
+                return (
+                    <Row
+                        gutter={[8, 8]} style={{
+                        width: '100%',
+                    }}
+                        key={tag}>
+                        <Col span={24} style={{fontWeight: 'bold', color: '#1890ff'}}>
+                            <span>{tag}</span>
+                        </Col>
+                        {group.map((mapping, index) => {
+                            return (
+                                <Col
+                                    span={12}
+                                    key={index}
+                                    style={{
+                                        padding: '8px',
+                                        border: '1px solid #f0f0f0',
+                                        borderRadius: 4,
+                                        cursor: 'pointer',
+                                        backgroundColor: '#fff',
+                                    }}
+                                    onClick={() => {
+                                        props.onSelect(mapping);
+                                    }}
+                                >
+                                    <div style={{
+                                        fontSize: 14,
+                                        color: '#333',
+                                        fontWeight: 500,
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                    }}>{mapping.label}</div>
+                                    <div
+                                        style={{
+                                            fontSize: 12,
+                                            color: '#999',
+                                            marginTop: 4,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>{mapping.expression}</div>
+                                </Col>
+                            )
+                        })}
+                    </Row>
+                )
+            })}
+
+        </div>
+    )
 }
 
 /**
  * 变量选择器组件
  * 用于在脚本表达式中插入变量
  */
-export const VariablePicker: React.FC<VariablePickerProps> = ({
-  mappings,
-  onSelect,
-  visible,
-  onClose,
-}) => {
-  const [searchText, setSearchText] = useState('');
+export const VariablePicker: React.FC<VariablePickerProps> = (props) => {
 
-  // 过滤变量
-  const filteredMappings = useMemo(() => {
-    if (!searchText) {
-      return mappings;
+    const [visible, setVisible] = React.useState(false);
+
+    const handleSelect = (mapping: GroovyVariableMapping) => {
+        props.onSelect(mapping);
+        setVisible(false);
     }
-    const lowerSearch = searchText.toLowerCase();
-    return mappings.filter(
-      m =>
-        m.label.toLowerCase().includes(lowerSearch) ||
-        m.value.toLowerCase().includes(lowerSearch)
+
+    return (
+        <Popover
+            content={
+                (
+                    <VariablePickerContent
+                        {...props}
+                        onSelect={handleSelect}
+                    />
+                )
+            }
+            open={visible}
+            destroyOnHidden={true}
+            onOpenChange={(visible) => {
+                setVisible(visible);
+            }}
+            trigger="click"
+            placement="bottom"
+            getPopupContainer={(trigger) => trigger.parentElement || document.body}
+        >
+            <Button
+                icon={<EditOutlined/>}
+                onClick={() => {
+                    setVisible(true);
+                }}
+            >
+                插入变量
+            </Button>
+        </Popover>
     );
-  }, [mappings, searchText]);
-
-  // 按tag分组
-  const groupedMappings = useMemo(() => {
-    return GroovyVariableService.groupByTag(filteredMappings);
-  }, [filteredMappings]);
-
-  const handleVariableClick = (mapping: GroovyVariableMapping) => {
-    onSelect(mapping);
-    onClose();
-    setSearchText('');
-  };
-
-  return (
-    <Modal
-      title="选择变量"
-      open={visible}
-      onCancel={onClose}
-      footer={null}
-      width={600}
-      className={styles.variablePicker}
-    >
-      <div className={styles.searchWrapper}>
-        <Input
-          placeholder="搜索变量..."
-          prefix={<SearchOutlined />}
-          value={searchText}
-          onChange={e => setSearchText(e.target.value)}
-          allowClear
-        />
-      </div>
-
-      <div className={styles.variableList}>
-        {groupedMappings.size === 0 ? (
-          <Empty description="未找到匹配的变量" />
-        ) : (
-          Array.from(groupedMappings.entries()).map(([tag, variables]: [string, GroovyVariableMapping[]]) => (
-            <div key={tag} className={styles.variableGroup}>
-              <div className={styles.groupTitle}>{tag}</div>
-              <div className={styles.variableItems}>
-                {variables.map((variable: GroovyVariableMapping) => (
-                  <div
-                    key={variable.label}
-                    className={styles.variableItem}
-                    onClick={() => handleVariableClick(variable)}
-                  >
-                    <div className={styles.variableLabel}>{variable.label}</div>
-                    <div className={styles.variableValue}>{variable.value}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </Modal>
-  );
 };

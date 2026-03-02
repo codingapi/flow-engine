@@ -1,129 +1,69 @@
-import React, { useMemo, useState, useCallback } from 'react';
-import { Form, Button, Space } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
-import { Field, FieldRenderProps } from '@flowgram.ai/fixed-layout-editor';
-import { useDesignContext } from '@/components/design-panel/hooks/use-design-context';
-import { WorkflowFormManager } from '@/components/design-panel/manager/form';
-import { GroovyVariableService } from '@/components/design-editor/script/service/groovy-variable-service';
-import { TitleSyntaxConverter } from '@/components/design-editor/script/service/title-syntax-converter';
-import { NodeTitleConfigModal } from '../scripts/node-title-config-modal';
+import React from 'react';
+import {Button, Form, Space} from 'antd';
+import {EditOutlined} from '@ant-design/icons';
+import {Field, FieldRenderProps} from '@flowgram.ai/fixed-layout-editor';
+import {useDesignContext} from '@/components/design-panel/hooks/use-design-context';
+import {
+    NodeTitleVariableAdapter
+} from "@/components/design-editor/node-components/scripts/services/variable/node-title";
+import {GroovyScriptPreview} from "@/components/design-editor/node-components/scripts/components/groovy-script-preview";
+import {NodeTitleConfigModal} from "@/components/design-editor/node-components/scripts/node-title-config-modal";
+import {ScriptType} from "@/components/design-editor/typings/script";
 
 /**
  * 节点标题策略配置
  */
 export const NodeTitleStrategy: React.FC = () => {
-  const [showConfigModal, setShowConfigModal] = useState(false);
-  const [modalScript, setModalScript] = useState('');
-  const [currentOnChange, setCurrentOnChange] = useState<((value: string) => void) | null>(null);
+    // 从 design context 获取表单字段
+    const {state} = useDesignContext();
 
-  // 从 design context 获取表单字段
-  const { state } = useDesignContext();
+    const [showConfigModal, setShowConfigModal] = React.useState(false);
 
-  // 获取表单字段（从 workflow form 中提取）
-  const formFields = useMemo(() => {
-    const fields: Array<{ name: string; code: string }> = [];
-    if (!state?.workflow?.form) {
-      return fields;
-    }
-    const formManager = new WorkflowFormManager(state.workflow.form);
-    // 获取主表单字段
-    const mainFields = formManager.getFormFields(state.workflow.form.code);
-    for (const field of mainFields) {
-      fields.push({ name: field.name, code: field.code });
-    }
-    // 获取子表单字段
-    const subForms = state.workflow.form.subForms || [];
-    for (const subForm of subForms) {
-      const subFields = formManager.getFormFields(subForm.code);
-      for (const field of subFields) {
-        fields.push({ name: `${subForm.name}.${field.name}`, code: field.code });
-      }
-    }
-    return fields;
-  }, [state?.workflow?.form]);
+    const nodeTitleVariable = React.useMemo(() => {
+        return new NodeTitleVariableAdapter(state.workflow.form);
+    }, [state.workflow.form]);
 
-  // 获取变量映射
-  const mappings = GroovyVariableService.getAllMappings(formFields);
 
-  // 渲染预览内容
-  const renderPreview = useCallback((script: string) => {
-    if (!script) {
-      return '（未配置）';
-    }
+    return (
+        <>
+            <Form style={{width: '100%'}} layout="vertical">
+                <Form.Item label="节点标题">
+                    <Field
+                        name="NodeTitleStrategy.script"
+                        render={(props: FieldRenderProps<any>) => {
+                            const {value, onChange} = props.field;
+                            return (
+                                <Space.Compact style={{width: '100%'}}>
+                                    <GroovyScriptPreview
+                                        script={value}
+                                        variables={nodeTitleVariable.getVariables()}
+                                        type={ScriptType.TITLE}
+                                    />
+                                    <Button
+                                        icon={<EditOutlined/>}
+                                        onClick={() => {
+                                            setShowConfigModal(true);
+                                        }}
+                                        style={{borderRadius: '0 6px 6px 0'}}
+                                    >
+                                        编辑
+                                    </Button>
 
-    const mode = TitleSyntaxConverter.parseMode(script);
-    if (mode === 'normal') {
-      // Normal 模式：尝试解析为标签表达式
-      const labelExpr = TitleSyntaxConverter.toLabelExpression(script, mappings);
-      return labelExpr || '（未配置）';
-    }
-
-    // Advanced 模式：显示"用户自定义配置"，不显示代码
-    return '（自定义配置）';
-  }, [mappings]);
-
-  const handleOpenConfig = useCallback((currentValue: string, onChange: (value: string) => void) => {
-    setCurrentOnChange(() => onChange);
-    setModalScript(currentValue || '');
-    setShowConfigModal(true);
-  }, []);
-
-  const handleConfirm = useCallback((script: string) => {
-    // 调用 onChange 回调更新编辑器状态
-    if (currentOnChange) {
-      currentOnChange(script);
-    }
-    setShowConfigModal(false);
-  }, [currentOnChange]);
-
-  return (
-    <>
-      <Form style={{ width: '100%' }} layout="vertical">
-        <Form.Item label="节点标题">
-          <Field
-            name="NodeTitleStrategy.script"
-            render={(props: FieldRenderProps<any>) => {
-              const { value, onChange } = props.field;
-
-              return (
-                <Space.Compact style={{ width: '100%' }}>
-                  <div
-                    style={{
-                      flex: 1,
-                      padding: '4px 11px',
-                      backgroundColor: value ? '#fff' : '#fafafa',
-                      border: '1px solid #d9d9d9',
-                      borderRadius: '6px 0 0 6px',
-                      color: value ? 'rgba(0,0,0,0.88)' : 'rgba(0,0,0,0.25)',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
-                  >
-                    {renderPreview(value || '')}
-                  </div>
-                  <Button
-                    icon={<EditOutlined />}
-                    onClick={() => handleOpenConfig(value || '', onChange)}
-                    style={{ borderRadius: '0 6px 6px 0' }}
-                  >
-                    编辑
-                  </Button>
-                </Space.Compact>
-              );
-            }}
-          />
-        </Form.Item>
-      </Form>
-
-      {showConfigModal && (
-        <NodeTitleConfigModal
-          script={modalScript}
-          formFields={formFields}
-          onConfirm={handleConfirm}
-          onCancel={() => setShowConfigModal(false)}
-        />
-      )}
-    </>
-  );
+                                    <NodeTitleConfigModal
+                                        open={showConfigModal}
+                                        script={value}
+                                        variables={nodeTitleVariable.getVariables()}
+                                        onCancel={() => setShowConfigModal(false)}
+                                        onConfirm={(script) => {
+                                            onChange(script);
+                                        }}
+                                    />
+                                </Space.Compact>
+                            );
+                        }}
+                    />
+                </Form.Item>
+            </Form>
+        </>
+    );
 };
