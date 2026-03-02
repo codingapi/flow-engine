@@ -211,11 +211,15 @@ flow-engine
 └── frontend                      # 前端项目
     ├── apps
     │   ├── app-pc                # PC端应用
-    │   └── app-mobile            # 移动端应用（开发中）
+    │   └── app-mobile            # 移动端应用
     └── packages
-        ├── flow-design           # 流程设计器组件库
         ├── flow-core            # 核心 API 库
-        └── flow-types           # TypeScript 类型定义库
+        ├── flow-types           # TypeScript 类型定义库
+        └── flow-pc              # PC 端组件库
+            ├── flow-pc-ui       # PC 端基础 UI 组件库
+            ├── flow-pc-form     # PC 端表单相关组件
+            ├── flow-pc-design   # PC 端流程设计器组件
+            └── flow-pc-approval # PC 端审批页面组件
 ```
 
 ## 技术栈
@@ -261,11 +265,25 @@ cd frontend
 # 安装依赖
 pnpm install
 
-# 构建设计库
-pnpm run build:flow-engine
+# 构建所有包
+pnpm run build
 
-# 启动PC端应用
+# 构建 PC 端所有组件库
+pnpm run build:flow-pc
+
+# 构建特定组件库
+pnpm run build:flow-core    # 核心 API 库
+pnpm run build:flow-types   # 类型定义库
+pnpm run build:flow-pc-ui   # 基础 UI 组件库
+pnpm run build:flow-pc-form # 表单组件库
+pnpm run build:flow-pc-design # 设计器组件库
+pnpm run build:flow-pc-approval # 审批组件库
+
+# 启动 PC 端应用
 pnpm run dev:app-pc
+
+# 启动移动端应用
+pnpm run dev:app-mobile
 ```
 
 ## 核心架构
@@ -364,10 +382,7 @@ category.subcategory.errorType
 
 ## 文档
 
-- [PRD.md](PRD.md) - 产品需求文档
-- [Design.md](Design.md) - 架构设计文档
 - [CLAUDE.md](CLAUDE.md) - Claude Code 指南
-- [TODO.md](TODO.md) - 开发进度
 
 ## 测试
 
