@@ -69,12 +69,27 @@ const VariablePickerContent: React.FC<VariablePickerProps> = (props) => {
                                         cursor: 'pointer',
                                         backgroundColor: '#fff',
                                     }}
-                                    onClick={()=>{
+                                    onClick={() => {
                                         props.onSelect(mapping);
                                     }}
                                 >
-                                    <div>{mapping.label}</div>
-                                    <div>{mapping.value}</div>
+                                    <div style={{
+                                        fontSize: 14,
+                                        color: '#333',
+                                        fontWeight: 500,
+                                        whiteSpace: 'nowrap',
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                    }}>{mapping.label}</div>
+                                    <div
+                                        style={{
+                                            fontSize: 12,
+                                            color: '#999',
+                                            marginTop: 4,
+                                            whiteSpace: 'nowrap',
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                        }}>{mapping.expression}</div>
                                 </Col>
                             )
                         })}
@@ -94,11 +109,19 @@ export const VariablePicker: React.FC<VariablePickerProps> = (props) => {
 
     const [visible, setVisible] = React.useState(false);
 
+    const handleSelect = (mapping: GroovyVariableMapping) => {
+        props.onSelect(mapping);
+        setVisible(false);
+    }
+
     return (
         <Popover
             content={
                 (
-                    <VariablePickerContent {...props}/>
+                    <VariablePickerContent
+                        {...props}
+                        onSelect={handleSelect}
+                    />
                 )
             }
             open={visible}

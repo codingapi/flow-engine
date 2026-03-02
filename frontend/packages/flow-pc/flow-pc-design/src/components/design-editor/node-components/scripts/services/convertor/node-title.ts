@@ -1,5 +1,5 @@
 import {GroovyVariableMapping} from "@/components/design-editor/typings/script";
-import {GroovyScriptConverter, GroovyScriptUtil} from "./utils";
+import {GroovyScriptConverter, GroovyScriptConvertorUtil} from "./utils";
 
 
 export class NodeTitleGroovyConvertor implements GroovyScriptConverter {
@@ -13,13 +13,13 @@ export class NodeTitleGroovyConvertor implements GroovyScriptConverter {
         this.mappings = mappings;
     }
 
-    toScript(): string {
+    getScript(): string {
         return this.script;
     }
 
     toExpression(): string {
-        const returnExpression = GroovyScriptUtil.getReturnExpression(this.script);
-        return GroovyScriptUtil.toExpression(returnExpression, this.mappings);
+        const returnExpression = GroovyScriptConvertorUtil.getReturnScript(this.script);
+        return GroovyScriptConvertorUtil.toExpression(returnExpression, this.mappings);
     }
 
     getDefaultScript(): string {
@@ -27,14 +27,14 @@ export class NodeTitleGroovyConvertor implements GroovyScriptConverter {
     }
 
     addVariable(variable: GroovyVariableMapping): string {
-        const returnExpression = GroovyScriptUtil.getReturnExpression(this.script);
+        const returnExpression = GroovyScriptConvertorUtil.getReturnScript(this.script);
         const newExpression = `${returnExpression}` + ` + ${variable.value}`;
         return this.script.replace(returnExpression, newExpression);
     }
 
-    resetExpression(value:string) {
-        const returnExpression = GroovyScriptUtil.getReturnExpression(this.script);
-        const script = GroovyScriptUtil.toScript(value, this.mappings);
+    resetExpression(expression:string) {
+        const returnExpression = GroovyScriptConvertorUtil.getReturnScript(this.script);
+        const script = GroovyScriptConvertorUtil.toScript(expression, this.mappings);
         return this.script.replace(returnExpression, `${script}`);
     }
 }

@@ -5,8 +5,8 @@ import {GroovyScriptContent, GroovyScriptModal} from "./components/groovy-script
 import {GroovyScriptPreview} from "@/components/design-editor/node-components/scripts/components/groovy-script-preview";
 import {CodeOutlined, DeleteOutlined} from "@ant-design/icons";
 import {NodeTitleGroovyConvertor} from "./services/convertor/node-title";
-import ScriptEditor from "@/components/design-editor/node-components/scripts/components/script-editor";
-import {GroovyScriptUtil} from "@/components/design-editor/node-components/scripts/services/convertor/utils";
+import {AdvancedScriptEditor} from "@/components/design-editor/node-components/scripts/components/advanced-script-editor";
+import {GroovyScriptConvertorUtil} from "@/components/design-editor/node-components/scripts/services/convertor/utils";
 import {VariablePicker} from "@/components/design-editor/node-components/scripts/components/variable-picker";
 
 const {TextArea} = Input;
@@ -24,7 +24,7 @@ export interface NodeTitleConfigModalProps {
 }
 
 
-const NodeTitleDefaultContent: React.FC<GroovyScriptContent> = (props)=>{
+const NodeTitleDefaultContent: React.FC<GroovyScriptContent> = (props) => {
 
     const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(props.content, props.variables);
 
@@ -33,7 +33,9 @@ const NodeTitleDefaultContent: React.FC<GroovyScriptContent> = (props)=>{
             <div>
                 预览
                 <GroovyScriptPreview
-                    value={nodeTitleGroovyConvertor.toExpression()}
+                    script={props.content}
+                    variables={props.variables}
+                    type={ScriptType.TITLE}
                     multiline={true}
                 />
             </div>
@@ -53,27 +55,27 @@ const NodeTitleDefaultContent: React.FC<GroovyScriptContent> = (props)=>{
 
             <Space
                 style={{
-                    marginTop:8
+                    marginTop: 8
                 }}
             >
                 <VariablePicker
                     mappings={props.variables}
-                    onSelect={(variable)=>{
+                    onSelect={(variable) => {
                         props.onChange(nodeTitleGroovyConvertor.addVariable(variable));
                     }}
                 />
                 <Button
-                    icon={<CodeOutlined />}
-                    onClick={()=>{
-                        props.onChange(GroovyScriptUtil.toCustomScript(props.content));
+                    icon={<CodeOutlined/>}
+                    onClick={() => {
+                        props.onChange(GroovyScriptConvertorUtil.toCustomScript(props.content));
                     }}
                 >
                     高级配置
                 </Button>
                 <Button
-                    icon={<DeleteOutlined />}
+                    icon={<DeleteOutlined/>}
                     danger={true}
-                    onClick={()=>{
+                    onClick={() => {
                         props.onChange(nodeTitleGroovyConvertor.getDefaultScript());
                     }}
                 >
@@ -84,49 +86,16 @@ const NodeTitleDefaultContent: React.FC<GroovyScriptContent> = (props)=>{
     );
 }
 
-const NodeTitleAdvancedContent: React.FC<GroovyScriptContent> = (props) => {
-
-    const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(props.content, props.variables);
-
-    return (
-        <div>
-            自定义脚本
-            <ScriptEditor
-                scriptType={ScriptType.TITLE}
-                script={props.content}
-                variables={props.variables}
-                onChange={props.onChange}
-            />
-            <Space
-                style={{
-                    marginTop:8
-                }}
-            >
-                <Button
-                    icon={<DeleteOutlined />}
-                    danger={true}
-                    onClick={()=>{
-                        props.onChange(nodeTitleGroovyConvertor.getDefaultScript());
-                    }}
-                >
-                    重置配置
-                </Button>
-            </Space>
-        </div>
-    )
-}
-
 
 const NodeTitleConfigContent: React.FC<GroovyScriptContent> = (props) => {
+    const isAdvance = GroovyScriptConvertorUtil.isCustomScript(props.content);
 
     console.log('NodeTitleConfigContent script', props.content);
-
-    const isAdvance =  GroovyScriptUtil.isCustomScript(props.content);
 
     return (
         <>
             {isAdvance && (
-                <NodeTitleAdvancedContent {...props} />
+                <AdvancedScriptEditor {...props} />
             )}
             {!isAdvance && (
                 <NodeTitleDefaultContent {...props} />

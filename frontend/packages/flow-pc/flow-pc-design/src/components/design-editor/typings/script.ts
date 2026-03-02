@@ -20,10 +20,10 @@ export interface GroovyVariableMapping {
     /** 中文显示名称：如"当前操作人" */
     label: string;
 
-    /** 变量展示名：如"request.operatorName" */
+    /** 变量展示名：如"request.getOperatorName()" */
     value: string;
 
-    /** Groovy表达式：如"request.getOperatorName()" */
+    /** Groovy表达式：如"${当前操作人}" */
     expression: string;
 
     /** 分组标签：如"操作人相关" */

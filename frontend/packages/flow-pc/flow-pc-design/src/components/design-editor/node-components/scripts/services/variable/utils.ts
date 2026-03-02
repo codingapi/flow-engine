@@ -93,7 +93,7 @@ export class GroovyVariableUtil {
         return formMeta.fields.map((field, index) => ({
             label: `${field.name}`,
             value: `request.getFormData('${field.code}')`,
-            expression: `${field.name}`,
+            expression: "${" + `${field.name}` + "}",
             tag: VariableTag.FORM_FIELD,
             order: 100 + index,
         }));

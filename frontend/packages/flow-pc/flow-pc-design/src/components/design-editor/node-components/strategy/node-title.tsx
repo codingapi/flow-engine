@@ -4,13 +4,11 @@ import {EditOutlined} from '@ant-design/icons';
 import {Field, FieldRenderProps} from '@flowgram.ai/fixed-layout-editor';
 import {useDesignContext} from '@/components/design-panel/hooks/use-design-context';
 import {
-    NodeTitleGroovyConvertor
-} from "@/components/design-editor/node-components/scripts/services/convertor/node-title";
-import {
     NodeTitleVariableAdapter
 } from "@/components/design-editor/node-components/scripts/services/variable/node-title";
 import {GroovyScriptPreview} from "@/components/design-editor/node-components/scripts/components/groovy-script-preview";
 import {NodeTitleConfigModal} from "@/components/design-editor/node-components/scripts/node-title-config-modal";
+import {ScriptType} from "@/components/design-editor/typings/script";
 
 /**
  * 节点标题策略配置
@@ -34,11 +32,12 @@ export const NodeTitleStrategy: React.FC = () => {
                         name="NodeTitleStrategy.script"
                         render={(props: FieldRenderProps<any>) => {
                             const {value, onChange} = props.field;
-                            const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(value || '', nodeTitleVariable.getVariables());
                             return (
                                 <Space.Compact style={{width: '100%'}}>
                                     <GroovyScriptPreview
-                                        value={nodeTitleGroovyConvertor.toExpression()}
+                                        script={value}
+                                        variables={nodeTitleVariable.getVariables()}
+                                        type={ScriptType.TITLE}
                                     />
                                     <Button
                                         icon={<EditOutlined/>}

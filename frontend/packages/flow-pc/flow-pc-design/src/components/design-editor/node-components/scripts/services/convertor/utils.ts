@@ -1,4 +1,7 @@
-import {GroovyVariableMapping} from "@/components/design-editor/typings/script";
+import {GroovyVariableMapping, ScriptType} from "@/components/design-editor/typings/script";
+import {
+    NodeTitleGroovyConvertor
+} from "@/components/design-editor/node-components/scripts/services/convertor/node-title";
 
 /** 自定义注释标记 */
 const CUSTOM_COMMENT = '@CUSTOM_SCRIPT';
@@ -10,9 +13,9 @@ const CUSTOM_COMMENT = '@CUSTOM_SCRIPT';
 export interface GroovyScriptConverter {
 
     /**
-     * 转换为完整Groovy脚本（编辑时）
+     * 转换为完整Groovy脚本
      */
-    toScript(): string;
+    getScript(): string;
 
     /**
      * 转换为可视化表达式（回显时）
@@ -32,13 +35,60 @@ export interface GroovyScriptConverter {
 
     /**
      * 重置脚本中的表达式部分（编辑时）
-     * @param value
+     * @param expression 展示的表达式
      */
-    resetExpression(value: string): void;
+    resetExpression(expression: string): void;
 }
 
+/**
+ * Groovy脚本转换器构造函数类型
+ */
+export type GroovyScriptConverterConstructor = new (script: string, variables: GroovyVariableMapping[]) => GroovyScriptConverter;
 
-export class GroovyScriptUtil {
+
+/**
+ * Groovy脚本转换器上下文，负责管理不同类型脚本的转换器
+ */
+export class GroovyScriptConverterContext {
+    private converterMap: Map<ScriptType, GroovyScriptConverterConstructor>;
+
+    private register(scriptType: ScriptType, converter: GroovyScriptConverterConstructor) {
+        this.converterMap.set(scriptType, converter);
+    }
+
+    public createConverter(scriptType: ScriptType, script: string, variables: GroovyVariableMapping[]): GroovyScriptConverter | undefined {
+        const constructor = this.converterMap.get(scriptType);
+        if (constructor) {
+            return new constructor(script, variables);
+        }
+        return undefined;
+    }
+
+    private constructor() {
+        this.converterMap = new Map();
+        this.initializeDefaultConverters();
+    }
+
+    private initializeDefaultConverters() {
+        // 在这里注册默认的转换器
+        try {
+            this.register(ScriptType.TITLE, NodeTitleGroovyConvertor);
+        } catch (e) {
+            console.error('Failed to register default converters:', e);
+        }
+    }
+
+    private static readonly instance = new GroovyScriptConverterContext();
+
+    public static getInstance(): GroovyScriptConverterContext {
+        return GroovyScriptConverterContext.instance;
+    }
+}
+
+/**
+ * Groovy脚本转换器工具类，提供一些通用的脚本处理方法
+ */
+export class GroovyScriptConvertorUtil {
 
     /**
      * 判断脚本是否包含自定义注释标记
@@ -53,7 +103,7 @@ export class GroovyScriptUtil {
      * @param script
      */
     public static toCustomScript(script: string): string {
-        if (GroovyScriptUtil.isCustomScript(script)) {
+        if (GroovyScriptConvertorUtil.isCustomScript(script)) {
             return script;
         }
         return `// ${CUSTOM_COMMENT}\n${script}`;
@@ -71,9 +121,9 @@ export class GroovyScriptUtil {
      * 提取脚本中的return表达式
      * @param script
      */
-    public static getReturnExpression(script: string): string {
+    public static getReturnScript(script: string): string {
         try {
-            let result = GroovyScriptUtil.clearComments(script);
+            let result = GroovyScriptConvertorUtil.clearComments(script);
             const funcMatch = result.match(/def\s+run\s*\([^)]*\)\s*\{([\s\S]*)\}/);
             if (funcMatch) {
                 result = funcMatch[1];
@@ -164,11 +214,11 @@ export class GroovyScriptUtil {
             exprToLabel.set(mapping.value, mapping.label);
         }
 
-        const sortedExprs = Array.from(exprToLabel.keys()).sort((a, b) => b.length - a.length);
+        const sortedExpress = Array.from(exprToLabel.keys()).sort((a, b) => b.length - a.length);
         let placeholders = 0;
         const placeholderMap = new Map<string, string>();
 
-        for (const expr of sortedExprs) {
+        for (const expr of sortedExpress) {
             const escaped = expr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const placeholder = `___EXPR_PLACEHOLDER_${placeholders}___`;
             result = result.replace(new RegExp(escaped, 'g'), placeholder);
