@@ -50,7 +50,7 @@ export const ScriptEditor:React.FC<ScriptEditorProps> = (props: ScriptEditorProp
 
 export const AdvancedScriptEditor: React.FC<GroovyScriptContent> = (props) => {
 
-    const groovyScriptConvertor = GroovyScriptConverterContext.getInstance().createConverter(props.type, props.content, props.variables);
+    const groovyScriptConvertor = GroovyScriptConverterContext.getInstance().createConverter(props.type, props.script, props.variables);
 
     if(groovyScriptConvertor) {
 
@@ -59,7 +59,7 @@ export const AdvancedScriptEditor: React.FC<GroovyScriptContent> = (props) => {
                 自定义脚本
                 <ScriptEditor
                     type={props.type}
-                    script={props.content}
+                    script={props.script}
                     variables={props.variables}
                     onChange={props.onChange}
                 />

@@ -47,8 +47,8 @@ export enum ScriptType {
     CONDITION = 'CONDITION',
     /** 人员加载脚本 */
     OPERATOR_LOAD = 'OPERATOR_LOAD',
-    /** 自定义脚本 */
-    CUSTOM = 'CUSTOM',
+    /** 流程创建人脚本 */
+    OPERATOR_CREATE = 'OPERATOR_LOAD',
 }
 
 /**

@@ -1,19 +1,12 @@
 import React from 'react';
-import {Button, Input, Space} from 'antd';
 import {GroovyScriptContent, GroovyScriptModal} from "./components/groovy-script-modal";
-import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
-import {CodeOutlined, DeleteOutlined} from "@ant-design/icons";
-import {NodeTitleGroovyConvertor} from "./services/convertor/node-title";
-import {
-    AdvancedScriptEditor
-} from "@/components/script/components/advanced-script-editor";
-import {VariablePicker} from "@/components/script/components/variable-picker";
+import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
 import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
-
-const {TextArea} = Input;
+import {NodeTitlePluginView} from "@/components/script/plugins/view/node-title-view";
 
 export interface NodeTitleConfigModalProps {
+    /** 是否展示 **/
     open: boolean;
     /** 当前脚本 */
     script: string;
@@ -25,74 +18,8 @@ export interface NodeTitleConfigModalProps {
     onConfirm: (script: string) => void;
 }
 
-
-const NodeTitleDefaultContent: React.FC<GroovyScriptContent> = (props) => {
-
-    const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(props.content, props.variables);
-
-    const title = GroovyScriptConvertorUtil.getScriptTitle(props.content);
-
-    return (
-        <div>
-            <div>
-                预览
-                <GroovyScriptPreview
-                    script={props.content}
-                    multiline={true}
-                />
-            </div>
-
-
-            <div>
-                内容
-                <TextArea
-                    value={title}
-                    onChange={(e) => {
-                        props.onChange(nodeTitleGroovyConvertor.resetExpression(e.target.value));
-                    }}
-                    placeholder="请输入标题配置脚本，支持使用变量"
-                    autoSize={{minRows: 3, maxRows: 12}}
-                />
-            </div>
-
-            <Space
-                style={{
-                    marginTop: 8
-                }}
-            >
-                <VariablePicker
-                    mappings={props.variables}
-                    onSelect={(variable) => {
-                        props.onChange(nodeTitleGroovyConvertor.addVariable(variable));
-                    }}
-                />
-                <Button
-                    icon={<CodeOutlined/>}
-                    onClick={() => {
-                        props.onChange(GroovyScriptConvertorUtil.toCustomScript(props.content));
-                    }}
-                >
-                    高级配置
-                </Button>
-                <Button
-                    icon={<DeleteOutlined/>}
-                    danger={true}
-                    onClick={() => {
-                        props.onChange(nodeTitleGroovyConvertor.getDefaultScript());
-                    }}
-                >
-                    重置配置
-                </Button>
-            </Space>
-        </div>
-    );
-}
-
-
 const NodeTitleConfigContent: React.FC<GroovyScriptContent> = (props) => {
-    const isAdvance = GroovyScriptConvertorUtil.isCustomScript(props.content);
-
-    console.log('NodeTitleConfigContent script', props.content);
+    const isAdvance = GroovyScriptConvertorUtil.isCustomScript(props.script);
 
     return (
         <>
@@ -100,7 +27,7 @@ const NodeTitleConfigContent: React.FC<GroovyScriptContent> = (props) => {
                 <AdvancedScriptEditor {...props} />
             )}
             {!isAdvance && (
-                <NodeTitleDefaultContent {...props} />
+                <NodeTitlePluginView {...props} />
             )}
         </>
     );
@@ -114,7 +41,7 @@ export const NodeTitleConfigModal: React.FC<NodeTitleConfigModalProps> = (props)
 
     return (
         <GroovyScriptModal
-            scriptType={ScriptType.TITLE}
+            type={ScriptType.TITLE}
             open={props.open}
             script={props.script}
             variables={props.variables || []}

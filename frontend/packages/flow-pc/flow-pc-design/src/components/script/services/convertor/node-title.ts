@@ -1,5 +1,6 @@
 import {GroovyScriptConverter, GroovyVariableMapping} from "@/components/script/typings";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {DEFAULT_NODE_TITLE_SCRIPT} from "@/components/script/default-script";
 
 
 export class NodeTitleGroovyConvertor implements GroovyScriptConverter {
@@ -22,10 +23,7 @@ export class NodeTitleGroovyConvertor implements GroovyScriptConverter {
     }
 
     getDefaultScript(): string {
-        return `
-        // @SCRIPT_TITLE 您有一条待办消息
-        def run(request){\nreturn \"您有一条待办消息\"\n}
-        `;
+        return DEFAULT_NODE_TITLE_SCRIPT;
     }
 
     addVariable(variable: GroovyVariableMapping): string {
