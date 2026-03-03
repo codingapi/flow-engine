@@ -11,11 +11,11 @@ import {NodeTitleStrategy} from "@/components/design-editor/node-components/stra
 import {OperatorLoadStrategy} from "@/components/design-editor/node-components/strategy/operator-load";
 import {View} from "@/components/design-editor/node-components/view";
 
-export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
+export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
   if (isSidebar) {
     return (
-      <NodePanel>
+      <NodePanel data={data}>
           <NodeHeader/>
           <TabNodeLayout hiddenAction={true}>
               <View/>
@@ -27,7 +27,7 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
     );
   }
   return (
-    <NodePanel>
+    <NodePanel data={data}>
         <NodeHeader/>
         notify
     </NodePanel>

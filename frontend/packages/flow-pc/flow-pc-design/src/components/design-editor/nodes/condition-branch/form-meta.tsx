@@ -7,18 +7,18 @@ import {NodeHeader} from "@/components/design-editor/node-components/header";
 import {NodePanel} from "@/components/design-editor/node-components/panel";
 import {ConditionScript} from "@/components/design-editor/node-components/condition";
 
-export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
+export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
   if (isSidebar) {
     return (
-      <NodePanel>
+      <NodePanel data={data}>
           <NodeHeader/>
           <ConditionScript/>
       </NodePanel>
     );
   }
   return (
-    <NodePanel>
+    <NodePanel data={data}>
         <NodeHeader/>
         branch
     </NodePanel>

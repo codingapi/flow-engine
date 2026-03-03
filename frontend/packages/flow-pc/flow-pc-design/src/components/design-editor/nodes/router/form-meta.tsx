@@ -8,11 +8,11 @@ import {NodePanel} from "@/components/design-editor/node-components/panel";
 import {PanelLayout} from "@/components/design-editor/node-components/layout";
 import {RouterStrategy} from "@/components/design-editor/node-components/strategy/router";
 
-export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
+export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
   if (isSidebar) {
     return (
-      <NodePanel>
+      <NodePanel data={data}>
           <NodeHeader/>
           <PanelLayout>
               <RouterStrategy/>
@@ -21,7 +21,7 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
     );
   }
   return (
-    <NodePanel>
+    <NodePanel data={data}>
         <NodeHeader/>
         router
     </NodePanel>

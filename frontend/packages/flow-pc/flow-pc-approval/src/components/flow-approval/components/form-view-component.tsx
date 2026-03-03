@@ -9,7 +9,7 @@ interface FormViewComponentProps{
 
 export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
     const {state, context} = useApprovalContext();
-    const ViewComponent = ViewBindPlugin.getInstance().get(state.flow?.view || 'default');
+    const ViewComponent = ViewBindPlugin.getInstance().get(state.flow?.view || 'default') ;
 
     const formMeta = state.flow?.form;
 

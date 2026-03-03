@@ -6,9 +6,9 @@ import {NodePanel} from "@/components/design-editor/node-components/panel";
 import {NodeIcon} from "@/components/design-editor/components/node-icon";
 import {Space} from "antd";
 
-export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
+export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   return (
-      <NodePanel>
+      <NodePanel data={data}>
           <Space style={
               {
                   width: 100,

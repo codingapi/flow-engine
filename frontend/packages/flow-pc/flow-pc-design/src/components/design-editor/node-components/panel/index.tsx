@@ -1,16 +1,28 @@
 import React, {useCallback, useContext, useMemo, useState} from "react";
 import {Flex, theme} from "antd";
 import {CloseCircleOutlined} from "@ant-design/icons";
-import {NodeRenderContext} from "@/components/design-editor/context";
-import {FlowNodeRegistry} from "@/components/design-editor/typings";
-import {useClientContext} from "@flowgram.ai/fixed-layout-editor";
+import {NodeFormContext, NodeRenderContext} from "@/components/design-editor/context";
+import {FlowNodeJSON, FlowNodeRegistry} from "@/components/design-editor/typings";
+import {FormRenderProps, useClientContext} from "@flowgram.ai/fixed-layout-editor";
 import {useIsSidebar} from "@/components/design-editor/hooks";
 
 interface NodePanelProps {
     children?: React.ReactNode;
+    data: FormRenderProps<FlowNodeJSON['data']>;
 }
 
 export const NodePanel: React.FC<NodePanelProps> = (props) => {
+    return (
+        <NodeFormContext.Provider value={props.data}>
+            <$NodePanel
+                {...props}
+            />
+        </NodeFormContext.Provider>
+    )
+}
+
+
+export const $NodePanel: React.FC<NodePanelProps> = (props) => {
     const [isHovered, setIsHovered] = useState(false);
     const {node, deleteNode} = useContext(NodeRenderContext);
     const clientContext = useClientContext();
@@ -48,7 +60,7 @@ export const NodePanel: React.FC<NodePanelProps> = (props) => {
         deleteNode();
     }, [deleteNode]);
 
-    if(isSidebar || canDeleteNode){
+    if (isSidebar || canDeleteNode) {
         return (
             <div
                 style={{

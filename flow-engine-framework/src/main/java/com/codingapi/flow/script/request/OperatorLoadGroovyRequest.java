@@ -20,6 +20,11 @@ public class OperatorLoadGroovyRequest extends BaseGroovyRequest {
     private IFlowOperator createdOperator;
 
     /**
+     * 当前操作人（上一节点审批人）
+     */
+    private IFlowOperator currentOperator;
+
+    /**
      * 从FlowSession构建OperatorLoadGroovyRequest
      * @param session 流程会话（不能为null）
      */
@@ -29,5 +34,6 @@ public class OperatorLoadGroovyRequest extends BaseGroovyRequest {
         if (session.getWorkflow() != null && session.getWorkflow().getCreatedOperator() != null) {
             this.createdOperator = session.getWorkflow().getCreatedOperator();
         }
+        this.currentOperator = session.getCurrentOperator();
     }
 }

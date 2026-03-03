@@ -9,11 +9,11 @@ import {NodeTitleStrategy} from "@/components/design-editor/node-components/stra
 import {RevokeStrategy} from "@/components/design-editor/node-components/strategy/revoke";
 import {View} from "@/components/design-editor/node-components/view";
 
-export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
+export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
   if (isSidebar) {
     return (
-      <NodePanel>
+      <NodePanel data={data}>
           <NodeHeader/>
           <TabNodeLayout>
               <View/>
@@ -24,9 +24,9 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
     );
   }
   return (
-    <NodePanel>
+    <NodePanel data={data}>
         <NodeHeader/>
-       start
+       流程发起人
     </NodePanel>
   );
 };
