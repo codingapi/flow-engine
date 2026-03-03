@@ -1,18 +1,18 @@
 import React from "react";
-import {OperatorCreateViewPlugin, VIEW_KEY} from "@/components/script/plugins/operator-create-view-type";
+import {OperatorLoadViewPlugin, VIEW_KEY} from "@/components/script/plugins/operator-load-view-type";
 import {Button, Form, Select, Space} from "antd";
 import {ViewBindPlugin} from "@flow-engine/flow-types";
-import {DEFAULT_OPERATOR_CREATE_SCRIPT, DEFAULT_OPERATOR_LOAD_SCRIPT} from "@/components/script/default-script";
+import {DEFAULT_OPERATOR_LOAD_SCRIPT} from "@/components/script/default-script";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
 
-export const OperatorCreatePluginView: React.FC<OperatorCreateViewPlugin> = (props) => {
+export const OperatorLoadPluginView: React.FC<OperatorLoadViewPlugin> = (props) => {
 
-    const OperatorCreatePluginViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
+    const OperatorLoadPluginViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
 
-    if (OperatorCreatePluginViewComponent) {
+    if (OperatorLoadPluginViewComponent) {
         return (
-            <OperatorCreatePluginViewComponent {...props} />
+            <OperatorLoadPluginViewComponent {...props} />
         );
     }
 
@@ -26,13 +26,13 @@ export const OperatorCreatePluginView: React.FC<OperatorCreateViewPlugin> = (pro
                 <Select
                     options={[
                         {
-                            label: '任意用户',
+                            label: '流程创建者',
                             value: '1',
-                        }
+                        },
                     ]}
                     placeholder={"请选择人员类型"}
                     onChange={(value) => {
-                        props.onChange(DEFAULT_OPERATOR_CREATE_SCRIPT);
+                        props.onChange(DEFAULT_OPERATOR_LOAD_SCRIPT);
                     }}
                 />
             </Form.Item>

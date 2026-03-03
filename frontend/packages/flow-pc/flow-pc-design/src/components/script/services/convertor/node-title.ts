@@ -1,9 +1,9 @@
-import {GroovyScriptConverter, GroovyVariableMapping} from "@/components/script/typings";
+import {GroovyVariableMapping} from "@/components/script/typings";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {DEFAULT_NODE_TITLE_SCRIPT} from "@/components/script/default-script";
 
 
-export class NodeTitleGroovyConvertor implements GroovyScriptConverter {
+export class NodeTitleGroovyConvertor  {
 
     private readonly script: string;
     private readonly mappings: GroovyVariableMapping[];

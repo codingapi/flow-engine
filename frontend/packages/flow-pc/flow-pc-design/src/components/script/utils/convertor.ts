@@ -31,9 +31,9 @@ export class GroovyScriptConvertorUtil {
      */
     public static toCustomScript(script: string): string {
         if (GroovyScriptConvertorUtil.isCustomScript(script)) {
-            return script;
+            return GroovyFormatter.formatScript(script);
         }
-        return `// ${CUSTOM_SCRIPT}\n${script}`;
+        return GroovyFormatter.formatScript(`// ${CUSTOM_SCRIPT}\n${script}`);
     }
 
 

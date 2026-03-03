@@ -5,7 +5,7 @@ import {Field, FieldRenderProps} from '@flowgram.ai/fixed-layout-editor';
 import {useDesignContext} from '@/components/design-panel/hooks/use-design-context';
 import {NodeTitleVariableAdapter} from "@/components/script/services/variable/node-title";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
-import {NodeTitleConfigModal} from "@/components/script/node-title-config-modal";
+import {NodeTitleConfigModal} from "@/components/script/modal/node-title-config-modal";
 
 /**
  * 节点标题策略配置

@@ -1,8 +1,8 @@
 import {FlowFromMeta} from "@flow-engine/flow-types";
-import {GroovyVariableAdapter, GroovyVariableMapping} from "@/components/script/typings";
+import {GroovyVariableMapping} from "@/components/script/typings";
 import {GroovyVariableUtil} from "@/components/script/utils/varibale";
 
-export class NodeTitleVariableAdapter implements GroovyVariableAdapter {
+export class NodeTitleVariableAdapter  {
 
     private readonly form: FlowFromMeta;
     private readonly variableUtil: GroovyVariableUtil;

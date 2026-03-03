@@ -1,9 +1,10 @@
 import React from 'react';
-import {GroovyScriptContent, GroovyScriptModal} from "./components/groovy-script-modal";
+import {GroovyScriptContent, GroovyScriptModal} from "../components/groovy-script-modal";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
 import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {NodeTitlePluginView} from "@/components/script/plugins/view/node-title-view";
+import {DEFAULT_NODE_TITLE_SCRIPT} from "@/components/script/default-script";
 
 export interface NodeTitleConfigModalProps {
     /** 是否展示 **/
@@ -24,7 +25,12 @@ const NodeTitleConfigContent: React.FC<GroovyScriptContent> = (props) => {
     return (
         <>
             {isAdvance && (
-                <AdvancedScriptEditor {...props} />
+                <AdvancedScriptEditor
+                    {...props}
+                    resetScript={()=>{
+                        return DEFAULT_NODE_TITLE_SCRIPT;
+                    }}
+                />
             )}
             {!isAdvance && (
                 <NodeTitlePluginView {...props} />

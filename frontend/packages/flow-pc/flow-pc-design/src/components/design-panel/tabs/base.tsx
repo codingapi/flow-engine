@@ -4,7 +4,7 @@ import {CardForm, Panel} from "@flow-engine/flow-pc-ui";
 import {useDesignContext} from "../hooks/use-design-context";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
 import {EditOutlined} from "@ant-design/icons";
-import {OperatorCreateConfigModal} from "@/components/script/operator-create-config-modal";
+import {OperatorCreateConfigModal} from "@/components/script/modal/operator-create-config-modal";
 
 
 interface FlowCreateOperatorEditorProps {
