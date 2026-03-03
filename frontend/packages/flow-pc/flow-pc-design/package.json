@@ -23,9 +23,11 @@
   },
   "dependencies": {
     "@ant-design/icons": "~6.1.0",
+    "@codemirror/lang-java": "^6.0.2",
+    "@codemirror/theme-one-dark": "^6.1.3",
     "@flow-engine/flow-core": "workspace:*",
-    "@flow-engine/flow-types": "workspace:*",
     "@flow-engine/flow-pc-ui": "workspace:*",
+    "@flow-engine/flow-types": "workspace:*",
     "@flowgram.ai/export-plugin": "1.0.7",
     "@flowgram.ai/fixed-layout-editor": "1.0.7",
     "@flowgram.ai/fixed-semi-materials": "1.0.7",

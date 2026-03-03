@@ -3,7 +3,7 @@ import React from "react";
 import {GroovyScriptContent} from "@/components/script/components/groovy-script-modal";
 import {MenuUnfoldOutlined, ReloadOutlined} from "@ant-design/icons";
 import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
-import {PythonCodeEditor} from "@flowgram.ai/form-materials";
+import {GroovyCodeEditor} from './groovy-code-editor';
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 
 interface ScriptEditorProps {
@@ -38,7 +38,7 @@ export const ScriptEditor: React.FC<ScriptEditorProps> = (props: ScriptEditorPro
     };
 
     return (
-        <PythonCodeEditor
+        <GroovyCodeEditor
             value={script}
             readonly={readonly}
             onChange={handleChange}

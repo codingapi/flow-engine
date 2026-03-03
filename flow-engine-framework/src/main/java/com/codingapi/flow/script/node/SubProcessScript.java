@@ -15,8 +15,8 @@ public class SubProcessScript {
 
     public static final String SCRIPT_DEFAULT = """
             // @SCRIPT_TITLE 创建当前流程 
-            def run(session){ 
-                return session.toCreateRequest() 
+            def run(request){ 
+                return request.toCreateRequest() 
             }
             """;
 

@@ -13,7 +13,7 @@ public class TriggerScript {
 
     public static final String SCRIPT_DEFAULT = """
             // @SCRIPT_TITLE 示例触发节点（打印触发日志） 
-            def run(session){ 
+            def run(request){ 
                 print('hello trigger node.'); 
             }
             """;

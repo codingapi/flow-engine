@@ -13,7 +13,7 @@ public class OperatorMatchScript {
 
     public static final String SCRIPT_ANY = """
             // @SCRIPT_TITLE 任意用户 
-            def run(operator){
+            def run(request){
                 return true
             }
             """;
