@@ -3,9 +3,11 @@ import {
     NodeTitleGroovyConvertor
 } from "@/components/design-editor/node-components/scripts/services/convertor/node-title";
 
-/** 自定义注释标记 */
-const CUSTOM_COMMENT = '@CUSTOM_SCRIPT';
+/** 自定义脚本标记 */
+const CUSTOM_SCRIPT = '@CUSTOM_SCRIPT';
 
+/** 脚本标题标记 */
+const SCRIPT_TITLE = '@SCRIPT_TITLE';
 
 /**
  * Groovy脚本转换器接口
@@ -94,7 +96,7 @@ export class GroovyScriptConvertorUtil {
      * @param script
      */
     public static isCustomScript(script: string): boolean {
-        return script.includes(CUSTOM_COMMENT);
+        return script.includes(CUSTOM_SCRIPT);
     }
 
     /**
@@ -105,8 +107,37 @@ export class GroovyScriptConvertorUtil {
         if (GroovyScriptConvertorUtil.isCustomScript(script)) {
             return script;
         }
-        return `// ${CUSTOM_COMMENT}\n${script}`;
+        return `// ${CUSTOM_SCRIPT}\n${script}`;
     }
+
+
+    /**
+     * 获取脚本中的标题注释内容
+     * @param script
+     */
+    public static getScriptTitle(script: string): string {
+        const titleMatch = script.match(new RegExp(`//\\s*${SCRIPT_TITLE}:\\s*(.+)`));
+        if (titleMatch) {
+            return titleMatch[1].trim();
+        }
+        return '';
+    }
+
+    /**
+     * 更新脚本中的标题注释内容，如果不存在则添加
+     * @param script
+     * @param title
+     */
+    public static updateScriptTitle(script: string, title: string): string {
+        const titleComment = `// ${SCRIPT_TITLE}: ${title}`;
+        if (GroovyScriptConvertorUtil.getScriptTitle(script)) {
+            return script.replace(new RegExp(`//\\s*${SCRIPT_TITLE}:\\s*.+`), titleComment);
+        } else {
+            return `${titleComment}\n${script}`;
+        }
+    }
+
+
 
     /**
      * 清除脚本中的注释
@@ -144,14 +175,14 @@ export class GroovyScriptConvertorUtil {
     /**
      * 将可视化表达式转换为Groovy表达式（编辑时）
      * @param expression
-     * @param mappings
+     * @param variables
      */
-    public static toScript(expression: string, mappings: GroovyVariableMapping[]): string {
+    public static toScript(expression: string, variables: GroovyVariableMapping[]): string {
 
         let result = expression;
 
         // 按label长度降序排序，避免短label替换长label的一部分
-        const sortedMappings = [...mappings].sort((a, b) => b.label.length - a.label.length);
+        const sortedMappings = [...variables].sort((a, b) => b.label.length - a.label.length);
 
         // 将 ${label} 替换为唯一的占位符
         const placeholders: Map<string, string> = new Map();
@@ -204,12 +235,12 @@ export class GroovyScriptConvertorUtil {
     /**
      * 将Groovy表达式转换为可视化表达式（回显时）
      * @param script
-     * @param mappings
+     * @param variables
      */
-    public static toExpression(script: string, mappings: GroovyVariableMapping[]): string {
+    public static toExpression(script: string, variables: GroovyVariableMapping[]): string {
         let result = script;
         const exprToLabel = new Map<string, string>();
-        for (const mapping of mappings) {
+        for (const mapping of variables) {
             exprToLabel.set(mapping.value, mapping.label);
         }
 
