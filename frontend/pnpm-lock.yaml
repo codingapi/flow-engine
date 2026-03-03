@@ -134,6 +134,9 @@ importers:
       '@flow-engine/flow-pc-design':
         specifier: workspace:*
         version: link:../flow-pc-design
+      '@flow-engine/flow-pc-form':
+        specifier: workspace:*
+        version: link:../flow-pc-form
       '@flow-engine/flow-pc-ui':
         specifier: workspace:*
         version: link:../flow-pc-ui

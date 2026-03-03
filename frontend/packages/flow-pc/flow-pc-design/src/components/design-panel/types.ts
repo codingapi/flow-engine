@@ -117,6 +117,7 @@ export const initStateData: State = {
         id:'',
         title:'',
         code:'',
+        operatorCreateScript:'',
         form:{
             code:'',
             name:'',

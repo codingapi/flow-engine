@@ -28,6 +28,7 @@
     "@flow-engine/flow-types": "workspace:*",
     "@flow-engine/flow-pc-design": "workspace:*",
     "@flow-engine/flow-pc-ui": "workspace:*",
+    "@flow-engine/flow-pc-form": "workspace:*",
     "@reduxjs/toolkit": "^2.11.2",
     "antd": "^6.2.1",
     "immer": "^11.1.3",
