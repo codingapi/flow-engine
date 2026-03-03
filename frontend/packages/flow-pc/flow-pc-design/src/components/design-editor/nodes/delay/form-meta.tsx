@@ -8,11 +8,11 @@ import {NodePanel} from "@/components/design-editor/node-components/panel";
 import {PanelLayout} from "@/components/design-editor/node-components/layout";
 import {DelayStrategy} from "@/components/design-editor/node-components/strategy/deplay";
 
-export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
+export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
   if (isSidebar) {
     return (
-      <NodePanel>
+      <NodePanel data={data}>
           <NodeHeader/>
           <PanelLayout>
               <DelayStrategy/>
@@ -21,9 +21,9 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
     );
   }
   return (
-    <NodePanel>
+    <NodePanel data={data}>
         <NodeHeader/>
-        delay
+        延迟配置
     </NodePanel>
   );
 };

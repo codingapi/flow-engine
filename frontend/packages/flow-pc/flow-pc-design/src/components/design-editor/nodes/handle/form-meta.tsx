@@ -16,12 +16,14 @@ import {RecordMergeStrategy} from "@/components/design-editor/node-components/st
 import {ResubmitStrategy} from "@/components/design-editor/node-components/strategy/resubmit";
 import {AdviceStrategy} from "@/components/design-editor/node-components/strategy/advice";
 import {View} from "@/components/design-editor/node-components/view";
+import {CurrentNodeOperator} from "@/components/design-editor/node-components/current-operator";
+import React from "react";
 
-export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
+export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
   if (isSidebar) {
     return (
-      <NodePanel>
+      <NodePanel data={data}>
           <NodeHeader/>
           <TabNodeLayout>
               <View/>
@@ -39,9 +41,9 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
     );
   }
   return (
-    <NodePanel>
+    <NodePanel data={data}>
         <NodeHeader/>
-        handle
+        <CurrentNodeOperator/>
     </NodePanel>
   );
 };

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Button, Col, Empty, Input, Popover, Row} from "antd";
 import {EditOutlined, SearchOutlined} from "@ant-design/icons";
-import {GroovyVariableMapping} from "@/components/design-editor/typings/script";
+import {GroovyVariableMapping} from "@/components/script/typings";
 
 export interface VariablePickerProps {
     /** 变量映射列表 */

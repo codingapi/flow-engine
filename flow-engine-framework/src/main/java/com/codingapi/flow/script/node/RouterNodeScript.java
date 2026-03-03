@@ -6,13 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 异常触发脚本
+ * 路由触发脚本
  */
 @AllArgsConstructor
 public class RouterNodeScript {
 
-
     public static final String SCRIPT_NODE_DEFAULT = """
+            // @SCRIPT_TITLE 发起节点 
             def run(request){
                 return request.getStartNode().getId();
             }

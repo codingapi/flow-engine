@@ -1,3 +1,4 @@
+import React from "react";
 import {provideJsonSchemaOutputs, syncVariableTitle,} from '@flowgram.ai/form-materials';
 import {FormMeta, FormRenderProps, ValidateTrigger,} from '@flowgram.ai/fixed-layout-editor';
 
@@ -17,12 +18,14 @@ import {TimeoutStrategy} from "@/components/design-editor/node-components/strate
 import {RecordMergeStrategy} from "@/components/design-editor/node-components/strategy/record-merge";
 import {RevokeStrategy} from "@/components/design-editor/node-components/strategy/revoke";
 import {View} from "@/components/design-editor/node-components/view";
+import {CurrentNodeOperator} from "@/components/design-editor/node-components/current-operator";
 
-export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
+
+export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
   if (isSidebar) {
     return (
-      <NodePanel>
+      <NodePanel data={data}>
           <NodeHeader/>
           <TabNodeLayout>
               <View/>
@@ -41,9 +44,9 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
     );
   }
   return (
-    <NodePanel>
+    <NodePanel data={data}>
         <NodeHeader/>
-        approval
+        <CurrentNodeOperator/>
     </NodePanel>
   );
 };

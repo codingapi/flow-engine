@@ -1,7 +1,6 @@
 import {type FlowNodeEntity, useClientContext} from '@flowgram.ai/fixed-layout-editor';
 import React, {useCallback, useContext} from "react";
 import {NodeRenderContext} from "@/components/design-editor/context";
-import {NodePanel} from "@/components/design-editor/node-components/panel";
 import {NodeHeader} from "@/components/design-editor/node-components/header";
 import {Button} from "antd";
 import {nodeFormPanelFactory} from "@/components/design-editor/components/sidebar";
@@ -54,13 +53,13 @@ export const BranchAdderRender: React.FC<BranchAdderProps> = (props) => {
     const canAddBranch = playground.config.readonlyOrDisabled;
 
     return (
-        <NodePanel>
+        <div>
             <NodeHeader
                 iconEnable={true}
                 style={{
                     width: 120
                 }}/>
             <Button type={'link'} disabled={canAddBranch} onClick={handleAddBranch}>{props.buttonText}</Button>
-        </NodePanel>
+        </div>
     );
 };

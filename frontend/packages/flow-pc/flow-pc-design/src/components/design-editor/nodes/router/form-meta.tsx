@@ -7,12 +7,14 @@ import {NodeHeader} from "@/components/design-editor/node-components/header";
 import {NodePanel} from "@/components/design-editor/node-components/panel";
 import {PanelLayout} from "@/components/design-editor/node-components/layout";
 import {RouterStrategy} from "@/components/design-editor/node-components/strategy/router";
+import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 
-export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
+export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
+  const script = data.form.getValueIn('RouterStrategy.script');
   if (isSidebar) {
     return (
-      <NodePanel>
+      <NodePanel data={data}>
           <NodeHeader/>
           <PanelLayout>
               <RouterStrategy/>
@@ -21,9 +23,9 @@ export const renderForm = ({ form }: FormRenderProps<FlowNodeJSON['data']>) => {
     );
   }
   return (
-    <NodePanel>
+    <NodePanel data={data}>
         <NodeHeader/>
-        router
+        {GroovyScriptConvertorUtil.getScriptTitle(script)}
     </NodePanel>
   );
 };

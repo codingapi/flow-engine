@@ -1,13 +1,5 @@
-import {GroovyVariableMapping, VariableTag} from "@/components/design-editor/typings/script";
+import {GroovyVariableMapping, VariableTag} from "@/components/script/typings";
 import {FlowFromMeta} from "@flow-engine/flow-types";
-
-/**
- * Groovy变量适配器接口
- * 用于提供不同脚本类型的变量列表
- */
-export interface GroovyVariableAdapter {
-    getVariables(): GroovyVariableMapping[];
-}
 
 
 export class GroovyVariableUtil {

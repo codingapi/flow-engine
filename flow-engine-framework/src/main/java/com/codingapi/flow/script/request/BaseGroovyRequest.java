@@ -22,7 +22,7 @@ public abstract class BaseGroovyRequest {
     /**
      * 当前操作人ID
      */
-    protected Integer operatorId;
+    protected long operatorId;
 
     /**
      * 是否流程管理员

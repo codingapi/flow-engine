@@ -1,12 +1,11 @@
 import React from "react";
-import {ViewComponentProps} from "@/types/view-component";
 
 /**
  *  视图绑定插件，提供视图组件注册和获取功能
  */
 export class ViewBindPlugin {
 
-    private readonly cache:Map<string,React.ComponentType<ViewComponentProps>>;
+    private readonly cache:Map<string,React.ComponentType<any>>;
 
     private  static readonly instance:ViewBindPlugin = new ViewBindPlugin();
 
@@ -18,7 +17,7 @@ export class ViewBindPlugin {
         return this.instance;
     }
 
-    public register(name:string,view:React.ComponentType<ViewComponentProps>){
+    public register(name:string,view:React.ComponentType<any>){
         this.cache.set(name,view);
     }
 

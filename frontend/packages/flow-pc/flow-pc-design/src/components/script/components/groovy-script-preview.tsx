@@ -1,23 +1,17 @@
 import React from "react";
-import {GroovyVariableMapping, ScriptType} from "@/components/design-editor/typings/script";
-import {
-    GroovyScriptConverterContext
-} from "@/components/design-editor/node-components/scripts/services/convertor/utils";
+import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 
 interface GroovyScriptPreviewProps {
     script: string;
-    variables: GroovyVariableMapping[];
-    type: ScriptType;
     // 多行
     multiline?: boolean;
 }
 
 export const GroovyScriptPreview: React.FC<GroovyScriptPreviewProps> = (props) => {
-    const groovyScriptConvertor = GroovyScriptConverterContext.getInstance().createConverter(props.type, props.script, props.variables);
 
     const multiline = props.multiline || false;
 
-    const value = groovyScriptConvertor?.toExpression() || '';
+    const value = GroovyScriptConvertorUtil.getScriptTitle(props.script);
 
     return (
         <>

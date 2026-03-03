@@ -1,15 +1,21 @@
+/** 自定义脚本标记 */
+export const CUSTOM_SCRIPT = '@CUSTOM_SCRIPT';
+
+/** 脚本标题标记 */
+export const SCRIPT_TITLE = '@SCRIPT_TITLE';
+
 /**
  * Groovy脚本类型枚举
  */
 export enum ScriptType {
-  /** 标题脚本 */
-  TITLE = 'TITLE',
-  /** 条件脚本 */
-  CONDITION = 'CONDITION',
-  /** 人员加载脚本 */
-  OPERATOR_LOAD = 'OPERATOR_LOAD',
-  /** 自定义脚本 */
-  CUSTOM = 'CUSTOM',
+    /** 标题脚本 */
+    TITLE = 'TITLE',
+    /** 条件脚本 */
+    CONDITION = 'CONDITION',
+    /** 人员加载脚本 */
+    OPERATOR_LOAD = 'OPERATOR_LOAD',
+    /** 流程创建人脚本 */
+    OPERATOR_CREATE = 'OPERATOR_LOAD',
 }
 
 /**
@@ -40,5 +46,4 @@ export enum VariableTag {
     FORM_FIELD = '表单字段',
     WORK_CODE = '流程编号',
 }
-
 

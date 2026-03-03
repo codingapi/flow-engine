@@ -2,10 +2,10 @@ import {describe, expect, it} from '@rstest/core';
 import {FlowFromMeta} from "@flow-engine/flow-types";
 import {
     NodeTitleGroovyConvertor
-} from "@/components/design-editor/node-components/scripts/services/convertor/node-title";
+} from "@/components/script/services/convertor/node-title";
 import {
     NodeTitleVariableAdapter
-} from "@/components/design-editor/node-components/scripts/services/variable/node-title";
+} from "@/components/script/services/variable/node-title";
 
 describe('NodeTitleGroovyConvertor', () => {
 
@@ -35,10 +35,8 @@ describe('NodeTitleGroovyConvertor', () => {
 
     const nodeTitleVariableAdapter = new NodeTitleVariableAdapter(form);
 
-
-
     describe('toExpression', () => {
-        it('should convert simple text to groovy script', () => {
+        it('node title script to expression', () => {
             const script = `
 def run(request){
 return "您有一条待办消息" + request.getOperatorId() + request.getOperatorId() + request.getCreatorName() + request.getIsFlowManager()
@@ -52,7 +50,7 @@ return "您有一条待办消息" + request.getOperatorId() + request.getOperato
 
 
     describe('resetExpression', () => {
-        it('should convert simple text to groovy script', () => {
+        it('node title script reset expression', () => {
             const script = `
 // @CUSTOM_SCRIPT 
 def run(request){

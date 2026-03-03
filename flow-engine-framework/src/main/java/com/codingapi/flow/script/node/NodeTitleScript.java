@@ -12,7 +12,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public class NodeTitleScript {
 
-    public static final String SCRIPT_DEFAULT = "def run(request){return '你有一条待办'}";
+    public static final String SCRIPT_DEFAULT = """
+            // @SCRIPT_TITLE 你有一条待办 
+            def run(request){
+                return '你有一条待办'
+            }
+            """;
 
     @Getter
     private final String script;

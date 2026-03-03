@@ -1,10 +1,10 @@
 import React from "react";
-import {type ViewComponentProps} from "@flow-engine/flow-types";
+import {FormViewProps} from "@flow-engine/flow-types";
 import {Form} from "antd";
 import {ObjectUtils} from "@flow-engine/flow-core";
 import {FormItemFactory} from "@/components/factory/form-item-factory";
 
-export const FlowFormView: React.FC<ViewComponentProps> = (props) => {
+export const FlowFormView: React.FC<FormViewProps> = (props) => {
 
     const [values, setValues] = React.useState<any>({});
 

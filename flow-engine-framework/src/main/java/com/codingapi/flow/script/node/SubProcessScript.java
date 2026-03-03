@@ -13,7 +13,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SubProcessScript {
 
-    public static final String SCRIPT_DEFAULT = "def run(session){ return session.toCreateRequest() }";
+    public static final String SCRIPT_DEFAULT = """
+            // @SCRIPT_TITLE 创建当前流程 
+            def run(request){ 
+                return request.toCreateRequest() 
+            }
+            """;
 
     @Getter
     private final String script;

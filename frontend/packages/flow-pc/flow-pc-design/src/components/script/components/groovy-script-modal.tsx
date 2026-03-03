@@ -1,12 +1,12 @@
 import React from 'react';
 import {Modal} from 'antd';
-import {ScriptType,GroovyVariableMapping} from '@/components/design-editor/typings/script';
+import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
 
 
 export interface GroovyScriptModalProps {
     open: boolean;
     /** 脚本类型 */
-    scriptType: ScriptType;
+    type: ScriptType;
     /** 当前脚本 */
     script: string;
     /** 变量映射列表 */
@@ -26,7 +26,7 @@ export interface GroovyScriptContent {
     /** 脚本类型 */
     type: ScriptType;
     /** 当前脚本 */
-    content: string;
+    script: string;
     /** 变量映射列表 */
     variables: GroovyVariableMapping[];
     /** 确认回调 */
@@ -56,8 +56,8 @@ const GroovyScriptContentComponent: React.FC<GroovyScriptContentComponentProps> 
 
     return (
         <GroovyContent
-            type={props.scriptType}
-            content={content}
+            type={props.type}
+            script={content}
             variables={props.variables}
             onChange={setContent}
         />

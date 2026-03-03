@@ -2,6 +2,7 @@ import React from "react";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
 import {ViewBindPlugin} from "@flow-engine/flow-types";
 import { Form } from "antd";
+import {FlowFormView} from "@flow-engine/flow-pc-form";
 
 interface FormViewComponentProps{
     onValuesChange?:(values:any)=>void;
@@ -9,7 +10,7 @@ interface FormViewComponentProps{
 
 export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
     const {state, context} = useApprovalContext();
-    const ViewComponent = ViewBindPlugin.getInstance().get(state.flow?.view || 'default');
+    const ViewComponent = ViewBindPlugin.getInstance().get(state.flow?.view || 'default') || FlowFormView ;
 
     const formMeta = state.flow?.form;
 
