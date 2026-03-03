@@ -15,7 +15,12 @@ import java.util.List;
 @AllArgsConstructor
 public class OperatorLoadScript {
 
-    public static final String SCRIPT_CREATOR = "def run(request){return [request.getCreatedOperator()]}";
+    public static final String SCRIPT_CREATOR = """
+            // @SCRIPT_TITLE 流程创建者 
+            def run(request){
+                return [request.getCreatedOperator()]
+            }
+            """;
 
     @Getter
     private final String script;

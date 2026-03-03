@@ -3,12 +3,9 @@ import {Button, Form, Space} from 'antd';
 import {EditOutlined} from '@ant-design/icons';
 import {Field, FieldRenderProps} from '@flowgram.ai/fixed-layout-editor';
 import {useDesignContext} from '@/components/design-panel/hooks/use-design-context';
-import {
-    NodeTitleVariableAdapter
-} from "@/components/design-editor/node-components/scripts/services/variable/node-title";
-import {GroovyScriptPreview} from "@/components/design-editor/node-components/scripts/components/groovy-script-preview";
-import {NodeTitleConfigModal} from "@/components/design-editor/node-components/scripts/node-title-config-modal";
-import {ScriptType} from "@/components/design-editor/typings/script";
+import {NodeTitleVariableAdapter} from "@/components/script/services/variable/node-title";
+import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
+import {NodeTitleConfigModal} from "@/components/script/node-title-config-modal";
 
 /**
  * 节点标题策略配置
@@ -36,8 +33,6 @@ export const NodeTitleStrategy: React.FC = () => {
                                 <Space.Compact style={{width: '100%'}}>
                                     <GroovyScriptPreview
                                         script={value}
-                                        variables={nodeTitleVariable.getVariables()}
-                                        type={ScriptType.TITLE}
                                     />
                                     <Button
                                         icon={<EditOutlined/>}

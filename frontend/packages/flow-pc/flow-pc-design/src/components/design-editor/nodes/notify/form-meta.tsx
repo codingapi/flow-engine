@@ -10,6 +10,8 @@ import {ErrorTriggerStrategy} from "@/components/design-editor/node-components/s
 import {NodeTitleStrategy} from "@/components/design-editor/node-components/strategy/node-title";
 import {OperatorLoadStrategy} from "@/components/design-editor/node-components/strategy/operator-load";
 import {View} from "@/components/design-editor/node-components/view";
+import {CurrentNodeOperator} from "@/components/design-editor/node-components/current-operator";
+import React from "react";
 
 export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
@@ -29,7 +31,7 @@ export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   return (
     <NodePanel data={data}>
         <NodeHeader/>
-        notify
+        <CurrentNodeOperator/>
     </NodePanel>
   );
 };

@@ -11,7 +11,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TriggerScript {
 
-    public static final String SCRIPT_DEFAULT = "def run(session){ print('hello trigger node.') }";
+    public static final String SCRIPT_DEFAULT = """
+            // @SCRIPT_TITLE 示例触发节点（打印触发日志） 
+            def run(session){ 
+                print('hello trigger node.'); 
+            }
+            """;
 
     @Getter
     private final String script;

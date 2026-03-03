@@ -1,7 +1,8 @@
 import React from "react";
-import {Button, Form,Input, Space} from "antd";
-import { Field, FieldRenderProps } from "@flowgram.ai/fixed-layout-editor";
-import { EditOutlined } from "@ant-design/icons";
+import {Button, Form, Space} from "antd";
+import {Field, FieldRenderProps} from "@flowgram.ai/fixed-layout-editor";
+import {EditOutlined} from "@ant-design/icons";
+import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
 
 /**
  * 操作人配置策略
@@ -28,7 +29,9 @@ export const OperatorLoadStrategy:React.FC = () => {
                     name="OperatorLoadStrategy.script"
                     render={({ field: { value, onChange } }: FieldRenderProps<any>) => (
                         <Space.Compact style={{width: '100%'}}>
-                            <Input value={value} onChange={onChange} />
+                            <GroovyScriptPreview
+                                script={value}
+                            />
 
                             <Button
                                 icon={<EditOutlined/>}

@@ -1,14 +1,11 @@
-import {ScriptType,GroovyVariableMapping} from '@/components/design-editor/typings/script';
 import {Button, Input, Space} from 'antd';
 import React from "react";
-import {GroovyScriptContent} from "@/components/design-editor/node-components/scripts/components/groovy-script-modal";
-import {
-    NodeTitleGroovyConvertor
-} from "@/components/design-editor/node-components/scripts/services/convertor/node-title";
-import { DeleteOutlined } from "@ant-design/icons";
+import {GroovyScriptContent} from "@/components/script/components/groovy-script-modal";
+import {DeleteOutlined} from "@ant-design/icons";
+import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
 import {
     GroovyScriptConverterContext
-} from "@/components/design-editor/node-components/scripts/services/convertor/utils";
+} from "@/components/script/context/groovy-script-convertor-context";
 
 const {TextArea} = Input;
 

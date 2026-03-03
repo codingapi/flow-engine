@@ -1,6 +1,6 @@
-import {GroovyVariableMapping} from "@/components/design-editor/typings/script";
 import {FlowFromMeta} from "@flow-engine/flow-types";
-import {GroovyVariableUtil,GroovyVariableAdapter} from "./utils";
+import {GroovyVariableAdapter, GroovyVariableMapping} from "@/components/script/typings";
+import {GroovyVariableUtil} from "@/components/script/utils/varibale";
 
 export class NodeTitleVariableAdapter implements GroovyVariableAdapter {
 

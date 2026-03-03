@@ -1,90 +1,5 @@
-import {GroovyVariableMapping, ScriptType} from "@/components/design-editor/typings/script";
-import {
-    NodeTitleGroovyConvertor
-} from "@/components/design-editor/node-components/scripts/services/convertor/node-title";
-
-/** 自定义脚本标记 */
-const CUSTOM_SCRIPT = '@CUSTOM_SCRIPT';
-
-/** 脚本标题标记 */
-const SCRIPT_TITLE = '@SCRIPT_TITLE';
-
-/**
- * Groovy脚本转换器接口
- */
-export interface GroovyScriptConverter {
-
-    /**
-     * 转换为完整Groovy脚本
-     */
-    getScript(): string;
-
-    /**
-     * 转换为可视化表达式（回显时）
-     */
-    toExpression(): string;
-
-    /**
-     * 获取默认脚本模板
-     */
-    getDefaultScript(): string;
-
-    /**
-     * 添加变量到脚本中
-     * @param variable
-     */
-    addVariable(variable: GroovyVariableMapping): string;
-
-    /**
-     * 重置脚本中的表达式部分（编辑时）
-     * @param expression 展示的表达式
-     */
-    resetExpression(expression: string): void;
-}
-
-/**
- * Groovy脚本转换器构造函数类型
- */
-export type GroovyScriptConverterConstructor = new (script: string, variables: GroovyVariableMapping[]) => GroovyScriptConverter;
-
-
-/**
- * Groovy脚本转换器上下文，负责管理不同类型脚本的转换器
- */
-export class GroovyScriptConverterContext {
-    private converterMap: Map<ScriptType, GroovyScriptConverterConstructor>;
-
-    private register(scriptType: ScriptType, converter: GroovyScriptConverterConstructor) {
-        this.converterMap.set(scriptType, converter);
-    }
-
-    public createConverter(scriptType: ScriptType, script: string, variables: GroovyVariableMapping[]): GroovyScriptConverter | undefined {
-        const constructor = this.converterMap.get(scriptType);
-        if (constructor) {
-            return new constructor(script, variables);
-        }
-        return undefined;
-    }
-
-    private constructor() {
-        this.converterMap = new Map();
-        this.initializeDefaultConverters();
-    }
-
-    private initializeDefaultConverters() {
-        try {
-            this.register(ScriptType.TITLE, NodeTitleGroovyConvertor);
-        } catch (e) {
-            console.error('Failed to register default converters:', e);
-        }
-    }
-
-    private static readonly instance = new GroovyScriptConverterContext();
-
-    public static getInstance(): GroovyScriptConverterContext {
-        return GroovyScriptConverterContext.instance;
-    }
-}
+import {CUSTOM_SCRIPT,SCRIPT_TITLE,GroovyVariableMapping} from "@/components/script/typings";
+import {GroovyFormatter} from "@/components/script/utils/format";
 
 /**
  * Groovy脚本转换器工具类，提供一些通用的脚本处理方法
@@ -98,6 +13,17 @@ export class GroovyScriptConvertorUtil {
     public static isCustomScript(script: string): boolean {
         return script.includes(CUSTOM_SCRIPT);
     }
+
+
+    /**
+     *  格式化脚本内容，去除多余空白等
+     *  @param script
+     */
+    public static formatScript(script: string): string {
+        // 这里可以添加一些格式化逻辑，比如统一换行、缩进等
+        return GroovyFormatter.formatScript(script);
+    }
+
 
     /**
      *  将普通脚本转换为包含自定义注释标记的脚本
@@ -116,7 +42,7 @@ export class GroovyScriptConvertorUtil {
      * @param script
      */
     public static getScriptTitle(script: string): string {
-        const titleMatch = script.match(new RegExp(`//\\s*${SCRIPT_TITLE}:\\s*(.+)`));
+        const titleMatch = script.match(new RegExp(`//\\s*${SCRIPT_TITLE}\\s*(.+)`));
         if (titleMatch) {
             return titleMatch[1].trim();
         }
@@ -129,14 +55,13 @@ export class GroovyScriptConvertorUtil {
      * @param title
      */
     public static updateScriptTitle(script: string, title: string): string {
-        const titleComment = `// ${SCRIPT_TITLE}: ${title}`;
+        const titleComment = `// ${SCRIPT_TITLE} ${title}`;
         if (GroovyScriptConvertorUtil.getScriptTitle(script)) {
-            return script.replace(new RegExp(`//\\s*${SCRIPT_TITLE}:\\s*.+`), titleComment);
+            return script.replace(new RegExp(`//\\s*${SCRIPT_TITLE}\\s*.+`), titleComment);
         } else {
             return `${titleComment}\n${script}`;
         }
     }
-
 
 
     /**
@@ -234,11 +159,11 @@ export class GroovyScriptConvertorUtil {
 
     /**
      * 将Groovy表达式转换为可视化表达式（回显时）
-     * @param script
+     * @param returnScript
      * @param variables
      */
-    public static toExpression(script: string, variables: GroovyVariableMapping[]): string {
-        let result = script;
+    public static toExpression(returnScript: string, variables: GroovyVariableMapping[]): string {
+        let result = returnScript;
         const exprToLabel = new Map<string, string>();
         for (const mapping of variables) {
             exprToLabel.set(mapping.value, mapping.label);

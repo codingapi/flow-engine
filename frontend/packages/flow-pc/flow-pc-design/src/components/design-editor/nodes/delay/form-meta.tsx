@@ -23,7 +23,7 @@ export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   return (
     <NodePanel data={data}>
         <NodeHeader/>
-        delay
+        延迟配置
     </NodePanel>
   );
 };

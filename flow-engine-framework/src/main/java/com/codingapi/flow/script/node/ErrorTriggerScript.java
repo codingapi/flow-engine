@@ -13,9 +13,19 @@ import lombok.Getter;
 public class ErrorTriggerScript {
 
 
-    public static final String SCRIPT_NODE_DEFAULT = "def run(request){ return $bind.createErrorThrow(request.getStartNode()); }";
+    public static final String SCRIPT_NODE_DEFAULT = """
+            // @SCRIPT_TITLE 回退至开始节点 
+            def run(request){ 
+                return $bind.createErrorThrow(request.getStartNode());
+            }
+            """;
 
-    public static final String SCRIPT_OPERATOR_DEFAULT = "def run(request){ return $bind.createErrorThrow(request.getCreatedOperator()); }";
+    public static final String SCRIPT_OPERATOR_DEFAULT = """
+            // @SCRIPT_TITLE 指定用户到流程发起者 
+            def run(request){ 
+                return $bind.createErrorThrow(request.getCreatedOperator());
+            }
+            """;
 
     @Getter
     private final String script;

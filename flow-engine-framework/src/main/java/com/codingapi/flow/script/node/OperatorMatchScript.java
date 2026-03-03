@@ -11,7 +11,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public class OperatorMatchScript {
 
-    public static final String SCRIPT_ANY = "def run(operator){return true}";
+    public static final String SCRIPT_ANY = """
+            // @SCRIPT_TITLE 任意用户 
+            def run(operator){
+                return true
+            }
+            """;
 
     @Getter
     private final String script;

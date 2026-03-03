@@ -1,13 +1,15 @@
 import React from 'react';
 import {Button, Input, Space} from 'antd';
-import {GroovyVariableMapping, ScriptType} from "@/components/design-editor/typings/script";
 import {GroovyScriptContent, GroovyScriptModal} from "./components/groovy-script-modal";
-import {GroovyScriptPreview} from "@/components/design-editor/node-components/scripts/components/groovy-script-preview";
+import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
 import {CodeOutlined, DeleteOutlined} from "@ant-design/icons";
 import {NodeTitleGroovyConvertor} from "./services/convertor/node-title";
-import {AdvancedScriptEditor} from "@/components/design-editor/node-components/scripts/components/advanced-script-editor";
-import {GroovyScriptConvertorUtil} from "@/components/design-editor/node-components/scripts/services/convertor/utils";
-import {VariablePicker} from "@/components/design-editor/node-components/scripts/components/variable-picker";
+import {
+    AdvancedScriptEditor
+} from "@/components/script/components/advanced-script-editor";
+import {VariablePicker} from "@/components/script/components/variable-picker";
+import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
+import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 
 const {TextArea} = Input;
 
@@ -28,14 +30,14 @@ const NodeTitleDefaultContent: React.FC<GroovyScriptContent> = (props) => {
 
     const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(props.content, props.variables);
 
+    const title = GroovyScriptConvertorUtil.getScriptTitle(props.content);
+
     return (
         <div>
             <div>
                 预览
                 <GroovyScriptPreview
                     script={props.content}
-                    variables={props.variables}
-                    type={ScriptType.TITLE}
                     multiline={true}
                 />
             </div>
@@ -44,7 +46,7 @@ const NodeTitleDefaultContent: React.FC<GroovyScriptContent> = (props) => {
             <div>
                 内容
                 <TextArea
-                    value={nodeTitleGroovyConvertor.toExpression()}
+                    value={title}
                     onChange={(e) => {
                         props.onChange(nodeTitleGroovyConvertor.resetExpression(e.target.value));
                     }}

@@ -9,7 +9,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ConditionScript {
 
-    public static final String SCRIPT_DEFAULT = "def run(request){return true}";
+    public static final String SCRIPT_DEFAULT = """
+            // @SCRIPT_TITLE 默认条件（允许执行）
+            def run(request){
+                return true;
+            }
+            """;
 
     @Getter
     private final String script;

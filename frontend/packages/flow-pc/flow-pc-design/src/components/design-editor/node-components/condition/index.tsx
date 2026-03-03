@@ -1,6 +1,8 @@
-import { Field, FieldRenderProps } from "@flowgram.ai/fixed-layout-editor";
-import { Form,Input } from "antd";
+import {Field, FieldRenderProps} from "@flowgram.ai/fixed-layout-editor";
+import {Button, Form, Space} from "antd";
 import React from "react";
+import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
+import {EditOutlined} from "@ant-design/icons";
 
 /**
  * 条件配置
@@ -25,9 +27,20 @@ export const ConditionScript = ()=>{
                 <Field
                     name={"script"}
                     render={({ field: { value, onChange } }: FieldRenderProps<any>) => (
-                        <>
-                            <Input value={value} onChange={onChange} />
-                        </>
+                        <Space.Compact style={{width: '100%'}}>
+                            <GroovyScriptPreview
+                                script={value}
+                            />
+
+                            <Button
+                                icon={<EditOutlined/>}
+                                onClick={() => {
+                                }}
+                                style={{borderRadius: '0 6px 6px 0'}}
+                            >
+                                编辑
+                            </Button>
+                        </Space.Compact>
                     )}
                 />
             </Form.Item>

@@ -59,6 +59,8 @@ export interface Workflow {
     title: string;
     code: string;
     form: FlowForm;
+    // 流程创建人脚本
+    operatorCreateScript:string;
     strategies?:any[];
     nodes?:FlowNode[];
     edges?:FlowEdge[];

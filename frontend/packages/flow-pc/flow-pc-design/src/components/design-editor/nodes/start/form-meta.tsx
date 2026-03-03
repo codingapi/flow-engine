@@ -8,37 +8,40 @@ import {TabNodeLayout} from "@/components/design-editor/node-components/layout";
 import {NodeTitleStrategy} from "@/components/design-editor/node-components/strategy/node-title";
 import {RevokeStrategy} from "@/components/design-editor/node-components/strategy/revoke";
 import {View} from "@/components/design-editor/node-components/view";
+import {useDesignContext} from "@/components/design-panel/hooks/use-design-context";
+import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 
 export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
-  const isSidebar = useIsSidebar();
-  if (isSidebar) {
+    const isSidebar = useIsSidebar();
+    const {state} = useDesignContext();
+    if (isSidebar) {
+        return (
+            <NodePanel data={data}>
+                <NodeHeader/>
+                <TabNodeLayout>
+                    <View/>
+                    <NodeTitleStrategy/>
+                    <RevokeStrategy/>
+                </TabNodeLayout>
+            </NodePanel>
+        );
+    }
     return (
-      <NodePanel data={data}>
-          <NodeHeader/>
-          <TabNodeLayout>
-              <View/>
-              <NodeTitleStrategy/>
-              <RevokeStrategy/>
-          </TabNodeLayout>
-      </NodePanel>
+        <NodePanel data={data}>
+            <NodeHeader/>
+            {GroovyScriptConvertorUtil.getScriptTitle(state.workflow.operatorCreateScript)}
+        </NodePanel>
     );
-  }
-  return (
-    <NodePanel data={data}>
-        <NodeHeader/>
-       流程发起人
-    </NodePanel>
-  );
 };
 
 export const formMeta: FormMeta<FlowNodeJSON['data']> = {
-  render: renderForm,
-  validateTrigger: ValidateTrigger.onChange,
-  validate: {
-    title: ({ value }: { value: string }) => (value ? undefined : 'Title is required'),
-  },
-  effect: {
-    title: syncVariableTitle,
-    outputs: provideJsonSchemaOutputs,
-  },
+    render: renderForm,
+    validateTrigger: ValidateTrigger.onChange,
+    validate: {
+        title: ({value}: { value: string }) => (value ? undefined : 'Title is required'),
+    },
+    effect: {
+        title: syncVariableTitle,
+        outputs: provideJsonSchemaOutputs,
+    },
 };

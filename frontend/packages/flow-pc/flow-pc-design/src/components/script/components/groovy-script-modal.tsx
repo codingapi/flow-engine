@@ -1,6 +1,6 @@
 import React from 'react';
 import {Modal} from 'antd';
-import {ScriptType,GroovyVariableMapping} from '@/components/design-editor/typings/script';
+import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
 
 
 export interface GroovyScriptModalProps {

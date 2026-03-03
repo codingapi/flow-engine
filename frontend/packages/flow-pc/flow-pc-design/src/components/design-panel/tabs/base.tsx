@@ -1,9 +1,38 @@
 import React from "react";
-import {Input} from "antd";
+import {Button, Input, Space} from "antd";
 import {Panel} from "@flow-engine/flow-pc-ui";
 import {CardForm} from "@flow-engine/flow-pc-ui";
 import {useDesignContext} from "../hooks/use-design-context";
+import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
+import { EditOutlined } from "@ant-design/icons";
 
+
+interface FlowCreateOperatorEditorProps{
+    value?:string;
+    onChange?:(value:string) => void;
+}
+
+const FlowCreateOperatorEditor:React.FC<FlowCreateOperatorEditorProps> = (props)=>{
+
+    const script = props.value || '';
+
+    return (
+        <Space.Compact style={{width: '100%'}}>
+            <GroovyScriptPreview
+                script={script}
+            />
+
+            <Button
+                icon={<EditOutlined/>}
+                onClick={() => {
+                }}
+                style={{borderRadius: '0 6px 6px 0'}}
+            >
+                编辑
+            </Button>
+        </Space.Compact>
+    )
+}
 
 export const TabBase = () => {
 
@@ -128,7 +157,7 @@ export const TabBase = () => {
                         }
                     ]}
                 >
-                    <Input placeholder={"请输入发起人范围"}/>
+                    <FlowCreateOperatorEditor/>
                 </CardForm.Item>
             </CardForm>
         </Panel>
