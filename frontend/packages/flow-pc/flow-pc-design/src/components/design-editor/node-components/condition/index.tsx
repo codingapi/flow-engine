@@ -3,6 +3,7 @@ import {Button, Form, Space} from "antd";
 import React from "react";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
 import {EditOutlined} from "@ant-design/icons";
+import {ConditionConfigModal} from "@/components/script/modal/condition-config-modal";
 
 /**
  * 条件配置
@@ -11,6 +12,7 @@ import {EditOutlined} from "@ant-design/icons";
 export const ConditionScript = ()=>{
 
     const [form] = Form.useForm();
+    const [visible,setVisible] = React.useState(false);
 
     return (
         <Form
@@ -35,11 +37,19 @@ export const ConditionScript = ()=>{
                             <Button
                                 icon={<EditOutlined/>}
                                 onClick={() => {
+                                    setVisible(true);
                                 }}
                                 style={{borderRadius: '0 6px 6px 0'}}
                             >
                                 编辑
                             </Button>
+
+                            <ConditionConfigModal
+                                open={visible}
+                                onCancel={()=>{setVisible(false);}}
+                                onConfirm={(value)=>{onChange(value)}}
+                                script={value}
+                            />
                         </Space.Compact>
                     )}
                 />

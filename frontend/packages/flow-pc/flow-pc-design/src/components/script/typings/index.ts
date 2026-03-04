@@ -16,6 +16,14 @@ export enum ScriptType {
     OPERATOR_LOAD = 'OPERATOR_LOAD',
     /** 流程创建人脚本 */
     OPERATOR_CREATE = 'OPERATOR_LOAD',
+    /** 异常触发脚本 */
+    ERROR_TRIGGER = 'ERROR_TRIGGER',
+    /** 触发节点脚本 */
+    TRIGGER = 'TRIGGER',
+    /** 路由节点脚本 */
+    ROUTER = 'ROUTER',
+    /** 子流程节点脚本 */
+    SUB_PROCESS = 'SUB_PROCESS',
 }
 
 /**

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 流程审批节点
@@ -80,6 +81,20 @@ public class ProcessNode {
         this.state = STATE_CURRENT;
     }
 
+
+    @Override
+    public boolean equals(Object target) {
+        if(target instanceof ProcessNode) {
+            ProcessNode targetNode = (ProcessNode) target;
+            return targetNode.getNodeId().equals(this.getNodeId());
+        }
+        return super.equals(target);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nodeId, nodeName, nodeType, state, operators);
+    }
 
     /**
      * 审批意见内容，仅当历史节点存在数据
