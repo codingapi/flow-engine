@@ -1,8 +1,9 @@
 import React from "react";
-import {Button, Form,Input, Space} from "antd";
-import { Field, FieldRenderProps } from "@flowgram.ai/fixed-layout-editor";
+import {Button, Form, Space} from "antd";
+import {Field, FieldRenderProps} from "@flowgram.ai/fixed-layout-editor";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
-import { EditOutlined } from "@ant-design/icons";
+import {EditOutlined} from "@ant-design/icons";
+import {ErrorTriggerConfigModal} from "@/components/script/modal/error-trigger-config-modal";
 
 /**
  * 错误触发策略配置(没有匹配到人时)
@@ -11,6 +12,7 @@ import { EditOutlined } from "@ant-design/icons";
 export const ErrorTriggerStrategy: React.FC = () => {
 
     const [form] = Form.useForm();
+    const [visible,setVisible] = React.useState(false);
 
     return (
         <Form
@@ -36,11 +38,19 @@ export const ErrorTriggerStrategy: React.FC = () => {
                             <Button
                                 icon={<EditOutlined/>}
                                 onClick={() => {
+                                    setVisible(true);
                                 }}
                                 style={{borderRadius: '0 6px 6px 0'}}
                             >
                                 编辑
                             </Button>
+
+                            <ErrorTriggerConfigModal
+                                open={visible}
+                                onCancel={()=>{setVisible(false);}}
+                                onConfirm={(value)=>{onChange(value)}}
+                                script={value}
+                            />
                         </Space.Compact>
                     )}
                 />

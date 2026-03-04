@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- *  流程节点管理器，主要获取流程节点信息
+ * 流程节点管理器，主要获取流程节点信息
  */
 public class FlowNodeManager {
 
@@ -29,9 +29,9 @@ public class FlowNodeManager {
                 return node;
             }
             List<IFlowNode> blocks = node.blocks();
-            if(blocks!=null && !blocks.isEmpty()){
-                IFlowNode flowNode = this.fetchNodes(nodeId,blocks);
-                if(flowNode!=null){
+            if (blocks != null && !blocks.isEmpty()) {
+                IFlowNode flowNode = this.fetchNodes(nodeId, blocks);
+                if (flowNode != null) {
                     return flowNode;
                 }
             }
@@ -74,12 +74,13 @@ public class FlowNodeManager {
 
         /**
          * 加载下一节点
-         * @param current 当前节点状态
-         * @param iterator  当前遍历的节点列表
+         *
+         * @param current  当前节点状态
+         * @param iterator 当前遍历的节点列表
          * @return 下一节点列表
          */
         private List<IFlowNode> loadNextNodes(FlowNodeState current, Iterator<FlowNodeState> iterator) {
-            if(current.isEndNode()){
+            if (current.isEndNode()) {
                 return new ArrayList<>();
             }
             while (iterator.hasNext()) {
@@ -89,7 +90,17 @@ public class FlowNodeManager {
                         return node.getBlocks();
                     }
                     if (node.isBranchNode()) {
-                        return node.getFirstBlocks();
+                        List<IFlowNode> nextNodes = node.getFirstBlocks();
+                        if(!nextNodes.isEmpty()){
+                            return nextNodes;
+                        }else {
+                            // 跳过大循环，直接进入下一节点
+                            if (this.nodes.hasNext()) {
+                                return Stream.of(this.nodes.next().getNode()).toList();
+                            } else {
+                                throw FlowStateException.edgeConfigError(current.getName());
+                            }
+                        }
                     }
                     if (iterator.hasNext()) {
                         FlowNodeState next = iterator.next();
@@ -98,19 +109,20 @@ public class FlowNodeManager {
                         // 跳过大循环，直接进入下一节点
                         if (this.nodes.hasNext()) {
                             return Stream.of(this.nodes.next().getNode()).toList();
-                        }else {
+                        } else {
                             throw FlowStateException.edgeConfigError(current.getName());
                         }
                     }
                 }
 
                 if (node.isBlockNode() || node.isBranchNode()) {
-                    List<IFlowNode> nextNodes = this.loadNextNodes(current, node.getBlocks().stream().map(FlowNodeState::new).toList().iterator());
-                    if (!nextNodes.isEmpty()) {
-                        return nextNodes;
+                    if (node.getBlocks() != null) {
+                        List<IFlowNode> nextNodes = this.loadNextNodes(current, node.getBlocks().stream().map(FlowNodeState::new).toList().iterator());
+                        if (!nextNodes.isEmpty()) {
+                            return nextNodes;
+                        }
                     }
                 }
-
             }
             return new ArrayList<>();
         }

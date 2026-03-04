@@ -10,6 +10,7 @@ import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowProcessNodeRequest;
@@ -21,6 +22,7 @@ import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +47,7 @@ public class FlowProcessNodeService {
     // 流程节点记录
     private final List<ProcessNode> nodeList;
 
+
     public FlowProcessNodeService(FlowProcessNodeRequest request) {
         this.request = request;
         this.currentOperator = RepositoryHolderContext.getInstance().getOperatorById(request.getOperatorId());
@@ -54,6 +57,7 @@ public class FlowProcessNodeService {
         this.nodeList = new ArrayList<>();
         this.loadWorkflow();
     }
+
 
     private void loadWorkflow() {
         String id = this.request.getId();
@@ -104,30 +108,70 @@ public class FlowProcessNodeService {
                 FlowAdvice.nullFlowAdvice()
         );
 
-        this.fetchNextNode(flowSession, List.of(this.currentNode));
+        NextNodeLoader nextNodeLoader = new NextNodeLoader(this.currentNode);
+        List<ProcessNode> nextNodes =  nextNodeLoader.loadNextNode(flowSession);
 
-        // 推理后续
-        return nodeList;
+        this.nodeList.addAll(nextNodes);
+        return this.nodeList;
     }
 
 
-    private void fetchNextNode(FlowSession flowSession, List<IFlowNode> nexNodes) {
-        for (IFlowNode flowNode : nexNodes) {
-            List<IFlowOperator> operators = null;
-            if(flowNode.getType().equals(StartNode.NODE_TYPE)){
-                operators = List.of(flowSession.getCurrentOperator());
-            }else {
-                NodeStrategyManager nodeStrategyManager = flowNode.strategyManager();
-                OperatorManager operatorManager = nodeStrategyManager.loadOperators(flowSession);
-                operators = operatorManager.getOperators();
+    private class NextNodeLoader {
+
+        @Getter
+        private final List<ProcessNode> nodeList;
+        private final IFlowNode currentNode;
+        private final List<String> displayNodeTypes;
+
+        public NextNodeLoader(IFlowNode currentNode) {
+            this.currentNode = currentNode;
+            this.nodeList = new ArrayList<>();
+            this.displayNodeTypes = new ArrayList<>();
+            this.initDisplayNodeTypes();
+        }
+
+
+        private void initDisplayNodeTypes() {
+            this.displayNodeTypes.add(NodeType.START.name());
+            this.displayNodeTypes.add(NodeType.END.name());
+            this.displayNodeTypes.add(NodeType.APPROVAL.name());
+            this.displayNodeTypes.add(NodeType.NOTIFY.name());
+            this.displayNodeTypes.add(NodeType.HANDLE.name());
+            this.displayNodeTypes.add(NodeType.TRIGGER.name());
+            this.displayNodeTypes.add(NodeType.SUB_PROCESS.name());
+        }
+
+        private void fetchNextNode(FlowSession flowSession, List<IFlowNode> nexNodes) {
+            for (IFlowNode flowNode : nexNodes) {
+                List<IFlowOperator> operators = null;
+                if (flowNode.getType().equals(StartNode.NODE_TYPE)) {
+                    operators = List.of(flowSession.getCurrentOperator());
+                } else {
+                    NodeStrategyManager nodeStrategyManager = flowNode.strategyManager();
+                    OperatorManager operatorManager = nodeStrategyManager.loadOperators(flowSession);
+                    operators = operatorManager.getOperators();
+                }
+                ProcessNode processNode = new ProcessNode(flowNode, operators);
+                if (processNode.isFlowNode(this.currentNode)) {
+                    processNode.setCurrentState();
+                }
+                this.nodeList.add(processNode);
+                List<IFlowNode> nextNodes = workflow.nextNodes(flowNode);
+                this.fetchNextNode(flowSession.updateSession(flowNode), nextNodes);
             }
-            ProcessNode processNode = new ProcessNode(flowNode,operators);
-            if(processNode.isFlowNode(this.currentNode)){
-                processNode.setCurrentState();
+        }
+
+        public List<ProcessNode> loadNextNode(FlowSession flowSession) {
+            this.fetchNextNode(flowSession,List.of(this.currentNode));
+
+            List<ProcessNode> displayNodes = nodeList.stream().filter(node-> this.displayNodeTypes.contains(node.getNodeType())).toList();
+            List<ProcessNode> processNodeList = new ArrayList<>();
+            for (ProcessNode node:displayNodes){
+                if(!processNodeList.contains(node)){
+                    processNodeList.add(node);
+                }
             }
-            this.nodeList.add(processNode);
-            List<IFlowNode> nextNodes = workflow.nextNodes(flowNode);
-            this.fetchNextNode(flowSession.updateSession(flowNode), nextNodes);
+            return processNodeList;
         }
     }
 
