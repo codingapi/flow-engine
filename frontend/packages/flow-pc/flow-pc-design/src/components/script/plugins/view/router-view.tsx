@@ -1,29 +1,67 @@
 import React from "react";
 import {RouterViewPlugin, VIEW_KEY} from "@/components/script/plugins/router-view-type";
 import {ViewBindPlugin} from "@flow-engine/flow-types";
-import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
-import {DEFAULT_ROUTER_SCRIPT} from "@/components/script/default-script";
+import {SCRIPT_DEFAULT_ROUTER} from "@/components/script/default-script";
+import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {Button, Form, Select, Space} from "antd";
+import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
+import {useNodeRouterManager} from "@/components/design-panel/hooks/use-node-router-manager";
+import {RouterConvertor} from "@/components/script/services/convertor/router";
 
 /**
- * TODO 路由配置界面
  * @param props
  * @constructor
  */
 export const RouterPluginView: React.FC<RouterViewPlugin> = (props) => {
     const TriggerPluginViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
-    if(TriggerPluginViewComponent){
+    const nodeRouterManager = useNodeRouterManager();
+
+    if (TriggerPluginViewComponent) {
         return (
             <TriggerPluginViewComponent {...props} />
         );
     }
 
-
     return (
-        <AdvancedScriptEditor
-            {...props}
-            resetScript={()=>{
-                return DEFAULT_ROUTER_SCRIPT;
-            }}
-        />
+        <div>
+            <Form>
+                <Form.Item
+                    name={"node"}
+                    label={"跳转节点"}
+                >
+                    <Select
+                        options={nodeRouterManager.getNodes()}
+                        onChange={(value, option) => {
+                            const script = RouterConvertor.goNode(option as any);
+                            props.onChange(script);
+                        }}
+                    />
+                </Form.Item>
+            </Form>
+
+            <Space
+                style={{
+                    marginTop: 8
+                }}
+            >
+                <Button
+                    icon={<CodeOutlined/>}
+                    onClick={() => {
+                        props.onChange(GroovyScriptConvertorUtil.toCustomScript(props.script));
+                    }}
+                >
+                    高级配置
+                </Button>
+                <Button
+                    icon={<ReloadOutlined/>}
+                    danger={true}
+                    onClick={() => {
+                        props.onChange(SCRIPT_DEFAULT_ROUTER);
+                    }}
+                >
+                    重置脚本
+                </Button>
+            </Space>
+        </div>
     );
 }

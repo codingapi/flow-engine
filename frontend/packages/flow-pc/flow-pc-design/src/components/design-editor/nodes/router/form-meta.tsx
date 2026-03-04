@@ -7,11 +7,11 @@ import {NodeHeader} from "@/components/design-editor/node-components/header";
 import {NodePanel} from "@/components/design-editor/node-components/panel";
 import {PanelLayout} from "@/components/design-editor/node-components/layout";
 import {RouterStrategy} from "@/components/design-editor/node-components/strategy/router";
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import React from "react";
+import {NodeHint} from "@/components/design-editor/node-components/node-hint";
 
 export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
-  const script = data.form.getValueIn('RouterStrategy.script');
   if (isSidebar) {
     return (
       <NodePanel data={data}>
@@ -25,7 +25,7 @@ export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   return (
     <NodePanel data={data}>
         <NodeHeader/>
-        {GroovyScriptConvertorUtil.getScriptTitle(script)}
+        <NodeHint fieldName={"RouterStrategy.script"}/>
     </NodePanel>
   );
 };

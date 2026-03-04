@@ -18,7 +18,7 @@ import {TimeoutStrategy} from "@/components/design-editor/node-components/strate
 import {RecordMergeStrategy} from "@/components/design-editor/node-components/strategy/record-merge";
 import {RevokeStrategy} from "@/components/design-editor/node-components/strategy/revoke";
 import {View} from "@/components/design-editor/node-components/view";
-import {CurrentNodeOperator} from "@/components/design-editor/node-components/current-operator";
+import {NodeHint} from "@/components/design-editor/node-components/node-hint";
 
 
 export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
@@ -46,7 +46,7 @@ export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   return (
     <NodePanel data={data}>
         <NodeHeader/>
-        <CurrentNodeOperator/>
+        <NodeHint fieldName={"OperatorLoadStrategy.script"}/>
     </NodePanel>
   );
 };

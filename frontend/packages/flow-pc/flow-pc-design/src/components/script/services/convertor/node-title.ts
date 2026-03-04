@@ -1,6 +1,6 @@
 import {GroovyVariableMapping} from "@/components/script/typings";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
-import {DEFAULT_NODE_TITLE_SCRIPT} from "@/components/script/default-script";
+import {SCRIPT_DEFAULT_NODE_TITLE} from "@/components/script/default-script";
 
 
 export class NodeTitleGroovyConvertor  {
@@ -23,7 +23,7 @@ export class NodeTitleGroovyConvertor  {
     }
 
     getDefaultScript(): string {
-        return DEFAULT_NODE_TITLE_SCRIPT;
+        return SCRIPT_DEFAULT_NODE_TITLE;
     }
 
     addVariable(variable: GroovyVariableMapping): string {

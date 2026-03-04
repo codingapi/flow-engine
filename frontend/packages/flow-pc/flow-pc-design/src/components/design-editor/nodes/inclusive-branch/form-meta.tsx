@@ -6,11 +6,11 @@ import {useIsSidebar} from '../../hooks';
 import {NodeHeader} from "@/components/design-editor/node-components/header";
 import {NodePanel} from "@/components/design-editor/node-components/panel";
 import {ConditionScript} from "@/components/design-editor/node-components/condition";
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import React from "react";
+import {NodeHint} from "@/components/design-editor/node-components/node-hint";
 
 export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
     const isSidebar = useIsSidebar();
-    const script = data.form.getValueIn('script');
     if (isSidebar) {
         return (
             <NodePanel data={data}>
@@ -22,7 +22,7 @@ export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
     return (
         <NodePanel data={data}>
             <NodeHeader/>
-            {GroovyScriptConvertorUtil.getScriptTitle(script)}
+            <NodeHint fieldName={"script"}/>
         </NodePanel>
     );
 };

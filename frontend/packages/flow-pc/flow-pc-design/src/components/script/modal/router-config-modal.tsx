@@ -3,7 +3,7 @@ import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
 import {GroovyScriptContent, GroovyScriptModal} from "@/components/script/components/groovy-script-modal";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
-import {DEFAULT_ROUTER_SCRIPT} from "@/components/script/default-script";
+import {SCRIPT_DEFAULT_ROUTER} from "@/components/script/default-script";
 import {RouterPluginView} from "@/components/script/plugins/view/router-view";
 
 export interface RouterConfigModalProps {
@@ -19,8 +19,6 @@ export interface RouterConfigModalProps {
     onConfirm: (script: string) => void;
 }
 
-
-
 const RouterConfigContent: React.FC<GroovyScriptContent> = (props) => {
     const isAdvance = GroovyScriptConvertorUtil.isCustomScript(props.script);
 
@@ -30,7 +28,7 @@ const RouterConfigContent: React.FC<GroovyScriptContent> = (props) => {
                 <AdvancedScriptEditor
                     {...props}
                     resetScript={()=>{
-                        return DEFAULT_ROUTER_SCRIPT;
+                        return SCRIPT_DEFAULT_ROUTER;
                     }}
                 />
             )}
@@ -50,7 +48,7 @@ export const RouterConfigModal:React.FC<RouterConfigModalProps> = (props) => {
             variables={props.variables || []}
             onConfirm={props.onConfirm}
             onCancel={props.onCancel}
-            title="理由配置"
+            title="路由配置"
             content={RouterConfigContent}
         />
     );

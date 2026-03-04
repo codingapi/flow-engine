@@ -16,8 +16,8 @@ import {RecordMergeStrategy} from "@/components/design-editor/node-components/st
 import {ResubmitStrategy} from "@/components/design-editor/node-components/strategy/resubmit";
 import {AdviceStrategy} from "@/components/design-editor/node-components/strategy/advice";
 import {View} from "@/components/design-editor/node-components/view";
-import {CurrentNodeOperator} from "@/components/design-editor/node-components/current-operator";
 import React from "react";
+import {NodeHint} from "@/components/design-editor/node-components/node-hint";
 
 export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   const isSidebar = useIsSidebar();
@@ -43,7 +43,7 @@ export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
   return (
     <NodePanel data={data}>
         <NodeHeader/>
-        <CurrentNodeOperator/>
+        <NodeHint fieldName={"OperatorLoadStrategy.script"}/>
     </NodePanel>
   );
 };

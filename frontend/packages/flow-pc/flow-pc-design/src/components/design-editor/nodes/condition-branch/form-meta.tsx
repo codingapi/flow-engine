@@ -6,35 +6,35 @@ import {useIsSidebar} from '../../hooks';
 import {NodeHeader} from "@/components/design-editor/node-components/header";
 import {NodePanel} from "@/components/design-editor/node-components/panel";
 import {ConditionScript} from "@/components/design-editor/node-components/condition";
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import React from "react";
+import {NodeHint} from "@/components/design-editor/node-components/node-hint";
 
 export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
-  const isSidebar = useIsSidebar();
-  const script = data.form.getValueIn('script');
-  if (isSidebar) {
+    const isSidebar = useIsSidebar();
+    if (isSidebar) {
+        return (
+            <NodePanel data={data}>
+                <NodeHeader/>
+                <ConditionScript/>
+            </NodePanel>
+        );
+    }
     return (
-      <NodePanel data={data}>
-          <NodeHeader/>
-          <ConditionScript/>
-      </NodePanel>
+        <NodePanel data={data}>
+            <NodeHeader/>
+            <NodeHint fieldName={"script"}/>
+        </NodePanel>
     );
-  }
-  return (
-    <NodePanel data={data}>
-        <NodeHeader/>
-        {GroovyScriptConvertorUtil.getScriptTitle(script)}
-    </NodePanel>
-  );
 };
 
 export const formMeta: FormMeta<FlowNodeJSON['data']> = {
-  render: renderForm,
-  validateTrigger: ValidateTrigger.onChange,
-  validate: {
-    title: ({ value }: { value: string }) => (value ? undefined : 'Title is required'),
-  },
-  effect: {
-    title: syncVariableTitle,
-    outputs: provideJsonSchemaOutputs,
-  },
+    render: renderForm,
+    validateTrigger: ValidateTrigger.onChange,
+    validate: {
+        title: ({value}: { value: string }) => (value ? undefined : 'Title is required'),
+    },
+    effect: {
+        title: syncVariableTitle,
+        outputs: provideJsonSchemaOutputs,
+    },
 };
