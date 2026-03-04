@@ -1,8 +1,9 @@
 import React from "react";
-import {Button, Form, Input, Space} from "antd";
+import {Button, Form, Space} from "antd";
 import {Field, FieldRenderProps} from "@flowgram.ai/fixed-layout-editor";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
-import { EditOutlined } from "@ant-design/icons";
+import {EditOutlined} from "@ant-design/icons";
+import {RouterConfigModal} from "@/components/script/modal/router-config-modal";
 
 /**
  * 路由策略配置
@@ -10,6 +11,7 @@ import { EditOutlined } from "@ant-design/icons";
  */
 export const RouterStrategy:React.FC = () => {
     const [form] = Form.useForm();
+    const [visible,setVisible] = React.useState(false);
 
     return (
         <Form
@@ -34,11 +36,21 @@ export const RouterStrategy:React.FC = () => {
                             <Button
                                 icon={<EditOutlined/>}
                                 onClick={() => {
+                                    setVisible(true);
                                 }}
                                 style={{borderRadius: '0 6px 6px 0'}}
                             >
                                 编辑
                             </Button>
+
+                            <RouterConfigModal
+                                open={visible}
+                                script={value}
+                                onCancel={()=>{setVisible(false);}}
+                                onConfirm={(value)=>{
+                                    onChange(value);
+                                }}
+                            />
                         </Space.Compact>
                     )}
                 />

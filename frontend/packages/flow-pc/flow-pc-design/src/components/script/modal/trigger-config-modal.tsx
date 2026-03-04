@@ -3,10 +3,10 @@ import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
 import {GroovyScriptContent, GroovyScriptModal} from "@/components/script/components/groovy-script-modal";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
-import {DEFAULT_ERROR_TRIGGER_SCRIPT} from "@/components/script/default-script";
-import {ErrorTriggerPluginView} from "@/components/script/plugins/view/error-trigger-view";
+import {DEFAULT_TRIGGER_SCRIPT} from "@/components/script/default-script";
+import {TriggerPluginView} from "@/components/script/plugins/view/trigger-view";
 
-export interface ErrorTriggerConfigModalProps {
+export interface TriggerConfigModalProps {
     /** 是否展示 **/
     open: boolean;
     /** 当前脚本 */
@@ -21,7 +21,7 @@ export interface ErrorTriggerConfigModalProps {
 
 
 
-const ErrorTriggerConfigContent: React.FC<GroovyScriptContent> = (props) => {
+const TriggerConfigContent: React.FC<GroovyScriptContent> = (props) => {
     const isAdvance = GroovyScriptConvertorUtil.isCustomScript(props.script);
 
     return (
@@ -30,28 +30,28 @@ const ErrorTriggerConfigContent: React.FC<GroovyScriptContent> = (props) => {
                 <AdvancedScriptEditor
                     {...props}
                     resetScript={()=>{
-                        return DEFAULT_ERROR_TRIGGER_SCRIPT;
+                        return DEFAULT_TRIGGER_SCRIPT;
                     }}
                 />
             )}
             {!isAdvance && (
-                <ErrorTriggerPluginView {...props} />
+                <TriggerPluginView {...props} />
             )}
         </>
     );
 }
 
-export const ErrorTriggerConfigModal:React.FC<ErrorTriggerConfigModalProps> = (props) => {
+export const TriggerConfigModal:React.FC<TriggerConfigModalProps> = (props) => {
     return (
         <GroovyScriptModal
-            type={ScriptType.ERROR_TRIGGER}
+            type={ScriptType.TRIGGER}
             open={props.open}
             script={props.script}
             variables={props.variables || []}
             onConfirm={props.onConfirm}
             onCancel={props.onCancel}
-            title="异常配置"
-            content={ErrorTriggerConfigContent}
+            title="触发配置"
+            content={TriggerConfigContent}
         />
     );
 }
