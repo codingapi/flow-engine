@@ -95,9 +95,50 @@ export class NodeConvertorManager {
  */
 export class NodeRouterManager {
     private readonly nodes: FlowNode[];
+    private readonly nodeList:FlowNode[];
+
+    private readonly displayNodeTypes:string[];
 
     constructor(nodes: FlowNode[]) {
         this.nodes = nodes;
+        this.displayNodeTypes = [];
+        this.nodeList = [];
+        this.initDisplayNodeTypes();
+        this.initNodeList();
+    }
+
+    private initDisplayNodeTypes(){
+        this.displayNodeTypes.push('APPROVAL');
+        this.displayNodeTypes.push('DELAY');
+        this.displayNodeTypes.push('END');
+        this.displayNodeTypes.push('HANDLE');
+        this.displayNodeTypes.push('NOTIFY');
+        this.displayNodeTypes.push('ROUTER');
+        this.displayNodeTypes.push('START');
+        this.displayNodeTypes.push('SUB_PROCESS');
+        this.displayNodeTypes.push('TRIGGER');
+    }
+
+
+    private initNodeList(){
+        this.fetchNodes(this.nodes);
+    }
+
+    private isDisplayNode(node:FlowNode){
+        const nodeType = node.type;
+        return this.displayNodeTypes.includes(nodeType);
+    }
+
+    private fetchNodes(nodes:FlowNode[]){
+        for (const node of nodes) {
+            if(this.isDisplayNode(node)){
+                this.nodeList.push(node);
+            }
+            const blocks = node.blocks || [];
+            if (node.blocks && node.blocks.length > 0){
+                this.fetchNodes(blocks);
+            }
+        }
     }
 
     public size() {
@@ -106,18 +147,36 @@ export class NodeRouterManager {
 
     /**
      * 查看全部的可选节点
-     * TODO 需要对blocks的节点进行展开查看，并提出条件控制节点
      */
     public getNodes() {
-        return this.nodes;
+        return this.nodeList.map(node => {
+            return {
+                label:node.name,
+                value:node.id
+            }
+        });
     }
 
     /**
      *  获取可退回的节点
-     *  TODO 需要对blocks的节点进行展开查看，并提出条件控制节点
      *  @param nodeId
      */
     public getBackNodes(nodeId: string) {
-        return this.nodes;
+        const list:FlowNode[] = [];
+        let matchCurrent = false;
+        for (const node of this.nodeList) {
+            if(!matchCurrent) {
+                list.push(node);
+            }
+            if(node.id === nodeId) {
+                matchCurrent = true;
+            }
+        }
+        return list.map(node => {
+            return {
+                label:node.name,
+                value:node.id
+            }
+        });
     }
 }

@@ -1,14 +1,14 @@
-import React, {useCallback, useContext, useMemo, useState} from "react";
+import React, {useCallback, useMemo, useState} from "react";
 import {useIsSidebar} from "@/components/design-editor/hooks";
 import {Button, Flex, Input, Space, theme} from "antd";
 import {nodeFormPanelFactory} from "@/components/design-editor/components/sidebar";
 import {usePanelManager} from "@flowgram.ai/panel-manager-plugin";
-import {NodeRenderContext} from "@/components/design-editor/context";
 import {Field, FieldRenderProps} from "@flowgram.ai/fixed-layout-editor";
 import {CloseOutlined, EditOutlined} from "@ant-design/icons";
 import {NodeIcon} from "@/components/design-editor/components/node-icon";
 import {NodeType} from "@/components/design-editor/typings/node-type";
 import {FlowNodeRegistry} from "@/components/design-editor/typings";
+import {useNodeRenderContext} from "@/components/design-editor/hooks/use-node-render-context";
 
 interface HeaderTitleProps {
     title: string;
@@ -16,15 +16,15 @@ interface HeaderTitleProps {
     readonly?: boolean;
 }
 
-const HeaderTitle: React.FC<HeaderTitleProps> = ({ title, onChange, readonly }) => {
-    const { token } = theme.useToken();
+const HeaderTitle: React.FC<HeaderTitleProps> = ({title, onChange, readonly}) => {
+    const {token} = theme.useToken();
     const [editTitle, setEditTitle] = useState(false);
     const isSidebar = useIsSidebar();
-    const { node } = useContext(NodeRenderContext);
+    const {node} = useNodeRenderContext();
 
     const registry = node.getNodeRegistry<FlowNodeRegistry>();
     const editTitleDisabled = useMemo(() => {
-        const { meta } = registry;
+        const {meta} = registry;
         return meta?.editTitleDisable ?? false;
     }, [registry, node]);
 
@@ -44,9 +44,9 @@ const HeaderTitle: React.FC<HeaderTitleProps> = ({ title, onChange, readonly }) 
             <Input
                 autoFocus
                 size="small"
-                style={{ width: 200 }}
+                style={{width: 200}}
                 defaultValue={title}
-                onChange={(e)=>{
+                onChange={(e) => {
                     handleChange(e.target.value);
                 }}
                 onBlur={() => setEditTitle(false)}
@@ -62,23 +62,23 @@ const HeaderTitle: React.FC<HeaderTitleProps> = ({ title, onChange, readonly }) 
         <Space>
             <span>{title}</span>
             <EditOutlined
-                style={{ color: token.colorPrimary, cursor: "pointer" }}
+                style={{color: token.colorPrimary, cursor: "pointer"}}
                 onClick={() => setEditTitle(true)}
             />
         </Space>
     );
 };
 
-interface NodeHeaderProps{
+interface NodeHeaderProps {
     style?: React.CSSProperties;
     iconEnable?: boolean;
 }
 
 export const NodeHeader: React.FC<NodeHeaderProps> = (props) => {
-    const { node } = useContext(NodeRenderContext);
+    const {node} = useNodeRenderContext();
     const isSidebar = useIsSidebar();
     const panelManager = usePanelManager();
-    const { token } = theme.useToken();
+    const {token} = theme.useToken();
     const iconEnable = props.iconEnable ?? true;
 
     const nodeType = node.getNodeRegistry<FlowNodeRegistry>().type as NodeType;
@@ -103,9 +103,9 @@ export const NodeHeader: React.FC<NodeHeaderProps> = (props) => {
             align="center"
         >
             <Space>
-                {iconEnable && <NodeIcon type={nodeType} />}
+                {iconEnable && <NodeIcon type={nodeType}/>}
                 <Field name="title">
-                    {({ field: { value, onChange } }: FieldRenderProps<string>) => (
+                    {({field: {value, onChange}}: FieldRenderProps<string>) => (
                         <HeaderTitle
                             title={value}
                             onChange={onChange}
@@ -117,7 +117,7 @@ export const NodeHeader: React.FC<NodeHeaderProps> = (props) => {
             {isSidebar && (
                 <Button
                     type="text"
-                    icon={<CloseOutlined style={{ color: token.colorPrimary }} />}
+                    icon={<CloseOutlined style={{color: token.colorPrimary}}/>}
                     onClick={handleClose}
                 />
             )}

@@ -1,65 +1,87 @@
 import React from "react";
-import {NodeTitleGroovyConvertor} from "@/components/script/services/convertor/node-title";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
-import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
-import {VariablePicker} from "@/components/script/components/variable-picker";
-import {Button, Input, Space} from "antd";
+import {Button, Form, Select, Space} from "antd";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
 import {ErrorTriggerViewPlugin, VIEW_KEY} from "@/components/script/plugins/error-trigger-view-type";
 import {ViewBindPlugin} from "@flow-engine/flow-types";
+import {DEFAULT_ERROR_TRIGGER_SCRIPT} from "@/components/script/default-script";
+import {useNodeRouterManager} from "@/components/design-panel/hooks/use-node-router-manager";
+import {useNodeRenderContext} from "@/components/design-editor/hooks/use-node-render-context";
+import {ErrorTriggerConvertor} from "@/components/script/services/convertor/error-trigger";
 
-const {TextArea} = Input;
 
 /**
- * TODO 异常触发界面
+ * TODO 异常配置界面
  * @param props
  * @constructor
  */
 export const ErrorTriggerPluginView: React.FC<ErrorTriggerViewPlugin> = (props) => {
-    const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(props.script, props.variables);
     const ErrorTriggerPluginViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
+    const [type,setType] = React.useState('node');
+
+    const nodeRouterManager = useNodeRouterManager();
+    const { node } = useNodeRenderContext();
+
     if(ErrorTriggerPluginViewComponent){
         return (
             <ErrorTriggerPluginViewComponent {...props} />
         );
     }
 
-    const title = GroovyScriptConvertorUtil.getScriptTitle(props.script);
-
     return (
         <div>
-            <div>
-                预览
-                <GroovyScriptPreview
-                    script={props.script}
-                    multiline={true}
-                />
-            </div>
+            <Form
+                initialValues={{
+                    type: type,
+                }}
+            >
+                <Form.Item
+                    name={"type"}
+                    label={"触发类型"}
+                >
+                    <Select
+                        options={[
+                            {
+                                label:'跳转节点',
+                                value:'node'
+                            },
+                            {
+                                label:'跳转用户',
+                                value:'user'
+                            }
+                        ]}
+                        onChange={(value) => {
+                            setType(value);
+                        }}
+                    />
 
+                </Form.Item>
 
-            <div>
-                内容
-                <TextArea
-                    value={title}
-                    onChange={(e) => {
-                        props.onChange(nodeTitleGroovyConvertor.resetExpression(e.target.value));
-                    }}
-                    placeholder="请输入标题配置脚本，支持使用变量"
-                    autoSize={{minRows: 3, maxRows: 12}}
-                />
-            </div>
+                {type === "node" && (
+                    <Form.Item
+                        name={"node"}
+                        label={"指定节点"}
+                    >
+                        <Select
+                            options={nodeRouterManager.getBackNodes(node.id)}
+                            onChange={(value,option) => {
+                                const script = ErrorTriggerConvertor.goNode(option as any);
+                                props.onChange(script);
+                            }}
+                        />
+                    </Form.Item>
+                )}
+
+                {type === "user" && (
+                    <div>选择人员</div>
+                )}
+            </Form>
 
             <Space
                 style={{
                     marginTop: 8
                 }}
             >
-                <VariablePicker
-                    mappings={props.variables}
-                    onSelect={(variable) => {
-                        props.onChange(nodeTitleGroovyConvertor.addVariable(variable));
-                    }}
-                />
                 <Button
                     icon={<CodeOutlined/>}
                     onClick={() => {
@@ -72,7 +94,7 @@ export const ErrorTriggerPluginView: React.FC<ErrorTriggerViewPlugin> = (props) 
                     icon={<ReloadOutlined/>}
                     danger={true}
                     onClick={() => {
-                        props.onChange(nodeTitleGroovyConvertor.getDefaultScript());
+                        props.onChange(DEFAULT_ERROR_TRIGGER_SCRIPT);
                     }}
                 >
                     重置脚本

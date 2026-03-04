@@ -1,8 +1,8 @@
-import React, {useContext} from "react";
+import React from "react";
 import {Space, Switch} from "antd";
 import {Table} from "@flow-engine/flow-pc-ui";
-import {NodeRenderContext} from "@/components/design-editor/context";
 import {ActionManager} from "@/components/design-editor/node-components/action/index";
+import {useNodeRenderContext} from "@/components/design-editor/hooks/use-node-render-context";
 
 interface ActionTableProps {
     value: any[];
@@ -10,7 +10,7 @@ interface ActionTableProps {
 }
 
 export const ActionTable: React.FC<ActionTableProps> = (props) => {
-    const {node} = useContext(NodeRenderContext);
+    const {node} = useNodeRenderContext();
     const actions = node.getNodeRegistry()?.meta.actions || [];
     const actionManager = new ActionManager(props.value,props.onChange);
     const datasource = actionManager.getDatasource(actions);

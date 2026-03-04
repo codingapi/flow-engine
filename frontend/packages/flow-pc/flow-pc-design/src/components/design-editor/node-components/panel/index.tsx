@@ -1,10 +1,11 @@
-import React, {useCallback, useContext, useMemo, useState} from "react";
+import React, {useCallback, useMemo, useState} from "react";
 import {Flex, theme} from "antd";
 import {CloseCircleOutlined} from "@ant-design/icons";
-import {NodeFormContext, NodeRenderContext} from "@/components/design-editor/context";
+import {NodeFormContext} from "@/components/design-editor/context";
 import {FlowNodeJSON, FlowNodeRegistry} from "@/components/design-editor/typings";
 import {FormRenderProps, useClientContext} from "@flowgram.ai/fixed-layout-editor";
 import {useIsSidebar} from "@/components/design-editor/hooks";
+import {useNodeRenderContext} from "@/components/design-editor/hooks/use-node-render-context";
 
 interface NodePanelProps {
     children?: React.ReactNode;
@@ -24,7 +25,7 @@ export const NodePanel: React.FC<NodePanelProps> = (props) => {
 
 export const $NodePanel: React.FC<NodePanelProps> = (props) => {
     const [isHovered, setIsHovered] = useState(false);
-    const {node, deleteNode} = useContext(NodeRenderContext);
+    const {node, deleteNode} = useNodeRenderContext();
     const clientContext = useClientContext();
     const registry = node.getNodeRegistry<FlowNodeRegistry>();
     const isSidebar = useIsSidebar();
