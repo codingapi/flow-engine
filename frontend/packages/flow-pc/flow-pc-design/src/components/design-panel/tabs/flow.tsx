@@ -1,7 +1,7 @@
 import React from "react";
 import {FlowEditor, FlowEditorAction} from "@/components/design-editor";
 import {useDesignContext} from "@/components/design-panel/hooks/use-design-context";
-import {NodeManager} from "@/components/design-panel/manager/node";
+import {NodeConvertorManager} from "@/components/design-panel/manager/node";
 
 export const TabFlow = () => {
 
@@ -10,7 +10,7 @@ export const TabFlow = () => {
 
     const actionRef = React.useRef<FlowEditorAction | null>(null);
 
-    const nodeManager = new NodeManager();
+    const nodeManager = new NodeConvertorManager();
 
     // 注册form行为
     React.useEffect(() => {

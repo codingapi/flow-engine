@@ -1,11 +1,8 @@
 package com.codingapi.flow.api.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.codingapi.flow.api.pojo.BackNodeRequest;
 import com.codingapi.flow.api.pojo.NodeCreateRequest;
-import com.codingapi.flow.api.pojo.SelectOption;
 import com.codingapi.flow.node.IBlockNode;
-import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.factory.NodeFactory;
@@ -14,14 +11,12 @@ import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
 import com.codingapi.springboot.framework.dto.request.IdRequest;
-import com.codingapi.springboot.framework.dto.response.MultiResponse;
 import com.codingapi.springboot.framework.dto.response.Response;
 import com.codingapi.springboot.framework.dto.response.SingleResponse;
 import com.codingapi.springboot.framework.user.UserContext;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 
@@ -71,24 +66,6 @@ public class WorkflowController {
         }
         return SingleResponse.of(node.toMap());
     }
-
-
-    @PostMapping("/back-nodes")
-    public MultiResponse<SelectOption> backNodes(@RequestBody BackNodeRequest request) {
-        Workflow workflow = workflowRepository.get(request.getWorkId());
-        IFlowNode backNode = workflow.getFlowNode(request.getNodeId());
-        List<IFlowNode> backNodes = workflow.getNackNodes(backNode).stream().filter(node -> node instanceof IDisplayNode).toList();
-        return MultiResponse.of(backNodes.stream().map(node -> new SelectOption(node.getId(), node.getName())).toList());
-    }
-
-
-    @PostMapping("/nodes")
-    public MultiResponse<SelectOption> nodes(@RequestBody IdRequest request) {
-        Workflow workflow = workflowRepository.get(request.getStringId());
-        List<IFlowNode> backNodes = workflow.getNodes().stream().filter(node -> node instanceof IDisplayNode).toList();
-        return MultiResponse.of(backNodes.stream().map(node -> new SelectOption(node.getId(), node.getName())).toList());
-    }
-
 
     @PostMapping("/save")
     public Response save(@RequestBody JSONObject request) {

@@ -4,6 +4,11 @@ import {ViewBindPlugin} from "@flow-engine/flow-types";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
 import {DEFAULT_ROUTER_SCRIPT} from "@/components/script/default-script";
 
+/**
+ * TODO 路由配置界面
+ * @param props
+ * @constructor
+ */
 export const RouterPluginView: React.FC<RouterViewPlugin> = (props) => {
     const TriggerPluginViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
     if(TriggerPluginViewComponent){
