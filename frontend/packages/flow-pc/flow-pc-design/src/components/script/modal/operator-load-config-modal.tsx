@@ -4,7 +4,7 @@ import {ScriptType} from "@/components/script/typings";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
 import {OperatorLoadPluginView} from "@/components/script/plugins/view/operator-load-view";
-import {DEFAULT_OPERATOR_LOAD_SCRIPT} from "@/components/script/default-script";
+import {SCRIPT_DEFAULT_OPERATOR_LOAD} from "@/components/script/default-script";
 
 interface OperatorLoadConfigModalProps{
     /** 是否展示 **/
@@ -27,7 +27,7 @@ const OperatorLoadConfigContent:React.FC<GroovyScriptContent> = (props)=>{
                 <AdvancedScriptEditor
                     {...props}
                     resetScript={()=>{
-                        return DEFAULT_OPERATOR_LOAD_SCRIPT;
+                        return SCRIPT_DEFAULT_OPERATOR_LOAD;
                     }}
                 />
             )}

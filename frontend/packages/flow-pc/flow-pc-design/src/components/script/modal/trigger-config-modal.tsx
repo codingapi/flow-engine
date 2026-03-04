@@ -3,7 +3,7 @@ import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
 import {GroovyScriptContent, GroovyScriptModal} from "@/components/script/components/groovy-script-modal";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
-import {DEFAULT_TRIGGER_SCRIPT} from "@/components/script/default-script";
+import {SCRIPT_DEFAULT_TRIGGER} from "@/components/script/default-script";
 import {TriggerPluginView} from "@/components/script/plugins/view/trigger-view";
 
 export interface TriggerConfigModalProps {
@@ -30,7 +30,7 @@ const TriggerConfigContent: React.FC<GroovyScriptContent> = (props) => {
                 <AdvancedScriptEditor
                     {...props}
                     resetScript={()=>{
-                        return DEFAULT_TRIGGER_SCRIPT;
+                        return SCRIPT_DEFAULT_TRIGGER;
                     }}
                 />
             )}

@@ -4,7 +4,7 @@ import {ScriptType} from "@/components/script/typings";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
 import {OperatorCreatePluginView} from "@/components/script/plugins/view/operator-create-view";
-import {DEFAULT_OPERATOR_CREATE_SCRIPT} from "@/components/script/default-script";
+import {SCRIPT_DEFAULT_OPERATOR_CREATE} from "@/components/script/default-script";
 
 
 interface OperatorCreateConfigModalProps{
@@ -29,7 +29,7 @@ const OperatorCreateConfigContent :React.FC<GroovyScriptContent> = (props)=>{
                 <AdvancedScriptEditor
                     {...props}
                     resetScript={()=>{
-                        return DEFAULT_OPERATOR_CREATE_SCRIPT;
+                        return SCRIPT_DEFAULT_OPERATOR_CREATE;
                     }}
                 />
             )}

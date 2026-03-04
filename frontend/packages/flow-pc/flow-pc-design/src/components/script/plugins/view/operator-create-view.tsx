@@ -2,7 +2,7 @@ import React from "react";
 import {OperatorCreateViewPlugin, VIEW_KEY} from "@/components/script/plugins/operator-create-view-type";
 import {Button, Form, Select, Space} from "antd";
 import {ViewBindPlugin} from "@flow-engine/flow-types";
-import {DEFAULT_OPERATOR_CREATE_SCRIPT, DEFAULT_OPERATOR_LOAD_SCRIPT} from "@/components/script/default-script";
+import {SCRIPT_DEFAULT_OPERATOR_CREATE, SCRIPT_DEFAULT_OPERATOR_LOAD} from "@/components/script/default-script";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
 
@@ -32,7 +32,7 @@ export const OperatorCreatePluginView: React.FC<OperatorCreateViewPlugin> = (pro
                     ]}
                     placeholder={"请选择人员类型"}
                     onChange={(value) => {
-                        props.onChange(DEFAULT_OPERATOR_CREATE_SCRIPT);
+                        props.onChange(SCRIPT_DEFAULT_OPERATOR_CREATE);
                     }}
                 />
             </Form.Item>
@@ -53,7 +53,7 @@ export const OperatorCreatePluginView: React.FC<OperatorCreateViewPlugin> = (pro
                     icon={<ReloadOutlined/>}
                     danger={true}
                     onClick={() => {
-                        props.onChange(DEFAULT_OPERATOR_LOAD_SCRIPT);
+                        props.onChange(SCRIPT_DEFAULT_OPERATOR_LOAD);
                     }}
                 >
                     重置脚本

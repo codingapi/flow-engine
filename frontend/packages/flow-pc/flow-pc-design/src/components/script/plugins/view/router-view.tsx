@@ -1,7 +1,7 @@
 import React from "react";
 import {RouterViewPlugin, VIEW_KEY} from "@/components/script/plugins/router-view-type";
 import {ViewBindPlugin} from "@flow-engine/flow-types";
-import {DEFAULT_ROUTER_SCRIPT} from "@/components/script/default-script";
+import {SCRIPT_DEFAULT_ROUTER} from "@/components/script/default-script";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {Button, Form, Select, Space} from "antd";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
@@ -56,7 +56,7 @@ export const RouterPluginView: React.FC<RouterViewPlugin> = (props) => {
                     icon={<ReloadOutlined/>}
                     danger={true}
                     onClick={() => {
-                        props.onChange(DEFAULT_ROUTER_SCRIPT);
+                        props.onChange(SCRIPT_DEFAULT_ROUTER);
                     }}
                 >
                     重置脚本

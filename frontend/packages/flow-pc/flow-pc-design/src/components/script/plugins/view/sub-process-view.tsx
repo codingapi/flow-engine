@@ -5,7 +5,7 @@ import {Button, Input, Space} from "antd";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
 import {SubProcessViewPlugin, VIEW_KEY} from "@/components/script/plugins/sub-process-view-type";
 import {ViewBindPlugin} from "@flow-engine/flow-types";
-import {DEFAULT_SUB_PROCESS_SCRIPT} from "@/components/script/default-script";
+import {SCRIPT_DEFAULT_SUB_PROCESS} from "@/components/script/default-script";
 
 const {TextArea} = Input;
 
@@ -65,7 +65,7 @@ export const SubProcessPluginView: React.FC<SubProcessViewPlugin> = (props) => {
                     icon={<ReloadOutlined/>}
                     danger={true}
                     onClick={() => {
-                        props.onChange(DEFAULT_SUB_PROCESS_SCRIPT);
+                        props.onChange(SCRIPT_DEFAULT_SUB_PROCESS);
                     }}
                 >
                     重置脚本

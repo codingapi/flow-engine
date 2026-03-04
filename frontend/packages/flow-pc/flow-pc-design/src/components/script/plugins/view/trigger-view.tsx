@@ -2,7 +2,7 @@ import React from "react";
 import {TriggerViewPlugin, VIEW_KEY} from "@/components/script/plugins/trigger-view-type";
 import {ViewBindPlugin} from "@flow-engine/flow-types";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
-import {DEFAULT_TRIGGER_SCRIPT} from "@/components/script/default-script";
+import {SCRIPT_DEFAULT_TRIGGER} from "@/components/script/default-script";
 
 export const TriggerPluginView: React.FC<TriggerViewPlugin> = (props) => {
     const TriggerPluginViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
@@ -17,7 +17,7 @@ export const TriggerPluginView: React.FC<TriggerViewPlugin> = (props) => {
         <AdvancedScriptEditor
             {...props}
             resetScript={()=>{
-                return DEFAULT_TRIGGER_SCRIPT;
+                return SCRIPT_DEFAULT_TRIGGER;
             }}
         />
     );
