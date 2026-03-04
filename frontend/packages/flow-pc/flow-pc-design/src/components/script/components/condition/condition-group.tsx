@@ -59,7 +59,7 @@ export const ConditionGroup = () => {
                     {
                         id:1,
                         left:'用户编号',
-                        type:'equals',
+                        type:'等于',
                         right:'1'
                     }
                 ]}
