@@ -21,7 +21,7 @@ export const GroovyScriptPreview: React.FC<GroovyScriptPreviewProps> = (props) =
                         minHeight: '45px',
                         padding: '4px 11px',
                         border: '1px solid #d9d9d9',
-                        borderRadius: '6px 0 0 6px',
+                        borderRadius: '6px',
                         backgroundColor: value ? '#fff' : '#fafafa',
                         color: value ? 'rgba(0,0,0,0.88)' : 'rgba(0,0,0,0.25)',
                     }}
