@@ -5,6 +5,7 @@ import com.codingapi.flow.domain.DelayTask;
 import com.codingapi.flow.domain.DelayTaskManager;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -19,7 +20,7 @@ import java.util.Map;
 /**
  * 延迟节点
  */
-public class DelayNode extends BaseFlowNode {
+public class DelayNode extends BaseFlowNode implements IDisplayNode {
 
     public static final String NODE_TYPE = NodeType.DELAY.name();
     public static final String DEFAULT_NAME = "延迟节点";

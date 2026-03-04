@@ -38,9 +38,9 @@ public class WorkflowController {
     @PostMapping("/changeState")
     public Response changeState(@RequestBody IdRequest request) {
         Workflow workflow = workflowRepository.get(request.getStringId());
-        if(workflow.isDisable()){
+        if (workflow.isDisable()) {
             workflow.enable();
-        }else {
+        } else {
             workflow.disable();
         }
         workflowRepository.save(workflow);

@@ -4,6 +4,7 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.*;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.node.BaseAuditNode;
+import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.strategy.node.*;
 import com.codingapi.flow.utils.RandomUtils;
@@ -15,7 +16,7 @@ import java.util.Map;
 /**
  * 审批节点
  */
-public class ApprovalNode extends BaseAuditNode {
+public class ApprovalNode extends BaseAuditNode implements IDisplayNode {
 
     public static final String NODE_TYPE = NodeType.APPROVAL.name();
     public static final String DEFAULT_NAME = "审批节点";

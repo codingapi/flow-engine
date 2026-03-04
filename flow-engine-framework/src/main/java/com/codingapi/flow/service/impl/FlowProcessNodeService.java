@@ -121,24 +121,10 @@ public class FlowProcessNodeService {
         @Getter
         private final List<ProcessNode> nodeList;
         private final IFlowNode currentNode;
-        private final List<String> displayNodeTypes;
 
         public NextNodeLoader(IFlowNode currentNode) {
             this.currentNode = currentNode;
             this.nodeList = new ArrayList<>();
-            this.displayNodeTypes = new ArrayList<>();
-            this.initDisplayNodeTypes();
-        }
-
-
-        private void initDisplayNodeTypes() {
-            this.displayNodeTypes.add(NodeType.START.name());
-            this.displayNodeTypes.add(NodeType.END.name());
-            this.displayNodeTypes.add(NodeType.APPROVAL.name());
-            this.displayNodeTypes.add(NodeType.NOTIFY.name());
-            this.displayNodeTypes.add(NodeType.HANDLE.name());
-            this.displayNodeTypes.add(NodeType.TRIGGER.name());
-            this.displayNodeTypes.add(NodeType.SUB_PROCESS.name());
         }
 
         private void fetchNextNode(FlowSession flowSession, List<IFlowNode> nexNodes) {
@@ -164,7 +150,7 @@ public class FlowProcessNodeService {
         public List<ProcessNode> loadNextNode(FlowSession flowSession) {
             this.fetchNextNode(flowSession,List.of(this.currentNode));
 
-            List<ProcessNode> displayNodes = nodeList.stream().filter(node-> this.displayNodeTypes.contains(node.getNodeType())).toList();
+            List<ProcessNode> displayNodes = nodeList.stream().filter(ProcessNode::isDisplay).toList();
             List<ProcessNode> processNodeList = new ArrayList<>();
             for (ProcessNode node:displayNodes){
                 if(!processNodeList.contains(node)){

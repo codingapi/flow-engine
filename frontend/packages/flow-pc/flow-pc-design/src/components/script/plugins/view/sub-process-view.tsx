@@ -8,7 +8,11 @@ import {ViewBindPlugin} from "@flow-engine/flow-types";
 
 const {TextArea} = Input;
 
-// TODO 异常触发界面
+/**
+ * TODO 子流程配置界面
+ * @param props
+ * @constructor
+ */
 export const SubProcessPluginView: React.FC<SubProcessViewPlugin> = (props) => {
     const SubProcessPluginViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
     if(SubProcessPluginViewComponent){

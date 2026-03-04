@@ -10,7 +10,11 @@ import {ViewBindPlugin} from "@flow-engine/flow-types";
 
 const {TextArea} = Input;
 
-// TODO 异常触发界面
+/**
+ * TODO 异常触发界面
+ * @param props
+ * @constructor
+ */
 export const ErrorTriggerPluginView: React.FC<ErrorTriggerViewPlugin> = (props) => {
     const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(props.script, props.variables);
     const ErrorTriggerPluginViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);

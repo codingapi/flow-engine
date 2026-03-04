@@ -2,7 +2,7 @@ import {DesignPanelApi, FlowNode, initStateData, State, TabPanelType} from "../t
 import {Dispatch} from "@flow-engine/flow-core";
 import {FormActionContext} from "@/components/design-panel/presenters/form";
 import {WorkflowFormManager} from "@/components/design-panel/manager/form";
-import {NodeManager} from "@/components/design-panel/manager/node";
+import {NodeConvertorManager} from "@/components/design-panel/manager/node";
 import {WorkflowConvertor} from "@/components/design-panel/presenters/convertor";
 
 export class Presenter {
@@ -128,7 +128,7 @@ export class Presenter {
 
     public async createNode(form: string, type: string) {
         const flowNode = await this.api.createNode(type);
-        const nodeManager = new NodeManager();
+        const nodeManager = new NodeConvertorManager();
         return nodeManager.toItemRender(flowNode);
     }
 

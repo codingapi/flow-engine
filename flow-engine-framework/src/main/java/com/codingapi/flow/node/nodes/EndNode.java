@@ -6,6 +6,7 @@ import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordFinishEvent;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -18,7 +19,7 @@ import java.util.Map;
 /**
  * 结束节点
  */
-public class EndNode extends BaseFlowNode {
+public class EndNode extends BaseFlowNode implements IDisplayNode {
 
     public static final String NODE_TYPE = NodeType.END.name();
     public static final String DEFAULT_NAME = "结束节点";
