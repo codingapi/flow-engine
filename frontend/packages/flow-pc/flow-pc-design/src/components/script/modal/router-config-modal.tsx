@@ -19,8 +19,6 @@ export interface RouterConfigModalProps {
     onConfirm: (script: string) => void;
 }
 
-
-
 const RouterConfigContent: React.FC<GroovyScriptContent> = (props) => {
     const isAdvance = GroovyScriptConvertorUtil.isCustomScript(props.script);
 
@@ -50,7 +48,7 @@ export const RouterConfigModal:React.FC<RouterConfigModalProps> = (props) => {
             variables={props.variables || []}
             onConfirm={props.onConfirm}
             onCancel={props.onCancel}
-            title="理由配置"
+            title="路由配置"
             content={RouterConfigContent}
         />
     );

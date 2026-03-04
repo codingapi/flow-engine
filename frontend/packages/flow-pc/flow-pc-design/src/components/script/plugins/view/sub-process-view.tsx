@@ -2,9 +2,10 @@ import React from "react";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
 import {Button, Input, Space} from "antd";
-import {CodeOutlined} from "@ant-design/icons";
+import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
 import {SubProcessViewPlugin, VIEW_KEY} from "@/components/script/plugins/sub-process-view-type";
 import {ViewBindPlugin} from "@flow-engine/flow-types";
+import {DEFAULT_SUB_PROCESS_SCRIPT} from "@/components/script/default-script";
 
 const {TextArea} = Input;
 
@@ -60,6 +61,15 @@ export const SubProcessPluginView: React.FC<SubProcessViewPlugin> = (props) => {
                     高级配置
                 </Button>
 
+                <Button
+                    icon={<ReloadOutlined/>}
+                    danger={true}
+                    onClick={() => {
+                        props.onChange(DEFAULT_SUB_PROCESS_SCRIPT);
+                    }}
+                >
+                    重置脚本
+                </Button>
             </Space>
         </div>
     );
