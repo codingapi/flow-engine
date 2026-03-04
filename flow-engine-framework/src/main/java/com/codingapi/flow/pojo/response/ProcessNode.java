@@ -1,5 +1,6 @@
 package com.codingapi.flow.pojo.response;
 
+import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
@@ -36,6 +37,11 @@ public class ProcessNode {
     private String nodeType;
 
     /**
+     * 是否呈现节点
+     */
+    private boolean display;
+
+    /**
      * 记录状态
      * -1 为历史状态
      * 0 为当前状态
@@ -59,6 +65,7 @@ public class ProcessNode {
         this.nodeName = flowNode.getName();
         this.nodeType = flowNode.getType();
         this.operators = new ArrayList<>();
+        this.display = true;
         this.state = STATE_HISTORY;
         this.operators.add(new FlowOperatorBody(flowRecord));
     }
@@ -70,6 +77,7 @@ public class ProcessNode {
         this.nodeType = flowNode.getType();
         this.operators = operators.stream().map(FlowOperatorBody::new).toList();
         this.state = STATE_NEXT;
+        this.display = flowNode instanceof IDisplayNode;
     }
 
 

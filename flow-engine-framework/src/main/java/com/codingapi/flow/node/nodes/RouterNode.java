@@ -5,6 +5,7 @@ import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.session.FlowSession;
@@ -20,7 +21,7 @@ import java.util.Map;
 /**
  * 路由分支节点
  */
-public class RouterNode extends BaseFlowNode {
+public class RouterNode extends BaseFlowNode implements IDisplayNode {
 
     public static final String NODE_TYPE = NodeType.ROUTER.name();
     public static final String DEFAULT_NAME = "路由节点";

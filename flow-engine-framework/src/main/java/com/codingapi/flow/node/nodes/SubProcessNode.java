@@ -3,6 +3,7 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.INodeStrategy;
@@ -16,7 +17,7 @@ import java.util.Map;
 /**
  * 子流程
  */
-public class SubProcessNode extends BaseFlowNode {
+public class SubProcessNode extends BaseFlowNode implements IDisplayNode {
 
     public static final String NODE_TYPE = NodeType.SUB_PROCESS.name();
     public static final String DEFAULT_NAME = "子流程";

@@ -8,6 +8,7 @@ import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseFlowNode;
+import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
@@ -27,7 +28,7 @@ import java.util.Map;
 /**
  * 开始节点
  */
-public class StartNode extends BaseFlowNode {
+public class StartNode extends BaseFlowNode implements IDisplayNode {
 
     public static final String NODE_TYPE = NodeType.START.name();
     public static final String DEFAULT_NAME = "开始节点";

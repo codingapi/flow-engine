@@ -9,6 +9,7 @@ import com.codingapi.flow.form.FormMeta;
 import com.codingapi.flow.form.FormMetaBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.gateway.impl.UserGateway;
+import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.*;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
@@ -157,10 +158,14 @@ class WorkflowBuilderTest {
 
         List<IFlowNode> nackNodes = workflow.getNackNodes(endNode);
         assertEquals(2, nackNodes.size());
+        assertEquals(2, nackNodes.stream().filter(node->node instanceof IDisplayNode).toList().size());
         assertTrue(nackNodes.contains(startNode));
         assertTrue(nackNodes.contains(approvalNode));
         assertFalse(nackNodes.contains(endNode));
 
+        List<IFlowNode> nodes = workflow.getNodes();
+        assertEquals(3, nodes.size());
+        assertEquals(3, nodes.stream().filter(node->node instanceof IDisplayNode).toList().size());
 
     }
 
