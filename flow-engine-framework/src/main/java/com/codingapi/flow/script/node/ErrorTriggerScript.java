@@ -2,6 +2,7 @@ package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.script.ScriptDefaultConstants;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,8 @@ public class ErrorTriggerScript {
     @Getter
     private final String script;
 
-    public ErrorThrow execute(FlowSession request) {
+    public ErrorThrow execute(FlowSession session) {
+        GroovyScriptRequest request = new GroovyScriptRequest(session);
         return ScriptRuntimeContext.getInstance().run(script, ErrorThrow.class, request);
     }
 

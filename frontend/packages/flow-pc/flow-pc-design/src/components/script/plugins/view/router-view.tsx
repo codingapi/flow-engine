@@ -6,7 +6,7 @@ import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {Button, Form, Select, Space} from "antd";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
 import {useNodeRouterManager} from "@/components/design-panel/hooks/use-node-router-manager";
-import {RouterScriptUtils} from "@/components/script/services/utils/router";
+import {RouterScriptUtils} from "@/components/script/services/router";
 import {useScriptMetaData} from "@/components/script/hooks/use-script-meta-data";
 
 /**

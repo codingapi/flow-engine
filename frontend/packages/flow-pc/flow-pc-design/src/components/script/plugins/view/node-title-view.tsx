@@ -1,5 +1,5 @@
 import React from "react";
-import {NodeTitleScriptUtils} from "@/components/script/services/utils/node-title";
+import {NodeTitleScriptUtils} from "@/components/script/services/node-title";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
 import {VariablePicker} from "@/components/script/components/variable-picker";

@@ -1,7 +1,7 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.script.ScriptDefaultConstants;
-import com.codingapi.flow.script.request.ConditionGroovyRequest;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ public class ConditionScript {
     private final String script;
 
     public boolean execute(FlowSession session) {
-        ConditionGroovyRequest request = new ConditionGroovyRequest(session);
+        GroovyScriptRequest request = new GroovyScriptRequest(session);
         return ScriptRuntimeContext.getInstance().run(script, Boolean.class, request);
     }
 

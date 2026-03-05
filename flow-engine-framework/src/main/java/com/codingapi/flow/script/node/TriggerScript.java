@@ -1,6 +1,7 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.script.ScriptDefaultConstants;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,8 @@ public class TriggerScript {
     @Getter
     private final String script;
 
-    public void execute(FlowSession request) {
+    public void execute(FlowSession session) {
+        GroovyScriptRequest request = new GroovyScriptRequest(session);
         ScriptRuntimeContext.getInstance().run(script, Void.class, request);
     }
 

@@ -2,24 +2,16 @@ import React from 'react';
 import {Button, Form, Space} from 'antd';
 import {EditOutlined} from '@ant-design/icons';
 import {Field, FieldRenderProps} from '@flowgram.ai/fixed-layout-editor';
-import {useDesignContext} from '@/components/design-panel/hooks/use-design-context';
-import {NodeTitleVariableService} from "@/components/script/services/variable/node-title";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
 import {NodeTitleConfigModal} from "@/components/script/modal/node-title-config-modal";
+import {useScriptVariables} from "@/components/design-editor/hooks/use-script-variables";
 
 /**
  * 节点标题策略配置
  */
 export const NodeTitleStrategy: React.FC = () => {
-    // 从 design context 获取表单字段
-    const {state} = useDesignContext();
-
     const [showConfigModal, setShowConfigModal] = React.useState(false);
-
-    const nodeTitleVariable = React.useMemo(() => {
-        return new NodeTitleVariableService(state.workflow.form);
-    }, [state.workflow.form]);
-
+    const scriptVariables = useScriptVariables();
 
     return (
         <>
@@ -47,7 +39,7 @@ export const NodeTitleStrategy: React.FC = () => {
                                     <NodeTitleConfigModal
                                         open={showConfigModal}
                                         script={value}
-                                        variables={nodeTitleVariable.getVariables()}
+                                        variables={scriptVariables}
                                         onCancel={() => setShowConfigModal(false)}
                                         onConfirm={(script) => {
                                             onChange(script);

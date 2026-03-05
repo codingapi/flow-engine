@@ -1,8 +1,8 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.script.ScriptDefaultConstants;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
-import com.codingapi.flow.script.request.TitleGroovyRequest;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +17,7 @@ public class NodeTitleScript {
     private final String script;
 
     public String execute(FlowSession session) {
-        TitleGroovyRequest request = new TitleGroovyRequest(session);
+        GroovyScriptRequest request = new GroovyScriptRequest(session);
         return ScriptRuntimeContext.getInstance().run(script, String.class, request);
     }
 

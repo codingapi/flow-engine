@@ -3,7 +3,7 @@ import {FlowForm} from "@flow-engine/flow-types";
 
 export class GroovyVariableUtil {
 
-    getDefaultVariables(): GroovyVariableMapping[] {
+     public static getDefaultVariables(): GroovyVariableMapping[] {
         return [
             // ========== 操作人相关 ==========
             {
@@ -85,7 +85,11 @@ export class GroovyVariableUtil {
         ];
     }
 
-    getMainFormMetaVariables(flowForm: FlowForm): GroovyVariableMapping[] {
+    /**
+     * 流程表单参数
+     * @param flowForm
+     */
+    public static getMainFormMetaVariables(flowForm: FlowForm): GroovyVariableMapping[] {
         if (!flowForm || !flowForm.fields) {
             return [];
         }
@@ -100,6 +104,18 @@ export class GroovyVariableUtil {
         }));
     }
 
+    /**
+     * 获取全部表单参数
+     * @param form
+     */
+    public static getVariables(form:FlowForm): GroovyVariableMapping[] {
+        const variables: GroovyVariableMapping[] = [];
+        // 添加默认变量
+        variables.push(...GroovyVariableUtil.getDefaultVariables());
+        // 添加表单字段变量
+        variables.push(...GroovyVariableUtil.getMainFormMetaVariables(form));
+        return variables;
+    }
 
     /**
      * 将可视化表达式转换为Groovy表达式（编辑时）

@@ -2,7 +2,7 @@ import {describe, expect, it} from '@rstest/core';
 import {FlowFromMeta} from "@flow-engine/flow-types";
 import {
     NodeTitleScriptUtils
-} from "@/components/script/services/utils/node-title";
+} from "@/components/script/services/node-title";
 import {
     NodeTitleVariableService
 } from "@/components/script/services/variable/node-title";
