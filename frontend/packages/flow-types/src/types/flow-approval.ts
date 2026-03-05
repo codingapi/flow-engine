@@ -1,11 +1,38 @@
 /**
+ *  数据类型
+ */
+export type DataType = 'string' | 'number' | 'boolean' | 'date';
+
+
+
+// FormField字段类型
+export const dataTypeOptions = [
+    {
+        label: '整数',
+        value: 'number'
+    },
+    {
+        label: '字符串',
+        value: 'string'
+    },
+    {
+        label: '日期类型',
+        value: 'date'
+    },
+    {
+        label: '布尔类型',
+        value: 'boolean'
+    },
+]
+
+/**
  *  流程表单字段元数据
  */
-export interface FlowFormFieldMeta {
+export interface FormField {
     id:string;
     name:string;
     code:string;
-    type:string;
+    type:DataType;
     required:boolean;
     defaultValue:string;
 }
@@ -13,11 +40,11 @@ export interface FlowFormFieldMeta {
 /**
  * 流程表单元数据
  */
-export interface FlowFromMeta {
+export interface FlowForm {
     name:string;
     code:string;
-    fields:FlowFormFieldMeta[];
-    subForms:FlowFromMeta[];
+    fields:FormField[];
+    subForms:FlowForm[];
 }
 
 /**
@@ -105,7 +132,7 @@ export interface FlowContent {
     view:string;
     adviceNullable:boolean;
     signable:boolean;
-    form:FlowFromMeta;
+    form:FlowForm;
     todos:FlowTodo[];
     actions:FlowAction[];
     mergeable:boolean;

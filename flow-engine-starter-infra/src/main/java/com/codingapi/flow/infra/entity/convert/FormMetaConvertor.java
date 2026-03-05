@@ -1,14 +1,14 @@
 package com.codingapi.flow.infra.entity.convert;
 
 import com.alibaba.fastjson.JSON;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import jakarta.persistence.AttributeConverter;
 import org.springframework.util.StringUtils;
 
-public class FormMetaConvertor implements AttributeConverter<FormMeta, String> {
+public class FormMetaConvertor implements AttributeConverter<FlowForm, String> {
 
     @Override
-    public String convertToDatabaseColumn(FormMeta attribute) {
+    public String convertToDatabaseColumn(FlowForm attribute) {
         if (attribute == null) {
             return null;
         }
@@ -16,10 +16,10 @@ public class FormMetaConvertor implements AttributeConverter<FormMeta, String> {
     }
 
     @Override
-    public FormMeta convertToEntityAttribute(String dbData) {
+    public FlowForm convertToEntityAttribute(String dbData) {
         if(!StringUtils.hasText(dbData)){
             return null;
         }
-        return FormMeta.fromMap(JSON.parseObject(dbData));
+        return FlowForm.fromMap(JSON.parseObject(dbData));
     }
 }

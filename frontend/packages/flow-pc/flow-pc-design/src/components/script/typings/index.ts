@@ -1,3 +1,5 @@
+import {DataType} from "@flow-engine/flow-types";
+
 /** 自定义脚本标记 */
 export const CUSTOM_SCRIPT = '@CUSTOM_SCRIPT';
 
@@ -40,6 +42,9 @@ export interface GroovyVariableMapping {
 
     /** 变量展示名：如"request.getOperatorName()" */
     value: string;
+
+    /** 数据类型 */
+    type:DataType;
 
     /** Groovy表达式：如"${当前操作人}" */
     expression: string;

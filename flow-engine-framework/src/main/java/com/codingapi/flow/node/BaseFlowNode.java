@@ -6,7 +6,7 @@ import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowValidationException;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.FlowNodeState;
 import com.codingapi.flow.manager.NodeStrategyManager;
@@ -173,7 +173,7 @@ public abstract class BaseFlowNode implements IFlowNode {
 
 
     @Override
-    public void verifyNode(FormMeta form) {
+    public void verifyNode(FlowForm form) {
         this.verifyDefaultConfig();
         ActionManager actionManager = this.actionManager();
         actionManager.verify(form);

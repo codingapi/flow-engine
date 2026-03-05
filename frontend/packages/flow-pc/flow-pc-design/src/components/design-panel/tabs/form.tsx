@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {Panel} from "@flow-engine/flow-pc-ui";
 import {Table, TableProps} from"@flow-engine/flow-pc-ui";
 import {Button, Flex, Form, FormInstance, Input, Modal, Popconfirm, Select, Space, Switch, Tabs,Empty} from "antd";
-import {FormFieldOptions} from "@/components/design-panel/types";
+import {dataTypeOptions} from "@flow-engine/flow-types";
 import {useDesignContext} from "@/components/design-panel/hooks/use-design-context";
 import {WorkflowFormManager} from "@/components/design-panel/manager/form";
 
@@ -96,7 +96,7 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
                 >
                     <Select
                         placeholder={"请输入字段类型"}
-                        options={FormFieldOptions}
+                        options={dataTypeOptions}
                     />
                 </Form.Item>
 
@@ -210,7 +210,7 @@ const FormTable: React.FC<FormTableProps> = (props) => {
             title: '字段类型',
             render: (value, record) => {
                 let label = '';
-                for(const option of FormFieldOptions) {
+                for(const option of dataTypeOptions) {
                     if(option.value == value){
                         label = option.label;
                     }

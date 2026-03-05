@@ -1,8 +1,8 @@
 import React from "react";
 import {Form, Input} from "antd";
-import {FlowFormFieldMeta} from "@flow-engine/flow-types";
+import {FormField} from "@flow-engine/flow-types";
 
-export const FormItemNumber:React.FC<FlowFormFieldMeta> = (props)=>{
+export const FormItemNumber:React.FC<FormField> = (props)=>{
 
     const rules = props.required?[
         {

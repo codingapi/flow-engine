@@ -2,7 +2,7 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.exception.FlowExecutionException;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IDisplayNode;
@@ -65,7 +65,7 @@ public class RouterNode extends BaseFlowNode implements IDisplayNode {
     }
 
     @Override
-    public void verifyNode(FormMeta form) {
+    public void verifyNode(FlowForm form) {
         super.verifyNode(form);
     }
 

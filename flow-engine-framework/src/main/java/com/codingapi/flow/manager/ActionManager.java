@@ -3,7 +3,7 @@ package com.codingapi.flow.manager;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.*;
 import com.codingapi.flow.exception.FlowValidationException;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.EndNode;
@@ -54,7 +54,7 @@ public class ActionManager {
         return null;
     }
 
-    public void verify(FormMeta form) {
+    public void verify(FlowForm form) {
 
     }
 

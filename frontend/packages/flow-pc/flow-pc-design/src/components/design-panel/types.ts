@@ -1,30 +1,12 @@
 // Tab布局类型
 import {NodeType} from "@/components/design-editor/typings/node-type";
+import {FlowForm} from "@flow-engine/flow-types";
 
 export type TabPanelType = 'base' | 'form' | 'flow' | 'setting';
 
 // 布局顶部高度
 export const LayoutHeaderHeight = 50;
 
-// Form字段类型
-export const FormFieldOptions = [
-        {
-            label: '整数',
-            value: 'number'
-        },
-        {
-            label: '字符串',
-            value: 'string'
-        },
-        {
-            label: '小数类型',
-            value: 'float'
-        },
-        {
-            label: '布尔类型',
-            value: 'boolean'
-        },
-]
 
 
 export interface DesignPanelProps {
@@ -32,24 +14,6 @@ export interface DesignPanelProps {
     id?:string
     open: boolean;
     onClose?: () => void;
-}
-
-// 表单字段
-export interface FormField{
-    id:string;
-    name: string;
-    code: string;
-    type: string;
-    required: boolean;
-    defaultValue: string;
-}
-
-// 流程表单
-export interface FlowForm {
-    name:string;
-    code:string;
-    fields:FormField[];
-    subForms:FlowForm[];
 }
 
 

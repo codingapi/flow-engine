@@ -1,7 +1,4 @@
-/**
- *  数据类型
- */
-export type DataType = 'string' | 'number' | 'boolean' | 'date';
+import {DataType} from "@flow-engine/flow-types";
 
 /**
  *  条件类型

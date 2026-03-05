@@ -6,8 +6,8 @@ import com.codingapi.flow.builder.ActionBuilder;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
-import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.form.FormMetaBuilder;
+import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.node.nodes.ApprovalNode;
@@ -62,7 +62,7 @@ public class FlowMergeableServiceTest {
 
         GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
 
-        FormMeta form = FormMetaBuilder.builder()
+        FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
                 .addField("请假人", "name", "string")

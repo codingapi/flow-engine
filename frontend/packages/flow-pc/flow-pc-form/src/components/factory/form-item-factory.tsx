@@ -1,4 +1,4 @@
-import {FlowFormFieldMeta} from "@flow-engine/flow-types";
+import {FormField} from "@flow-engine/flow-types";
 import React from "react";
 
 import {FormItemString} from "@/components/item/string";
@@ -9,7 +9,7 @@ import {FormItemBoolean} from "@/components/item/boolean";
 
 export class FormItemFactory {
 
-    private readonly cache:Map<string,React.ComponentType<FlowFormFieldMeta>>;
+    private readonly cache:Map<string,React.ComponentType<FormField>>;
 
     private static instance:FormItemFactory = new FormItemFactory();
 

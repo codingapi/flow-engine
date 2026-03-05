@@ -1,7 +1,7 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.common.IMapConvertor;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.record.FlowRecord;
@@ -49,7 +49,7 @@ public interface IFlowNode extends IMapConvertor {
      * 节点验证
      * 用于流程配置完成以后的验证时触发
      */
-    void verifyNode(FormMeta form);
+    void verifyNode(FlowForm form);
 
     /**
      * 是否执行节点

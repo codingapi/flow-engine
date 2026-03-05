@@ -4,8 +4,8 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
-import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.form.FormMetaBuilder;
+import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.node.IFlowNode;
@@ -56,7 +56,7 @@ class FlowParallelServiceTest {
 
         GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
 
-        FormMeta form = FormMetaBuilder.builder()
+        FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
                 .addField("请假人", "name", "string")

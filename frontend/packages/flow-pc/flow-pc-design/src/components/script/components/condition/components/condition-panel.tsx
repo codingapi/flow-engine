@@ -1,7 +1,7 @@
 import React from "react";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
 import {ConditionRelation} from "@/components/script/components/condition/components/condition-relation";
-import {ConditionGroup} from "@/components/script/components/condition/components/condition-group";
+import {Group} from "@/components/script/components/condition/components/condition-group";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {SCRIPT_DEFAULT_CONDITION} from "@/components/script/default-script";
 import {Button, Space} from "antd";
@@ -34,7 +34,7 @@ export const ConditionPanel:React.FC<ConditionPanelProps> = (props)=>{
             </div>
             <div>
                 条件
-                <ConditionGroup/>
+                <Group/>
             </div>
             <Space
                 style={{

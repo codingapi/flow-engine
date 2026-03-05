@@ -1,6 +1,6 @@
 package com.codingapi.flow.strategy.node;
 
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.session.FlowSession;
 
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public abstract class BaseStrategy implements INodeStrategy {
     }
 
     @Override
-    public void verifyNode(FormMeta form) {
+    public void verifyNode(FlowForm form) {
 
     }
 

@@ -7,7 +7,7 @@ import lombok.Data;
  * 表单字段元数据
  */
 @Data
-public class FormFieldMeta {
+public class FormField {
 
     // 字段编号
     private String id;
@@ -22,7 +22,7 @@ public class FormFieldMeta {
     // 默认值
     private String defaultValue;
 
-    public FormFieldMeta() {
+    public FormField() {
         this.id = RandomUtils.generateStringId();
     }
 

@@ -1,8 +1,8 @@
 package com.codingapi.flow.integration;
 
 import com.codingapi.flow.form.FormData;
-import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.form.FormMetaBuilder;
+import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.script.node.NodeTitleScript;
@@ -40,7 +40,7 @@ class NodeTitleIntegrationTest {
         );
 
         User user = new User(1, "张三");
-        FormMeta form = FormMetaBuilder.builder()
+        FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
                 .addField("请假天数", "days", "int")
@@ -73,7 +73,7 @@ class NodeTitleIntegrationTest {
         );
 
         User user = new User(1, "李四");
-        FormMeta form = FormMetaBuilder.builder()
+        FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
                 .addField("请假天数", "days", "int")
@@ -119,7 +119,7 @@ class NodeTitleIntegrationTest {
         );
 
         User user = new User(1, "王五");
-        FormMeta form = FormMetaBuilder.builder()
+        FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
                 .addField("请假人", "name", "string")

@@ -13,7 +13,7 @@ import java.util.Map;
  */
 @Setter
 @Getter
-public class FormMeta {
+public class FlowForm {
 
     /**
      * 表单名称
@@ -26,12 +26,12 @@ public class FormMeta {
     /**
      * 表单字段
      */
-    private List<FormFieldMeta> fields;
+    private List<FormField> fields;
 
     /**
      * 子表单
      */
-    private List<FormMeta> subForms;
+    private List<FlowForm> subForms;
 
 
     public boolean isSubForm(String formCode) {
@@ -50,19 +50,19 @@ public class FormMeta {
         map.put("code", code);
         map.put("fields", fields);
         if (subForms != null && !subForms.isEmpty()) {
-            map.put("subForms", subForms.stream().map(FormMeta::toMap).toList());
+            map.put("subForms", subForms.stream().map(FlowForm::toMap).toList());
         }
         return map;
     }
 
     @SuppressWarnings("unchecked")
-    public static FormMeta fromMap(Map<String, Object> map) {
-        FormMeta form = new FormMeta();
+    public static FlowForm fromMap(Map<String, Object> map) {
+        FlowForm form = new FlowForm();
         List<Map<String, Object>> fields = (List<Map<String, Object>>) map.get("fields");
-        List<FormFieldMeta> fieldList = new ArrayList<>();
+        List<FormField> fieldList = new ArrayList<>();
         if (fields != null && !fields.isEmpty()) {
             for (Map<String, Object> field : fields) {
-                FormFieldMeta fieldMeta = new FormFieldMeta();
+                FormField fieldMeta = new FormField();
                 fieldMeta.setId((String) field.get("id"));
                 fieldMeta.setName((String) field.get("name"));
                 fieldMeta.setCode((String) field.get("code"));
@@ -78,7 +78,7 @@ public class FormMeta {
 
         List<Map<String, Object>> subForms = (List<Map<String, Object>>) map.get("subForms");
         if (subForms != null) {
-            List<FormMeta> subFormList = new ArrayList<>();
+            List<FlowForm> subFormList = new ArrayList<>();
             for (Map<String, Object> subForm : subForms) {
                 subFormList.add(fromMap(subForm));
             }
@@ -91,7 +91,7 @@ public class FormMeta {
      * 获取表单字段名称
      */
     public List<String> loadFieldNames() {
-        return fields.stream().map(FormFieldMeta::getName).toList();
+        return fields.stream().map(FormField::getName).toList();
     }
 
     /**
@@ -100,12 +100,12 @@ public class FormMeta {
      * @param fieldName 字段名称
      * @return 表单字段
      */
-    public FormFieldMeta getField(String fieldName) {
+    public FormField getField(String fieldName) {
         return fields.stream().filter(field -> field.getName().equals(fieldName)).findFirst().orElse(null);
     }
 
-    private void initFormFieldTypes(FormMeta form, Map<String, String> types) {
-        for (FormFieldMeta field : form.getFields()) {
+    private void initFormFieldTypes(FlowForm form, Map<String, String> types) {
+        for (FormField field : form.getFields()) {
             String key = form.getCode() + "." + field.getCode();
             String type = field.getType();
             types.put(key, type);
@@ -119,12 +119,12 @@ public class FormMeta {
      */
     public Map<String, String> loadAllFieldTypeMaps() {
         Map<String, String> types = new HashMap<>();
-        List<FormMeta> forms = this.getSubForms();
+        List<FlowForm> forms = this.getSubForms();
         if (forms == null) {
             forms = new ArrayList<>();
         }
         forms.add(this);
-        for (FormMeta subForm : forms) {
+        for (FlowForm subForm : forms) {
             this.initFormFieldTypes(subForm, types);
         }
         return types;
@@ -138,15 +138,15 @@ public class FormMeta {
      */
     public Map<String, String> loadMainFieldTypeMaps() {
         Map<String, String> types = new HashMap<>();
-        List<FormMeta> forms = new ArrayList<>();
+        List<FlowForm> forms = new ArrayList<>();
         forms.add(this);
-        for (FormMeta subForm : forms) {
+        for (FlowForm subForm : forms) {
             this.initFormFieldTypes(subForm, types);
         }
         return types;
     }
 
-    public FormMeta getSubForm(String formCode) {
+    public FlowForm getSubForm(String formCode) {
         return this.subForms.stream().filter(form -> form.getCode().equals(formCode)).findFirst().orElse(null);
     }
 }

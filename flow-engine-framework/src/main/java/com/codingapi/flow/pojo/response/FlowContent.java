@@ -1,7 +1,7 @@
 package com.codingapi.flow.pojo.response;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
@@ -52,7 +52,7 @@ public class FlowContent {
     /**
      * 表单元数据
      */
-    private FormMeta form;
+    private FlowForm form;
     /**
      * 流程记录
      */

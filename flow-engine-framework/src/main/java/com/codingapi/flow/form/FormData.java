@@ -11,7 +11,7 @@ public class FormData {
 
     // 当前表单的元数据定义
     @Getter
-    private final FormMeta formMeta;
+    private final FlowForm flowForm;
     // 主表单数据内容
     @Getter
     private final DataBody dataBody;
@@ -19,8 +19,8 @@ public class FormData {
     private final Map<String, List<DataBody>> subDataBody;
 
 
-    public FormData(FormMeta form) {
-        this.formMeta = form;
+    public FormData(FlowForm form) {
+        this.flowForm = form;
         this.dataBody = new DataBody(form);
         this.subDataBody = new HashMap<>();
     }
@@ -40,11 +40,11 @@ public class FormData {
      * @param formCode 子表单编号
      */
     public DataBody addSubDataBody(String formCode) {
-        FormMeta subFormMeta = getSubFormMeta(formCode);
-        if (subFormMeta == null) {
+        FlowForm subFlowForm = getSubFormMeta(formCode);
+        if (subFlowForm == null) {
             return null;
         }
-        DataBody subData = new DataBody(subFormMeta);
+        DataBody subData = new DataBody(subFlowForm);
         List<DataBody> list = this.getSubDataBody(formCode);
         if (list == null) {
             list = new ArrayList<>();
@@ -108,22 +108,22 @@ public class FormData {
      *
      * @param formCode 子表单编号
      */
-    private FormMeta getSubFormMeta(String formCode) {
-        return formMeta.getSubForm(formCode);
+    private FlowForm getSubFormMeta(String formCode) {
+        return flowForm.getSubForm(formCode);
     }
 
     /**
      * 表单数据体
      */
     public static class DataBody {
-        private final FormMeta formMeta;
+        private final FlowForm flowForm;
         private final Map<String, Object> data;
         private final Map<String, String> fieldTypes;
 
-        public DataBody(FormMeta formMeta) {
-            this.formMeta = formMeta;
+        public DataBody(FlowForm flowForm) {
+            this.flowForm = flowForm;
             this.data = new HashMap<>();
-            this.fieldTypes = formMeta.loadMainFieldTypeMaps();
+            this.fieldTypes = flowForm.loadMainFieldTypeMaps();
         }
 
 
@@ -141,7 +141,7 @@ public class FormData {
          * @param value 表单字段值
          */
         public DataBody set(String key, Object value) {
-            String id = formMeta.getCode() + "." + key;
+            String id = flowForm.getCode() + "." + key;
             String type = this.fieldTypes.get(id);
             if (type == null) {
                 throw new RuntimeException("key:" + key + " not found");
@@ -157,7 +157,7 @@ public class FormData {
          * @return 表单字段值
          */
         public Object get(String key) {
-            String id = formMeta.getCode() + "." + key;
+            String id = flowForm.getCode() + "." + key;
             return this.data.get(id);
         }
 

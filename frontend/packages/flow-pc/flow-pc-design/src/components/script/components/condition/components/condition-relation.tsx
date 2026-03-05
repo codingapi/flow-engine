@@ -54,7 +54,7 @@ export const ConditionRelation = () => {
                     删除
                 </a>
             ),
-            danger:true
+            danger: true
         },
     ];
 
@@ -69,10 +69,12 @@ export const ConditionRelation = () => {
         }}>
 
 
-            <Dropdown menu={{ items }}>
-                <PlusCircleOutlined style={{
-                    cursor: 'pointer',
-                }}/>
+            <Dropdown menu={{items}}>
+                <PlusCircleOutlined
+                    style={{
+                        cursor: 'pointer',
+                    }}
+                />
             </Dropdown>
 
         </div>

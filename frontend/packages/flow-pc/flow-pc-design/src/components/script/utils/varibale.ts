@@ -1,6 +1,5 @@
 import {GroovyVariableMapping, VariableTag} from "@/components/script/typings";
-import {FlowFromMeta} from "@flow-engine/flow-types";
-
+import {FlowForm} from "@flow-engine/flow-types";
 
 export class GroovyVariableUtil {
 
@@ -12,6 +11,7 @@ export class GroovyVariableUtil {
                 value: 'request.getOperatorName()',
                 expression: "${当前操作人}",
                 tag: VariableTag.OPERATOR,
+                type:'string',
                 order: 1,
             },
             {
@@ -19,12 +19,14 @@ export class GroovyVariableUtil {
                 value: 'request.getOperatorId()',
                 expression: '${当前操作人ID}',
                 tag: VariableTag.OPERATOR,
+                type:'number',
                 order: 2,
             },
             {
                 label: '是否管理员',
                 value: 'request.getIsFlowManager()',
                 expression: '${是否管理员}',
+                type:'boolean',
                 tag: VariableTag.OPERATOR,
                 order: 3,
             },
@@ -33,6 +35,7 @@ export class GroovyVariableUtil {
                 value: 'request.getCreatorName()',
                 expression: '${流程创建人}',
                 tag: VariableTag.OPERATOR,
+                type:'string',
                 order: 4,
             },
 
@@ -42,6 +45,7 @@ export class GroovyVariableUtil {
                 value: 'request.getWorkflowTitle()',
                 expression: '${流程标题}',
                 tag: VariableTag.WORKFLOW,
+                type:'string',
                 order: 10,
             },
             {
@@ -49,6 +53,7 @@ export class GroovyVariableUtil {
                 value: 'request.getWorkflowCode()',
                 expression: '${流程编码}',
                 tag: VariableTag.WORKFLOW,
+                type:'string',
                 order: 11,
             },
             {
@@ -56,6 +61,7 @@ export class GroovyVariableUtil {
                 value: 'request.getNodeName()',
                 expression: '${当前节点}',
                 tag: VariableTag.WORKFLOW,
+                type:'string',
                 order: 12,
             },
             {
@@ -63,6 +69,7 @@ export class GroovyVariableUtil {
                 value: 'request.getNodeType()',
                 expression: '${节点类型}',
                 tag: VariableTag.WORKFLOW,
+                type:'string',
                 order: 13,
             },
 
@@ -72,20 +79,22 @@ export class GroovyVariableUtil {
                 value: 'request.getWorkCode()',
                 expression: '${流程编号}',
                 tag: VariableTag.WORK_CODE,
+                type:'string',
                 order: 20,
             }
         ];
     }
 
-    getMainFormMetaVariables(formMeta: FlowFromMeta): GroovyVariableMapping[] {
-        if (!formMeta || !formMeta.fields) {
+    getMainFormMetaVariables(flowForm: FlowForm): GroovyVariableMapping[] {
+        if (!flowForm || !flowForm.fields) {
             return [];
         }
 
-        return formMeta.fields.map((field, index) => ({
+        return flowForm.fields.map((field, index) => ({
             label: `${field.name}`,
             value: `request.getFormData('${field.code}')`,
             expression: "${" + `${field.name}` + "}",
+            type:field.type,
             tag: VariableTag.FORM_FIELD,
             order: 100 + index,
         }));

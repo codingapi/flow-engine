@@ -4,7 +4,7 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.exception.FlowValidationException;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.*;
@@ -133,7 +133,7 @@ public class NodeStrategyManager {
         return 0;
     }
 
-    public void verifyNode(FormMeta form) {
+    public void verifyNode(FlowForm form) {
         for (INodeStrategy strategy : strategies) {
             strategy.verifyNode(form);
         }

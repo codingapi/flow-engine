@@ -2,42 +2,14 @@ import React from "react";
 import {Table} from "@flow-engine/flow-pc-ui";
 import {Button, Popconfirm, Space} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
-import {useConditionContext} from "../hooks/use-condition-context";
-import {Condition, RelationType, relationTypeOptions} from "../typings";
-
-
-interface ConditionItemViewProps {
-    data?: Condition;
-}
-
-const ConditionItemView: React.FC<ConditionItemViewProps> = (props) => {
-    const label = props.data?.label || '未设置';
-    return (
-        <span>{label}</span>
-    )
-}
-
-interface ConditionTypeViewProps {
-    type?: RelationType;
-}
-
-const ConditionTypeView: React.FC<ConditionTypeViewProps> = (props) => {
-    const type = props.type;
-    const typeLabel = relationTypeOptions.find(item => item.value === type);
-    if (typeLabel) {
-        return (
-            <span>{typeLabel.label}</span>
-        )
-    }
-    return (
-        <span>未知</span>
-    )
-}
+import {useConditionContext} from "../../hooks/use-condition-context";
+import {ConditionItemView} from "./condition";
+import {ConditionTypeView} from "./type";
 
 /**
  * @constructor
  */
-export const ConditionGroup = () => {
+export const Group = () => {
 
     const {state, context} = useConditionContext();
     const presenter = context.getPresenter().getConditionGroupPresenter();
@@ -117,7 +89,6 @@ export const ConditionGroup = () => {
                 dataSource={state.groups}
                 pagination={false}
             />
-
         </div>
     )
 }
