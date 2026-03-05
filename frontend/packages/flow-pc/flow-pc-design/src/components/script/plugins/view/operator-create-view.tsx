@@ -5,10 +5,12 @@ import {ViewBindPlugin} from "@flow-engine/flow-types";
 import {SCRIPT_DEFAULT_OPERATOR_CREATE, SCRIPT_DEFAULT_OPERATOR_LOAD} from "@/components/script/default-script";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
+import {useScriptMetaData} from "@/components/script/hooks/use-script-meta-data";
 
 export const OperatorCreatePluginView: React.FC<OperatorCreateViewPlugin> = (props) => {
 
     const OperatorCreatePluginViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
+    const data = useScriptMetaData(props.script);
 
     if (OperatorCreatePluginViewComponent) {
         return (
@@ -17,7 +19,11 @@ export const OperatorCreatePluginView: React.FC<OperatorCreateViewPlugin> = (pro
     }
 
     return (
-        <Form>
+        <Form
+            initialValues={{
+                ...data
+            }}
+        >
             <Form.Item
                 name={"type"}
                 label={"类型"}
@@ -27,7 +33,7 @@ export const OperatorCreatePluginView: React.FC<OperatorCreateViewPlugin> = (pro
                     options={[
                         {
                             label: '任意用户',
-                            value: '1',
+                            value: 'any',
                         }
                     ]}
                     placeholder={"请选择人员类型"}

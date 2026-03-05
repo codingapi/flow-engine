@@ -90,14 +90,21 @@ export class NodeConvertorManager {
 
 }
 
+
+interface MappingData {
+    node: string;
+
+    [key: string]: any;
+}
+
 /**
  *  节点关系分析管理，分析所有的节点，可回退的节点等信息
  */
 export class NodeRouterManager {
     private readonly nodes: FlowNode[];
-    private readonly nodeList:FlowNode[];
+    private readonly nodeList: FlowNode[];
 
-    private readonly displayNodeTypes:string[];
+    private readonly displayNodeTypes: string[];
 
     constructor(nodes: FlowNode[]) {
         this.nodes = nodes;
@@ -107,7 +114,7 @@ export class NodeRouterManager {
         this.initNodeList();
     }
 
-    private initDisplayNodeTypes(){
+    private initDisplayNodeTypes() {
         this.displayNodeTypes.push('APPROVAL');
         this.displayNodeTypes.push('DELAY');
         this.displayNodeTypes.push('END');
@@ -120,22 +127,22 @@ export class NodeRouterManager {
     }
 
 
-    private initNodeList(){
+    private initNodeList() {
         this.fetchNodes(this.nodes);
     }
 
-    private isDisplayNode(node:FlowNode){
+    private isDisplayNode(node: FlowNode) {
         const nodeType = node.type;
         return this.displayNodeTypes.includes(nodeType);
     }
 
-    private fetchNodes(nodes:FlowNode[]){
+    private fetchNodes(nodes: FlowNode[]) {
         for (const node of nodes) {
-            if(this.isDisplayNode(node)){
+            if (this.isDisplayNode(node)) {
                 this.nodeList.push(node);
             }
             const blocks = node.blocks || [];
-            if (node.blocks && node.blocks.length > 0){
+            if (node.blocks && node.blocks.length > 0) {
                 this.fetchNodes(blocks);
             }
         }
@@ -151,8 +158,8 @@ export class NodeRouterManager {
     public getNodes() {
         return this.nodeList.map(node => {
             return {
-                label:node.name,
-                value:node.id
+                label: node.name,
+                value: node.id
             }
         });
     }
@@ -162,21 +169,45 @@ export class NodeRouterManager {
      *  @param nodeId
      */
     public getBackNodes(nodeId: string) {
-        const list:FlowNode[] = [];
+        const list: FlowNode[] = [];
         let matchCurrent = false;
         for (const node of this.nodeList) {
-            if(!matchCurrent) {
+            if (!matchCurrent) {
                 list.push(node);
             }
-            if(node.id === nodeId) {
+            if (node.id === nodeId) {
                 matchCurrent = true;
             }
         }
         return list.map(node => {
             return {
-                label:node.name,
-                value:node.id
+                label: node.name,
+                value: node.id
             }
         });
+    }
+
+    /**
+     * 处理默认数据
+     * @param data
+     */
+    public mapping(data: MappingData) {
+        const nodeId = data.node;
+        let matchNode = null;
+        for(const node of this.nodeList) {
+            if(matchNode) {
+               break;
+            }
+            if(node.type === nodeId){
+                matchNode = node;
+            }
+        }
+        if(matchNode){
+            return {
+                ...data,
+                node: matchNode.id
+            }
+        }
+        return data
     }
 }

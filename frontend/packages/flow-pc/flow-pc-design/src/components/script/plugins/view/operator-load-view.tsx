@@ -5,10 +5,12 @@ import {ViewBindPlugin} from "@flow-engine/flow-types";
 import {SCRIPT_DEFAULT_OPERATOR_LOAD} from "@/components/script/default-script";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
+import {useScriptMetaData} from "@/components/script/hooks/use-script-meta-data";
 
 export const OperatorLoadPluginView: React.FC<OperatorLoadViewPlugin> = (props) => {
 
     const OperatorLoadPluginViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
+    const data = useScriptMetaData(props.script);
 
     if (OperatorLoadPluginViewComponent) {
         return (
@@ -17,7 +19,11 @@ export const OperatorLoadPluginView: React.FC<OperatorLoadViewPlugin> = (props) 
     }
 
     return (
-        <Form>
+        <Form
+            initialValues={{
+                ...data
+            }}
+        >
             <Form.Item
                 name={"type"}
                 label={"类型"}
@@ -27,7 +33,7 @@ export const OperatorLoadPluginView: React.FC<OperatorLoadViewPlugin> = (props) 
                     options={[
                         {
                             label: '流程创建者',
-                            value: '1',
+                            value: 'creator',
                         },
                     ]}
                     placeholder={"请选择人员类型"}

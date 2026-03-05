@@ -78,12 +78,18 @@ class ErrorTriggerScriptTest {
 
         FlowSession flowSession = FlowSession.startSession(user, workflow, startNode, startNode.getActions().get(0), data, 0);
 
-        ErrorTriggerScript errorNodeTriggerScript = ErrorTriggerScript.defaultNodeScript();
+        ErrorTriggerScript errorNodeTriggerScript = ErrorTriggerScript.defaultScript();
         ErrorThrow errorThrow = errorNodeTriggerScript.execute(flowSession);
         assertTrue(errorThrow.isNode());
         assertEquals(startNode.getId(), errorThrow.getNode().getId());
 
-        ErrorTriggerScript errorOperatorTriggerScript = ErrorTriggerScript.defaultOperatorScript();
+        String script = """
+            def run(request){ 
+                return $bind.createErrorThrow(request.getCreatedOperator());
+            }
+            """;
+
+        ErrorTriggerScript errorOperatorTriggerScript = new ErrorTriggerScript(script);
         errorThrow = errorOperatorTriggerScript.execute(flowSession);
         assertFalse(errorThrow.isNode());
         assertEquals(user, errorThrow.getOperators().get(0));

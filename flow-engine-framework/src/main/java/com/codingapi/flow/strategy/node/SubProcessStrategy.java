@@ -27,9 +27,6 @@ public class SubProcessStrategy extends BaseStrategy {
      */
     private SubProcessScript subProcessScript;
 
-    public void setTriggerScript(String script) {
-        this.subProcessScript = new SubProcessScript(script);
-    }
 
     @Override
     public void copy(INodeStrategy target) {
@@ -38,7 +35,7 @@ public class SubProcessStrategy extends BaseStrategy {
 
     public static SubProcessStrategy defaultStrategy() {
         SubProcessStrategy processStrategy = new SubProcessStrategy();
-        processStrategy.setTriggerScript(SubProcessScript.SCRIPT_DEFAULT);
+        processStrategy.subProcessScript = SubProcessScript.defaultScript();
         processStrategy.submit = true;
         return processStrategy;
     }

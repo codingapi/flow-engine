@@ -2,6 +2,7 @@ package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.script.ScriptDefaultConstants;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -13,12 +14,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SubProcessScript {
 
-    public static final String SCRIPT_DEFAULT = """
-            // @SCRIPT_TITLE 创建当前流程 
-            def run(request){ 
-                return request.toCreateRequest() 
-            }
-            """;
 
     @Getter
     private final String script;
@@ -31,6 +26,6 @@ public class SubProcessScript {
     }
 
     public static SubProcessScript defaultScript() {
-        return new SubProcessScript(SCRIPT_DEFAULT);
+        return new SubProcessScript(ScriptDefaultConstants.SCRIPT_DEFAULT_SUB_PROCESS);
     }
 }
