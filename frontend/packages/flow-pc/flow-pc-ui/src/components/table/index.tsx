@@ -35,8 +35,8 @@ export function Table<RecordType extends object = any>(props: TableProps<RecordT
 
     const requestData = (request: ParamRequest) => {
         props.request?.({
-            current: current,
-            pageSize: pageSize,
+            current: request.current,
+            pageSize: request.pageSize,
         }).then(res => {
             if (res.success) {
                 setCurrent(request.current);
@@ -78,7 +78,7 @@ export function Table<RecordType extends object = any>(props: TableProps<RecordT
                             showQuickJumper: true,
                             defaultCurrent: defaultCurrent,
                             defaultPageSize: defaultPageSize,
-                            onChange: (pageSize, current) => {
+                            onChange: (current, pageSize) => {
                                 requestData({
                                     current,
                                     pageSize
