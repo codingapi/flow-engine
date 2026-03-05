@@ -1,7 +1,7 @@
 import React from "react";
 import {ConditionViewPlugin, VIEW_KEY} from "@/components/script/plugins/condition-view-type";
 import {ViewBindPlugin} from "@flow-engine/flow-types";
-import {ConditionPanel} from "@/components/script/components/condition/condition-panel";
+import {ConditionView} from "@/components/script/components/condition";
 
 /**
  * @param props
@@ -17,6 +17,6 @@ export const ConditionPluginView: React.FC<ConditionViewPlugin> = (props) => {
     }
 
     return (
-        <ConditionPanel {...props}/>
+        <ConditionView {...props}/>
     );
 }

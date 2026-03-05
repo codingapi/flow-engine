@@ -1,12 +1,11 @@
 import React from "react";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
-import {ConditionRelation} from "@/components/script/components/condition/condition-relation";
-import {ConditionGroup} from "@/components/script/components/condition/condition-group";
+import {ConditionRelation} from "@/components/script/components/condition/components/condition-relation";
+import {ConditionGroup} from "@/components/script/components/condition/components/condition-group";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {SCRIPT_DEFAULT_CONDITION} from "@/components/script/default-script";
-import { Button, Space } from "antd";
-import { CodeOutlined, ReloadOutlined } from "@ant-design/icons";
-import {useScriptMetaData} from "@/components/script/hooks/use-script-meta-data";
+import {Button, Space} from "antd";
+import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
 
 interface ConditionPanelProps {
     script:string;
@@ -14,8 +13,6 @@ interface ConditionPanelProps {
 }
 
 export const ConditionPanel:React.FC<ConditionPanelProps> = (props)=>{
-
-    const scriptMeta = useScriptMetaData(props.script);
 
     return (
         <div>

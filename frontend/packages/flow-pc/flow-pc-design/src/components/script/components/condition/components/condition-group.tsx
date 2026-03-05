@@ -2,12 +2,15 @@ import React from "react";
 import {Table} from "@flow-engine/flow-pc-ui";
 import {Button, Space } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
+import {useConditionContext} from "../hooks/use-condition-context";
 
 /**
- * TODO 尚未完成
  * @constructor
  */
 export const ConditionGroup = () => {
+
+    const {state} = useConditionContext();
+
     return (
         <div style={{
             backgroundColor: '#fff',
@@ -48,21 +51,14 @@ export const ConditionGroup = () => {
                         render: (text, record) => {
                             return (
                                 <Space>
-                                    <a>交换</a>
+                                    <a>互换</a>
                                     <a>删除</a>
                                 </Space>
                             )
                         }
                     },
                 ]}
-                dataSource={[
-                    {
-                        id:1,
-                        left:'用户编号',
-                        type:'等于',
-                        right:'1'
-                    }
-                ]}
+                dataSource={state.groups}
                 pagination={false}
             />
 
