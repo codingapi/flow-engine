@@ -67,20 +67,34 @@ export const TabBase = () => {
     // 注册form行为
     React.useEffect(() => {
         formActionContext.addAction({
-            save() {
+            save:()=> {
                 return baseForm.getFieldsValue();
             },
-            key(): string {
+            key:()=> {
                 return 'base';
+            },
+            validate:()=>{
+                return new Promise((resolve, reject) => {
+                    baseForm.validateFields().then(values => {
+                        resolve(values);
+                    }).catch(reject);
+                })
             }
         });
 
         formActionContext.addAction({
-            save() {
+            save:()=> {
                 return operatorForm.getFieldsValue();
             },
-            key(): string {
+            key:()=> {
                 return 'operator';
+            },
+            validate:()=>{
+                return new Promise((resolve, reject) => {
+                    operatorForm.validateFields().then(values=>{
+                        resolve(values);
+                    }).catch(reject)
+                })
             }
         });
 

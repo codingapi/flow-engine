@@ -1,5 +1,5 @@
 import {FlowApprovalApi, State} from "@/components/flow-approval/typings";
-import {FormActionContext} from "@/components/flow-approval/presenters/form";
+import {FormActionContext} from "@flow-engine/flow-types";
 
 export class FlowActionPresenter {
 
@@ -29,10 +29,27 @@ export class FlowActionPresenter {
     }
 
 
-    public async action(actionId:string) {
+    /**
+     * 是否通过操作
+     * @param actionId
+     * @private
+     */
+    private isPassAction(actionId:string){
+        const actions = this.state.flow?.actions || [];
+        for(const action of actions){
+            if(action.id === actionId){
+                if(action.type ==='PASS'){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private async submitAction(actionId:string,formData:any){
         const recordId = this.state.flow?.recordId;
         const workId = this.state.flow?.workId;
-        const formData = this.formActionContext.save();
         if(recordId){
             const request = {
                 formData,
@@ -58,6 +75,17 @@ export class FlowActionPresenter {
             }
             return await this.api.action(actionRequest);
         }
+    }
+
+
+    public async action(actionId:string) {
+        let formData;
+        if(this.isPassAction(actionId)){
+            formData = await this.formActionContext.validate();
+        }else {
+            formData = this.formActionContext.save();
+        }
+        return await this.submitAction(actionId, formData);
     }
 
 }
