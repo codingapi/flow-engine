@@ -4,6 +4,10 @@ export const CUSTOM_SCRIPT = '@CUSTOM_SCRIPT';
 /** 脚本标题标记 */
 export const SCRIPT_TITLE = '@SCRIPT_TITLE';
 
+
+/** 脚本元数据标记 */
+export const SCRIPT_META = '@SCRIPT_META';
+
 /**
  * Groovy脚本类型枚举
  */

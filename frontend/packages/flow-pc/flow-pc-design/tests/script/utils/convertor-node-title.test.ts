@@ -6,6 +6,7 @@ import {
 import {
     NodeTitleVariableAdapter
 } from "@/components/script/services/variable/node-title";
+import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 
 describe('NodeTitleGroovyConvertor', () => {
 
@@ -38,6 +39,7 @@ describe('NodeTitleGroovyConvertor', () => {
     describe('toExpression', () => {
         it('node title script to expression', () => {
             const script = `
+// @SCRIPT_TITLE 您有一条待办消息\${当前操作人ID}\${当前操作人ID}\${流程创建人}\${是否管理员}   
 def run(request){
 return "您有一条待办消息" + request.getOperatorId() + request.getOperatorId() + request.getCreatorName() + request.getIsFlowManager()
 }
@@ -59,7 +61,8 @@ def run(request){
 `
             const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(script, nodeTitleVariableAdapter.getVariables());
             const result = nodeTitleGroovyConvertor.resetExpression('你有一条${当前操作人}的${流程标题}待办消息 【${当前节点}】')
-            expect(result).toEqual(script);
+            const title = GroovyScriptConvertorUtil.getScriptTitle(result);
+            expect(title).toEqual("你有一条${当前操作人}的${流程标题}待办消息 【${当前节点}】");
         });
     });
 });
