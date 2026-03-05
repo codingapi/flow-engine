@@ -5,12 +5,14 @@ import {FormItemProps} from "@/type";
 
 
 const $Input:React.FC<FormItemProps> = (props)=>{
-
+    const value = props.value || undefined;
 
     return (
         <Input
-            {...props}
             type="number"
+            value={value}
+            placeholder={props.placeholder}
+            defaultValue={props.defaultValue}
             onChange={(event) => {
                 props.onChange?.(event.target.value);
             }}

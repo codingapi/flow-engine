@@ -260,6 +260,7 @@ const FormTable: React.FC<FormTableProps> = (props) => {
                 return (
                     <Space>
                         <a onClick={() => {
+                            fieldForm.resetFields();
                             fieldForm.setFieldsValue(record);
                             setEditable(true);
                         }}>编辑</a>

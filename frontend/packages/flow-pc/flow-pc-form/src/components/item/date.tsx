@@ -7,17 +7,22 @@ import {FormItemProps} from "@/type";
 const $Date: React.FC<FormItemProps> = (props) => {
 
     const handlerChange = (value: any) => {
-        props.onChange?.(dayjs(value).format('YYYY-MM-DD'));
+        if (value) {
+            props.onChange?.(dayjs(value).format('YYYY-MM-DD'));
+        } else {
+            props.onChange?.('');
+        }
     }
 
     const value = props.value ? dayjs(props.value) : undefined;
+    const defaultValue = props.defaultValue ? dayjs(props.defaultValue) : undefined;
 
     return (
         <DatePicker
-            {...props}
             value={value as any}
             onChange={handlerChange}
             placeholder={props.placeholder}
+            defaultValue={defaultValue}
         />
     )
 }

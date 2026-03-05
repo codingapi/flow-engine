@@ -11,7 +11,6 @@ const $Switch: React.FC<FormItemProps> = (props) => {
 
     return (
         <Switch
-            {...props}
             value={value}
             defaultValue={defaultValue}
             onChange={(value) => {
