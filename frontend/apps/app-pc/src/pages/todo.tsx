@@ -4,7 +4,7 @@ import {WorkflowSelectModal} from "@flow-engine/flow-pc-design";
 import {type ActionType, Table, type TableProps} from "@flow-engine/flow-pc-ui";
 import {Button, Space, Tabs, type TabsProps} from "antd";
 import dayjs from "dayjs";
-import {ApprovalPanelDrawer} from "@flow-engine/flow-pc-approval";
+import {ApprovalPanelDrawer,FlowTitle} from "@flow-engine/flow-pc-approval";
 
 const TodoPage: React.FC = () => {
 
@@ -27,11 +27,14 @@ const TodoPage: React.FC = () => {
         {
             dataIndex: 'title',
             title: '流程名称',
+            render:(value)=>{
+                return <FlowTitle title={value}/>
+            }
         },
         {
             dataIndex: 'readTime',
             title: '读取状态',
-            render: (value, record) => {
+            render: (value) => {
                 return value ? '已读' : '未读';
             }
         },
@@ -42,7 +45,7 @@ const TodoPage: React.FC = () => {
         {
             dataIndex: 'createTime',
             title: '创建时间',
-            render: (text, record) => {
+            render: (text) => {
                 return dayjs(text).format('YYYY-MM-DD HH:mm:ss');
             }
         },
@@ -58,14 +61,14 @@ const TodoPage: React.FC = () => {
         {
             dataIndex: 'recordState',
             title: '状态',
-            render: (text, record) => {
+            render: (text) => {
                 return text ? '已办' : '待办';
             }
         },
         {
             dataIndex: 'option',
             title: '操作',
-            render: (value, record) => {
+            render: (_, record) => {
                 if(currentTab==='todo'){
                     return (
                         <Space>
