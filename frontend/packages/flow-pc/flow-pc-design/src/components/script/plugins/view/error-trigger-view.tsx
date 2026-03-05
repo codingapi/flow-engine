@@ -7,7 +7,7 @@ import {ViewBindPlugin} from "@flow-engine/flow-types";
 import {SCRIPT_DEFAULT_ERROR_TRIGGER} from "@/components/script/default-script";
 import {useNodeRouterManager} from "@/components/design-panel/hooks/use-node-router-manager";
 import {useNodeRenderContext} from "@/components/design-editor/hooks/use-node-render-context";
-import {ErrorTriggerConvertor} from "@/components/script/services/convertor/error-trigger";
+import {ErrorTriggerScriptUtils} from "@/components/script/services/utils/error-trigger";
 
 
 /**
@@ -65,7 +65,7 @@ export const ErrorTriggerPluginView: React.FC<ErrorTriggerViewPlugin> = (props) 
                         <Select
                             options={nodeRouterManager.getBackNodes(node.id)}
                             onChange={(value,option) => {
-                                const script = ErrorTriggerConvertor.goNode(option as any);
+                                const script = ErrorTriggerScriptUtils.goNode(option as any);
                                 props.onChange(script);
                             }}
                         />

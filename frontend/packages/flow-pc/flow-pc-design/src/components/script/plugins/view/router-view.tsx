@@ -6,7 +6,7 @@ import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {Button, Form, Select, Space} from "antd";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
 import {useNodeRouterManager} from "@/components/design-panel/hooks/use-node-router-manager";
-import {RouterConvertor} from "@/components/script/services/convertor/router";
+import {RouterScriptUtils} from "@/components/script/services/utils/router";
 
 /**
  * @param props
@@ -32,7 +32,7 @@ export const RouterPluginView: React.FC<RouterViewPlugin> = (props) => {
                     <Select
                         options={nodeRouterManager.getNodes()}
                         onChange={(value, option) => {
-                            const script = RouterConvertor.goNode(option as any);
+                            const script = RouterScriptUtils.goNode(option as any);
                             props.onChange(script);
                         }}
                     />

@@ -3,7 +3,7 @@ import {Button, Form, Space} from 'antd';
 import {EditOutlined} from '@ant-design/icons';
 import {Field, FieldRenderProps} from '@flowgram.ai/fixed-layout-editor';
 import {useDesignContext} from '@/components/design-panel/hooks/use-design-context';
-import {NodeTitleVariableAdapter} from "@/components/script/services/variable/node-title";
+import {NodeTitleVariableService} from "@/components/script/services/variable/node-title";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
 import {NodeTitleConfigModal} from "@/components/script/modal/node-title-config-modal";
 
@@ -17,7 +17,7 @@ export const NodeTitleStrategy: React.FC = () => {
     const [showConfigModal, setShowConfigModal] = React.useState(false);
 
     const nodeTitleVariable = React.useMemo(() => {
-        return new NodeTitleVariableAdapter(state.workflow.form);
+        return new NodeTitleVariableService(state.workflow.form);
     }, [state.workflow.form]);
 
 
