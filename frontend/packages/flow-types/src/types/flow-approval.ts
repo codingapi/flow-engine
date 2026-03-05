@@ -1,27 +1,27 @@
 /**
  *  数据类型
  */
-export type DataType = 'string' | 'number' | 'boolean' | 'date';
+export type DataType = 'STRING' | 'NUMBER' | 'BOOLEAN' | 'DATE';
 
 
 
 // FormField字段类型
 export const dataTypeOptions = [
     {
-        label: '整数',
-        value: 'number'
+        label: '数字',
+        value: 'NUMBER'
     },
     {
         label: '字符串',
-        value: 'string'
+        value: 'STRING'
     },
     {
         label: '日期类型',
-        value: 'date'
+        value: 'DATE'
     },
     {
         label: '布尔类型',
-        value: 'boolean'
+        value: 'BOOLEAN'
     },
 ]
 
@@ -34,7 +34,10 @@ export interface FormField {
     code:string;
     type:DataType;
     required:boolean;
-    defaultValue:string;
+    defaultValue?:string;
+    placeholder?:string;
+    tooltip?:string;
+    help?:string;
 }
 
 /**

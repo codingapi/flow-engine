@@ -23,7 +23,7 @@ public class FlowFormBuilder {
         return this;
     }
 
-    public FlowFormBuilder addField(String name, String code, String type) {
+    public FlowFormBuilder addField(String name, String code, DataType type) {
         FormField field = new FormField();
         field.setName(name);
         field.setCode(code);

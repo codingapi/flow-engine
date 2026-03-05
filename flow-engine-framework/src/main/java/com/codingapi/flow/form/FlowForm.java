@@ -66,9 +66,11 @@ public class FlowForm {
                 fieldMeta.setId((String) field.get("id"));
                 fieldMeta.setName((String) field.get("name"));
                 fieldMeta.setCode((String) field.get("code"));
-                fieldMeta.setType((String) field.get("type"));
+                fieldMeta.setType(DataType.valueOf((String) field.get("type")));
                 fieldMeta.setRequired(Boolean.TRUE.equals(field.get("required")));
                 fieldMeta.setDefaultValue((String) field.get("defaultValue"));
+                fieldMeta.setTooltip((String) field.get("tooltip"));
+                fieldMeta.setHelp((String) field.get("help"));
                 fieldList.add(fieldMeta);
             }
         }
@@ -104,10 +106,10 @@ public class FlowForm {
         return fields.stream().filter(field -> field.getName().equals(fieldName)).findFirst().orElse(null);
     }
 
-    private void initFormFieldTypes(FlowForm form, Map<String, String> types) {
+    private void initFormFieldTypes(FlowForm form, Map<String, DataType> types) {
         for (FormField field : form.getFields()) {
             String key = form.getCode() + "." + field.getCode();
-            String type = field.getType();
+            DataType type = field.getType();
             types.put(key, type);
         }
     }
@@ -117,8 +119,8 @@ public class FlowForm {
      *
      * @return 表单字段类型
      */
-    public Map<String, String> loadAllFieldTypeMaps() {
-        Map<String, String> types = new HashMap<>();
+    public Map<String, DataType> loadAllFieldTypeMaps() {
+        Map<String, DataType> types = new HashMap<>();
         List<FlowForm> forms = this.getSubForms();
         if (forms == null) {
             forms = new ArrayList<>();
@@ -136,8 +138,8 @@ public class FlowForm {
      *
      * @return 表单字段类型
      */
-    public Map<String, String> loadMainFieldTypeMaps() {
-        Map<String, String> types = new HashMap<>();
+    public Map<String, DataType> loadMainFieldTypeMaps() {
+        Map<String, DataType> types = new HashMap<>();
         List<FlowForm> forms = new ArrayList<>();
         forms.add(this);
         for (FlowForm subForm : forms) {

@@ -41,7 +41,7 @@ export class FlowActionPresenter {
                     actionId,
                 }
             }
-            await this.api.action(request);
+            return await this.api.action(request);
         }else {
             const createRequest = {
                 workId,
@@ -56,7 +56,7 @@ export class FlowActionPresenter {
                     actionId,
                 }
             }
-            await this.api.action(actionRequest);
+            return await this.api.action(actionRequest);
         }
     }
 

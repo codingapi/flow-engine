@@ -3,6 +3,7 @@ package com.codingapi.flow.strategy.node;
 import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.exception.FlowValidationException;
+import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
@@ -42,7 +43,7 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
      */
     @Override
     public void verifyNode(FlowForm form) {
-        Map<String, String> fieldTypes = form.loadAllFieldTypeMaps();
+        Map<String, DataType> fieldTypes = form.loadAllFieldTypeMaps();
         for (FormFieldPermission permission : fieldPermissions) {
             String key = permission.getFormCode() + "." + permission.getFieldCode();
             if (!fieldTypes.containsKey(key)) {

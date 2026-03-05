@@ -38,9 +38,11 @@ export const Header = () => {
                             type={index === 0 ? "primary" : "default"}
                             danger={item.type === 'REJECT'}
                             onClick={() => {
-                                actionPresenter.action(item.id).then(() => {
-                                    message.success("操作成功");
-                                    context.close();
+                                actionPresenter.action(item.id).then((res) => {
+                                    if(res.success){
+                                        message.success("操作成功");
+                                        context.close();
+                                    }
                                 });
                             }}
                             style={index === 0 ? {} : {}}

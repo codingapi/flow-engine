@@ -1,5 +1,6 @@
 package com.codingapi.flow.script.node;
 
+import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FlowFormBuilder;
@@ -41,7 +42,7 @@ class NodeTitleScriptTest {
         FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
-                .addField("请假天数", "days", "int")
+                .addField("请假天数", "days", DataType.NUMBER)
                 .build();
 
         StartNode startNode = StartNode.builder().build();

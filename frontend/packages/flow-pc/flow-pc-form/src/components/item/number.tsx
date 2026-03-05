@@ -1,6 +1,22 @@
 import React from "react";
 import {Form, Input} from "antd";
 import {FormField} from "@flow-engine/flow-types";
+import {FormItemProps} from "@/type";
+
+
+const $Input:React.FC<FormItemProps> = (props)=>{
+
+
+    return (
+        <Input
+            {...props}
+            type="number"
+            onChange={(event) => {
+                props.onChange?.(event.target.value);
+            }}
+        />
+    )
+}
 
 export const FormItemNumber:React.FC<FormField> = (props)=>{
 
@@ -17,8 +33,13 @@ export const FormItemNumber:React.FC<FormField> = (props)=>{
             label={props.name}
             required={props.required}
             rules={rules}
+            tooltip={props.tooltip}
+            help={props.help}
         >
-            <Input type={"number"} defaultValue={props.defaultValue}/>
+            <$Input
+                defaultValue={props.defaultValue}
+                placeholder={props.placeholder}
+            />
         </Form.Item>
     )
 }

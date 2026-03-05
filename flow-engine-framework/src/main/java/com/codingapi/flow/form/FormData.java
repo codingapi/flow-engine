@@ -1,5 +1,6 @@
 package com.codingapi.flow.form;
 
+import com.codingapi.flow.exception.FlowValidationException;
 import lombok.Getter;
 
 import java.util.*;
@@ -113,12 +114,52 @@ public class FormData {
     }
 
     /**
+     *  校验formData
+     */
+    public void verify() {
+        for (FormField formField:flowForm.getFields()){
+            Object value = this.dataBody.get(formField.getCode());
+            Object defaultValue = formField.getDefaultValue();
+            if(value==null && defaultValue!=null){
+                this.dataBody.set(formField.getCode(),defaultValue);
+            }
+            if(formField.isRequired()){
+                if(value==null && defaultValue==null){
+                    throw FlowValidationException.fieldNotFound(formField.getName());
+                }
+            }
+        }
+
+        if(flowForm.getSubForms()!=null) {
+            for (FlowForm subForm : flowForm.getSubForms()) {
+                List<DataBody> subDataList =  this.getSubDataBody(subForm.getCode());
+                for (DataBody subData:subDataList) {
+                    for (FormField formField : subForm.getFields()) {
+                        Object value = subData.get(formField.getCode());
+                        Object defaultValue = formField.getDefaultValue();
+                        if(value==null && defaultValue!=null){
+                            subData.set(formField.getCode(),defaultValue);
+                        }
+                        if(formField.isRequired()){
+                            if(value==null && defaultValue==null){
+                                throw FlowValidationException.fieldNotFound(formField.getName());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+    }
+
+    /**
      * 表单数据体
      */
     public static class DataBody {
         private final FlowForm flowForm;
         private final Map<String, Object> data;
-        private final Map<String, String> fieldTypes;
+        private final Map<String, DataType> fieldTypes;
 
         public DataBody(FlowForm flowForm) {
             this.flowForm = flowForm;
@@ -142,9 +183,9 @@ public class FormData {
          */
         public DataBody set(String key, Object value) {
             String id = flowForm.getCode() + "." + key;
-            String type = this.fieldTypes.get(id);
+            DataType type = this.fieldTypes.get(id);
             if (type == null) {
-                throw new RuntimeException("key:" + key + " not found");
+                throw FlowValidationException.fieldNotFound(key);
             }
             this.data.put(id, value);
             return this;

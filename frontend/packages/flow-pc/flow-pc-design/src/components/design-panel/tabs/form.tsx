@@ -115,6 +115,22 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
                 >
                     <Input placeholder={"请输入默认值"}/>
                 </Form.Item>
+
+                <Form.Item
+                    name={"tooltip"}
+                    label={"提示信息"}
+                    labelCol={labelCol}
+                >
+                    <Input placeholder={"请输入提示信息"}/>
+                </Form.Item>
+
+                <Form.Item
+                    name={"help"}
+                    label={"帮助提示"}
+                    labelCol={labelCol}
+                >
+                    <Input placeholder={"请输入帮助提示"}/>
+                </Form.Item>
             </Form>
 
         </Modal>
@@ -228,6 +244,14 @@ const FormTable: React.FC<FormTableProps> = (props) => {
         {
             dataIndex: 'defaultValue',
             title: '默认值'
+        },
+        {
+            dataIndex: 'tooltip',
+            title: '提示信息'
+        },
+        {
+            dataIndex: 'help',
+            title: '帮助提示'
         },
         {
             dataIndex: 'option',

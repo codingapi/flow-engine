@@ -72,6 +72,11 @@ public class ActionManager {
             return;
         }
 
+        // 保存操作,不做检查
+        if (flowAction instanceof PassAction) {
+            session.getFormData().verify();
+        }
+
         // 加签操作、转办操作、委托操作
         if (flowAction instanceof AddAuditAction || flowAction instanceof TransferAction || flowAction instanceof DelegateAction) {
             if (flowAdvice.getForwardOperators() == null || flowAdvice.getForwardOperators().isEmpty()) {

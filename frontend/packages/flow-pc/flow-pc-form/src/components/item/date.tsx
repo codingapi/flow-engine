@@ -1,27 +1,28 @@
 import React from "react";
-import {Form, Switch} from "antd";
+import {DatePicker, Form} from "antd";
 import {FormField} from "@flow-engine/flow-types";
+import dayjs from "dayjs";
 import {FormItemProps} from "@/type";
 
+const $Date: React.FC<FormItemProps> = (props) => {
 
-const $Switch: React.FC<FormItemProps> = (props) => {
+    const handlerChange = (value: any) => {
+        props.onChange?.(dayjs(value).format('YYYY-MM-DD'));
+    }
 
-    const value = props.value ? props.value === 'true' : undefined;
-    const defaultValue = props.defaultValue ? props.defaultValue === 'true' : undefined;
+    const value = props.value ? dayjs(props.value) : undefined;
 
     return (
-        <Switch
+        <DatePicker
             {...props}
-            value={value}
-            defaultValue={defaultValue}
-            onChange={(value) => {
-                props.onChange?.(value ? 'true' : 'false');
-            }}
+            value={value as any}
+            onChange={handlerChange}
+            placeholder={props.placeholder}
         />
     )
 }
 
-export const FormItemBoolean: React.FC<FormField> = (props) => {
+export const FormItemDate: React.FC<FormField> = (props) => {
 
     const rules = props.required ? [
         {
@@ -29,7 +30,6 @@ export const FormItemBoolean: React.FC<FormField> = (props) => {
             message: `${props.name}不能为空`
         }
     ] : [];
-
 
     return (
         <Form.Item
@@ -40,7 +40,7 @@ export const FormItemBoolean: React.FC<FormField> = (props) => {
             tooltip={props.tooltip}
             help={props.help}
         >
-            <$Switch
+            <$Date
                 defaultValue={props.defaultValue}
                 placeholder={props.placeholder}
             />

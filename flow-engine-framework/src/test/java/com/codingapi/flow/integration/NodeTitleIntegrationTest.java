@@ -1,5 +1,6 @@
 package com.codingapi.flow.integration;
 
+import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FlowFormBuilder;
@@ -43,7 +44,9 @@ class NodeTitleIntegrationTest {
         FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
-                .addField("请假天数", "days", "int")
+                .addField("请假人", "name", DataType.STRING)
+                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假事由", "reason", DataType.STRING)
                 .build();
 
         StartNode startNode = StartNode.builder().build();
@@ -76,7 +79,9 @@ class NodeTitleIntegrationTest {
         FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
-                .addField("请假天数", "days", "int")
+                .addField("请假人", "name", DataType.STRING)
+                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假事由", "reason", DataType.STRING)
                 .build();
 
         StartNode startNode = StartNode.builder().build();
@@ -122,7 +127,9 @@ class NodeTitleIntegrationTest {
         FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
-                .addField("请假人", "name", "string")
+                .addField("请假人", "name", DataType.STRING)
+                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假事由", "reason", DataType.STRING)
                 .build();
 
         StartNode startNode = StartNode.builder().build();
