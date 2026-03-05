@@ -1,5 +1,5 @@
 import {describe, expect, it} from '@rstest/core';
-import {GroovyScriptConvertorUtil} from "@/components/script/services/convertor/utils";
+import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 
 describe('GroovyScriptUtil', () => {
 
@@ -50,6 +50,36 @@ def run(request){
             console.log(result);
             const title = GroovyScriptConvertorUtil.getScriptTitle(result)
             expect(title).toEqual(`这就是一个实例的标题`);
+        });
+    });
+
+
+    describe('getScriptMeta', () => {
+        it('get groovy script meta', () => {
+            const script = `
+// @SCRIPT_TITLE 这是一个实例的标题     
+// @SCRIPT_META {name:"name"}       
+def run(request){
+    return "你有一条" + request.getOperatorName() + "的" + request.getWorkflowTitle() + "待办消息 【" + request.getNodeName() + "】"
+}`
+            const result = GroovyScriptConvertorUtil.getScriptMeta(script)
+            expect(result).toEqual(`{name:"name"}`);
+        });
+    });
+
+
+    describe('updateScriptMeta', () => {
+        it('update groovy script meta', () => {
+            const script = `
+// @SCRIPT_TITLE 这是一个实例的标题  
+// @SCRIPT_META {name:"name"}              
+def run(request){
+    return "你有一条" + request.getOperatorName() + "的" + request.getWorkflowTitle() + "待办消息 【" + request.getNodeName() + "】"
+}`
+            const result = GroovyScriptConvertorUtil.updateScriptMeta(script,'{name:"test"}');
+            console.log(result);
+            const title = GroovyScriptConvertorUtil.getScriptMeta(result)
+            expect(title).toEqual(`{name:"test"}`);
         });
     });
 });

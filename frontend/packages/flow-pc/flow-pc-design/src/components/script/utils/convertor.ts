@@ -1,4 +1,4 @@
-import {CUSTOM_SCRIPT,SCRIPT_TITLE,GroovyVariableMapping} from "@/components/script/typings";
+import {CUSTOM_SCRIPT, SCRIPT_TITLE, GroovyVariableMapping, SCRIPT_META} from "@/components/script/typings";
 import {GroovyFormatter} from "@/components/script/utils/format";
 
 /**
@@ -60,6 +60,34 @@ export class GroovyScriptConvertorUtil {
             return script.replace(new RegExp(`//\\s*${SCRIPT_TITLE}\\s*.+`), titleComment);
         } else {
             return `${titleComment}\n${script}`;
+        }
+    }
+
+
+    /**
+     * 获取脚本中的元数据
+     * @param script
+     */
+    public static getScriptMeta(script: string): string {
+        const titleMatch = script.match(new RegExp(`//\\s*${SCRIPT_META}\\s*(.+)`));
+        if (titleMatch) {
+            return titleMatch[1].trim();
+        }
+        return '';
+    }
+
+
+    /**
+     * 更新脚本中的元数据内容，如果不存在则添加
+     * @param script
+     * @param meta
+     */
+    public static updateScriptMeta(script: string, meta: string): string {
+        const metaComment = `// ${SCRIPT_META} ${meta}`;
+        if (GroovyScriptConvertorUtil.getScriptTitle(script)) {
+            return script.replace(new RegExp(`//\\s*${SCRIPT_META}\\s*.+`), metaComment);
+        } else {
+            return `${metaComment}\n${script}`;
         }
     }
 

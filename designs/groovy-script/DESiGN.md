@@ -1,5 +1,15 @@
 # Groovy Script 脚本设计规范
 
+示例脚本
+```
+// @CUSTOM_SCRIPT
+// @SCRIPT_TITLE 这是一个示例脚本
+// @SCRIPT_META {name:"name"}
+def run(request){
+    return "Hello, ${request.name}!"
+}
+```
+
 ## 脚本的实例写法如下
 ```
 def run(request){
@@ -9,7 +19,7 @@ def run(request){
 
 ## 脚本规范
 request对象，根据脚本的不同，起传递的request对象也不同。
-return语句，return语句根据脚本的不同，起返回的对象也不同。
+return语句，return语句根据脚本的不同，对应返回的对象也不同。
 
 ## 开发规范
 为了让脚本可以更好的呈现和使用，脚本的配置分为两种模式，一种是可视化配置模式，一种是代码配置模式。
@@ -41,3 +51,15 @@ def run(request){
 }
 ```
 上述的脚本在编辑器中就会以“这是一个示例脚本”来展示，而不是以代码的方式来展示。
+
+
+## 脚本元数据
+在可视化呈现的过程中，界面不仅要能够解析脚本的标题，还需要可以正常的在可视化界面上呈现内容，为此通过@SCRIPT_META来标注界面展示的meta数据格式。   
+meta的数据是json格式的数据。
+
+```
+// @SCRIPT_META {name:"name"}
+def run(request){
+    return "Hello, ${request.name}!"
+}
+```
