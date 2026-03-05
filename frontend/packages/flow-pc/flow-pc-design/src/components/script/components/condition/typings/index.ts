@@ -6,7 +6,7 @@ export type DataType = 'string' | 'number' | 'boolean' | 'date';
 /**
  *  条件类型
  */
-export type RelationType = 'equal' | 'greater_than' | 'greater_equal' | 'less_than' | 'less_equal' | 'not_equal';
+export type RelationType = 'equal' | 'greater_than' | 'greater_equal' | 'less_than' | 'less_equal' | 'not_equal' | 'unknow';
 
 /**
  *  逻辑关系
@@ -112,9 +112,9 @@ export interface ConditionGroup {
     // 分组编号
     id: string;
     // 左侧参数
-    left: Condition;
+    left?: Condition;
     // 右侧参数
-    right: Condition;
+    right?: Condition;
     // 参数关系
-    type: RelationType;
+    type?: RelationType;
 }

@@ -6,6 +6,7 @@ import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 import {SCRIPT_DEFAULT_CONDITION} from "@/components/script/default-script";
 import {Button, Space} from "antd";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
+import {useConditionContext} from "@/components/script/components/condition/hooks/use-condition-context";
 
 interface ConditionPanelProps {
     script:string;
@@ -13,6 +14,10 @@ interface ConditionPanelProps {
 }
 
 export const ConditionPanel:React.FC<ConditionPanelProps> = (props)=>{
+
+    const {context} = useConditionContext();
+
+    const presenter = context.getPresenter();
 
     return (
         <div>
@@ -48,6 +53,7 @@ export const ConditionPanel:React.FC<ConditionPanelProps> = (props)=>{
                     icon={<ReloadOutlined/>}
                     danger={true}
                     onClick={() => {
+                        presenter.clearState();
                         props.onChange(SCRIPT_DEFAULT_CONDITION);
                     }}
                 >

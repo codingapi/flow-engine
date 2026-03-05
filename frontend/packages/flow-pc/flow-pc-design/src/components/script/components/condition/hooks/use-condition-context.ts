@@ -45,6 +45,15 @@ export const createConditionContext = (props: ConditionViewProps) => {
         ref.current?.syncState(state);
     }, [state]);
 
+
+    React.useEffect(()=>{
+        // 关闭时清空redux的数据
+        return ()=>{
+            ref.current?.clearState();
+            ref.current = undefined;
+        }
+    },[]);
+
     return {
         state,
         context: ref.current,

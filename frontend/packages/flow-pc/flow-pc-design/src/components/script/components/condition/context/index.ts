@@ -22,6 +22,10 @@ export class ConditionContextScope {
     public initState(initData:any) {
         this.presenter.initState(initData);
     }
+
+    public clearState(){
+        this.presenter.clearState();
+    }
 }
 
 
