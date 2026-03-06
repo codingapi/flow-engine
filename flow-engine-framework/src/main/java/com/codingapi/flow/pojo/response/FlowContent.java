@@ -87,7 +87,7 @@ public class FlowContent {
     /**
      * 流程按钮
      */
-    private List<IFlowAction> actions;
+    private List<Map<String,Object>> actions;
 
     /**
      * 是否可合并
@@ -128,7 +128,7 @@ public class FlowContent {
     public void pushCurrentNode(IFlowNode currentNode) {
         ActionManager actionManager = currentNode.actionManager();
         NodeStrategyManager strategyManager = currentNode.strategyManager();
-        this.actions = actionManager.getActions();
+        this.actions = actionManager.getActions().stream().map(IFlowAction::toMap).toList();
         this.adviceRequired = strategyManager.isAdviceRequired();
         this.signRequired = strategyManager.isSignRequired();
         this.nodeId = currentNode.getId();

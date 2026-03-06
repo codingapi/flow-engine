@@ -1,15 +1,16 @@
 import {FlowApprovalApi, State} from "@/components/flow-approval/typings";
 import {FormActionContext} from "@flow-engine/flow-types";
+import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 
 export class FlowActionPresenter {
 
     private readonly api: FlowApprovalApi;
-    private readonly formActionContext:FormActionContext;
+    private readonly formActionContext: FormActionContext;
     private state: State;
 
     constructor(state: State,
                 api: FlowApprovalApi,
-                formActionContext:FormActionContext) {
+                formActionContext: FormActionContext) {
         this.state = state;
         this.api = api;
         this.formActionContext = formActionContext;
@@ -19,7 +20,7 @@ export class FlowActionPresenter {
         this.state = state;
     }
 
-    public async processNodes(){
+    public async processNodes() {
         const formData = this.formActionContext.save();
         const id = this.state.flow?.recordId || this.state.flow?.workId || '';
         return await this.api.processNodes({
@@ -34,17 +35,19 @@ export class FlowActionPresenter {
      * @param actionId
      * @private
      */
-    private isPassAction(actionId:string){
+    private isPassAction(actionId: string) {
         const actions = this.state.flow?.actions || [];
-        for(const action of actions){
-            if(action.id === actionId){
-                if(action.type ==='PASS'){
+        for (const action of actions) {
+            if (action.id === actionId) {
+                if (action.type === 'PASS') {
                     return true;
                 }
-                if(action.type === 'CUSTOM'){
+                if (action.type === 'CUSTOM') {
                     const script = action.script || '';
-
-
+                    const returnData = GroovyScriptConvertorUtil.getReturnScript(script);
+                    if (returnData.includes('PASS')) {
+                        return true;
+                    }
                 }
             }
         }
@@ -52,20 +55,20 @@ export class FlowActionPresenter {
     }
 
 
-    private async submitAction(actionId:string,formData:any,params?:any){
+    private async submitAction(actionId: string, formData: any, params?: any) {
         const recordId = this.state.flow?.recordId;
         const workId = this.state.flow?.workId;
-        if(recordId){
+        if (recordId) {
             const request = {
                 formData,
                 recordId,
-                advice:{
+                advice: {
                     actionId,
                     ...params
                 }
             }
             return await this.api.action(request);
-        }else {
+        } else {
             const createRequest = {
                 workId,
                 formData,
@@ -75,7 +78,7 @@ export class FlowActionPresenter {
             const actionRequest = {
                 formData,
                 recordId,
-                advice:{
+                advice: {
                     actionId,
                     ...params
                 }
@@ -85,14 +88,14 @@ export class FlowActionPresenter {
     }
 
 
-    public async action(actionId:string,params?:any) {
+    public async action(actionId: string, params?: any) {
         let formData;
-        if(this.isPassAction(actionId)){
+        if (this.isPassAction(actionId)) {
             formData = await this.formActionContext.validate();
-        }else {
+        } else {
             formData = this.formActionContext.save();
         }
-        return await this.submitAction(actionId, formData,params);
+        return await this.submitAction(actionId, formData, params);
     }
 
 }
