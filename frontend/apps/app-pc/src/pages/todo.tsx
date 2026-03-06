@@ -26,6 +26,10 @@ const TodoPage: React.FC = () => {
             title: '编号',
         },
         {
+            dataIndex: 'processId',
+            title: '流程编码',
+        },
+        {
             dataIndex: 'title',
             title: '流程名称',
             render:(value)=>{

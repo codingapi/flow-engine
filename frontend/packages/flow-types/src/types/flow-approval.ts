@@ -176,8 +176,10 @@ export interface FlowContent {
     // 记录id
     recordId:number;
     // 流程id
+    processId:string;
+    // 流程设计id
     workId:string;
-    // 流程编码
+    // 流程设计编码
     workCode:string;
     // 节点id
     nodeId:string;

@@ -26,6 +26,12 @@ public class FlowContent {
     private long recordId;
 
     /**
+     * 流程id
+     * 每一次流程启动时生成，直到流程结束
+     */
+    private String processId;
+
+    /**
      * 流程编号
      */
     private String workId;
@@ -135,6 +141,7 @@ public class FlowContent {
 
     public void pushRecords(FlowRecord record, List<FlowRecord> mergeRecords) {
         this.recordId = record.getId();
+        this.processId = record.getProcessId();
         this.createOperator = new FlowOperator(record.getCreateOperatorId(), record.getCreateOperatorName());
         this.mergeable = record.isMergeable();
         this.flowState = record.getFlowState();
