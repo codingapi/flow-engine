@@ -172,6 +172,20 @@ export interface ProcessNode{
 }
 
 /**
+ * 节点
+ */
+export interface NodeOption{
+    // 节点id
+    id:string;
+    // 节点名称
+    name:string;
+    // 节点类型
+    type:string;
+    // 展示节点
+    display:boolean;
+}
+
+/**
  * 流程审批内容对象
  */
 export interface FlowContent {
@@ -215,4 +229,6 @@ export interface FlowContent {
     recordState:number;
     // 审批记录
     histories:History[];
+    // 所有节点
+    nodes:NodeOption[];
 }

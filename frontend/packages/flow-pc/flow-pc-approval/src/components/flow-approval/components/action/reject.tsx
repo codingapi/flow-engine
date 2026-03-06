@@ -5,6 +5,11 @@ import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-
 
 const {TextArea} = Input;
 
+/**
+ * 拒绝
+ * @param props
+ * @constructor
+ */
 export const RejectAction: React.FC<FlowActionProps> = (props) => {
 
     const action = props.action;

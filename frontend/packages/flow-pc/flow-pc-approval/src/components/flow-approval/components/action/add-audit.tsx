@@ -4,6 +4,11 @@ import {Button, Form, message, Modal} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
 import {AddAuditView} from "@/components/flow-approval/plugins/view/add-audit-view";
 
+/**
+ * 加签
+ * @param props
+ * @constructor
+ */
 export const AddAuditAction: React.FC<FlowActionProps> = (props) => {
 
     const action = props.action;

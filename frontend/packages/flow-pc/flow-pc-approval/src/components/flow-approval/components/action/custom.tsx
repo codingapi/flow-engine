@@ -3,6 +3,11 @@ import {FlowActionProps} from "./type";
 import {Button, message} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
 
+/**
+ * 自定义
+ * @param props
+ * @constructor
+ */
 export const CustomAction: React.FC<FlowActionProps> = (props) => {
 
     const action = props.action;

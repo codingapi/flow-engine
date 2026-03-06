@@ -119,6 +119,11 @@ public class FlowContent {
      */
     private List<History> histories;
 
+    /**
+     * 所有节点
+     */
+    private List<NodeOption> nodes;
+
 
     public void pushCurrentNode(IFlowNode currentNode) {
         ActionManager actionManager = currentNode.actionManager();
@@ -137,6 +142,7 @@ public class FlowContent {
         this.form = workflow.getForm();
         this.workCode = workflow.getCode();
         this.workId = workflow.getId();
+        this.nodes = workflow.getNodes().stream().map(NodeOption::new).toList();
     }
 
     public void pushRecords(FlowRecord record, List<FlowRecord> mergeRecords) {

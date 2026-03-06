@@ -6,6 +6,11 @@ import {SignKeyView} from "@/components/flow-approval/plugins/view/sign-key-view
 
 const {TextArea} = Input;
 
+/**
+ * 通过
+ * @param props
+ * @constructor
+ */
 export const PassAction: React.FC<FlowActionProps> = (props) => {
 
     const action = props.action;
