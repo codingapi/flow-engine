@@ -1,7 +1,8 @@
 import React from "react";
 import {FlowActionProps} from "./type";
-import {Button, Form, message, Modal,Input} from "antd";
+import {Button, Form, Input, message, Modal} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
+import {SignKeyView} from "@/components/flow-approval/plugins/view/sign-key-view";
 
 const {TextArea} = Input;
 
@@ -15,10 +16,12 @@ export const PassAction: React.FC<FlowActionProps> = (props) => {
 
     const isStartNode = state.flow?.nodeType === 'START';
 
+    const currentOperator = state.flow?.currentOperator;
+
     const [form] = Form.useForm();
 
-    const handleSubmit = (params?:any) => {
-        actionPresenter.action(action.id,params).then((res) => {
+    const handleSubmit = (params?: any) => {
+        actionPresenter.action(action.id, params).then((res) => {
             if (res.success) {
                 message.success("操作成功");
                 setModalVisible(false);
@@ -27,27 +30,21 @@ export const PassAction: React.FC<FlowActionProps> = (props) => {
         });
     }
 
-    const adviceRules =state.flow?.adviceRequired? [
+    const adviceRules = state.flow?.adviceRequired ? [
         {
             required: state.flow?.adviceRequired || false,
-            message:'请输入审批意见'
+            message: '请输入审批意见'
         }
-    ]:[];
-
-    const signRules = state.flow?.signRequired ?[
-        {
-            required: state.flow?.signRequired || false,
-            message:'请设置签名'
-        }
-    ]:[];
+    ] : [];
 
     return (
         <>
             <Button
                 onClick={() => {
-                    if(isStartNode) {
+                    if (isStartNode) {
                         handleSubmit();
-                    }else {
+                    } else {
+                        form.resetFields();
                         setModalVisible(true);
                     }
                 }}
@@ -56,20 +53,23 @@ export const PassAction: React.FC<FlowActionProps> = (props) => {
             </Button>
 
             <Modal
-                title={"流程审批"}
+                title={"审批通过"}
                 open={modalVisible}
-                onCancel={()=>setModalVisible(false)}
-                onOk={()=>{
+                destroyOnHidden
+                onCancel={() => setModalVisible(false)}
+                onOk={() => {
                     form.submit();
                 }}
             >
                 <Form
                     form={form}
                     layout="vertical"
-                    onFinish={(values)=>{
+                    onFinish={(values) => {
                         handleSubmit(values);
                     }}
                 >
+
+
                     <Form.Item
                         name={"advice"}
                         label={"审批意见"}
@@ -79,14 +79,25 @@ export const PassAction: React.FC<FlowActionProps> = (props) => {
                         <TextArea placeholder={"请输入审批意见"}/>
                     </Form.Item>
 
-                    <Form.Item
-                        name={"signKey"}
-                        label={"签名"}
-                        required={state.flow?.signRequired}
-                        rules={signRules}
-                    >
-                        <TextArea placeholder={"请输入审批签名"}/>
-                    </Form.Item>
+
+
+                    {state.flow?.signRequired && currentOperator && (
+                        <Form.Item
+                            name={"signKey"}
+                            label={"审批签名"}
+                            required={state.flow?.signRequired}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: '请设置审批签名'
+                                }
+                            ]}
+                        >
+                            <SignKeyView
+                                current={currentOperator}
+                            />
+                        </Form.Item>
+                    )}
                 </Form>
 
             </Modal>

@@ -11,12 +11,10 @@ export const SaveAction: React.FC<FlowActionProps> = (props) => {
 
     return (
         <Button
-            danger={action.type === 'REJECT'}
             onClick={() => {
                 actionPresenter.action(action.id).then((res) => {
                     if (res.success) {
-                        message.success("操作成功");
-                        context.close();
+                        message.success("流程数据已保存");
                     }
                 });
             }}

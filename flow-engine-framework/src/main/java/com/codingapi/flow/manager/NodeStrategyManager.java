@@ -1,16 +1,10 @@
 package com.codingapi.flow.manager;
 
-import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.actions.PassAction;
-import com.codingapi.flow.action.actions.RejectAction;
 import com.codingapi.flow.error.ErrorThrow;
-import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FlowForm;
-import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.*;
 import lombok.Getter;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -161,30 +155,6 @@ public class NodeStrategyManager {
     }
 
     public void verifySession(FlowSession session) {
-
-        FlowAdvice flowAdvice = session.getAdvice();
-        IFlowAction flowAction = flowAdvice.getAction();
-
-
-        //  通过操作
-        if (flowAction instanceof PassAction || flowAction instanceof RejectAction) {
-
-            // 是否必须填写审批意见
-            if (this.isAdviceRequired()) {
-                if (!StringUtils.hasText(flowAdvice.getAdvice())) {
-                    throw FlowValidationException.required("advice");
-                }
-            }
-
-            // 是否必须签名
-            if (this.isSignRequired()) {
-                if (!StringUtils.hasText(flowAdvice.getSignKey())) {
-                    throw FlowValidationException.required("signKey");
-                }
-            }
-
-        }
-
         for (INodeStrategy strategy : strategies) {
             strategy.verifySession(session);
         }

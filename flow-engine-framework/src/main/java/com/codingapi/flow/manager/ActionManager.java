@@ -14,6 +14,7 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -60,6 +61,7 @@ public class ActionManager {
 
     public void verifySession(FlowSession session) {
         FlowAdvice flowAdvice = session.getAdvice();
+        NodeStrategyManager nodeStrategyManager = session.getCurrentNode().strategyManager();
 
         IFlowAction flowAction = flowAdvice.getAction();
         // 保存操作,不做检查
@@ -72,9 +74,33 @@ public class ActionManager {
             return;
         }
 
-        // 保存操作,不做检查
-        if (flowAction instanceof PassAction) {
+        //  通过操作
+        if (flowAction instanceof PassAction ) {
             session.getFormData().verify();
+
+            // 是否必须填写审批意见
+            if (nodeStrategyManager.isAdviceRequired()) {
+                if (!StringUtils.hasText(flowAdvice.getAdvice())) {
+                    throw FlowValidationException.required("advice");
+                }
+            }
+
+            // 是否必须签名
+            if (nodeStrategyManager.isSignRequired()) {
+                if (!StringUtils.hasText(flowAdvice.getSignKey())) {
+                    throw FlowValidationException.required("signKey");
+                }
+            }
+        }
+
+        //  通过操作
+        if (flowAction instanceof RejectAction ) {
+            // 是否必须填写审批意见
+            if (nodeStrategyManager.isAdviceRequired()) {
+                if (!StringUtils.hasText(flowAdvice.getAdvice())) {
+                    throw FlowValidationException.required("advice");
+                }
+            }
         }
 
         // 加签操作、转办操作、委托操作
