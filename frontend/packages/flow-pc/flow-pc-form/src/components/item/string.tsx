@@ -1,16 +1,16 @@
 import React from "react";
 import {Form, Input} from "antd";
-import {FormField} from "@flow-engine/flow-types";
-import {FormItemProps} from "@/type";
+import {FormItemInputProps, FormItemProps} from "@/type";
 
 
-const $Input: React.FC<FormItemProps> = (props) => {
+const $Input: React.FC<FormItemInputProps> = (props) => {
 
     const value = props.value || undefined;
 
     return (
         <Input
             value={value}
+            disabled={props.readOnly}
             placeholder={props.placeholder}
             defaultValue={props.defaultValue}
             onChange={(event) => {
@@ -21,7 +21,7 @@ const $Input: React.FC<FormItemProps> = (props) => {
 }
 
 
-export const FormItemString: React.FC<FormField> = (props) => {
+export const FormItemString: React.FC<FormItemProps> = (props) => {
 
     const rules = props.required ? [
         {
@@ -43,6 +43,7 @@ export const FormItemString: React.FC<FormField> = (props) => {
             <$Input
                 defaultValue={props.defaultValue}
                 placeholder={props.placeholder}
+                readOnly={props.readOnly}
             />
         </Form.Item>
     )

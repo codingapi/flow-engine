@@ -8,7 +8,6 @@ import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowStateException;
-import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.action.RejectActionScript;

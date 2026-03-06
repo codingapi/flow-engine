@@ -28,6 +28,7 @@ export class ApprovalContextScope {
     public initialState() {
         this.presenter.initialState({
             flow: this.props.content,
+            review: this.props.review,
         });
     }
 }

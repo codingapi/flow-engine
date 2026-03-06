@@ -47,7 +47,7 @@ public class WorkflowBackup {
         this.workCode = workflow.getCode();
         this.workTitle = workflow.getTitle();
         this.createTime = System.currentTimeMillis();
-        this.workVersion = workflow.getCreatedTime();
+        this.workVersion = workflow.getUpdatedTime();
     }
 
 

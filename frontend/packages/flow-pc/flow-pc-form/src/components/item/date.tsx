@@ -1,10 +1,9 @@
 import React from "react";
 import {DatePicker, Form} from "antd";
-import {FormField} from "@flow-engine/flow-types";
 import dayjs from "dayjs";
-import {FormItemProps} from "@/type";
+import {FormItemInputProps, FormItemProps} from "@/type";
 
-const $Date: React.FC<FormItemProps> = (props) => {
+const $Date: React.FC<FormItemInputProps> = (props) => {
 
     const handlerChange = (value: any) => {
         if (value) {
@@ -19,6 +18,7 @@ const $Date: React.FC<FormItemProps> = (props) => {
 
     return (
         <DatePicker
+            disabled={props.readOnly}
             value={value as any}
             onChange={handlerChange}
             placeholder={props.placeholder}
@@ -27,7 +27,7 @@ const $Date: React.FC<FormItemProps> = (props) => {
     )
 }
 
-export const FormItemDate: React.FC<FormField> = (props) => {
+export const FormItemDate: React.FC<FormItemProps> = (props) => {
 
     const rules = props.required ? [
         {
@@ -48,6 +48,7 @@ export const FormItemDate: React.FC<FormField> = (props) => {
             <$Date
                 defaultValue={props.defaultValue}
                 placeholder={props.placeholder}
+                readOnly={props.readOnly}
             />
         </Form.Item>
     )

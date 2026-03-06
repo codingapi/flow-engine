@@ -9,6 +9,7 @@ const {Title} = Typography;
 export const Header = () => {
     const {state, context} = useApprovalContext()
     const actions = state.flow?.actions || [];
+    const review = state?.review || false;
 
     return (
         <div
@@ -32,7 +33,7 @@ export const Header = () => {
                 </Title>
 
                 <Space size={8}>
-                    {actions.map((action) => {
+                    {!review && actions.map((action) => {
                         return ActionFactory.getInstance().render(action);
                     })}
                     <Button

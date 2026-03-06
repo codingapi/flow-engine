@@ -10,6 +10,7 @@ interface FormViewComponentProps {
 
 export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
     const {state, context} = useApprovalContext();
+    const review = state.review || false;
     const ViewComponent = ViewBindPlugin.getInstance().get(state.flow?.view || 'default') || FlowFormView;
 
     const flowForm = state.flow?.form;
@@ -65,6 +66,7 @@ export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
                 {viewForms.map((item, index) => (
                     <ViewComponent
                         key={index}
+                        review={review}
                         meta={flowForm}
                         form={item.instance}
                         onValuesChange={props.onValuesChange}

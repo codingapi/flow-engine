@@ -16,6 +16,7 @@ const TodoPage: React.FC = () => {
 
     const [selectVisible, setSelectVisible] = React.useState(false);
     const [approvalVisible, setApprovalVisible] = React.useState(false);
+    const [reviewVisible, setReviewVisible] = React.useState(false);
     const [workflowCode, setWorkflowCode] = React.useState<string>('');
     const [currentRecordId, setCurrentRecordId] = React.useState<string>('');
     const [currentTab, setCurrentTab] = React.useState<string>('todo');
@@ -80,9 +81,22 @@ const TodoPage: React.FC = () => {
                             <a
                                 onClick={() => {
                                     setCurrentRecordId(record.recordId);
+                                    setReviewVisible(false);
                                     setApprovalVisible(true);
                                 }}
                             >办理</a>
+                        </Space>
+                    )
+                }else {
+                    return (
+                        <Space>
+                            <a
+                                onClick={() => {
+                                    setCurrentRecordId(record.recordId);
+                                    setReviewVisible(true);
+                                    setApprovalVisible(true);
+                                }}
+                            >详情</a>
                         </Space>
                     )
                 }
@@ -185,6 +199,7 @@ const TodoPage: React.FC = () => {
                             type={'primary'}
                             onClick={() => {
                                 setCurrentRecordId('');
+                                setReviewVisible(false);
                                 setSelectVisible(true);
                             }}>发起流程</Button>
                     )
@@ -207,6 +222,7 @@ const TodoPage: React.FC = () => {
                 workflowCode={workflowCode}
                 open={approvalVisible}
                 recordId={currentRecordId}
+                review={reviewVisible}
                 onClose={() => {
                     setApprovalVisible(false);
                     reloadCurrentTab();

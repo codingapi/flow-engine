@@ -82,14 +82,38 @@ public class FlowProcessNodeService {
     public List<ProcessNode> processNodes() {
         long backupId = 0;
         if (this.flowRecord != null) {
-            backupId = this.flowRecord.getWorkBackupId();
-            // 查询历史记录
-            List<FlowRecord> historyRecords = flowRecordRepository.findBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
-            for (FlowRecord historyRecord : historyRecords) {
-                ProcessNode processNode = new ProcessNode(historyRecord, this.workflow);
-                nodeList.add(processNode);
+            // 如果当前记录已结束，则不查询后续流程
+            if(this.flowRecord.isDone()){
+
+                List<FlowRecord> historyRecords =  flowRecordRepository.findProcessRecords(this.flowRecord.getProcessId());
+                for (FlowRecord historyRecord : historyRecords) {
+                    ProcessNode processNode = new ProcessNode(historyRecord, this.workflow);
+                    nodeList.add(processNode);
+                }
+
+                if(this.flowRecord.isFinish()){
+                    nodeList.add(ProcessNode.createEndNode(this.workflow));
+                }
+
+                return this.nodeList;
+            }else {
+                backupId = this.flowRecord.getWorkBackupId();
+                // 查询历史记录
+                List<FlowRecord> historyRecords = flowRecordRepository.findBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
+                for (FlowRecord historyRecord : historyRecords) {
+                    ProcessNode processNode = new ProcessNode(historyRecord, this.workflow);
+                    nodeList.add(processNode);
+                }
             }
         }
+
+        this.loadNextNode(backupId);
+
+        return this.nodeList;
+    }
+
+
+    private void loadNextNode(long backupId){
 
         ActionManager actionManager = currentNode.actionManager();
         IFlowAction flowAction = actionManager.getAction(PassAction.class);
@@ -112,7 +136,6 @@ public class FlowProcessNodeService {
         List<ProcessNode> nextNodes =  nextNodeLoader.loadNextNode(flowSession);
 
         this.nodeList.addAll(nextNodes);
-        return this.nodeList;
     }
 
 

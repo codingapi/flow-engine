@@ -69,6 +69,7 @@ public class FlowForm {
                 fieldMeta.setType(DataType.valueOf((String) field.get("type")));
                 fieldMeta.setRequired(Boolean.TRUE.equals(field.get("required")));
                 fieldMeta.setDefaultValue((String) field.get("defaultValue"));
+                fieldMeta.setPlaceholder((String) field.get("placeholder"));
                 fieldMeta.setTooltip((String) field.get("tooltip"));
                 fieldMeta.setHelp((String) field.get("help"));
                 fieldList.add(fieldMeta);

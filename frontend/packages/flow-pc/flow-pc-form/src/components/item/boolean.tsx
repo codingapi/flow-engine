@@ -1,10 +1,9 @@
 import React from "react";
 import {Form, Switch} from "antd";
-import {FormField} from "@flow-engine/flow-types";
-import {FormItemProps} from "@/type";
+import {FormItemInputProps, FormItemProps} from "@/type";
 
 
-const $Switch: React.FC<FormItemProps> = (props) => {
+const $Switch: React.FC<FormItemInputProps> = (props) => {
 
     const value = props.value ? props.value === 'true' : undefined;
     const defaultValue = props.defaultValue ? props.defaultValue === 'true' : undefined;
@@ -12,6 +11,7 @@ const $Switch: React.FC<FormItemProps> = (props) => {
     return (
         <Switch
             value={value}
+            disabled={props.readOnly}
             defaultValue={defaultValue}
             onChange={(value) => {
                 props.onChange?.(value ? 'true' : 'false');
@@ -20,7 +20,7 @@ const $Switch: React.FC<FormItemProps> = (props) => {
     )
 }
 
-export const FormItemBoolean: React.FC<FormField> = (props) => {
+export const FormItemBoolean: React.FC<FormItemProps> = (props) => {
 
     const rules = props.required ? [
         {
@@ -42,6 +42,7 @@ export const FormItemBoolean: React.FC<FormField> = (props) => {
             <$Switch
                 defaultValue={props.defaultValue}
                 placeholder={props.placeholder}
+                readOnly={props.readOnly}
             />
         </Form.Item>
     )

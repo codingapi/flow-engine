@@ -149,6 +149,8 @@ export interface FlowApprovalOperator {
     signKey:string;
     // 审核时间
     approveTime:number;
+    // 审批动作
+    actionName:string;
     // 审批人
     flowOperator:FlowOperator;
 }

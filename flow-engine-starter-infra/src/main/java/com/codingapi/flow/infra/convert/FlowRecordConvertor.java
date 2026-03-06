@@ -26,6 +26,7 @@ public class FlowRecordConvertor {
                 entity.getProcessId(),
                 entity.getActionId(),
                 entity.getActionType(),
+                entity.getActionName(),
                 entity.getAdvice(),
                 entity.getSignKey(),
                 entity.getCurrentOperatorId(),
@@ -77,6 +78,7 @@ public class FlowRecordConvertor {
         entity.setProcessId(record.getProcessId());
         entity.setActionId(record.getActionId());
         entity.setActionType(record.getActionType());
+        entity.setActionName(record.getActionName());
         entity.setAdvice(record.getAdvice());
         entity.setSignKey(record.getSignKey());
         entity.setCurrentOperatorId(record.getCurrentOperatorId());

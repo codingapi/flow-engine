@@ -9,4 +9,6 @@ export interface FormViewProps {
     onValuesChange?: (values: any) => void;
     /** 表单元数据对象 */
     meta: FlowForm;
+    /** 是否预览模式 */
+    review:boolean;
 }

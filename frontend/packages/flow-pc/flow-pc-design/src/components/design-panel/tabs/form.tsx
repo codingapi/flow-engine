@@ -109,6 +109,14 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
                 </Form.Item>
 
                 <Form.Item
+                    name={"placeholder"}
+                    label={"输入提示信息"}
+                    labelCol={labelCol}
+                >
+                    <Input placeholder={"请输入输入提示信息"}/>
+                </Form.Item>
+
+                <Form.Item
                     name={"defaultValue"}
                     label={"默认值"}
                     labelCol={labelCol}
@@ -240,6 +248,10 @@ const FormTable: React.FC<FormTableProps> = (props) => {
             render: (value) => {
                 return value ? '必填' : '非必填'
             }
+        },
+        {
+            dataIndex: 'placeholder',
+            title: '输入提示'
         },
         {
             dataIndex: 'defaultValue',

@@ -104,6 +104,11 @@ public class FlowRecord {
     private String actionType;
 
     /**
+     * 动作名称
+     */
+    private String actionName;
+
+    /**
      * 审批意见
      */
     private String advice;
@@ -161,11 +166,11 @@ public class FlowRecord {
     private boolean notify;
 
     /**
-     * 节点状态 | 待办、已办
+     * 节点状态 | 待办 0、已办 1
      */
     private int recordState;
     /**
-     * 流程状态 | 运行中、已完成、异常、删除
+     * 流程状态 | 运行中 0、终止 1 已完成 2、异常 3、删除 4
      */
     private int flowState;
     /**
@@ -277,6 +282,7 @@ public class FlowRecord {
         this.recordState = SATE_RECORD_TODO;
         this.actionId = action.id();
         this.actionType = action.type();
+        this.actionName = action.title();
 
         this.currentOperatorId = currentOperator.getUserId();
         this.currentOperatorName = currentOperator.getName();
@@ -406,6 +412,7 @@ public class FlowRecord {
         this.formData = flowSession.getFormData().toMapData();
         this.actionId = flowAction.id();
         this.actionType = flowAction.type();
+        this.actionName = flowAction.title();
         this.readable = true;
         this.readTime = System.currentTimeMillis();
         this.updateTime = System.currentTimeMillis();
