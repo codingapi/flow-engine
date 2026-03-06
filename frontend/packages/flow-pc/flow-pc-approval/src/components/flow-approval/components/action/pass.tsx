@@ -13,8 +13,9 @@ export const PassAction: React.FC<FlowActionProps> = (props) => {
 
     const [modalVisible, setModalVisible] = React.useState(false);
 
-    const [form] = Form.useForm();
+    const isStartNode = state.flow?.nodeType === 'START';
 
+    const [form] = Form.useForm();
 
     const handleSubmit = (params?:any) => {
         actionPresenter.action(action.id,params).then((res) => {
@@ -44,7 +45,11 @@ export const PassAction: React.FC<FlowActionProps> = (props) => {
         <>
             <Button
                 onClick={() => {
-                    setModalVisible(true);
+                    if(isStartNode) {
+                        handleSubmit();
+                    }else {
+                        setModalVisible(true);
+                    }
                 }}
             >
                 {action.title}
