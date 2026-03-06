@@ -2,6 +2,7 @@ package com.codingapi.flow.manager;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
+import com.codingapi.flow.action.actions.RejectAction;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FlowForm;
@@ -67,26 +68,26 @@ public class NodeStrategyManager {
 
 
     /**
-     * 审批意见是否必须填写
+     * 审批意见是否必填
      */
-    public boolean isEnableAdvice() {
+    public boolean isAdviceRequired() {
         List<INodeStrategy> strategies = this.strategies;
         for (INodeStrategy strategy : strategies) {
             if (strategy instanceof AdviceStrategy) {
-                return !((AdviceStrategy) strategy).isAdviceNullable();
+                return ((AdviceStrategy) strategy).isAdviceRequired();
             }
         }
         return false;
     }
 
     /**
-     * 是否可签名
+     * 签名是否必填
      */
-    public boolean isEnableSignable() {
+    public boolean isSignRequired() {
         List<INodeStrategy> strategies = this.strategies;
         for (INodeStrategy strategy : strategies) {
             if (strategy instanceof AdviceStrategy) {
-                return ((AdviceStrategy) strategy).isSignable();
+                return ((AdviceStrategy) strategy).isSignRequired();
             }
         }
         return false;
@@ -163,23 +164,28 @@ public class NodeStrategyManager {
 
         FlowAdvice flowAdvice = session.getAdvice();
         IFlowAction flowAction = flowAdvice.getAction();
-        // 是否必须填写审批意见
-        if (this.isEnableAdvice()) {
-            if (!StringUtils.hasText(flowAdvice.getAdvice())) {
-                throw FlowValidationException.required("advice");
-            }
-        }
+
+
         //  通过操作
-        if (flowAction instanceof PassAction) {
+        if (flowAction instanceof PassAction || flowAction instanceof RejectAction) {
+
+            // 是否必须填写审批意见
+            if (this.isAdviceRequired()) {
+                if (!StringUtils.hasText(flowAdvice.getAdvice())) {
+                    throw FlowValidationException.required("advice");
+                }
+            }
+
             // 是否必须签名
-            if (this.isEnableSignable()) {
+            if (this.isSignRequired()) {
                 if (!StringUtils.hasText(flowAdvice.getSignKey())) {
                     throw FlowValidationException.required("signKey");
                 }
             }
+
         }
 
-        for (INodeStrategy strategy : strategies){
+        for (INodeStrategy strategy : strategies) {
             strategy.verifySession(session);
         }
     }
@@ -196,6 +202,7 @@ public class NodeStrategyManager {
 
     /**
      * 错误触发(没有匹配到人时执行的逻辑)
+     *
      * @param session 触发会话
      * @return 错误触发
      */

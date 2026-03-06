@@ -47,7 +47,7 @@ export class FlowActionPresenter {
     }
 
 
-    private async submitAction(actionId:string,formData:any){
+    private async submitAction(actionId:string,formData:any,params?:any){
         const recordId = this.state.flow?.recordId;
         const workId = this.state.flow?.workId;
         if(recordId){
@@ -56,6 +56,7 @@ export class FlowActionPresenter {
                 recordId,
                 advice:{
                     actionId,
+                    ...params
                 }
             }
             return await this.api.action(request);
@@ -71,6 +72,7 @@ export class FlowActionPresenter {
                 recordId,
                 advice:{
                     actionId,
+                    ...params
                 }
             }
             return await this.api.action(actionRequest);
@@ -78,14 +80,14 @@ export class FlowActionPresenter {
     }
 
 
-    public async action(actionId:string) {
+    public async action(actionId:string,params?:any) {
         let formData;
         if(this.isPassAction(actionId)){
             formData = await this.formActionContext.validate();
         }else {
             formData = this.formActionContext.save();
         }
-        return await this.submitAction(actionId, formData);
+        return await this.submitAction(actionId, formData,params);
     }
 
 }

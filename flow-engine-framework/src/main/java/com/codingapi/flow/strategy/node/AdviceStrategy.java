@@ -16,41 +16,41 @@ import java.util.Map;
 public class AdviceStrategy extends BaseStrategy {
 
     /**
-     * 是否可空
+     * 意见必填
      */
-    private boolean adviceNullable;
+    private boolean adviceRequired;
     /**
-     * 是否可签名
+     * 签名必填
      */
-    private boolean signable;
+    private boolean signRequired;
 
 
     public static AdviceStrategy defaultStrategy() {
         AdviceStrategy strategy = new AdviceStrategy();
-        strategy.setAdviceNullable(true);
-        strategy.setSignable(false);
+        strategy.setAdviceRequired(false);
+        strategy.setSignRequired(false);
         return strategy;
     }
 
     @Override
     public void copy(INodeStrategy target) {
-        this.adviceNullable = ((AdviceStrategy) target).adviceNullable;
-        this.signable = ((AdviceStrategy) target).signable;
+        this.adviceRequired = ((AdviceStrategy) target).adviceRequired;
+        this.signRequired = ((AdviceStrategy) target).signRequired;
     }
 
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
-        map.put("adviceNullable", adviceNullable);
-        map.put("signable", signable);
+        map.put("adviceRequired", adviceRequired);
+        map.put("signRequired", signRequired);
         return map;
     }
 
     public static AdviceStrategy fromMap(Map<String, Object> map) {
         AdviceStrategy strategy = IMapConvertor.fromMap(map, AdviceStrategy.class);
         if (strategy == null) return null;
-        strategy.setAdviceNullable((boolean) map.get("adviceNullable"));
-        strategy.setSignable((boolean) map.get("signable"));
+        strategy.setAdviceRequired((boolean) map.get("adviceRequired"));
+        strategy.setSignRequired((boolean) map.get("signRequired"));
         return strategy;
     }
 }

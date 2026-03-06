@@ -40,14 +40,34 @@ public class FlowContent {
     private String view;
 
     /**
+     * 节点名称
+     */
+    private String nodeName;
+
+    /**
+     * 节点Id
+     */
+    private String nodeId;
+
+    /**
+     * 节点类型
+     */
+    private String nodeType;
+
+    /**
+     * 流程标题
+     */
+    private String title;
+
+    /**
      * 审批意见是否必填
      */
-    private boolean adviceNullable;
+    private boolean adviceRequired;
 
     /**
      * 签名是否必填
      */
-    private boolean signable;
+    private boolean signRequired;
 
     /**
      * 表单元数据
@@ -98,8 +118,11 @@ public class FlowContent {
         ActionManager actionManager = currentNode.actionManager();
         NodeStrategyManager strategyManager = currentNode.strategyManager();
         this.actions = actionManager.getActions();
-        this.adviceNullable = strategyManager.isEnableAdvice();
-        this.signable = strategyManager.isEnableSignable();
+        this.adviceRequired = strategyManager.isAdviceRequired();
+        this.signRequired = strategyManager.isSignRequired();
+        this.nodeId = currentNode.getId();
+        this.nodeName = currentNode.getName();
+        this.nodeType = currentNode.getType();
         Map<String,Object> nodeData = currentNode.toMap();
         this.view = (String) nodeData.get("view");
     }
@@ -116,6 +139,7 @@ public class FlowContent {
         this.mergeable = record.isMergeable();
         this.flowState = record.getFlowState();
         this.recordState = record.getRecordState();
+        this.title = record.getTitle();
 
         this.todos = new ArrayList<>();
         for (FlowRecord item : mergeRecords){

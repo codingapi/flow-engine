@@ -20,11 +20,11 @@ export const AdviceStrategy: React.FC = () => {
             layout="vertical"
         >
             <Form.Item
-                label={"审批意见为空"}
-                name={["AdviceStrategy","adviceNullable"]}
+                label={"审批意见是否必填"}
+                name={["AdviceStrategy","adviceRequired"]}
             >
                 <Field
-                    name="AdviceStrategy.adviceNullable"
+                    name="AdviceStrategy.adviceRequired"
                     render={({ field: { value, onChange } }: FieldRenderProps<any>) => (
                         <>
                             <Switch value={value} onChange={onChange} />
@@ -34,11 +34,11 @@ export const AdviceStrategy: React.FC = () => {
             </Form.Item>
 
             <Form.Item
-                label={"审批签名为空"}
-                name={["AdviceStrategy","signable"]}
+                label={"审批签名是否必填"}
+                name={["AdviceStrategy","signRequired"]}
             >
                 <Field
-                    name="AdviceStrategy.signable"
+                    name="AdviceStrategy.signRequired"
                     render={({ field: { value, onChange } }: FieldRenderProps<any>) => (
                         <>
                             <Switch value={value} onChange={onChange} />
