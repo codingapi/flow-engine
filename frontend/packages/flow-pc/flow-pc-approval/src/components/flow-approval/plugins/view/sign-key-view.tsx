@@ -1,6 +1,6 @@
 import React from "react";
 import {SignKeyViewPlugin, VIEW_KEY} from "../sign-key-type";
-import {ViewBindPlugin} from "@flow-engine/flow-types";
+import {ViewBindPlugin} from "@flow-engine/flow-core";
 import {Input} from "antd";
 
 const {TextArea} = Input;

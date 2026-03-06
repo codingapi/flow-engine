@@ -1,4 +1,4 @@
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 
 export const useScriptMetaData = (script:string) => {
     const meta = GroovyScriptConvertorUtil.getScriptMeta(script);

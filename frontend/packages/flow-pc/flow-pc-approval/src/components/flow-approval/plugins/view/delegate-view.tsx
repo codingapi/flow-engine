@@ -1,6 +1,6 @@
 import React from "react";
 import {DelegateViewPlugin, VIEW_KEY} from "../delegate-type";
-import {ViewBindPlugin} from "@flow-engine/flow-types";
+import {ViewBindPlugin} from "@flow-engine/flow-core";
 import {Select} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
 

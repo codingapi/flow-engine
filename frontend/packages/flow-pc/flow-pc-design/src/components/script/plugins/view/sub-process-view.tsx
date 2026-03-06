@@ -1,6 +1,6 @@
 import React from "react";
 import {SubProcessViewPlugin, VIEW_KEY} from "@/components/script/plugins/sub-process-view-type";
-import {ViewBindPlugin} from "@flow-engine/flow-types";
+import {ViewBindPlugin} from "@flow-engine/flow-core";
 import {SCRIPT_DEFAULT_TRIGGER} from "@/components/script/default-script";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
 

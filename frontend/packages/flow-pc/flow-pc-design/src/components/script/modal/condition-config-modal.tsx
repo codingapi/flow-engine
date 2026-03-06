@@ -1,7 +1,7 @@
 import React from "react";
 import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
 import {GroovyScriptContent, GroovyScriptModal} from "@/components/script/components/groovy-script-modal";
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
 import {SCRIPT_DEFAULT_CONDITION} from "@/components/script/default-script";
 import {ConditionPluginView} from "@/components/script/plugins/view/condition-view";

@@ -1,6 +1,6 @@
 import React from "react";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
-import {ViewBindPlugin} from "@flow-engine/flow-types";
+import {ViewBindPlugin} from "@flow-engine/flow-core";
 import {Form as AntdForm} from "antd";
 import {FlowFormView} from "@flow-engine/flow-pc-form";
 

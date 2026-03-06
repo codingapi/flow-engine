@@ -2,7 +2,7 @@ import React from 'react';
 import {GroovyScriptContent, GroovyScriptModal} from "../components/groovy-script-modal";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
 import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 import {NodeTitlePluginView} from "@/components/script/plugins/view/node-title-view";
 import {SCRIPT_DEFAULT_NODE_TITLE} from "@/components/script/default-script";
 

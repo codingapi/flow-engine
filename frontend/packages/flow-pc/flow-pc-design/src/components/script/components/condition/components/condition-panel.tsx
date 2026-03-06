@@ -2,7 +2,7 @@ import React from "react";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
 import {ConditionRelation} from "@/components/script/components/condition/components/condition-relation";
 import {Group} from "@/components/script/components/condition/components/condition-group";
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 import {SCRIPT_DEFAULT_CONDITION} from "@/components/script/default-script";
 import {Button, Space} from "antd";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";

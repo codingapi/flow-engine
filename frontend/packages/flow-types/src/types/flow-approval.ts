@@ -88,6 +88,8 @@ export interface FlowAction{
     display:FlowActionDisplay;
     // 是否启用
     enable:boolean;
+    // 自定义脚本
+    script?:string;
 }
 
 /**

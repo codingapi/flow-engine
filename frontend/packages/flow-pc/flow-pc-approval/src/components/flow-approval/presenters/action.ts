@@ -41,6 +41,11 @@ export class FlowActionPresenter {
                 if(action.type ==='PASS'){
                     return true;
                 }
+                if(action.type === 'CUSTOM'){
+                    const script = action.script || '';
+
+
+                }
             }
         }
         return false;

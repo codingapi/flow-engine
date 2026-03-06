@@ -1,5 +1,5 @@
 import React from "react";
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 
 interface GroovyScriptPreviewProps {
     script: string;

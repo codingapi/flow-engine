@@ -1,5 +1,5 @@
 import {GroovyVariableMapping} from "@/components/script/typings";
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 import {GroovyVariableUtil} from "@/components/script/utils/varibale";
 
 /**

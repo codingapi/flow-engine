@@ -16,7 +16,6 @@ export const CustomAction: React.FC<FlowActionProps> = (props) => {
 
     return (
         <Button
-            danger={action.type === 'REJECT'}
             onClick={() => {
                 actionPresenter.action(action.id).then((res) => {
                     if (res.success) {
