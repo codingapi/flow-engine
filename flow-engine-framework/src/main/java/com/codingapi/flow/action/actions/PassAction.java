@@ -127,7 +127,6 @@ public class PassAction extends BaseAction {
                 });
             }
         }
-
         RepositoryHolderContext.getInstance().saveRecords(recordList);
 
         flowEvents.forEach(EventPusher::push);
