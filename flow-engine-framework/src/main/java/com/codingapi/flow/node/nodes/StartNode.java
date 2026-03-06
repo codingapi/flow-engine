@@ -1,7 +1,6 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.action.actions.SaveAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
@@ -90,7 +89,6 @@ public class StartNode extends BaseFlowNode implements IDisplayNode {
         List<IFlowAction> actions = new ArrayList<>();
         actions.add(new PassAction());
         actions.add(new SaveAction());
-        actions.add(new CustomAction());
         return actions;
     }
 
