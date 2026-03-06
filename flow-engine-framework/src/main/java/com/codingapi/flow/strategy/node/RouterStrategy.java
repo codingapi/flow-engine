@@ -21,10 +21,6 @@ public class RouterStrategy extends BaseStrategy {
         this.routerNodeScript = new RouterNodeScript(script);
     }
 
-    public void setRouterNodeScript(String script) {
-        this.routerNodeScript = new RouterNodeScript(script);
-    }
-
     public String execute(FlowSession request){
         return routerNodeScript.execute(request);
     }
@@ -36,7 +32,7 @@ public class RouterStrategy extends BaseStrategy {
 
     public static RouterStrategy defaultStrategy() {
         RouterStrategy routerStrategy = new RouterStrategy();
-        routerStrategy.setRouterNodeScript(RouterNodeScript.SCRIPT_NODE_DEFAULT);
+        routerStrategy.routerNodeScript = RouterNodeScript.defaultScript();
         return routerStrategy;
     }
 
@@ -50,7 +46,7 @@ public class RouterStrategy extends BaseStrategy {
     public static RouterStrategy fromMap(Map<String, Object> map) {
         RouterStrategy delayStrategy = IMapConvertor.fromMap(map, RouterStrategy.class);
         if (delayStrategy == null) return null;
-        delayStrategy.setRouterNodeScript((String) map.get("script"));
+        delayStrategy.routerNodeScript = new RouterNodeScript((String) map.get("script"));
         return delayStrategy;
     }
 }

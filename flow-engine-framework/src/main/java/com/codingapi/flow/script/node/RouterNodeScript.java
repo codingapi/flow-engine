@@ -1,5 +1,7 @@
 package com.codingapi.flow.script.node;
 
+import com.codingapi.flow.script.ScriptDefaultConstants;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -11,26 +13,19 @@ import lombok.Getter;
 @AllArgsConstructor
 public class RouterNodeScript {
 
-    public static final String SCRIPT_NODE_DEFAULT = """
-            // @SCRIPT_TITLE 发起节点 
-            def run(request){
-                return request.getStartNode().getId();
-            }
-            """;
-
-
     @Getter
     private final String script;
 
-    public String execute(FlowSession request) {
+    public String execute(FlowSession session) {
+        GroovyScriptRequest request = new GroovyScriptRequest(session);
         return ScriptRuntimeContext.getInstance().run(script, String.class, request);
     }
 
     /**
      * 默认节点脚本
      */
-    public static RouterNodeScript defaultNodeScript() {
-        return new RouterNodeScript(SCRIPT_NODE_DEFAULT);
+    public static RouterNodeScript defaultScript() {
+        return new RouterNodeScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ROUTER);
     }
 
 }

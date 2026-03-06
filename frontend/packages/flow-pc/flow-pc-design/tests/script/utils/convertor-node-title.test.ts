@@ -1,10 +1,10 @@
 import {describe, expect, it} from '@rstest/core';
 import {FlowFromMeta} from "@flow-engine/flow-types";
 import {
-    NodeTitleGroovyConvertor
-} from "@/components/script/services/convertor/node-title";
+    NodeTitleScriptUtils
+} from "@/components/script/services/node-title";
 import {
-    NodeTitleVariableAdapter
+    NodeTitleVariableService
 } from "@/components/script/services/variable/node-title";
 import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
 
@@ -34,35 +34,37 @@ describe('NodeTitleGroovyConvertor', () => {
         subForms:[]
     }
 
-    const nodeTitleVariableAdapter = new NodeTitleVariableAdapter(form);
+    const nodeTitleVariableAdapter = new NodeTitleVariableService(form);
 
-    describe('toExpression', () => {
-        it('node title script to expression', () => {
-            const script = `
-// @SCRIPT_TITLE 您有一条待办消息\${当前操作人ID}\${当前操作人ID}\${流程创建人}\${是否管理员}   
-def run(request){
-return "您有一条待办消息" + request.getOperatorId() + request.getOperatorId() + request.getCreatorName() + request.getIsFlowManager()
-}
-`
-            const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(script, nodeTitleVariableAdapter.getVariables());
-            const result = nodeTitleGroovyConvertor.toExpression()
-            expect(result).toEqual("您有一条待办消息${当前操作人ID}${当前操作人ID}${流程创建人}${是否管理员}");
-        });
-    });
-
-
-    describe('resetExpression', () => {
+    describe('updateExpression', () => {
         it('node title script reset expression', () => {
             const script = `
 // @CUSTOM_SCRIPT 
 def run(request){
     return "你有一条" + request.getOperatorName() + "的" + request.getWorkflowTitle() + "待办消息 【" + request.getNodeName() + "】"
 }
-`
-            const nodeTitleGroovyConvertor = new NodeTitleGroovyConvertor(script, nodeTitleVariableAdapter.getVariables());
-            const result = nodeTitleGroovyConvertor.resetExpression('你有一条${当前操作人}的${流程标题}待办消息 【${当前节点}】')
+`;
+            const variables =  nodeTitleVariableAdapter.getVariables();
+            const result = NodeTitleScriptUtils.updateExpression(script,'你有一条${当前操作人}的${流程标题}待办消息 【${当前节点}】',variables)
             const title = GroovyScriptConvertorUtil.getScriptTitle(result);
             expect(title).toEqual("你有一条${当前操作人}的${流程标题}待办消息 【${当前节点}】");
+        });
+    });
+
+
+    describe('addVariable', () => {
+        it('node title script reset expression', () => {
+            const script = `
+// @CUSTOM_SCRIPT 
+def run(request){
+    return "你有一条" + request.getOperatorName() + "的" + request.getWorkflowTitle() + "待办消息 【" + request.getNodeName() + "】"
+}
+`;
+            const variables =  nodeTitleVariableAdapter.getVariables();
+            const variable = variables[0];
+            const result = NodeTitleScriptUtils.addVariable(script,variable,variables)
+            const title = GroovyScriptConvertorUtil.getScriptTitle(result);
+            expect(title).toEqual("你有一条${当前操作人}的${流程标题}待办消息 【${当前节点}】${当前操作人}");
         });
     });
 });

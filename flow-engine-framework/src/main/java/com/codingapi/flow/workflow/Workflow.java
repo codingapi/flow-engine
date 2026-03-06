@@ -3,7 +3,7 @@ package com.codingapi.flow.workflow;
 import com.alibaba.fastjson.JSON;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.exception.FlowValidationException;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.manager.FlowNodeManager;
 import com.codingapi.flow.manager.WorkflowStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
@@ -65,7 +65,7 @@ public class Workflow {
     /**
      * 流程表单
      */
-    private FormMeta form;
+    private FlowForm form;
 
     /**
      * 创建者脚本
@@ -146,7 +146,7 @@ public class Workflow {
         this.createdOperator = createdOperator;
     }
 
-    protected void setForm(FormMeta form) {
+    protected void setForm(FlowForm form) {
         this.form = form;
     }
 
@@ -214,7 +214,7 @@ public class Workflow {
         workflow.setCreatedTime(Long.parseLong((String) data.get("createdTime")));
         workflow.setUpdatedTime(Long.parseLong((String) data.get("updatedTime")));
         workflow.setCreatedOperator(GatewayContext.getInstance().getFlowOperator(createOperator));
-        workflow.setForm(FormMeta.fromMap((Map<String, Object>) data.get("form")));
+        workflow.setForm(FlowForm.fromMap((Map<String, Object>) data.get("form")));
         workflow.setOperatorCreateScript(new OperatorMatchScript((String) data.get("operatorCreateScript")));
 
         List<Map<String, Object>> nodes = (List<Map<String, Object>>) data.get("nodes");

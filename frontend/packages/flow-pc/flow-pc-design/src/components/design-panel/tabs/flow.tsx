@@ -15,14 +15,23 @@ export const TabFlow = () => {
     // 注册form行为
     React.useEffect(() => {
         formActionContext.addAction({
-            save() {
+            save:()=> {
                 const data = actionRef.current?.getData();
                 return {
                     nodes: nodeManager.toData(data?.nodes || []),
                 }
             },
-            key(): string {
+            key:()=> {
                 return 'flow';
+            },
+            validate:()=>{
+                return new Promise((resolve, reject) => {
+                    const data = actionRef.current?.getData();
+                    const values = {
+                        nodes: nodeManager.toData(data?.nodes || []),
+                    }
+                    resolve(values);
+                })
             }
         });
 

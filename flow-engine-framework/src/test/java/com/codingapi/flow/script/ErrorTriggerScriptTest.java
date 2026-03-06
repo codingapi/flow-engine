@@ -3,9 +3,10 @@ package com.codingapi.flow.script;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.error.ErrorThrow;
+import com.codingapi.flow.form.DataType;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FormData;
-import com.codingapi.flow.form.FormMeta;
-import com.codingapi.flow.form.FormMetaBuilder;
+import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.EndNode;
@@ -27,12 +28,12 @@ class ErrorTriggerScriptTest {
     void execute() {
         User user = new User(1, "lorne");
 
-        FormMeta form = FormMetaBuilder.builder()
+        FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
-                .addField("请假人", "name", "string")
-                .addField("请假天数", "days", "int")
-                .addField("请假事由", "reason", "string")
+                .addField("请假人", "name", DataType.STRING)
+                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假事由", "reason", DataType.STRING)
                 .build();
 
         StartNode startNode = StartNode.builder()
@@ -78,12 +79,18 @@ class ErrorTriggerScriptTest {
 
         FlowSession flowSession = FlowSession.startSession(user, workflow, startNode, startNode.getActions().get(0), data, 0);
 
-        ErrorTriggerScript errorNodeTriggerScript = ErrorTriggerScript.defaultNodeScript();
+        ErrorTriggerScript errorNodeTriggerScript = ErrorTriggerScript.defaultScript();
         ErrorThrow errorThrow = errorNodeTriggerScript.execute(flowSession);
         assertTrue(errorThrow.isNode());
         assertEquals(startNode.getId(), errorThrow.getNode().getId());
 
-        ErrorTriggerScript errorOperatorTriggerScript = ErrorTriggerScript.defaultOperatorScript();
+        String script = """
+            def run(request){ 
+                return $bind.createErrorThrow(request.getCreatedOperator());
+            }
+            """;
+
+        ErrorTriggerScript errorOperatorTriggerScript = new ErrorTriggerScript(script);
         errorThrow = errorOperatorTriggerScript.execute(flowSession);
         assertFalse(errorThrow.isNode());
         assertEquals(user, errorThrow.getOperators().get(0));

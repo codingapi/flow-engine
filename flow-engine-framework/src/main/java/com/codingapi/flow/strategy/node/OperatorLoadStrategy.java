@@ -28,9 +28,6 @@ public class OperatorLoadStrategy extends BaseStrategy {
         this.operatorLoadScript = ((OperatorLoadStrategy) target).operatorLoadScript;
     }
 
-    public void setOperatorLoadScript(String script) {
-        this.operatorLoadScript = new OperatorLoadScript(script);
-    }
 
     public OperatorManager loadOperators(FlowSession flowSession) {
         return new OperatorManager(operatorLoadScript.execute(flowSession));
@@ -38,7 +35,7 @@ public class OperatorLoadStrategy extends BaseStrategy {
 
     public static OperatorLoadStrategy defaultStrategy() {
         OperatorLoadStrategy strategy = new OperatorLoadStrategy();
-        strategy.setOperatorLoadScript(OperatorLoadScript.SCRIPT_CREATOR);
+        strategy.operatorLoadScript = OperatorLoadScript.defaultScript();
         return strategy;
     }
 
@@ -53,7 +50,7 @@ public class OperatorLoadStrategy extends BaseStrategy {
     public static OperatorLoadStrategy fromMap(Map<String, Object> map) {
         OperatorLoadStrategy strategy = IMapConvertor.fromMap(map, OperatorLoadStrategy.class);
         if (strategy == null) return null;
-        strategy.setOperatorLoadScript((String) map.get("script"));
+        strategy.operatorLoadScript = new OperatorLoadScript((String) map.get("script"));
         return strategy;
     }
 }

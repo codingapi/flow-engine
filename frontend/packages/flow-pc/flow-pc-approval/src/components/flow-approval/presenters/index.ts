@@ -1,7 +1,7 @@
 import {FlowApprovalApi, State} from "@/components/flow-approval/typings";
 import {Dispatch} from "@flow-engine/flow-core";
-import {FormActionContext} from "@/components/flow-approval/presenters/form";
-import {FlowActionPresenter} from "@/components/flow-approval/presenters/action";
+import {FormActionContext} from "@flow-engine/flow-types";
+import {FlowActionPresenter} from "./action";
 
 export class Presenter {
 
@@ -33,11 +33,9 @@ export class Presenter {
         return this.flowActionPresenter;
     }
 
-
     public initialState(state: State) {
         this.dispatch(state);
     }
-
 
     public processNodes(){
         return this.flowActionPresenter.processNodes();

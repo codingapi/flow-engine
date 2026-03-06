@@ -1,30 +1,31 @@
 import React from "react";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
-import {ViewBindPlugin} from "@flow-engine/flow-types";
-import { Form } from "antd";
+import {ViewBindPlugin} from "@flow-engine/flow-core";
+import {Form as AntdForm} from "antd";
 import {FlowFormView} from "@flow-engine/flow-pc-form";
 
-interface FormViewComponentProps{
-    onValuesChange?:(values:any)=>void;
+interface FormViewComponentProps {
+    onValuesChange?: (values: any) => void;
 }
 
 export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
     const {state, context} = useApprovalContext();
-    const ViewComponent = ViewBindPlugin.getInstance().get(state.flow?.view || 'default') || FlowFormView ;
+    const review = state.review || false;
+    const ViewComponent = ViewBindPlugin.getInstance().get(state.flow?.view || 'default') || FlowFormView;
 
-    const formMeta = state.flow?.form;
+    const flowForm = state.flow?.form;
 
     // 是否可合并审批
     const mergeable = state.flow?.mergeable || false;
     const todos = state.flow?.todos || [];
-    const viewForms = todos.length>0?todos.map(item => {
+    const viewForms= todos.length > 0 ? todos.map(item => {
         return {
-            instance: Form.useForm()[0],
-            data: item.data,
+            instance: AntdForm.useForm()[0],
+            data: item.data as any,
         }
-    }):[
+    }) : [
         {
-            instance: Form.useForm()[0],
+            instance: AntdForm.useForm()[0],
             data: undefined,
         }
     ]
@@ -34,18 +35,25 @@ export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
             const formInstance = item.instance;
             const data = item.data;
             context.getPresenter().getFormActionContext().addAction({
-                save(): any {
+                save: () => {
                     return formInstance.getFieldsValue();
                 },
-                key(): string {
+                key: () => {
                     return 'view-form'
+                },
+                validate: () => {
+                    return new Promise((resolve,reject) => {
+                        formInstance.validateFields()
+                            .then(resolve)
+                            .catch(reject)
+                    })
                 }
             });
             formInstance.setFieldsValue(data);
         });
     }, []);
 
-    if (ViewComponent && formMeta) {
+    if (ViewComponent && flowForm) {
         if (mergeable) {
             return (
                 <div>
@@ -58,8 +66,9 @@ export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
                 {viewForms.map((item, index) => (
                     <ViewComponent
                         key={index}
-                        meta={formMeta}
-                        form={item.instance as any}
+                        review={review}
+                        meta={flowForm}
+                        form={item.instance}
                         onValuesChange={props.onValuesChange}
                     />
                 ))}

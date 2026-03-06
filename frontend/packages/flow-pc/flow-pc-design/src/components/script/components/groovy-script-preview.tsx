@@ -1,5 +1,5 @@
 import React from "react";
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 
 interface GroovyScriptPreviewProps {
     script: string;
@@ -25,9 +25,8 @@ export const GroovyScriptPreview: React.FC<GroovyScriptPreviewProps> = (props) =
                         backgroundColor: value ? '#fff' : '#fafafa',
                         color: value ? 'rgba(0,0,0,0.88)' : 'rgba(0,0,0,0.25)',
                     }}
-                >
-                    {value}
-                </div>
+                    dangerouslySetInnerHTML={{__html: value}}
+                />
             )}
 
             {!multiline && (
@@ -43,9 +42,8 @@ export const GroovyScriptPreview: React.FC<GroovyScriptPreviewProps> = (props) =
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                     }}
-                >
-                    {value}
-                </div>
+                    dangerouslySetInnerHTML={{__html: value}}
+                />
             )}
         </>
 

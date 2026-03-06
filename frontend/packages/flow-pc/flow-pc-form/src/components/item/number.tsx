@@ -1,8 +1,26 @@
 import React from "react";
 import {Form, Input} from "antd";
-import {FlowFormFieldMeta} from "@flow-engine/flow-types";
+import {FormItemInputProps, FormItemProps} from "@/type";
 
-export const FormItemNumber:React.FC<FlowFormFieldMeta> = (props)=>{
+
+const $Input:React.FC<FormItemInputProps> = (props)=>{
+    const value = props.value || undefined;
+
+    return (
+        <Input
+            type="number"
+            value={value}
+            disabled={props.readOnly}
+            placeholder={props.placeholder}
+            defaultValue={props.defaultValue}
+            onChange={(event) => {
+                props.onChange?.(event.target.value);
+            }}
+        />
+    )
+}
+
+export const FormItemNumber:React.FC<FormItemProps> = (props)=>{
 
     const rules = props.required?[
         {
@@ -17,8 +35,14 @@ export const FormItemNumber:React.FC<FlowFormFieldMeta> = (props)=>{
             label={props.name}
             required={props.required}
             rules={rules}
+            tooltip={props.tooltip}
+            help={props.help}
         >
-            <Input type={"number"} defaultValue={props.defaultValue}/>
+            <$Input
+                defaultValue={props.defaultValue}
+                placeholder={props.placeholder}
+                readOnly={props.readOnly}
+            />
         </Form.Item>
     )
 }

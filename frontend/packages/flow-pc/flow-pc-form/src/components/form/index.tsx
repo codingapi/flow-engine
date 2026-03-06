@@ -14,6 +14,8 @@ export const FlowFormView: React.FC<FormViewProps> = (props) => {
 
     const fields = meta.fields || [];
 
+    const review = props.review;
+
     return (
         <Form
             form={form as any}
@@ -34,6 +36,7 @@ export const FlowFormView: React.FC<FormViewProps> = (props) => {
                         <FormItem
                             key={field.id}
                             {...field}
+                            readOnly={review}
                         />
                     );
                 }

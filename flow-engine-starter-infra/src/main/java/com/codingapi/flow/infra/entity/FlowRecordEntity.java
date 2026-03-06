@@ -71,6 +71,11 @@ public class FlowRecordEntity {
     private String actionType;
 
     /**
+     * 动作名称
+     */
+    private String actionName;
+
+    /**
      * 审批意见
      */
     private String advice;

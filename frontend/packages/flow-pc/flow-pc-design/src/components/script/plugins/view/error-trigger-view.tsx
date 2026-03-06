@@ -1,28 +1,31 @@
 import React from "react";
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 import {Button, Form, Select, Space} from "antd";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
 import {ErrorTriggerViewPlugin, VIEW_KEY} from "@/components/script/plugins/error-trigger-view-type";
-import {ViewBindPlugin} from "@flow-engine/flow-types";
+import {ViewBindPlugin} from "@flow-engine/flow-core";
 import {SCRIPT_DEFAULT_ERROR_TRIGGER} from "@/components/script/default-script";
 import {useNodeRouterManager} from "@/components/design-panel/hooks/use-node-router-manager";
 import {useNodeRenderContext} from "@/components/design-editor/hooks/use-node-render-context";
-import {ErrorTriggerConvertor} from "@/components/script/services/convertor/error-trigger";
-
+import {ErrorTriggerScriptUtils} from "@/components/script/services/error-trigger";
+import {useScriptMetaData} from "@/components/script/hooks/use-script-meta-data";
 
 /**
- * TODO 异常配置界面
+ *
  * @param props
  * @constructor
  */
 export const ErrorTriggerPluginView: React.FC<ErrorTriggerViewPlugin> = (props) => {
     const ErrorTriggerPluginViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
-    const [type,setType] = React.useState('node');
+    const [type, setType] = React.useState('node');
 
     const nodeRouterManager = useNodeRouterManager();
-    const { node } = useNodeRenderContext();
+    const {node} = useNodeRenderContext();
+    const data = useScriptMetaData(props.script);
 
-    if(ErrorTriggerPluginViewComponent){
+    const mappingData = nodeRouterManager.mapping(data);
+
+    if (ErrorTriggerPluginViewComponent) {
         return (
             <ErrorTriggerPluginViewComponent {...props} />
         );
@@ -32,7 +35,7 @@ export const ErrorTriggerPluginView: React.FC<ErrorTriggerViewPlugin> = (props) 
         <div>
             <Form
                 initialValues={{
-                    type: type,
+                    ...mappingData
                 }}
             >
                 <Form.Item
@@ -42,12 +45,12 @@ export const ErrorTriggerPluginView: React.FC<ErrorTriggerViewPlugin> = (props) 
                     <Select
                         options={[
                             {
-                                label:'跳转节点',
-                                value:'node'
+                                label: '跳转节点',
+                                value: 'node'
                             },
                             {
-                                label:'跳转用户',
-                                value:'user'
+                                label: '跳转用户',
+                                value: 'user'
                             }
                         ]}
                         onChange={(value) => {
@@ -64,8 +67,8 @@ export const ErrorTriggerPluginView: React.FC<ErrorTriggerViewPlugin> = (props) 
                     >
                         <Select
                             options={nodeRouterManager.getBackNodes(node.id)}
-                            onChange={(value,option) => {
-                                const script = ErrorTriggerConvertor.goNode(option as any);
+                            onChange={(value, option) => {
+                                const script = ErrorTriggerScriptUtils.setNode(option as any);
                                 props.onChange(script);
                             }}
                         />
@@ -73,7 +76,7 @@ export const ErrorTriggerPluginView: React.FC<ErrorTriggerViewPlugin> = (props) 
                 )}
 
                 {type === "user" && (
-                    <div>选择人员</div>
+                    <div>选择人员:暂不支持</div>
                 )}
             </Form>
 

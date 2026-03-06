@@ -1,4 +1,4 @@
-import {FlowForm, FormField} from "../types";
+import {FlowForm, FormField} from "@flow-engine/flow-types";
 
 export class WorkflowFormManager {
 

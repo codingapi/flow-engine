@@ -1,7 +1,7 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.common.IMapConvertor;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.record.FlowRecord;
@@ -14,7 +14,7 @@ import java.util.function.Consumer;
  * 流程节点 <br/>
  * 流程执行的生命周期，流程在运行之前将会先构建 {@link com.codingapi.flow.action.IFlowAction} {@link IFlowNode} {@link FlowSession} 等对象 <br/>
  * 1. 流程的调用第一步将会执行 {@link com.codingapi.flow.action.IFlowAction#run(FlowSession)} 函数。<br/>
- * 2. 在{@link com.codingapi.flow.action.IFlowAction#run(FlowSession)} 中流程将需要判断当前流程{@link IFlowNode#isDone(FlowSession)} 是否已经办理完成。 <br/>
+ * 2. 在{@link com.codingapi.flow.action.IFlowAction#run(FlowSession)} 中流程将需要判断当前流程{@link IFlowNode#isFinish(FlowSession)} 是否已经办理完成。 <br/>
  * 3. 流程办理完成后将会分析流程对的下一节点对象 {@link com.codingapi.flow.action.BaseAction#triggerNode(FlowSession, Consumer)} ()},将递归掉分析执行下一节点 <br/>
  * 4. 在获取下一节点对象时，将会访问节点的过滤策略 {@link IFlowNode#filterBranches(List, FlowSession)}，该函数将根据节点的配置进行过滤匹配下一节点。 <br/>
  * 5. 获取到下一节点对象后，则会访问流程节点的 {@link IFlowNode#handle(FlowSession)} 函数分析流程是否继续执行。当函数返回true时则会继续循环调用匹配下一节点的逻辑，即triggerNode的递归逻辑。 <br/>
@@ -49,7 +49,7 @@ public interface IFlowNode extends IMapConvertor {
      * 节点验证
      * 用于流程配置完成以后的验证时触发
      */
-    void verifyNode(FormMeta form);
+    void verifyNode(FlowForm form);
 
     /**
      * 是否执行节点
@@ -94,7 +94,7 @@ public interface IFlowNode extends IMapConvertor {
      * @param session 会话
      * @return true: 节点完成
      */
-    boolean isDone(FlowSession session);
+    boolean isFinish(FlowSession session);
 
     /**
      * 填充流程记录，在保存流程记录时将会触发当前节点的填充流程记录函数。由于不同节点存储的流程数据会存在差异。

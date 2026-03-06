@@ -13,8 +13,12 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.springboot.framework.event.EventPusher;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * 结束节点
@@ -23,6 +27,8 @@ public class EndNode extends BaseFlowNode implements IDisplayNode {
 
     public static final String NODE_TYPE = NodeType.END.name();
     public static final String DEFAULT_NAME = "结束节点";
+
+    private final ScheduledExecutorService threadPools = Executors.newScheduledThreadPool(1);
 
     @Override
     public String getType() {
@@ -47,16 +53,29 @@ public class EndNode extends BaseFlowNode implements IDisplayNode {
         IFlowAction currentAction = session.getCurrentAction();
         // 标记当前流程结束
         FlowRecord latestRecord = session.getCurrentRecord();
+
         // 添加历史记录到记录中
         List<FlowRecord> historyRecords = RepositoryHolderContext.getInstance().findProcessRecords(latestRecord.getProcessId());
+
+        // 同步当前处理的FlowRecord的数据
+        List<FlowRecord> recordList = new ArrayList<>();
+        for (FlowRecord historyRecord:historyRecords){
+            if(historyRecord.getId()== latestRecord.getId()){
+                recordList.add(latestRecord);
+            }else {
+                recordList.add(historyRecord);
+            }
+        }
+
         // 设置状态为完成
-        historyRecords.forEach(item -> {
+        recordList.forEach(item -> {
             item.finish(currentAction instanceof PassAction);
         });
-        RepositoryHolderContext.getInstance().saveRecords(historyRecords);
+        RepositoryHolderContext.getInstance().saveRecords(recordList);
         // 流程是否正常结束
         EventPusher.push(new FlowRecordFinishEvent(latestRecord));
     }
+
 
     @Override
     public boolean handle(FlowSession session) {
@@ -73,6 +92,46 @@ public class EndNode extends BaseFlowNode implements IDisplayNode {
 
     public static EndNode formMap(Map<String, Object> map) {
         return BaseFlowNode.fromMap(map, EndNode.class);
+    }
+
+
+    private static class RecordMergeHelper {
+
+        private final List<FlowRecord> currentRecords;
+        private final List<FlowRecord> historyRecords;
+
+        private final Map<Long,FlowRecord> currentRecordCache;
+
+        private final List<FlowRecord> recordList;
+
+        public RecordMergeHelper(List<FlowRecord> historyRecords, List<FlowRecord> currentRecords) {
+            this.historyRecords = historyRecords;
+            this.currentRecords = currentRecords;
+            this.currentRecordCache = new HashMap<>();
+            this.recordList = new ArrayList<>();
+            this.initCurrentRecordCache();
+        }
+
+        private void initCurrentRecordCache(){
+            for (FlowRecord currentRecord:this.currentRecords){
+                this.currentRecordCache.put(currentRecord.getId(),currentRecord);
+            }
+        }
+
+        public List<FlowRecord> getUpdateRecordList() {
+            for(FlowRecord historyRecord:historyRecords){
+                FlowRecord currentRecord =  this.currentRecordCache.get(historyRecord.getId());
+                if(currentRecord!=null){
+                    this.recordList.add(currentRecord);
+                }else {
+                    this.recordList.add(historyRecord);
+                }
+            }
+            return this.recordList;
+        }
+
+
+
     }
 
     public static Builder builder() {

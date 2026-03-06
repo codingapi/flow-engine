@@ -2,7 +2,7 @@ package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.common.ICopyAbility;
 import com.codingapi.flow.common.IMapConvertor;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.session.FlowSession;
 
 /**
@@ -16,7 +16,7 @@ public interface INodeStrategy extends IMapConvertor, ICopyAbility<INodeStrategy
      * 节点验证
      * 用于流程配置完成以后的验证时触发
      */
-    void verifyNode(FormMeta form);
+    void verifyNode(FlowForm form);
 
     /**
      * 节点验证会话

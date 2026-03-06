@@ -104,6 +104,11 @@ public class FlowRecord {
     private String actionType;
 
     /**
+     * 动作名称
+     */
+    private String actionName;
+
+    /**
      * 审批意见
      */
     private String advice;
@@ -161,11 +166,11 @@ public class FlowRecord {
     private boolean notify;
 
     /**
-     * 节点状态 | 待办、已办
+     * 节点状态 | 待办 0、已办 1
      */
     private int recordState;
     /**
-     * 流程状态 | 运行中、已完成、异常、删除
+     * 流程状态 | 运行中 0、终止 1 已完成 2、异常 3、删除 4
      */
     private int flowState;
     /**
@@ -277,6 +282,7 @@ public class FlowRecord {
         this.recordState = SATE_RECORD_TODO;
         this.actionId = action.id();
         this.actionType = action.type();
+        this.actionName = action.title();
 
         this.currentOperatorId = currentOperator.getUserId();
         this.currentOperatorName = currentOperator.getName();
@@ -398,18 +404,19 @@ public class FlowRecord {
      * 更新记录
      *
      * @param flowSession 流程会话
-     * @param done        是否完成
+     * @param pass        是否通过
      */
-    public void update(FlowSession flowSession, boolean done) {
+    public void update(FlowSession flowSession, boolean pass) {
         IFlowAction flowAction = flowSession.getCurrentAction();
         FlowAdvice flowAdvice = flowSession.getAdvice();
         this.formData = flowSession.getFormData().toMapData();
         this.actionId = flowAction.id();
         this.actionType = flowAction.type();
+        this.actionName = flowAction.title();
         this.readable = true;
         this.readTime = System.currentTimeMillis();
         this.updateTime = System.currentTimeMillis();
-        this.recordState = done ? SATE_RECORD_DONE : SATE_RECORD_TODO;
+        this.recordState = pass ? SATE_RECORD_DONE : SATE_RECORD_TODO;
 
         // 设置流程干预人信息，流程干预只能由流程管理员才能操作
         if (flowSession.getCurrentOperator().getUserId() != this.currentOperatorId) {

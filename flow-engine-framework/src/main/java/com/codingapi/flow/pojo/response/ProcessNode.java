@@ -49,14 +49,28 @@ public class ProcessNode {
      */
     private int state;
 
+
     /**
      * 节点审批人
      */
     private List<FlowOperatorBody> operators;
 
 
-    public boolean isHistory(){
+    public boolean isHistory() {
         return this.state == STATE_HISTORY;
+    }
+
+    private ProcessNode(IFlowNode flowNode) {
+        this.state = STATE_HISTORY;
+        this.operators = new ArrayList<>();
+        this.nodeType = flowNode.getType();
+        this.nodeName = flowNode.getName();
+        this.nodeId = flowNode.getId();
+    }
+
+    public static ProcessNode createEndNode(Workflow workflow) {
+        IFlowNode endNode = workflow.getEndNode();
+        return new ProcessNode(endNode);
     }
 
     public ProcessNode(FlowRecord flowRecord, Workflow workflow) {
@@ -92,7 +106,7 @@ public class ProcessNode {
 
     @Override
     public boolean equals(Object target) {
-        if(target instanceof ProcessNode) {
+        if (target instanceof ProcessNode) {
             ProcessNode targetNode = (ProcessNode) target;
             return targetNode.getNodeId().equals(this.getNodeId());
         }
@@ -122,7 +136,11 @@ public class ProcessNode {
         private String signKey;
 
         /**
-         * 审批记录
+         * 审批动作
+         */
+        private String actionName;
+        /**
+         * 审批人
          */
         private FlowOperator flowOperator;
         /**
@@ -134,6 +152,7 @@ public class ProcessNode {
             this.advice = flowRecord.getAdvice();
             this.signKey = flowRecord.getSignKey();
             this.approveTime = flowRecord.getCreateTime();
+            this.actionName = flowRecord.getActionName();
             this.flowOperator = new FlowOperator(flowRecord.getCurrentOperatorId(), flowRecord.getCurrentOperatorName());
         }
 

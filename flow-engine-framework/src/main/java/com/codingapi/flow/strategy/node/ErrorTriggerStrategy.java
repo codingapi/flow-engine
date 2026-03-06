@@ -20,10 +20,6 @@ public class ErrorTriggerStrategy extends BaseStrategy {
         this.errorTriggerScript = new ErrorTriggerScript(script);
     }
 
-    public void setErrorTriggerScript(String script) {
-        this.errorTriggerScript = new ErrorTriggerScript(script);
-    }
-
     @Override
     public void copy(INodeStrategy target) {
         this.errorTriggerScript = ((ErrorTriggerStrategy) target).errorTriggerScript;
@@ -39,7 +35,7 @@ public class ErrorTriggerStrategy extends BaseStrategy {
     public static ErrorTriggerStrategy fromMap(Map<String, Object> map) {
         ErrorTriggerStrategy strategy = IMapConvertor.fromMap(map, ErrorTriggerStrategy.class);
         if (strategy == null) return null;
-        strategy.setErrorTriggerScript((String) map.get("script"));
+        strategy.errorTriggerScript = new ErrorTriggerScript((String) map.get("script"));
         return strategy;
     }
 
@@ -50,7 +46,7 @@ public class ErrorTriggerStrategy extends BaseStrategy {
 
     public static ErrorTriggerStrategy defaultStrategy() {
         ErrorTriggerStrategy strategy = new ErrorTriggerStrategy();
-        strategy.setErrorTriggerScript(ErrorTriggerScript.SCRIPT_NODE_DEFAULT);
+        strategy.errorTriggerScript = ErrorTriggerScript.defaultScript();
         return strategy;
     }
 

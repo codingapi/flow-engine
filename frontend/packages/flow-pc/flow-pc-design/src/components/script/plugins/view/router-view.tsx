@@ -1,12 +1,13 @@
 import React from "react";
 import {RouterViewPlugin, VIEW_KEY} from "@/components/script/plugins/router-view-type";
-import {ViewBindPlugin} from "@flow-engine/flow-types";
+import {ViewBindPlugin} from "@flow-engine/flow-core";
 import {SCRIPT_DEFAULT_ROUTER} from "@/components/script/default-script";
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 import {Button, Form, Select, Space} from "antd";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
 import {useNodeRouterManager} from "@/components/design-panel/hooks/use-node-router-manager";
-import {RouterConvertor} from "@/components/script/services/convertor/router";
+import {RouterScriptUtils} from "@/components/script/services/router";
+import {useScriptMetaData} from "@/components/script/hooks/use-script-meta-data";
 
 /**
  * @param props
@@ -15,6 +16,9 @@ import {RouterConvertor} from "@/components/script/services/convertor/router";
 export const RouterPluginView: React.FC<RouterViewPlugin> = (props) => {
     const TriggerPluginViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
     const nodeRouterManager = useNodeRouterManager();
+    const data = useScriptMetaData(props.script);
+
+    const mappingData = nodeRouterManager.mapping(data);
 
     if (TriggerPluginViewComponent) {
         return (
@@ -24,7 +28,11 @@ export const RouterPluginView: React.FC<RouterViewPlugin> = (props) => {
 
     return (
         <div>
-            <Form>
+            <Form
+                initialValues={{
+                    ...mappingData
+                }}
+            >
                 <Form.Item
                     name={"node"}
                     label={"跳转节点"}
@@ -32,7 +40,7 @@ export const RouterPluginView: React.FC<RouterViewPlugin> = (props) => {
                     <Select
                         options={nodeRouterManager.getNodes()}
                         onChange={(value, option) => {
-                            const script = RouterConvertor.goNode(option as any);
+                            const script = RouterScriptUtils.update(option as any);
                             props.onChange(script);
                         }}
                     />

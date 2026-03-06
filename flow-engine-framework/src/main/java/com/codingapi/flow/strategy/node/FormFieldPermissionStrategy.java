@@ -3,7 +3,8 @@ package com.codingapi.flow.strategy.node;
 import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.exception.FlowValidationException;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.DataType;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.session.FlowSession;
@@ -41,8 +42,8 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
      * @param form 表单元数据
      */
     @Override
-    public void verifyNode(FormMeta form) {
-        Map<String, String> fieldTypes = form.loadAllFieldTypeMaps();
+    public void verifyNode(FlowForm form) {
+        Map<String, DataType> fieldTypes = form.loadAllFieldTypeMaps();
         for (FormFieldPermission permission : fieldPermissions) {
             String key = permission.getFormCode() + "." + permission.getFieldCode();
             if (!fieldTypes.containsKey(key)) {
@@ -53,12 +54,12 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
 
     @Override
     public void verifySession(FlowSession session) {
-        FormMeta formMeta = session.getFormData().getFormMeta();
+        FlowForm flowForm = session.getFormData().getFlowForm();
         Map<String, Object> currentData = session.getCurrentRecord().getFormData();
         Map<String, Object> latestData = session.getFormData().toMapData();
         for (FormFieldPermission permission : fieldPermissions) {
             // 子表
-            if (formMeta.isSubForm(permission.getFormCode())) {
+            if (flowForm.isSubForm(permission.getFormCode())) {
                 if (permission.getType() == PermissionType.READ) {
                     List<Map<String, Object>> currentSubFormData = (List<Map<String, Object>>) currentData.get(permission.getFormCode());
                     List<Map<String, Object>> latestSubFormData = (List<Map<String, Object>>) latestData.get(permission.getFormCode());

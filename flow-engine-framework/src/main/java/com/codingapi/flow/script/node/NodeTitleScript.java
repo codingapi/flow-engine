@@ -1,7 +1,8 @@
 package com.codingapi.flow.script.node;
 
+import com.codingapi.flow.script.ScriptDefaultConstants;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
-import com.codingapi.flow.script.request.TitleGroovyRequest;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,18 +13,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public class NodeTitleScript {
 
-    public static final String SCRIPT_DEFAULT = """
-            // @SCRIPT_TITLE 你有一条待办 
-            def run(request){
-                return '你有一条待办'
-            }
-            """;
-
     @Getter
     private final String script;
 
     public String execute(FlowSession session) {
-        TitleGroovyRequest request = new TitleGroovyRequest(session);
+        GroovyScriptRequest request = new GroovyScriptRequest(session);
         return ScriptRuntimeContext.getInstance().run(script, String.class, request);
     }
 
@@ -31,6 +25,6 @@ public class NodeTitleScript {
      * 默认脚本
      */
     public static NodeTitleScript defaultScript() {
-        return new NodeTitleScript(SCRIPT_DEFAULT);
+        return new NodeTitleScript(ScriptDefaultConstants.SCRIPT_DEFAULT_NODE_TITLE);
     }
 }

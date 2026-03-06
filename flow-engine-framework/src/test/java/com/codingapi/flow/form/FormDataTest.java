@@ -14,18 +14,18 @@ class FormDataTest {
      */
     @Test
     void dataTest() {
-        FormMeta form = FormMetaBuilder.builder()
+        FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
-                .addField("请假人", "name", "string")
-                .addField("请假天数", "days", "int")
-                .addField("请假事由", "reason", "string")
-                .addSubForm(FormMetaBuilder.builder()
+                .addField("请假人", "name", DataType.STRING)
+                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假事由", "reason", DataType.STRING)
+                .addSubForm(FlowFormBuilder.builder()
                         .name("审批记录")
                         .code("record")
-                        .addField("审批人", "approver", "string")
-                        .addField("审批结果", "result", "string")
-                        .addField("审批时间", "time", "date")
+                        .addField("审批人", "approver", DataType.STRING)
+                        .addField("审批结果", "result", DataType.STRING)
+                        .addField("审批时间", "time", DataType.DATE)
                         .build())
                 .build();
         FormData data = new FormData(form);

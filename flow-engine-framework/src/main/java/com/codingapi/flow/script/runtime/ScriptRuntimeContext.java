@@ -2,6 +2,7 @@ package com.codingapi.flow.script.runtime;
 
 import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.exception.FlowValidationException;
+import com.codingapi.flow.script.request.GroovyScriptBind;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
@@ -204,7 +205,7 @@ public class ScriptRuntimeContext {
                 shell = new GroovyShell(classLoader);
 
                 Script runtime = shell.parse(script);
-                runtime.setProperty("$bind", FlowScriptContext.getInstance());
+                runtime.setProperty("$bind", new GroovyScriptBind(FlowScriptContext.getInstance()));
                 return (T) runtime.invokeMethod(method, args);
             } catch (Exception e) {
                 LOGGER.error("Script execution error, method: {}, script: {}", method, script, e);

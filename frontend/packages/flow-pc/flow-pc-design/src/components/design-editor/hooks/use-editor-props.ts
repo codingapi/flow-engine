@@ -153,7 +153,7 @@ export function useEditorProps(initialData: FlowDocumentJSON, nodeRegistries: Fl
                 }, 100),
             },
             /**
-             * Node engine enable, you can configure formMeta in the FlowNodeRegistry
+             * Node engine enable, you can configure flowForm in the FlowNodeRegistry
              */
             nodeEngine: {
                 enable: true,

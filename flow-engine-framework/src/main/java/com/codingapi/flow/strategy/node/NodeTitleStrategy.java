@@ -24,18 +24,13 @@ public class NodeTitleStrategy extends BaseStrategy {
         this.nodeTitleScript = ((NodeTitleStrategy) target).nodeTitleScript;
     }
 
-    public void setOperatorScript(String script) {
-        this.nodeTitleScript = new NodeTitleScript(script);
-    }
-
-
     public String generateTitle(FlowSession flowSession) {
         return nodeTitleScript.execute(flowSession);
     }
 
     public static NodeTitleStrategy defaultStrategy() {
         NodeTitleStrategy strategy = new NodeTitleStrategy();
-        strategy.setOperatorScript(NodeTitleScript.SCRIPT_DEFAULT);
+        strategy.nodeTitleScript = NodeTitleScript.defaultScript();
         return strategy;
     }
 
@@ -50,7 +45,7 @@ public class NodeTitleStrategy extends BaseStrategy {
     public static NodeTitleStrategy fromMap(Map<String, Object> map) {
         NodeTitleStrategy strategy = IMapConvertor.fromMap(map, NodeTitleStrategy.class);
         if (strategy == null) return null;
-        strategy.setOperatorScript((String) map.get("script"));
+        strategy.nodeTitleScript = new NodeTitleScript((String) map.get("script"));
         return strategy;
     }
 

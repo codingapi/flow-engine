@@ -3,7 +3,7 @@ package com.codingapi.flow.node;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.exception.FlowValidationException;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -46,7 +46,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     }
 
 
-    public void verifyNode(FormMeta form) {
+    public void verifyNode(FlowForm form) {
         super.verifyNode(form);
         if (!StringUtils.hasText(view)) {
             throw FlowValidationException.nodeRequired("view");
@@ -69,7 +69,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     }
 
     @Override
-    public boolean isDone(FlowSession session) {
+    public boolean isFinish(FlowSession session) {
         List<FlowRecord> currentRecords = session.getCurrentNodeRecords();
         FlowRecord currentRecord = session.getCurrentRecord();
         // 多人审批

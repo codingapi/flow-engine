@@ -1,4 +1,4 @@
-import {FlowForm} from "@/components/design-panel/types";
+import {FlowForm} from "@flow-engine/flow-types";
 
 export class PromissionManager {
 

@@ -1,6 +1,7 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.script.ScriptDefaultConstants;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,13 +11,6 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 public class OperatorMatchScript {
-
-    public static final String SCRIPT_ANY = """
-            // @SCRIPT_TITLE 任意用户 
-            def run(request){
-                return true
-            }
-            """;
 
     @Getter
     private final String script;
@@ -29,6 +23,6 @@ public class OperatorMatchScript {
      * 任意人
      */
     public static OperatorMatchScript any() {
-        return new OperatorMatchScript(SCRIPT_ANY);
+        return new OperatorMatchScript(ScriptDefaultConstants.SCRIPT_DEFAULT_OPERATOR_MATCH);
     }
 }

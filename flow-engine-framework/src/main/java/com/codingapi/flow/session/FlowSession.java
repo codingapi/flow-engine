@@ -8,7 +8,6 @@ import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.script.request.TitleGroovyRequest;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Getter;
 import lombok.Setter;
@@ -199,11 +198,11 @@ public class FlowSession {
     /**
      * 获取表单数据
      *
-     * @param fieldName 字段名称
+     * @param fieldCode 字段名称
      * @return 表单数据
      */
-    public Object getFormData(String fieldName) {
-        return formData.getDataBody().get(fieldName);
+    public Object getFormData(String fieldCode) {
+        return formData.getDataBody().get(fieldCode);
     }
 
     /**
@@ -237,11 +236,4 @@ public class FlowSession {
         return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
     }
 
-    /**
-     * 创建标题请求对象
-     * 从当前session构建TitleGroovyRequest
-     */
-    public TitleGroovyRequest createTitleRequest() {
-        return new TitleGroovyRequest(this);
-    }
 }

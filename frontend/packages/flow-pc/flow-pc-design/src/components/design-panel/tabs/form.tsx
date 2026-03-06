@@ -1,8 +1,8 @@
 import React, {useState} from "react";
 import {Panel} from "@flow-engine/flow-pc-ui";
 import {Table, TableProps} from"@flow-engine/flow-pc-ui";
-import {Button, Flex, Form, FormInstance, Input, Modal, Popconfirm, Select, Space, Switch, Tabs,Empty} from "antd";
-import {FormFieldOptions} from "@/components/design-panel/types";
+import {Button, Flex, Form, FormInstance, Input, Modal, Popconfirm, Select, Space, Switch, Tabs,Empty, Row, Col} from "antd";
+import {dataTypeOptions} from "@flow-engine/flow-types";
 import {useDesignContext} from "@/components/design-panel/hooks/use-design-context";
 import {WorkflowFormManager} from "@/components/design-panel/manager/form";
 
@@ -54,69 +54,102 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
                 >
                     <Input/>
                 </Form.Item>
-
-                <Form.Item
-                    name={"name"}
-                    label={"字段名称"}
-                    labelCol={labelCol}
-                    rules={[
-                        {
-                            required: true,
-                            message: '字段名称不能为空'
-                        }
-                    ]}
-                >
-                    <Input placeholder={"请输入字段名称"}/>
-                </Form.Item>
-
-                <Form.Item
-                    name={"code"}
-                    label={"字段编码"}
-                    labelCol={labelCol}
-                    rules={[
-                        {
-                            required: true,
-                            message: '字段编码不能为空'
-                        }
-                    ]}
-                >
-                    <Input placeholder={"请输入字段编码"}/>
-                </Form.Item>
-
-                <Form.Item
-                    name={"type"}
-                    label={"字段类型"}
-                    labelCol={labelCol}
-                    rules={[
-                        {
-                            required: true,
-                            message: '字段类型不能为空'
-                        }
-                    ]}
-                >
-                    <Select
-                        placeholder={"请输入字段类型"}
-                        options={FormFieldOptions}
-                    />
-                </Form.Item>
-
-                <Form.Item
-                    name={"required"}
-                    label={"是否必填"}
-                    labelCol={labelCol}
-                >
-                    <Switch/>
-                </Form.Item>
-
-                <Form.Item
-                    name={"defaultValue"}
-                    label={"默认值"}
-                    labelCol={labelCol}
-                >
-                    <Input placeholder={"请输入默认值"}/>
-                </Form.Item>
+                <Row gutter={[8,8]}>
+                    <Col span={12}>
+                        <Form.Item
+                            name={"name"}
+                            label={"字段名称"}
+                            labelCol={labelCol}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: '字段名称不能为空'
+                                }
+                            ]}
+                        >
+                            <Input placeholder={"请输入字段名称"}/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name={"code"}
+                            label={"字段编码"}
+                            labelCol={labelCol}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: '字段编码不能为空'
+                                }
+                            ]}
+                        >
+                            <Input placeholder={"请输入字段编码"}/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name={"type"}
+                            label={"字段类型"}
+                            labelCol={labelCol}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: '字段类型不能为空'
+                                }
+                            ]}
+                        >
+                            <Select
+                                placeholder={"请输入字段类型"}
+                                options={dataTypeOptions}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name={"required"}
+                            label={"是否必填"}
+                            labelCol={labelCol}
+                        >
+                            <Switch/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name={"placeholder"}
+                            label={"输入提示信息"}
+                            labelCol={labelCol}
+                        >
+                            <Input placeholder={"请输入输入提示信息"}/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name={"defaultValue"}
+                            label={"默认值"}
+                            labelCol={labelCol}
+                        >
+                            <Input placeholder={"请输入默认值"}/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name={"tooltip"}
+                            label={"提示信息"}
+                            labelCol={labelCol}
+                        >
+                            <Input placeholder={"请输入提示信息"}/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name={"help"}
+                            label={"帮助提示"}
+                            labelCol={labelCol}
+                        >
+                            <Input placeholder={"请输入帮助提示"}/>
+                        </Form.Item>
+                    </Col>
+                </Row>
             </Form>
-
         </Modal>
     )
 }
@@ -210,7 +243,7 @@ const FormTable: React.FC<FormTableProps> = (props) => {
             title: '字段类型',
             render: (value, record) => {
                 let label = '';
-                for(const option of FormFieldOptions) {
+                for(const option of dataTypeOptions) {
                     if(option.value == value){
                         label = option.label;
                     }
@@ -226,8 +259,20 @@ const FormTable: React.FC<FormTableProps> = (props) => {
             }
         },
         {
+            dataIndex: 'placeholder',
+            title: '输入提示'
+        },
+        {
             dataIndex: 'defaultValue',
             title: '默认值'
+        },
+        {
+            dataIndex: 'tooltip',
+            title: '提示信息'
+        },
+        {
+            dataIndex: 'help',
+            title: '帮助提示'
         },
         {
             dataIndex: 'option',
@@ -236,6 +281,7 @@ const FormTable: React.FC<FormTableProps> = (props) => {
                 return (
                     <Space>
                         <a onClick={() => {
+                            fieldForm.resetFields();
                             fieldForm.setFieldsValue(record);
                             setEditable(true);
                         }}>编辑</a>

@@ -3,8 +3,8 @@ import React from "react";
 import {GroovyScriptContent} from "@/components/script/components/groovy-script-modal";
 import {MenuUnfoldOutlined, ReloadOutlined} from "@ant-design/icons";
 import {GroovyVariableMapping, ScriptType} from "@/components/script/typings";
-import {GroovyCodeEditor} from './groovy-code-editor';
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {GroovyCodeEditor} from '@/components/groovy-code';
+import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 
 interface ScriptEditorProps {
     /** 脚本类型 */

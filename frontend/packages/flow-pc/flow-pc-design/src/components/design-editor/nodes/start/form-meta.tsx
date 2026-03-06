@@ -9,7 +9,7 @@ import {NodeTitleStrategy} from "@/components/design-editor/node-components/stra
 import {RevokeStrategy} from "@/components/design-editor/node-components/strategy/revoke";
 import {View} from "@/components/design-editor/node-components/view";
 import {useDesignContext} from "@/components/design-panel/hooks/use-design-context";
-import {GroovyScriptConvertorUtil} from "@/components/script/utils/convertor";
+import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 
 export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
     const isSidebar = useIsSidebar();

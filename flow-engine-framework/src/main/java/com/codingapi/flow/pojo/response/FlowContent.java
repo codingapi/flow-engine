@@ -1,7 +1,7 @@
 package com.codingapi.flow.pojo.response;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.form.FormMeta;
+import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
@@ -26,6 +26,12 @@ public class FlowContent {
     private long recordId;
 
     /**
+     * 流程id
+     * 每一次流程启动时生成，直到流程结束
+     */
+    private String processId;
+
+    /**
      * 流程编号
      */
     private String workId;
@@ -40,19 +46,39 @@ public class FlowContent {
     private String view;
 
     /**
+     * 节点名称
+     */
+    private String nodeName;
+
+    /**
+     * 节点Id
+     */
+    private String nodeId;
+
+    /**
+     * 节点类型
+     */
+    private String nodeType;
+
+    /**
+     * 流程标题
+     */
+    private String title;
+
+    /**
      * 审批意见是否必填
      */
-    private boolean adviceNullable;
+    private boolean adviceRequired;
 
     /**
      * 签名是否必填
      */
-    private boolean signable;
+    private boolean signRequired;
 
     /**
      * 表单元数据
      */
-    private FormMeta form;
+    private FlowForm form;
     /**
      * 流程记录
      */
@@ -61,7 +87,7 @@ public class FlowContent {
     /**
      * 流程按钮
      */
-    private List<IFlowAction> actions;
+    private List<Map<String,Object>> actions;
 
     /**
      * 是否可合并
@@ -93,13 +119,21 @@ public class FlowContent {
      */
     private List<History> histories;
 
+    /**
+     * 所有节点
+     */
+    private List<NodeOption> nodes;
+
 
     public void pushCurrentNode(IFlowNode currentNode) {
         ActionManager actionManager = currentNode.actionManager();
         NodeStrategyManager strategyManager = currentNode.strategyManager();
-        this.actions = actionManager.getActions();
-        this.adviceNullable = strategyManager.isEnableAdvice();
-        this.signable = strategyManager.isEnableSignable();
+        this.actions = actionManager.getActions().stream().map(IFlowAction::toMap).toList();
+        this.adviceRequired = strategyManager.isAdviceRequired();
+        this.signRequired = strategyManager.isSignRequired();
+        this.nodeId = currentNode.getId();
+        this.nodeName = currentNode.getName();
+        this.nodeType = currentNode.getType();
         Map<String,Object> nodeData = currentNode.toMap();
         this.view = (String) nodeData.get("view");
     }
@@ -108,14 +142,17 @@ public class FlowContent {
         this.form = workflow.getForm();
         this.workCode = workflow.getCode();
         this.workId = workflow.getId();
+        this.nodes = workflow.getNodes().stream().map(NodeOption::new).toList();
     }
 
     public void pushRecords(FlowRecord record, List<FlowRecord> mergeRecords) {
         this.recordId = record.getId();
+        this.processId = record.getProcessId();
         this.createOperator = new FlowOperator(record.getCreateOperatorId(), record.getCreateOperatorName());
         this.mergeable = record.isMergeable();
         this.flowState = record.getFlowState();
         this.recordState = record.getRecordState();
+        this.title = record.getTitle();
 
         this.todos = new ArrayList<>();
         for (FlowRecord item : mergeRecords){

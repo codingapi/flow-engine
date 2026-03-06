@@ -5,9 +5,14 @@ import {FlowContent} from "@flow-engine/flow-types";
 import {ApprovalLayout} from "@/components/flow-approval/layout";
 
 interface ApprovalPanelProps {
+    // 流程设计编码
     workflowCode?: string;
+    // 流程记录Id
     recordId?: string;
+    // 关闭回掉
     onClose?: () => void;
+    // 是否预览（当查看详情非审批时，设置为true）
+    review?:boolean;
 }
 
 export const ApprovalPanel: React.FC<ApprovalPanelProps> = (props) => {
@@ -25,7 +30,11 @@ export const ApprovalPanel: React.FC<ApprovalPanelProps> = (props) => {
 
     return (
         <div>
-            {content && <ApprovalLayout content={content} onClose={props.onClose}/>}
+            {content && <ApprovalLayout
+                content={content}
+                onClose={props.onClose}
+                review={props.review}
+            />}
         </div>
     )
 }

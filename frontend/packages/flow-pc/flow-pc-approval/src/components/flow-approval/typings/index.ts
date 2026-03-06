@@ -5,6 +5,7 @@ import {FlowContent,ProcessNode} from "@flow-engine/flow-types";
  */
 export interface ApprovalLayoutProps {
     content:FlowContent;
+    review?:boolean;
     onClose?:() => void;
 }
 
@@ -18,6 +19,7 @@ export const ApprovalSidebarCollapsedWidth = 48;
 
 export type State  = {
     flow?:FlowContent;
+    review?:boolean;
 };
 
 

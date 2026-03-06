@@ -37,7 +37,6 @@ public class FlowRecordController {
         return MultiResponse.of(flowService.processNodes(request));
     }
 
-
     @PostMapping("/create")
     public SingleResponse<Long> create(@RequestBody FlowCreateRequest request) {
         IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();

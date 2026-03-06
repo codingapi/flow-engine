@@ -2,6 +2,8 @@ package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.script.ScriptDefaultConstants;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -13,24 +15,19 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SubProcessScript {
 
-    public static final String SCRIPT_DEFAULT = """
-            // @SCRIPT_TITLE 创建当前流程 
-            def run(request){ 
-                return request.toCreateRequest() 
-            }
-            """;
 
     @Getter
     private final String script;
 
-    public FlowCreateRequest execute(FlowSession request) {
-        FlowRecord flowRecord = request.getCurrentRecord();
+    public FlowCreateRequest execute(FlowSession session) {
+        FlowRecord flowRecord = session.getCurrentRecord();
+        GroovyScriptRequest request = new GroovyScriptRequest(session);
         FlowCreateRequest flowCreateRequest =  ScriptRuntimeContext.getInstance().run(script, FlowCreateRequest.class, request);
         flowCreateRequest.setParentRecordId(flowRecord.getId());
         return flowCreateRequest;
     }
 
     public static SubProcessScript defaultScript() {
-        return new SubProcessScript(SCRIPT_DEFAULT);
+        return new SubProcessScript(ScriptDefaultConstants.SCRIPT_DEFAULT_SUB_PROCESS);
     }
 }

@@ -16,7 +16,9 @@
     "dev:app-pc": "pnpm -F  @flow-engine/app-pc dev",
     "dev:app-mobile": "pnpm -F  @flow-engine/app-mobile dev",
     "watch:flow-pc-design": "pnpm -F  @flow-engine/flow-pc-design dev",
-    "watch:flow-pc-form": "pnpm -F  @flow-engine/flow-pc-form dev"
+    "watch:flow-pc-form": "pnpm -F  @flow-engine/flow-pc-form dev",
+    "watch:flow-pc-ui": "pnpm -F  @flow-engine/flow-pc-ui dev",
+    "watch:flow-pc-approval": "pnpm -F  @flow-engine/flow-pc-approval dev"
   },
   "keywords": [],
   "author": "",

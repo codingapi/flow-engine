@@ -1,7 +1,8 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.script.request.OperatorLoadGroovyRequest;
+import com.codingapi.flow.script.ScriptDefaultConstants;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -15,27 +16,21 @@ import java.util.List;
 @AllArgsConstructor
 public class OperatorLoadScript {
 
-    public static final String SCRIPT_CREATOR = """
-            // @SCRIPT_TITLE 流程创建者 
-            def run(request){
-                return [request.getCreatedOperator()]
-            }
-            """;
 
     @Getter
     private final String script;
 
     @SuppressWarnings("unchecked")
     public List<IFlowOperator> execute(FlowSession session) {
-        OperatorLoadGroovyRequest request = new OperatorLoadGroovyRequest(session);
+        GroovyScriptRequest request = new GroovyScriptRequest(session);
         return ScriptRuntimeContext.getInstance().run(script, List.class, request);
     }
 
     /**
      * 流程创建者
      */
-    public static OperatorLoadScript creator() {
-        return new OperatorLoadScript(SCRIPT_CREATOR);
+    public static OperatorLoadScript defaultScript() {
+        return new OperatorLoadScript(ScriptDefaultConstants.SCRIPT_DEFAULT_OPERATOR_LOAD);
     }
 
 }
