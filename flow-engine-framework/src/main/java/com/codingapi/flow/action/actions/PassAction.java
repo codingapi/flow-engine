@@ -70,8 +70,8 @@ public class PassAction extends BaseAction {
         List<FlowRecord> recordList = new ArrayList<>();
         FlowRecord currentRecord = flowSession.getCurrentRecord();
         IFlowNode currentNode = flowSession.getCurrentNode();
-        boolean done = currentNode.isDone(flowSession);
-        currentRecord.update(flowSession, done);
+        boolean isFinish = currentNode.isFinish(flowSession);
+        currentRecord.update(flowSession, true);
         // 添加流程结束事件
         flowEvents.add(new FlowRecordDoneEvent(currentRecord));
         recordList.add(currentRecord);
@@ -89,7 +89,7 @@ public class PassAction extends BaseAction {
             }
         }
 
-        if (done) {
+        if (isFinish) {
             // 是否转交审批人的流程
             if (currentRecord.isForward()) {
                 IFlowOperator forwardOperator = RepositoryHolderContext.getInstance().getOperatorById(currentRecord.getForwardOperatorId());

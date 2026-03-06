@@ -58,7 +58,7 @@ public class NotifyNode extends BaseAuditNode implements IDisplayNode {
     }
 
     @Override
-    public boolean isDone(FlowSession session) {
+    public boolean isFinish(FlowSession session) {
         return true;
     }
 

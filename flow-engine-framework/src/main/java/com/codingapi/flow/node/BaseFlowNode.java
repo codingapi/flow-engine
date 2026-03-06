@@ -247,7 +247,7 @@ public abstract class BaseFlowNode implements IFlowNode {
     }
 
     @Override
-    public boolean isDone(FlowSession session) {
+    public boolean isFinish(FlowSession session) {
         return true;
     }
 

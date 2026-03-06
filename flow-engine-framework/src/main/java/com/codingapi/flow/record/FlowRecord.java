@@ -398,9 +398,9 @@ public class FlowRecord {
      * 更新记录
      *
      * @param flowSession 流程会话
-     * @param done        是否完成
+     * @param pass        是否通过
      */
-    public void update(FlowSession flowSession, boolean done) {
+    public void update(FlowSession flowSession, boolean pass) {
         IFlowAction flowAction = flowSession.getCurrentAction();
         FlowAdvice flowAdvice = flowSession.getAdvice();
         this.formData = flowSession.getFormData().toMapData();
@@ -409,7 +409,7 @@ public class FlowRecord {
         this.readable = true;
         this.readTime = System.currentTimeMillis();
         this.updateTime = System.currentTimeMillis();
-        this.recordState = done ? SATE_RECORD_DONE : SATE_RECORD_TODO;
+        this.recordState = pass ? SATE_RECORD_DONE : SATE_RECORD_TODO;
 
         // 设置流程干预人信息，流程干预只能由流程管理员才能操作
         if (flowSession.getCurrentOperator().getUserId() != this.currentOperatorId) {

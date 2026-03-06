@@ -69,7 +69,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     }
 
     @Override
-    public boolean isDone(FlowSession session) {
+    public boolean isFinish(FlowSession session) {
         List<FlowRecord> currentRecords = session.getCurrentNodeRecords();
         FlowRecord currentRecord = session.getCurrentRecord();
         // 多人审批
