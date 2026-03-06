@@ -10,7 +10,6 @@ import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowProcessNodeRequest;
@@ -82,22 +81,21 @@ public class FlowProcessNodeService {
     public List<ProcessNode> processNodes() {
         long backupId = 0;
         if (this.flowRecord != null) {
+            backupId = this.flowRecord.getWorkBackupId();
             // 如果当前记录已结束，则不查询后续流程
             if(this.flowRecord.isDone()){
-
                 List<FlowRecord> historyRecords =  flowRecordRepository.findProcessRecords(this.flowRecord.getProcessId());
                 for (FlowRecord historyRecord : historyRecords) {
                     ProcessNode processNode = new ProcessNode(historyRecord, this.workflow);
                     nodeList.add(processNode);
                 }
-
                 if(this.flowRecord.isFinish()){
                     nodeList.add(ProcessNode.createEndNode(this.workflow));
+                }else {
+                    this.loadNextNode(backupId);
                 }
-
                 return this.nodeList;
             }else {
-                backupId = this.flowRecord.getWorkBackupId();
                 // 查询历史记录
                 List<FlowRecord> historyRecords = flowRecordRepository.findBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
                 for (FlowRecord historyRecord : historyRecords) {
