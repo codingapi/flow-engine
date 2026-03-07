@@ -1,7 +1,8 @@
 import React from "react";
 import {FlowActionProps} from "./type";
-import {Button, Form, message, Modal,Input} from "antd";
+import {Form, Input, message, Modal} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
+import {ActionButton} from "@/components/flow-approval/components/action-button";
 
 const {TextArea} = Input;
 
@@ -13,7 +14,7 @@ const {TextArea} = Input;
 export const RejectAction: React.FC<FlowActionProps> = (props) => {
 
     const action = props.action;
-    const {state,context} = useApprovalContext()
+    const {state, context} = useApprovalContext()
     const actionPresenter = context.getPresenter().getFlowActionPresenter();
     const [modalVisible, setModalVisible] = React.useState(false);
     const [form] = Form.useForm();
@@ -37,14 +38,14 @@ export const RejectAction: React.FC<FlowActionProps> = (props) => {
 
     return (
         <>
-            <Button
+            <ActionButton
+                display={props.action.display}
                 onClick={() => {
                     form.resetFields();
                     setModalVisible(true);
                 }}
-            >
-                {action.title}
-            </Button>
+                title={action.title}
+            />
 
             <Modal
                 title={"审批拒绝"}

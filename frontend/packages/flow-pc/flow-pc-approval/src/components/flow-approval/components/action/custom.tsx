@@ -1,9 +1,10 @@
 import React from "react";
 import {FlowActionProps} from "./type";
-import {Button, message} from "antd";
+import {message} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
 import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 import {ActionFactory} from "@/components/flow-approval/components/action/factory";
+import {ActionButton} from "@/components/flow-approval/components/action-button";
 
 /**
  * 自定义
@@ -31,7 +32,8 @@ export const CustomAction: React.FC<FlowActionProps> = (props) => {
     }
 
     return (
-        <Button
+        <ActionButton
+            display={props.action.display}
             onClick={() => {
                 actionPresenter.action(action.id).then((res) => {
                     if (res.success) {
@@ -40,8 +42,7 @@ export const CustomAction: React.FC<FlowActionProps> = (props) => {
                     }
                 });
             }}
-        >
-            {action.title}
-        </Button>
+            title={action.title}
+        />
     )
 }

@@ -29,23 +29,23 @@ export const dataTypeOptions = [
  */
 export interface FormField {
     // 字段id
-    id:string;
+    id: string;
     // 字段名称
-    name:string;
+    name: string;
     // 字段编码
-    code:string;
+    code: string;
     // 数据类型
-    type:DataType;
+    type: DataType;
     // 是否必填
-    required:boolean;
+    required: boolean;
     // 默认值
-    defaultValue?:string;
+    defaultValue?: string;
     // 输入提示
-    placeholder?:string;
+    placeholder?: string;
     // 提醒提示
-    tooltip?:string;
+    tooltip?: string;
     // 帮助提示
-    help?:string;
+    help?: string;
 }
 
 /**
@@ -53,13 +53,27 @@ export interface FormField {
  */
 export interface FlowForm {
     // 表单名称
-    name:string;
+    name: string;
     // 表单编码
-    code:string;
+    code: string;
     // 表单字段
-    fields:FormField[];
+    fields: FormField[];
     // 子表单
-    subForms:FlowForm[];
+    subForms: FlowForm[];
+}
+
+/**
+ *  展示样式
+ */
+export interface DisplayStyle {
+    // 边框颜色
+    borderColor?: string;
+    // 背景颜色
+    backgroundColor?: string;
+    // 边框大小
+    borderSize?: string;
+    // 边框圆角
+    borderRadius?: string;
 }
 
 /**
@@ -67,29 +81,29 @@ export interface FlowForm {
  */
 export interface FlowActionDisplay {
     // 标题
-    title:string;
+    title: string;
     // 样式
-    style:string;
+    style: string;
     // 图标
-    icon:string;
+    icon: string;
 }
 
 /**
  * 流程操作对象
  */
-export interface FlowAction{
+export interface FlowAction {
     // 操作id
-    id:string;
+    id: string;
     // 按钮名称
-    title:string;
+    title: string;
     // 动作类型
-    type:string;
+    type: string;
     // 展示样式
-    display:FlowActionDisplay;
+    display: FlowActionDisplay;
     // 是否启用
-    enable:boolean;
+    enable: boolean;
     // 自定义脚本
-    script?:string;
+    script?: string;
 }
 
 /**
@@ -97,31 +111,31 @@ export interface FlowAction{
  */
 export interface FlowOperator {
     // 人员id
-    id:number;
+    id: number;
     // 人员名称
-    name:string;
+    name: string;
 }
 
 /**
  *  流程操作记录对象
  */
-export interface History{
+export interface History {
     // 记录id
-    recordId:number;
+    recordId: number;
     // 流程标题
-    title:string;
+    title: string;
     // 审批意见
-    advice:string;
+    advice: string;
     // 审批签名key
-    signKey:string;
+    signKey: string;
     // 审批节点
-    nodeName:string;
+    nodeName: string;
     // 审批节点id
-    nodeId:string;
+    nodeId: string;
     // 节点类型
-    nodeType:string
+    nodeType: string
     // 审批时间
-    updateTime:number;
+    updateTime: number;
 }
 
 /**
@@ -129,15 +143,15 @@ export interface History{
  */
 export interface FlowTodo {
     // 记录id
-    recordId:number;
+    recordId: number;
     // 流程标题
-    title:string;
+    title: string;
     // 流程数据
-    data:Record<string,any>;
+    data: Record<string, any>;
     // 记录状态
-    recordState:number;
+    recordState: number;
     // 流程状态
-    flowState:number;
+    flowState: number;
 }
 
 
@@ -146,45 +160,45 @@ export interface FlowTodo {
  */
 export interface FlowApprovalOperator {
     // 意见信息
-    advice:string;
+    advice: string;
     // 签名key
-    signKey:string;
+    signKey: string;
     // 审核时间
-    approveTime:number;
+    approveTime: number;
     // 审批动作
-    actionName:string;
+    actionName: string;
     // 审批人
-    flowOperator:FlowOperator;
+    flowOperator: FlowOperator;
 }
 
 /**
  * 流程节点对象
  */
-export interface ProcessNode{
+export interface ProcessNode {
     // 节点id
-    nodeId:string;
+    nodeId: string;
     // 节点名称
-    nodeName:string;
+    nodeName: string;
     // 节点类型
-    nodeType:string;
+    nodeType: string;
     // 状态 -1 历史 0 当前 1 未执行
-    state:number;
+    state: number;
     // 审批人员
-    operators:FlowApprovalOperator[]
+    operators: FlowApprovalOperator[]
 }
 
 /**
  * 节点
  */
-export interface NodeOption{
+export interface NodeOption {
     // 节点id
-    id:string;
+    id: string;
     // 节点名称
-    name:string;
+    name: string;
     // 节点类型
-    type:string;
+    type: string;
     // 展示节点
-    display:boolean;
+    display: boolean;
 }
 
 /**
@@ -192,45 +206,45 @@ export interface NodeOption{
  */
 export interface FlowContent {
     // 记录id
-    recordId:number;
+    recordId: number;
     // 流程id
-    processId:string;
+    processId: string;
     // 流程设计id
-    workId:string;
+    workId: string;
     // 流程设计编码
-    workCode:string;
+    workCode: string;
     // 节点id
-    nodeId:string;
+    nodeId: string;
     // 节点名称
-    nodeName:string;
+    nodeName: string;
     // 节点类型
-    nodeType:string;
+    nodeType: string;
     // 流程标题
-    title:string;
+    title: string;
     // 视图名称
-    view:string;
+    view: string;
     // 是否必填意见
-    adviceRequired:boolean;
+    adviceRequired: boolean;
     // 是否必填签名
-    signRequired:boolean;
+    signRequired: boolean;
     // 表单元数据
-    form:FlowForm;
+    form: FlowForm;
     // 待办记录
-    todos:FlowTodo[];
+    todos: FlowTodo[];
     // 操作按钮
-    actions:FlowAction[];
+    actions: FlowAction[];
     // 是否合并
-    mergeable:boolean;
+    mergeable: boolean;
     // 流程创建人
-    createOperator:FlowOperator;
+    createOperator: FlowOperator;
     // 当前流程
-    currentOperator:FlowOperator;
+    currentOperator: FlowOperator;
     // 流程状态
-    flowState:number;
+    flowState: number;
     // 记录状态
-    recordState:number;
+    recordState: number;
     // 审批记录
-    histories:History[];
+    histories: History[];
     // 所有节点
-    nodes:NodeOption[];
+    nodes: NodeOption[];
 }
