@@ -5,6 +5,7 @@ import com.codingapi.flow.node.NodeType;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -31,7 +32,7 @@ public class FlowNodeState {
         this.branchNodeTypes.add(NodeType.PARALLEL_BRANCH.name());
     }
 
-    public boolean isEndNode(){
+    public boolean isEndNode() {
         return this.node.getType().equals(NodeType.END.name());
     }
 
@@ -65,8 +66,8 @@ public class FlowNodeState {
     }
 
     public List<IFlowNode> getFirstBlocks() {
-        List<IFlowNode> blocks = this.node.blocks();
-        if (blocks != null && !blocks.isEmpty()) {
+        List<IFlowNode> blocks = this.node.blocks().stream().sorted(Comparator.comparingInt(IFlowNode::getOrder)).toList();
+        if (!blocks.isEmpty()) {
             return Stream.of(blocks.get(0)).toList();
         }
         return new ArrayList<>();

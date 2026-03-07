@@ -13,10 +13,15 @@ import {FlowDocumentJSON, FlowNodeRegistry} from "@/components/design-editor/typ
 import {Adder} from "@/components/design-editor/components/node-adder";
 import {BranchAdder} from "@/components/design-editor/components/branch-adder";
 import {Collapse} from "../components/collapse";
+import {useDesignContext} from "@/components/design-panel/hooks/use-design-context";
 
 export function useEditorProps(initialData: FlowDocumentJSON, nodeRegistries: FlowNodeRegistry[]): FixedLayoutProps {
 
     const {token} = theme.useToken();
+
+    const {context} = useDesignContext();
+
+    const presenter = context.getPresenter();
 
     return useMemo<FixedLayoutProps>(
         () => ({
@@ -150,6 +155,8 @@ export function useEditorProps(initialData: FlowDocumentJSON, nodeRegistries: Fl
                     // Listen change to trigger auto save
                     const data = ctx.document.toJSON();
                     console.log('flow-engine auto save: ', data);
+                    presenter.syncNodes(data.nodes);
+
                 }, 100),
             },
             /**

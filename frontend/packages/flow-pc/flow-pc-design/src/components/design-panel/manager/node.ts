@@ -97,6 +97,43 @@ interface MappingData {
     [key: string]: any;
 }
 
+
+export class NodeManger{
+    private readonly nodes: FlowNode[];
+    private readonly nodeList: FlowNode[];
+
+
+    constructor(nodes: FlowNode[]) {
+        this.nodes = nodes;
+        this.nodeList = [];
+        this.fetchNodes(this.nodes);
+    }
+
+    private fetchNodes(nodes: FlowNode[]) {
+        for (const node of nodes) {
+            this.nodeList.push(node);
+            const blocks = node.blocks || [];
+            if (node.blocks && node.blocks.length > 0) {
+                this.fetchNodes(blocks);
+            }
+        }
+    }
+
+
+    /**
+     * 获取节点
+     * @param id 节点id
+     */
+    public getNode(id:string){
+        for (const node of this.nodeList) {
+            if (node.id === id) {
+                return node;
+            }
+        }
+        return null;
+    }
+}
+
 /**
  *  节点关系分析管理，分析所有的节点，可回退的节点等信息
  */

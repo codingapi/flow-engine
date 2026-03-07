@@ -112,6 +112,20 @@ export const NodeHeader: React.FC<NodeHeaderProps> = (props) => {
                         />
                     )}
                 </Field>
+                {!isSidebar && (
+                    <Field name="order">
+                        {({field: {value, onChange}}: FieldRenderProps<string>) => {
+                            if (nodeType === 'INCLUSIVE_BRANCH' || nodeType === 'CONDITION_BRANCH' || nodeType === 'PARALLEL_BRANCH') {
+                                return (
+                                    <>优先级:{value}</>
+                                )
+                            }
+                            return (
+                                <></>
+                            );
+                        }}
+                    </Field>
+                )}
             </Space>
 
             {isSidebar && (
