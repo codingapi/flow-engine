@@ -4,6 +4,7 @@ import React from "react";
 import {GroovyScriptPreview} from "@/components/script/components/groovy-script-preview";
 import {EditOutlined} from "@ant-design/icons";
 import {ConditionConfigModal} from "@/components/script/modal/condition-config-modal";
+import {useScriptVariables} from "@/components/design-editor/hooks/use-script-variables";
 
 /**
  * 条件配置
@@ -13,6 +14,7 @@ export const ConditionScript = ()=>{
 
     const [form] = Form.useForm();
     const [visible,setVisible] = React.useState(false);
+    const scriptVariables = useScriptVariables();
 
     return (
         <Form
@@ -49,6 +51,7 @@ export const ConditionScript = ()=>{
                                 onCancel={()=>{setVisible(false);}}
                                 onConfirm={(value)=>{onChange(value)}}
                                 script={value}
+                                variables={scriptVariables}
                             />
                         </Space.Compact>
                     )}

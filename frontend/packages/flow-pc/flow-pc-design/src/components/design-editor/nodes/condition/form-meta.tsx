@@ -3,14 +3,17 @@ import {FormMeta, FormRenderProps, ValidateTrigger,} from '@flowgram.ai/fixed-la
 
 import {FlowNodeJSON} from '../../typings';
 import {BranchAdderRender} from "@/components/design-editor/components/branch-adder";
+import {NodePanel} from "@/components/design-editor/node-components/panel";
 
-export const renderForm = ({form}: FormRenderProps<FlowNodeJSON['data']>) => {
+export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
 
     return (
-        <BranchAdderRender
-            buttonText={'添加条件分支'}
-            addType={'CONDITION_BRANCH'}
-        />
+        <NodePanel data={data}>
+            <BranchAdderRender
+                buttonText={'添加条件分支'}
+                addType={'CONDITION_BRANCH'}
+            />
+        </NodePanel>
     );
 };
 

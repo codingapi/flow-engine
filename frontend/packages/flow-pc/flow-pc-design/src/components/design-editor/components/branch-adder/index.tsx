@@ -36,9 +36,6 @@ export const BranchAdderRender: React.FC<BranchAdderProps> = (props) => {
             operation.addBlock(
                 node,
                 block,
-                {
-                    index: 0,
-                }
             );
             setTimeout(() => {
                 handleClose();

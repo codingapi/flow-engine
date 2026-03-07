@@ -8,6 +8,7 @@ import {NodePanel} from "@/components/design-editor/node-components/panel";
 import {ConditionScript} from "@/components/design-editor/node-components/condition";
 import React from "react";
 import {NodeHint} from "@/components/design-editor/node-components/node-hint";
+import {NodeOrder} from "@/components/design-editor/node-components/node-order";
 
 export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
     const isSidebar = useIsSidebar();
@@ -15,6 +16,7 @@ export const renderForm = (data: FormRenderProps<FlowNodeJSON['data']>) => {
         return (
             <NodePanel data={data}>
                 <NodeHeader/>
+                <NodeOrder/>
                 <ConditionScript/>
             </NodePanel>
         );

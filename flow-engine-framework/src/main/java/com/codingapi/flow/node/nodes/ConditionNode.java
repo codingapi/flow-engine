@@ -37,6 +37,7 @@ public class ConditionNode extends BaseFlowNode implements IBlockNode {
         List<IFlowNode> branches = new ArrayList<>();
         for (int i=0;i<count;i++){
             ConditionBranchNode branchNode = new ConditionBranchNode();
+            branchNode.setOrder(i+1);
             branches.add(branchNode);
         }
         this.setBlocks(branches);

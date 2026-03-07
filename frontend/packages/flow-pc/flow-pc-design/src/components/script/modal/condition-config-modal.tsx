@@ -51,6 +51,7 @@ export const ConditionConfigModal:React.FC<ConditionConfigModalProps> = (props) 
             onConfirm={props.onConfirm}
             onCancel={props.onCancel}
             title="条件配置"
+            width={"70%"}
             content={ConditionConfigContent}
         />
     );

@@ -415,7 +415,7 @@ export class GroovyScriptConvertorUtil {
      */
     public static updateScriptMeta(script: string, meta: string): string {
         const metaComment = `// ${SCRIPT_META} ${meta}`;
-        if (GroovyScriptConvertorUtil.getScriptTitle(script)) {
+        if (GroovyScriptConvertorUtil.getScriptMeta(script)) {
             return script.replace(new RegExp(`//\\s*${SCRIPT_META}\\s*.+`), metaComment);
         } else {
             return `${metaComment}\n${script}`;

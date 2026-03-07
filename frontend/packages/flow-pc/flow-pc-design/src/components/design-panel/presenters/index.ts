@@ -2,7 +2,7 @@ import {DesignPanelApi, FlowNode, initStateData, State, TabPanelType} from "../t
 import {Dispatch} from "@flow-engine/flow-core";
 import {FormActionContext} from "@flow-engine/flow-types";
 import {WorkflowFormManager} from "@/components/design-panel/manager/form";
-import {NodeConvertorManager} from "@/components/design-panel/manager/node";
+import {NodeConvertorManager, NodeManger} from "@/components/design-panel/manager/node";
 import {WorkflowConvertor} from "@/components/design-panel/presenters/convertor";
 
 export class Presenter {
@@ -24,16 +24,32 @@ export class Presenter {
         return this.formActionContext;
     }
 
+    /**
+     * 手动同步节点数据
+     * @param nodes
+     */
+    public syncNodes(nodes: any[]) {
+        const nodeConvertorManager = new NodeConvertorManager();
+        const data = nodeConvertorManager.toData(nodes);
+        this.state = {
+            ...this.state,
+            workflow: {
+                ...this.state.workflow,
+                nodes: data,
+            }
+        }
+    }
+
     public syncState(state: State) {
         this.state = state;
     }
 
     private mergeWorkflow(prevWorkflow: any, currentWorkflow: any) {
-        const nodes:FlowNode[] = [];
-        if(currentWorkflow.nodes && currentWorkflow.nodes.length > 0){
+        const nodes: FlowNode[] = [];
+        if (currentWorkflow.nodes && currentWorkflow.nodes.length > 0) {
             nodes.push(...currentWorkflow.nodes);
-        }else {
-            if(prevWorkflow.nodes && prevWorkflow.nodes.length > 0){
+        } else {
+            if (prevWorkflow.nodes && prevWorkflow.nodes.length > 0) {
                 nodes.push(...prevWorkflow.nodes);
             }
         }
@@ -44,7 +60,7 @@ export class Presenter {
                 ...prevWorkflow.form,
                 ...currentWorkflow.form,
             },
-            nodes:nodes
+            nodes: nodes
         }
     }
 
@@ -129,7 +145,23 @@ export class Presenter {
     public async createNode(form: string, type: string) {
         const flowNode = await this.api.createNode(type);
         const nodeManager = new NodeConvertorManager();
-        return nodeManager.toItemRender(flowNode);
+        const nodeManger = new NodeManger(this.state.workflow.nodes || []);
+        const currentNode = nodeManger.getNode(form);
+        const block = nodeManager.toItemRender(flowNode);
+        if (currentNode) {
+            if (currentNode.blocks) {
+                const order = currentNode.blocks.length + 1;
+                return {
+                    ...block,
+                    data: {
+                        ...block.data,
+                        order: order
+                    }
+                }
+            }
+        }
+
+        return block;
     }
 
 
