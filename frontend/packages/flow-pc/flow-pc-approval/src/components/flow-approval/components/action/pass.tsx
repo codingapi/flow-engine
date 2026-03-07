@@ -1,8 +1,9 @@
 import React from "react";
 import {FlowActionProps} from "./type";
-import {Button, Form, Input, message, Modal} from "antd";
+import {Form, Input, message, Modal} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
 import {SignKeyView} from "@/components/flow-approval/plugins/view/sign-key-view";
+import {ActionButton} from "@/components/flow-approval/components/action-button";
 
 const {TextArea} = Input;
 
@@ -44,7 +45,8 @@ export const PassAction: React.FC<FlowActionProps> = (props) => {
 
     return (
         <>
-            <Button
+            <ActionButton
+                display={props.action.display}
                 onClick={() => {
                     if (isStartNode) {
                         handleSubmit();
@@ -53,9 +55,8 @@ export const PassAction: React.FC<FlowActionProps> = (props) => {
                         setModalVisible(true);
                     }
                 }}
-            >
-                {action.title}
-            </Button>
+                title={action.title}
+            />
 
             <Modal
                 title={"审批通过"}
@@ -83,7 +84,6 @@ export const PassAction: React.FC<FlowActionProps> = (props) => {
                     >
                         <TextArea placeholder={"请输入审批意见"}/>
                     </Form.Item>
-
 
 
                     {state.flow?.signRequired && currentOperator && (

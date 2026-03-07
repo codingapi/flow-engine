@@ -1,7 +1,8 @@
-import {Col, Form, FormInstance, Input, Modal, Row, Select, Space} from "antd";
+import {Col, Form, FormInstance, Input, Modal, Row} from "antd";
 import React from "react";
-import {GroovyCodeEditor} from "@/components/groovy-code";
-import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
+import {CustomScriptView} from "./script";
+import {ActionStyle} from "./style";
+import {ActionIcon} from "@/components/design-editor/node-components/action/icon";
 
 interface ActionModalProps {
     open: boolean;
@@ -13,83 +14,8 @@ interface ActionModalProps {
 }
 
 
-interface CustomScriptViewProps{
-    options: any[];
-    form: FormInstance<any>;
-}
-
-const CustomScriptView:React.FC<CustomScriptViewProps> = (props)=>{
-
-    const trigger = props.form.getFieldValue("trigger") as string;
-
-    const [currentTrigger,setCurrentTrigger] = React.useState(trigger);
-
-    const handleChangeNodeType = (value: string) => {
-        const script = props.form.getFieldValue('script') as string;
-        let groovy;
-        if (script) {
-            const returnData = GroovyScriptConvertorUtil.getReturnScript(script).trim();
-            groovy = script.replace(returnData, `'${value}'`);
-            groovy = GroovyScriptConvertorUtil.updateScriptMeta(groovy,`{"trigger":"${value}"}`);
-        } else {
-            groovy = `// @CUSTOM_SCRIPT 自定义脚本，返回的数据为动作类型
-            // @SCRIPT_META {"trigger":"${value}"}
-            def run(request){
-                return '${value}';
-            }
-            `
-        }
-        props.form.setFieldValue("script", GroovyScriptConvertorUtil.formatScript(groovy));
-        setCurrentTrigger(value);
-    }
-
-    return (
-        <Col span={24}>
-            <Form.Item
-                name={"script"}
-                label={(
-                    <Space>
-                        自定义脚本
-                        <Space.Compact size={"small"}>
-                            <Space.Addon>触发动作：</Space.Addon>
-                            <Select
-                                style={{
-                                    width: '100px'
-                                }}
-                                value={currentTrigger}
-                                placeholder={"请选择触发动作类型"}
-                                options={props.options}
-                                onChange={handleChangeNodeType}
-                            />
-                        </Space.Compact>
-
-
-                    </Space>
-                )}
-                required={true}
-                help={"请先设置触发动作类型"}
-
-                rules={[
-                    {
-                        required: true,
-                        message: '自定义脚本不能为空'
-                    }
-                ]}
-            >
-                <GroovyCodeEditor
-                    placeholder={"请输入自定义脚本"}
-                    options={{
-                        minHeight: 200
-                    }}
-                />
-            </Form.Item>
-        </Col>
-    )
-}
-
 export const ActionModal: React.FC<ActionModalProps> = (props) => {
     const custom = props.custom;
-
 
     return (
         <Modal
@@ -117,7 +43,7 @@ export const ActionModal: React.FC<ActionModalProps> = (props) => {
                     <Input/>
                 </Form.Item>
                 <Row gutter={[8, 8]}>
-                    <Col span={24}>
+                    <Col span={12}>
                         <Form.Item
                             name={"title"}
                             label={"按钮名称"}
@@ -137,20 +63,20 @@ export const ActionModal: React.FC<ActionModalProps> = (props) => {
                             name={"icon"}
                             label={"按钮图标"}
                         >
-                            <Input placeholder={"请输入按钮图标"}/>
+                            <ActionIcon/>
                         </Form.Item>
                     </Col>
-                    <Col span={12}>
+                    <Col span={24}>
                         <Form.Item
                             name={"style"}
                             label={"按钮样式"}
                         >
-                            <Input placeholder={"请输入按钮样式"}/>
+                            <ActionStyle/>
                         </Form.Item>
                     </Col>
 
                     {custom && (
-                        <CustomScriptView options={props.options} form={props.form} />
+                        <CustomScriptView options={props.options} form={props.form}/>
                     )}
                 </Row>
 

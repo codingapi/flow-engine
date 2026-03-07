@@ -1,8 +1,9 @@
 import React from "react";
 import {FlowActionProps} from "./type";
-import {Button, Form, message, Modal} from "antd";
+import {Form, message, Modal} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
 import {AddAuditView} from "@/components/flow-approval/plugins/view/add-audit-view";
+import {ActionButton} from "@/components/flow-approval/components/action-button";
 
 /**
  * 加签
@@ -30,14 +31,14 @@ export const AddAuditAction: React.FC<FlowActionProps> = (props) => {
     }
     return (
         <>
-            <Button
+            <ActionButton
+                display={props.action.display}
                 onClick={() => {
                     form.resetFields();
                     setModalVisible(true);
                 }}
-            >
-                {action.title}
-            </Button>
+                title={action.title}
+            />
 
             <Modal
                 title={"加签审批"}

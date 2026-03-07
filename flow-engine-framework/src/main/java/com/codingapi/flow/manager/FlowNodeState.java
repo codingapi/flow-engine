@@ -66,9 +66,10 @@ public class FlowNodeState {
     }
 
     public List<IFlowNode> getFirstBlocks() {
-        List<IFlowNode> blocks = this.node.blocks().stream().sorted(Comparator.comparingInt(IFlowNode::getOrder)).toList();
-        if (!blocks.isEmpty()) {
-            return Stream.of(blocks.get(0)).toList();
+        List<IFlowNode> blocks = this.node.blocks();
+        if (blocks!=null && !blocks.isEmpty()) {
+            List<IFlowNode> sortList = blocks.stream().sorted(Comparator.comparingInt(IFlowNode::getOrder)).toList();
+            return Stream.of(sortList.get(0)).toList();
         }
         return new ArrayList<>();
     }

@@ -1,7 +1,8 @@
 import React from "react";
 import {FlowActionProps} from "./type";
-import {Button, message} from "antd";
+import {message} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
+import {ActionButton} from "@/components/flow-approval/components/action-button";
 
 /**
  * 保存
@@ -15,7 +16,8 @@ export const SaveAction: React.FC<FlowActionProps> = (props) => {
     const actionPresenter = context.getPresenter().getFlowActionPresenter();
 
     return (
-        <Button
+        <ActionButton
+            display={props.action.display}
             onClick={() => {
                 actionPresenter.action(action.id).then((res) => {
                     if (res.success) {
@@ -23,8 +25,7 @@ export const SaveAction: React.FC<FlowActionProps> = (props) => {
                     }
                 });
             }}
-        >
-            {action.title}
-        </Button>
+            title={action.title}
+        />
     )
 }

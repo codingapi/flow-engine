@@ -3,6 +3,7 @@ import {FlowActionProps} from "./type";
 import {Button, Form, message, Modal} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
 import {ReturnView} from "@/components/flow-approval/plugins/view/return-view";
+import {ActionButton} from "@/components/flow-approval/components/action-button";
 
 /**
  * 退回
@@ -30,14 +31,14 @@ export const ReturnAction: React.FC<FlowActionProps> = (props) => {
     }
     return (
         <>
-            <Button
+            <ActionButton
+                display={props.action.display}
                 onClick={() => {
                     form.resetFields();
                     setModalVisible(true);
                 }}
-            >
-                {action.title}
-            </Button>
+                title={action.title}
+            />
 
             <Modal
                 title={"退回审批"}
