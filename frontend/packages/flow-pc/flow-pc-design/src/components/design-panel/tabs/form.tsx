@@ -1,15 +1,30 @@
 import React, {useState} from "react";
-import {Panel} from "@flow-engine/flow-pc-ui";
-import {Table, TableProps} from"@flow-engine/flow-pc-ui";
-import {Button, Flex, Form, FormInstance, Input, Modal, Popconfirm, Select, Space, Switch, Tabs,Empty, Row, Col} from "antd";
+import {Panel, Table, TableProps} from "@flow-engine/flow-pc-ui";
+import {
+    Button,
+    Col,
+    Empty,
+    Flex,
+    Form,
+    FormInstance,
+    Input,
+    Modal,
+    Popconfirm,
+    Row,
+    Select,
+    Space,
+    Switch,
+    Tabs
+} from "antd";
 import {dataTypeOptions} from "@flow-engine/flow-types";
 import {useDesignContext} from "@/components/design-panel/hooks/use-design-context";
 import {WorkflowFormManager} from "@/components/design-panel/manager/form";
+import {DeleteOutlined, FolderAddOutlined, PlusOutlined } from "@ant-design/icons";
 
 interface FormTableProps {
     name: string;
     code: string;
-    delete: boolean;
+    mainForm: boolean;
 }
 
 interface FormFieldModalProps {
@@ -54,7 +69,7 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
                 >
                     <Input/>
                 </Form.Item>
-                <Row gutter={[8,8]}>
+                <Row gutter={[8, 8]}>
                     <Col span={12}>
                         <Form.Item
                             name={"name"}
@@ -224,6 +239,9 @@ const FormTable: React.FC<FormTableProps> = (props) => {
     const [fieldForm] = Form.useForm();
     const [editable, setEditable] = useState(false);
 
+    const [subForm] = Form.useForm();
+    const [subFormVisible, setSubFormVisible] = useState(false);
+
     const columns: TableProps<any>['columns'] = [
         {
             dataIndex: 'id',
@@ -243,8 +261,8 @@ const FormTable: React.FC<FormTableProps> = (props) => {
             title: '字段类型',
             render: (value, record) => {
                 let label = '';
-                for(const option of dataTypeOptions) {
-                    if(option.value == value){
+                for (const option of dataTypeOptions) {
+                    if (option.value == value) {
                         label = option.label;
                     }
                 }
@@ -316,26 +334,54 @@ const FormTable: React.FC<FormTableProps> = (props) => {
                                 {name}
                             </Space>
                             <Space>
-                                {props.delete && (
+                                {props.mainForm && (
+                                    <Button
+                                        icon={<FolderAddOutlined />}
+                                        onClick={() => {
+                                            subForm.resetFields();
+                                            setSubFormVisible(true)
+                                        }}>
+                                        添加子表
+                                    </Button>
+                                )}
+                                {!props.mainForm && (
                                     <Popconfirm
                                         title={"确认要删除子表吗？"}
                                         onConfirm={() => {
                                             presenter.removeWorkflowSubForm(props.code);
                                         }}
                                     >
-                                        <Button color={'danger'} type={'dashed'} variant="solid">删除子表</Button>
+                                        <Button
+                                            icon={<DeleteOutlined />}
+                                            danger={true}
+                                        >删除子表</Button>
                                     </Popconfirm>
                                 )}
-                                <Button onClick={() => {
-                                    fieldForm.resetFields();
-                                    setEditable(true);
-                                }}>添加字段</Button>
+                                <Button
+                                    icon={<PlusOutlined />}
+                                    onClick={() => {
+                                        fieldForm.resetFields();
+                                        setEditable(true);
+                                    }}
+                                >添加字段</Button>
                             </Space>
 
                         </Flex>
                     )
                 }}
             />
+
+            <SubFormModal
+                form={subForm}
+                open={subFormVisible}
+                onFinish={(values) => {
+                    presenter.addWorkflowSubForm(values);
+                }}
+                onClose={() => {
+                    setSubFormVisible(false)
+                }}
+            />
+
             <FormFieldModal
                 open={editable}
                 form={fieldForm}
@@ -352,16 +398,9 @@ const FormTable: React.FC<FormTableProps> = (props) => {
 }
 
 export const TabForm = () => {
-
-    const [subFormVisible, setSubFormVisible] = useState(false);
-    const [subForm] = Form.useForm();
-    const {state, context} = useDesignContext();
-
-    const presenter = context.getPresenter();
-
+    const {state} = useDesignContext();
     const mainCode = state.workflow.form.code;
     const mainName = state.workflow.form.name;
-
     const subForms = state.workflow.form.subForms || [];
 
     const items = subForms.map(item => {
@@ -369,11 +408,11 @@ export const TabForm = () => {
         return {
             key: item.code,
             label: title,
-            children: <FormTable name={title} code={item.code} delete={true}/>
+            children: <FormTable name={title} code={item.code} mainForm={false}/>
         }
     });
 
-    if(!mainCode){
+    if (!mainCode) {
         return (
             <Empty description={"请先在基本信息中添加表单的定义配置."}/>
         )
@@ -381,34 +420,12 @@ export const TabForm = () => {
 
     return (
         <Panel>
-            <FormTable name={`主表:${mainName}`} code={mainCode} delete={false}/>
+            <FormTable name={`主表:${mainName}`} code={mainCode} mainForm={true}/>
             <Tabs
                 style={{
-                    marginTop:20
+                    marginTop: 20
                 }}
                 items={items}
-                tabBarExtraContent={{
-                    right: (
-                        <Button
-                            onClick={() => {
-                                subForm.resetFields();
-                                setSubFormVisible(true)
-                            }}>
-                            添加子表
-                        </Button>
-                    )
-                }}
-            />
-
-            <SubFormModal
-                form={subForm}
-                open={subFormVisible}
-                onFinish={(values) => {
-                    presenter.addWorkflowSubForm(values);
-                }}
-                onClose={() => {
-                    setSubFormVisible(false)
-                }}
             />
         </Panel>
     )

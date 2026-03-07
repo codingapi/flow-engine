@@ -1,7 +1,8 @@
 import React from "react";
-import {Button, Space, Tabs, message} from "antd";
+import {Button, message, Space, Tabs} from "antd";
 import {LayoutHeaderHeight, TabPanelType} from "../types";
 import {useDesignContext} from "../hooks/use-design-context";
+import {CloseOutlined, SaveOutlined } from "@ant-design/icons";
 
 const Left = () => {
     return (
@@ -17,8 +18,10 @@ const Right = () => {
     return (
         <Space style={{
             width: 150,
+            marginRight:20
         }}>
             <Button
+                icon={<SaveOutlined />}
                 type="primary"
                 onClick={() => {
                     context.save().then(() => {
@@ -26,9 +29,12 @@ const Right = () => {
                     });
                 }}
             >保存</Button>
-            <Button onClick={() => {
-                context.close();
-            }}>关闭</Button>
+            <Button
+                icon={<CloseOutlined />}
+                onClick={() => {
+                    context.close();
+                }}
+            >关闭</Button>
         </Space>
     )
 }
