@@ -1,26 +1,12 @@
 import {Button} from "antd";
 import React from "react";
 import {DisplayStyle, FlowActionDisplay} from "@flow-engine/flow-types";
-
+import {Icon} from "@flow-engine/flow-pc-ui";
 
 interface ActionButtonProps {
     onClick: () => void;
     title: string;
     display: FlowActionDisplay;
-}
-
-/**
- *  展示样式
- */
-export interface DisplayStyle {
-    // 边框颜色
-    borderColor?: string;
-    // 背景颜色
-    backgroundColor?: string;
-    // 边框大小
-    borderSize?: string;
-    // 边框圆角
-    borderRadius?: string;
 }
 
 export const ActionButton: React.FC<ActionButtonProps> = (props) => {
@@ -56,6 +42,7 @@ export const ActionButton: React.FC<ActionButtonProps> = (props) => {
         <Button
             onClick={props.onClick}
             style={style}
+            icon={<Icon type={display.icon} />}
         >
             {title}
         </Button>
