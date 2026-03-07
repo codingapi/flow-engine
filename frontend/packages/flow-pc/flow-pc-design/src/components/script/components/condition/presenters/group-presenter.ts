@@ -1,6 +1,6 @@
 import {IdUtils} from "@/utils";
 import {Presenter} from "./index";
-import {ConditionGroup} from "@/components/script/components/condition/typings";
+import {Condition, ConditionGroup, RelationType} from "@/components/script/components/condition/typings";
 
 /**
  *  条件分组的Presenter对象
@@ -10,6 +10,50 @@ export class ConditionGroupPresenter {
 
     constructor(presenter: Presenter) {
         this.presenter = presenter;
+    }
+
+    /**
+     * 更新条件参数
+     * @param id
+     * @param location
+     * @param condition
+     */
+    public updateCondition(id: string, location: 'left' | 'right', condition: Condition) {
+        this.presenter.updateState(prevState => {
+            const groups = prevState.groups.map(group => {
+                if (group.id === id) {
+                    return {
+                        ...group,
+                        [location]: condition
+                    };
+                }
+                return group;
+            });
+            console.log('updateCondition:', groups);
+            return {
+                ...prevState,
+                groups: groups
+            }
+        })
+    }
+
+
+    public updateType(id: string, type: RelationType) {
+        this.presenter.updateState(prevState => {
+            const groups = prevState.groups.map(group => {
+                if (group.id === id) {
+                    return {
+                        ...group,
+                        type: type
+                    };
+                }
+                return group;
+            });
+            return {
+                ...prevState,
+                groups: groups
+            }
+        })
     }
 
     /**

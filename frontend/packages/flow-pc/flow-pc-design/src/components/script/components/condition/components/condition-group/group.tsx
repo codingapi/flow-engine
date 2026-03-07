@@ -43,7 +43,11 @@ export const Group = () => {
                         title: '左侧参数',
                         dataIndex: 'left',
                         render: (_, record) => {
-                            return (<ConditionItemView data={record.left}/>)
+                            return (<ConditionItemView
+                                id={record.id}
+                                location={'left'}
+                                data={record.left}
+                            />)
                         }
                     },
                     {
@@ -51,7 +55,10 @@ export const Group = () => {
                         title: '条件关系',
                         dataIndex: 'type',
                         render: (_, record) => {
-                            return (<ConditionTypeView type={record.type}/>)
+                            return (<ConditionTypeView
+                                type={record.type}
+                                id={record.id}
+                            />)
                         }
                     },
                     {
@@ -59,7 +66,11 @@ export const Group = () => {
                         title: '右侧参数',
                         dataIndex: 'right',
                         render: (_, record) => {
-                            return (<ConditionItemView data={record.right}/>)
+                            return (<ConditionItemView
+                                id={record.id}
+                                location={'right'}
+                                data={record.right}
+                            />)
                         }
                     },
                     {

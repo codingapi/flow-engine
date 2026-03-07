@@ -2,7 +2,7 @@ import React from "react";
 import {Presenter} from "../presenters";
 import {useDispatch, useSelector} from "react-redux";
 import {ConditionContext, ConditionContextScope} from "../context";
-import {ConditionReduxState,updateState} from "../store";
+import {ConditionReduxState, updateState} from "../store";
 import {ConditionApiImpl} from "../models";
 import {ConditionViewProps} from "../typings";
 import {useScriptMetaData} from "@/components/script/hooks/use-script-meta-data";
@@ -38,7 +38,10 @@ export const createConditionContext = (props: ConditionViewProps) => {
             new ConditionApiImpl()
         );
         ref.current = new ConditionContextScope(presenter, props);
-        ref.current.initState(initData);
+        ref.current.initState({
+            ...initData,
+            variables: props.variables
+        });
     }
 
     React.useEffect(() => {
@@ -46,13 +49,13 @@ export const createConditionContext = (props: ConditionViewProps) => {
     }, [state]);
 
 
-    React.useEffect(()=>{
+    React.useEffect(() => {
         // 关闭时清空redux的数据
-        return ()=>{
+        return () => {
             ref.current?.clearState();
             ref.current = undefined;
         }
-    },[]);
+    }, []);
 
     return {
         state,

@@ -1,9 +1,17 @@
 import {DataType} from "@flow-engine/flow-types";
+import {GroovyVariableMapping} from "@/components/script/typings";
 
 /**
  *  条件类型
  */
-export type RelationType = 'equal' | 'greater_than' | 'greater_equal' | 'less_than' | 'less_equal' | 'not_equal' | 'unknow';
+export type RelationType =
+    'equal'
+    | 'greater_than'
+    | 'greater_equal'
+    | 'less_than'
+    | 'less_equal'
+    | 'not_equal'
+    | 'unknow';
 
 /**
  *  逻辑关系
@@ -14,6 +22,8 @@ export type LogicalType = 'and' | 'or' | 'group' | 'condition' | 'action';
  *  条件状态
  */
 export interface ConditionState {
+    // 参数
+    variables: GroovyVariableMapping[];
     // 条件组
     groups: ConditionGroup[];
     // 关系定义
@@ -24,6 +34,7 @@ export interface ConditionState {
  *  初始化状态数据
  */
 export const initStateData: ConditionState = {
+    variables: [],
     groups: [],
     relations: [],
 }
@@ -32,6 +43,7 @@ export const initStateData: ConditionState = {
  *  条件组件数据
  */
 export interface ConditionViewProps {
+    variables: GroovyVariableMapping[];
     script: string;
     onChange: (value: string) => void;
 }
@@ -39,7 +51,7 @@ export interface ConditionViewProps {
 /**
  *  条件接口
  */
-export interface ConditionApi{
+export interface ConditionApi {
 
 }
 
@@ -93,12 +105,14 @@ export const relationTypeOptions = [
  * 条件参数
  */
 export interface Condition {
+    // 参数类型
+    type: 'input' | 'variable';
     // 变量展示名称
     label: string;
     // 变量实际表达式
     value: string;
-    // 参数的数据类型
-    type: DataType;
+    // 数据类型
+    dataType: DataType;
 }
 
 

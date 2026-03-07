@@ -15,6 +15,8 @@ export interface GroovyScriptModalProps {
     onConfirm: (script: string) => void;
     /** 取消回调 */
     onCancel: () => void;
+    // 宽度
+    width?:number|string;
     /** 弹框标题 */
     title?: string;
     /** 自定义内容组件（可选） */
@@ -72,6 +74,7 @@ export const GroovyScriptModal: React.FC<GroovyScriptModalProps> = (props) => {
 
     const actionRef = React.useRef<GroovyScriptContentComponentAction>(null);
 
+    const width = props.width || 800;
     const handleOk = () => {
         if (actionRef.current) {
             actionRef.current.handleConfirm();
@@ -84,7 +87,7 @@ export const GroovyScriptModal: React.FC<GroovyScriptModalProps> = (props) => {
             open={props.open}
             onCancel={props.onCancel}
             onOk={handleOk}
-            width={800}
+            width={width}
             okText="确认"
             cancelText="取消"
             destroyOnHidden={true}
