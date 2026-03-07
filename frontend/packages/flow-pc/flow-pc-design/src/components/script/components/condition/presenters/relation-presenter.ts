@@ -15,7 +15,7 @@ export class ConditionRelationPresenter {
         this.presenter.updateState(prevState => {
             return {
                 ...prevState,
-                relations: [...this.removeRelations(id,prevState.relations)]
+                relations: [...this.removeRelations(id, prevState.relations)]
             }
         })
     }
@@ -70,10 +70,13 @@ export class ConditionRelationPresenter {
             if (relation.children) {
                 current = {
                     ...relation,
-                    children:this.appendRelations(sourceId, relation.children, target)
+                    children: this.appendRelations(sourceId, relation.children, target)
                 }
             }
-            list.push(current);
+            if (current.type !== 'action') {
+                list.push(current);
+            }
+
             if (relation.id === sourceId) {
                 list.push(target);
             }

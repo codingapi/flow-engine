@@ -45,10 +45,23 @@ export class MenuRelation {
                     this.menuList.push(this.createCondition());
                 }
             }
-            return;
         }
 
-        this.menuList.push(this.createRemove());
+        if(currentType==='and' || currentType==='or') {
+            this.menuList.push(this.createGroup());
+            if (this.groups.length > 0) {
+                this.menuList.push(this.createCondition());
+            }
+        }
+
+        if(currentType==='group' || currentType==='condition') {
+            this.menuList.push(this.createAnd());
+            this.menuList.push(this.createOr());
+        }
+
+        if(this.current.id) {
+            this.menuList.push(this.createRemove());
+        }
     }
 
 
@@ -127,7 +140,12 @@ export class MenuRelation {
                     type: 'group',
                     id: IdUtils.generateId(),
                     label: '括号',
-                    children: []
+                    children: [
+                        {
+                            id: IdUtils.generateId(),
+                            type: 'action'
+                        }
+                    ]
                 });
             }
         }

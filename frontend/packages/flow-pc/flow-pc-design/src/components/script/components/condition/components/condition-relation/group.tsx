@@ -1,6 +1,6 @@
 import {Dropdown, Tag} from "antd";
 import React from "react";
-import {ConditionRelationProps, LogicalRelation} from "@/components/script/components/condition/typings";
+import {ConditionRelationProps} from "@/components/script/components/condition/typings";
 import {
     useDropdownMenus
 } from "@/components/script/components/condition/components/condition-relation/hooks/use-dropdown-menus";
@@ -8,17 +8,6 @@ import {RelationRender} from "@/components/script/components/condition/component
 
 export const RelationGroup: React.FC<ConditionRelationProps> = (props) => {
     const items = useDropdownMenus(props);
-
-    const relations = React.useMemo(() => {
-        const list: LogicalRelation[] = [];
-        if (props.current.children) {
-            list.push(...props.current.children);
-        }
-        list.push({
-            type: 'action'
-        })
-        return list;
-    }, [props.current.children]);
 
     return (
         <>
@@ -30,7 +19,7 @@ export const RelationGroup: React.FC<ConditionRelationProps> = (props) => {
                     }}
                 >（</Tag>
             </Dropdown>
-            {RelationRender.getInstance().renderList(relations)}
+            {RelationRender.getInstance().renderList(props.current.children || [])}
             <Dropdown
                 menu={{items}}>
                 <Tag
