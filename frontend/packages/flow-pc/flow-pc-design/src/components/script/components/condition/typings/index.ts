@@ -27,7 +27,7 @@ export interface ConditionState {
     // 条件组
     groups: ConditionGroup[];
     // 关系定义
-    relations: ConditionRelation[];
+    relations: LogicalRelation[];
 }
 
 /**
@@ -58,15 +58,22 @@ export interface ConditionApi {
 /**
  *  条件关系
  */
-export interface ConditionRelation {
+export interface LogicalRelation {
+    // 惟一表示
+    id?: string;
     // 条件名称
-    label: string;
+    label?: string;
     // 类型
     type: LogicalType;
     // 条件组Id
     groupId?: string;
     // 子条件
-    children?: ConditionRelation[];
+    children?: LogicalRelation[];
+}
+
+export interface ConditionRelationProps {
+    leftRelation?: LogicalRelation;
+    current: LogicalRelation;
 }
 
 
