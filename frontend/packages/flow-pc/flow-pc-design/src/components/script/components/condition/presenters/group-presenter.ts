@@ -29,7 +29,6 @@ export class ConditionGroupPresenter {
                 }
                 return group;
             });
-            console.log('updateCondition:', groups);
             return {
                 ...prevState,
                 groups: groups

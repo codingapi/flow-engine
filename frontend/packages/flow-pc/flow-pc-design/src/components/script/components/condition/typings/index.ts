@@ -30,6 +30,11 @@ export interface ConditionState {
     relations: LogicalRelation[];
 }
 
+export interface ConditionPanelProps {
+    script: string;
+    onChange: (value: string) => void;
+}
+
 /**
  *  初始化状态数据
  */
@@ -74,6 +79,7 @@ export interface LogicalRelation {
 export interface ConditionRelationProps {
     leftRelation?: LogicalRelation;
     current: LogicalRelation;
+    rightRelation?: LogicalRelation;
 }
 
 
@@ -83,7 +89,7 @@ export interface ConditionRelationProps {
 export const relationTypeOptions = [
     {
         label: '等于',
-        value: 'equals',
+        value: 'equal',
     },
     {
         label: '大于等于',

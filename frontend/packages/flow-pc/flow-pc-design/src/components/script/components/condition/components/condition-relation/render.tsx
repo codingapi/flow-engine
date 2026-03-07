@@ -41,12 +41,15 @@ export class RelationRender {
 
     public renderList(relations: LogicalRelation[]) {
         const list: React.ReactNode[] = [];
-        for (let i = 0; i < relations.length; i++) {
+        const length = relations.length;
+        for (let i = 0; i < length; i++) {
             const left = i - 1 >= 0 ? relations[i - 1] : undefined;
+            const right = i + 1 > length ? undefined : relations[i + 1];
             const current = relations[i];
             list.push(this.render({
                 leftRelation: left,
-                current:current
+                current: current,
+                rightRelation: right,
             }));
         }
         return list;

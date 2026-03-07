@@ -14,7 +14,6 @@ export const RelationPanel = () => {
         return list;
     }, [state.relations]);
 
-
     return (
         <div style={{
             padding: '4px 11px',

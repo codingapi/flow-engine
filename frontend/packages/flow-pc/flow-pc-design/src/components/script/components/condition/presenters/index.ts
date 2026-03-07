@@ -12,8 +12,8 @@ export class Presenter {
     private readonly dispatch: Dispatch<ConditionState>;
     private readonly api: ConditionApi;
 
-    private readonly groupPresenter:ConditionGroupPresenter;
-    private readonly relationPresenter:ConditionRelationPresenter;
+    private readonly groupPresenter: ConditionGroupPresenter;
+    private readonly relationPresenter: ConditionRelationPresenter;
 
     constructor(state: ConditionState, dispatch: Dispatch<ConditionState>, api: ConditionApi) {
         this.api = api;
@@ -23,11 +23,11 @@ export class Presenter {
         this.relationPresenter = new ConditionRelationPresenter(this);
     }
 
-    public getConditionGroupPresenter(){
+    public getConditionGroupPresenter() {
         return this.groupPresenter;
     }
 
-    public getConditionRelationPresenter(){
+    public getConditionRelationPresenter() {
         return this.relationPresenter;
     }
 
@@ -43,7 +43,7 @@ export class Presenter {
         this.dispatch(initStateData);
     }
 
-    public updateState(state: ((prevState: ConditionState) => ConditionState) | ConditionState){
+    public updateState(state: ((prevState: ConditionState) => ConditionState) | ConditionState) {
         this.dispatch(state);
     }
 
