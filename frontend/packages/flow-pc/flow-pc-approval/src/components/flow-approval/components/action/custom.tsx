@@ -5,6 +5,7 @@ import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-
 import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 import {ActionFactory} from "@/components/flow-approval/components/action/factory";
 import {ActionButton} from "@/components/flow-approval/components/action-button";
+import {ActionType} from "@flow-engine/flow-types";
 
 /**
  * 自定义
@@ -24,7 +25,7 @@ export const CustomAction: React.FC<FlowActionProps> = (props) => {
 
     const ActionView = ActionFactory.getInstance().render({
         ...props.action,
-        type: triggerType,
+        type: triggerType as ActionType,
     });
 
     if (ActionView) {

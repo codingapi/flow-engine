@@ -1,11 +1,11 @@
 import React from "react";
-import {Button, Form, Space, Switch,Popconfirm} from "antd";
+import {Button, Form, Popconfirm, Space, Switch} from "antd";
 import {Table} from "@flow-engine/flow-pc-ui";
-import {ActionManager} from "@/components/design-editor/node-components/action/index";
 import {useNodeRenderContext} from "@/components/design-editor/hooks/use-node-render-context";
 import {PlusOutlined} from "@ant-design/icons";
-import {ActionModal} from "@/components/design-editor/node-components/action/modal";
-import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
+import {actionOptions} from "@flow-engine/flow-types";
+import {ActionConfigModal} from "@/components/script/modal/action-config-modal";
+import {FlowActionListPresenter} from "./presenter";
 
 interface ActionTableProps {
     value: any[];
@@ -15,11 +15,11 @@ interface ActionTableProps {
 export const ActionTable: React.FC<ActionTableProps> = (props) => {
     const {node} = useNodeRenderContext();
     const actions = node.getNodeRegistry()?.meta.actions || [];
-    const actionManager = new ActionManager(props.value, props.onChange);
-    const datasource = actionManager.getDatasource(actions);
+    const presenter = new FlowActionListPresenter(props.value, props.onChange);
+    const datasource = presenter.getDatasource(actions);
     const [visible, setVisible] = React.useState(false);
-    const [customVisible, setCustomVisible] = React.useState(false);
     const [form] = Form.useForm();
+
     const columns = React.useCallback(() => {
         return [
             {
@@ -34,6 +34,15 @@ export const ActionTable: React.FC<ActionTableProps> = (props) => {
                 key: 'title',
             },
             {
+                title: '类型',
+                dataIndex: 'type',
+                key: 'type',
+                render:(value:string) => {
+                    const type = actionOptions.find(item=>item.value === value);
+                    return type?.label
+                }
+            },
+            {
                 title: '启用',
                 dataIndex: 'enable',
                 key: 'enable',
@@ -43,7 +52,7 @@ export const ActionTable: React.FC<ActionTableProps> = (props) => {
                             size="small"
                             value={record.enable}
                             onChange={(value) => {
-                                actionManager.enable(record.id, value);
+                                presenter.enable(record.id, value);
                             }}
                         />
                     )
@@ -59,21 +68,8 @@ export const ActionTable: React.FC<ActionTableProps> = (props) => {
                             <Space>
                                 <a
                                     onClick={() => {
-                                        const custom = record.type==='CUSTOM';
-                                        let trigger = {};
-                                        if(custom){
-                                            const meta = GroovyScriptConvertorUtil.getScriptMeta(record.script);
-                                            trigger = JSON.parse(meta);
-                                        }
-                                        const data = {
-                                            ...record,
-                                            ...record.display,
-                                            ...trigger,
-                                            title: record.title,
-                                            id: record.id,
-                                        }
-                                        form.setFieldsValue(data);
-                                        setCustomVisible(custom);
+                                        form.resetFields();
+                                        form.setFieldsValue(record);
                                         setVisible(true);
                                     }}
                                 >
@@ -83,7 +79,7 @@ export const ActionTable: React.FC<ActionTableProps> = (props) => {
                                     <Popconfirm
                                         title={"确认删除吗？"}
                                         onConfirm={()=>{
-                                            actionManager.delete(record.id);
+                                            presenter.delete(record.id);
                                         }}
                                     >
                                         <a>
@@ -107,10 +103,9 @@ export const ActionTable: React.FC<ActionTableProps> = (props) => {
                         icon={<PlusOutlined/>}
                         onClick={() => {
                             form.resetFields();
-                            setCustomVisible(true);
                             setVisible(true);
                         }}
-                    >添加按钮</Button>
+                    >自定义按钮</Button>
                 ]}
                 columns={columns()}
                 dataSource={datasource}
@@ -120,16 +115,16 @@ export const ActionTable: React.FC<ActionTableProps> = (props) => {
                 pagination={false}
             />
 
-            <ActionModal
+            <ActionConfigModal
+                nodeId={node.id}
                 open={visible}
+                manager={presenter.getFlowActionManager()}
                 form={form}
-                options={actionManager.getActionOptions()}
-                custom={customVisible}
                 onCancel={() => {
                     setVisible(false);
                 }}
                 onFinish={(values) => {
-                    actionManager.update(values);
+                    presenter.update(values);
                 }}
             />
         </>

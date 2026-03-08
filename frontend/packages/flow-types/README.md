@@ -1,14 +1,14 @@
 # @flow-engine/flow-types
 
-Flow Engine 前端类型定义库，提供整个项目的 TypeScript 类型系统。
+Flow Engine 前端 TypeScript 类型定义库，提供流程实例、表单、审批等业务类型定义。
 
 ## 简介
 
-`flow-types` 是 Flow Engine 的类型定义库，为整个前端项目提供统一的类型系统。
+`flow-types` 是 Flow Engine 的类型定义库，为整个前端项目提供统一的业务类型系统。
 
-### 核心依赖
+### 依赖关系
 
-- `@flow-engine/flow-core` - 核心库类型引用
+- **依赖**: `@flow-engine/flow-core`
 
 ## Setup
 
@@ -43,19 +43,19 @@ pnpm run dev
 
 - `FlowNode` - 节点基础类型
 - `NodeType` - 节点类型枚举
-- 节点具体类型: `StartNode`, `EndNode`, `ApprovalNode`, `HandleNode`, 等
+- 节点具体类型：`StartNode`, `EndNode`, `ApprovalNode`, `HandleNode`, `NotifyNode`, `RouterNode`, `SubProcessNode`, `DelayNode`, `TriggerNode`, `ConditionNode`, `ParallelNode`, `InclusiveNode` 等
 
 ### 策略类型
 
 - `NodeStrategy` - 节点策略基础类型
 - `WorkflowStrategy` - 工作流策略类型
-- 策略具体类型: `MultiOperatorAuditStrategy`, `TimeoutStrategy`, 等
+- 策略具体类型：`MultiOperatorAuditStrategy`, `TimeoutStrategy` 等
 
 ### 动作类型
 
 - `FlowAction` - 动作基础类型
 - `ActionType` - 动作类型枚举
-- 动作具体类型: `PassAction`, `RejectAction`, `SaveAction`, 等
+- 动作具体类型：`PassAction`, `RejectAction`, `SaveAction`, `AddAuditAction`, `DelegateAction`, `ReturnAction`, `TransferAction`, `CustomAction`
 
 ### 表单类型
 
@@ -69,6 +69,11 @@ pnpm run dev
 - `FlowState` - 流程状态枚举
 - `RecordState` - 记录状态枚举
 
+### 审批类型
+
+- `ApprovalTask` - 审批任务
+- `ApprovalResult` - 审批结果
+
 ## 类型系统特点
 
 ### 层次化节点结构
@@ -80,7 +85,7 @@ interface FlowNode {
   id: string;
   name: string;
   type: NodeType;
-  blocks?: FlowNode[];  // 子节点列表（块节点）
+  blocks?: FlowNode[];  // 子节点列表（块节点包含子节点）
   strategies?: NodeStrategy[];
   actions?: FlowAction[];
 }
@@ -88,9 +93,35 @@ interface FlowNode {
 
 ### 节点分类
 
-- **基础节点** (9种): START, END, APPROVAL, HANDLE, NOTIFY, ROUTER, SUB_PROCESS, DELAY, TRIGGER
-- **块节点** (3种): CONDITION, PARALLEL, INCLUSIVE（包含子节点）
-- **分支节点** (3种): CONDITION_BRANCH, PARALLEL_BRANCH, INCLUSIVE_BRANCH
+- **基础节点** (9 种): START, END, APPROVAL, HANDLE, NOTIFY, ROUTER, SUB_PROCESS, DELAY, TRIGGER
+- **块节点** (3 种): CONDITION, PARALLEL, INCLUSIVE（包含子节点）
+- **分支节点** (3 种): CONDITION_BRANCH, PARALLEL_BRANCH, INCLUSIVE_BRANCH
+
+## 使用示例
+
+```typescript
+import type { Workflow, FlowNode, NodeType } from '@flow-engine/flow-types';
+
+// 定义一个工作流
+const workflow: Workflow = {
+  id: 'wf-001',
+  name: '请假审批流程',
+  nodes: [
+    {
+      id: 'start-1',
+      name: '开始',
+      type: 'START' as NodeType
+    },
+    {
+      id: 'approval-1',
+      name: '经理审批',
+      type: 'APPROVAL' as NodeType,
+      strategies: [...],
+      actions: [...]
+    }
+  ]
+};
+```
 
 ## Learn more
 

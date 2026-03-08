@@ -147,6 +147,7 @@ public abstract class BaseFlowNode implements IFlowNode {
         map.put("id", id);
         map.put("name", name);
         map.put("type", getType());
+        map.put("display",this instanceof IDisplayNode);
         map.put("order", String.valueOf(order));
         if (this.blocks != null && !this.blocks.isEmpty()) {
             map.put("blocks", blocks.stream().map(IFlowNode::toMap).toList());

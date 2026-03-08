@@ -25,6 +25,7 @@ export class NodeConvertorManager {
                 actions: node.actions,
                 script: node.script,
                 view: node.view,
+                display: node.display,
                 ...this.toStrategyRender(node),
             },
             blocks: blocks.map(item => this.toItemRender(item))
@@ -50,6 +51,7 @@ export class NodeConvertorManager {
             actions: data?.actions || [],
             strategies: this.toStrategyData(data),
             script: data?.script,
+            display: data?.display,
             blocks: blocks.map(item => {
                 return this.toDataItem(item)
             }),
@@ -98,10 +100,10 @@ interface MappingData {
 }
 
 
-export class NodeManger{
+export class NodeManger {
+    // 设计时最新的数据
     private readonly nodes: FlowNode[];
     private readonly nodeList: FlowNode[];
-
 
     constructor(nodes: FlowNode[]) {
         this.nodes = nodes;
@@ -119,12 +121,43 @@ export class NodeManger{
         }
     }
 
+    /**
+     * 获取可以退回的节点
+     * @param nodeId
+     */
+    public getBackNodes(nodeId: string) {
+        const list: FlowNode[] = [];
+        for (const node of this.nodeList) {
+            if (node.id === nodeId) {
+                break;
+            }
+            if (node.display) {
+                list.push(node);
+            }
+        }
+        return list;
+    }
+
+
+    public getSize() {
+        return this.nodes.length;
+    }
+
+    public getNodeByType(type:string){
+        for (const node of this.nodeList) {
+            if (node.type === type) {
+                return node;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * 获取节点
      * @param id 节点id
      */
-    public getNode(id:string){
+    public getNode(id: string) {
         for (const node of this.nodeList) {
             if (node.id === id) {
                 return node;
@@ -231,15 +264,15 @@ export class NodeRouterManager {
     public mapping(data: MappingData) {
         const nodeId = data.node;
         let matchNode = null;
-        for(const node of this.nodeList) {
-            if(matchNode) {
-               break;
+        for (const node of this.nodeList) {
+            if (matchNode) {
+                break;
             }
-            if(node.type === nodeId){
+            if (node.type === nodeId) {
                 matchNode = node;
             }
         }
-        if(matchNode){
+        if (matchNode) {
             return {
                 ...data,
                 node: matchNode.id

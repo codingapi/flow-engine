@@ -35,7 +35,7 @@ public class RejectAction extends BaseAction {
         this.enable = true;
         this.type = ActionType.REJECT.name();
         this.display = new ActionDisplay(this.title);
-        this.script = RejectActionScript.startScript();
+        this.script = RejectActionScript.defaultScript();
     }
 
     @Override

@@ -142,6 +142,10 @@ export class Presenter {
         console.log('save latest:', apiData);
     }
 
+    public getNodeManager(){
+        return new NodeManger(this.state.workflow.nodes || []);
+    }
+
     public async createNode(form: string, type: string) {
         const flowNode = await this.api.createNode(type);
         const nodeManager = new NodeConvertorManager();

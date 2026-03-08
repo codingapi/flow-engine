@@ -6,6 +6,28 @@ package com.codingapi.flow.script;
 public class ScriptDefaultConstants {
 
     /**
+     *  默认自定义动作脚本
+     */
+    public static final String SCRIPT_DEFAULT_ACTION_CUSTOM = """
+            // @SCRIPT_TITLE 默认条件 触发通过
+            def run(request){
+                return 'PASS';
+            }
+            """;
+
+
+    /**
+     *  默认拒绝动作脚本
+     */
+    public static final String SCRIPT_DEFAULT_ACTION_REJECT = """
+            // @SCRIPT_TITLE 返回开始节点
+            // @SCRIPT_META {"type":"START"}
+            def run(request){
+                return request.getStartNode().getId();
+            }
+            """;
+
+    /**
      *  默认条件脚本
      */
     public static final String SCRIPT_DEFAULT_CONDITION = """

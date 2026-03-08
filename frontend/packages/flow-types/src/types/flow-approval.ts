@@ -1,3 +1,5 @@
+import {ActionType} from "@/types/flow-design";
+
 /**
  *  数据类型
  */
@@ -97,7 +99,7 @@ export interface FlowAction {
     // 按钮名称
     title: string;
     // 动作类型
-    type: string;
+    type: ActionType;
     // 展示样式
     display: FlowActionDisplay;
     // 是否启用

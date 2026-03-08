@@ -1,27 +1,21 @@
-import {actionOptions, ActionType} from "@/components/design-editor/typings/node-type";
+import {actionOptions, ActionType, FlowAction} from "@flow-engine/flow-types";
 import {nanoid} from "nanoid";
 import {IdUtils} from "@/utils";
+import {FlowActionManager} from "./manager";
 
-export class ActionManager {
-    private readonly data: any[];
-    private readonly onChange: (data: any[]) => void;
+export class FlowActionListPresenter {
+    private readonly data: FlowAction[];
+    private readonly onChange: (data: FlowAction[]) => void;
+    private readonly manager:FlowActionManager;
 
-    public constructor(data: any[], onChange: (data: any[]) => void) {
+    public constructor(data: FlowAction[], onChange: (data: FlowAction[]) => void) {
         this.onChange = onChange;
         this.data = data;
+        this.manager = new FlowActionManager(data);
     }
 
-    public getActionOptions() {
-        const actions = this.data.filter(item => item.type !== "CUSTOM");
-        const options:any[] = [];
-        for (const action of actions) {
-            const type = action.type;
-            const option =  actionOptions.find(item => item.value === type);
-            if (option) {
-                options.push(option);
-            }
-        }
-        return options;
+    public getFlowActionManager(){
+        return this.manager;
     }
 
     public enable(id: any, value: boolean) {
@@ -38,7 +32,7 @@ export class ActionManager {
     }
 
 
-    public delete(id:string){
+    public delete(id: string) {
         const data = this.data.filter(item => item.id !== id);
         this.onChange(data);
     }
@@ -46,28 +40,29 @@ export class ActionManager {
     public update(action: any) {
         const actionId = action.id;
 
-        if(actionId) {
+        if (actionId) {
             const data = this.data.map(item => {
                 if (item.id === actionId) {
                     return {
                         ...item,
-                        title: action.title,
+                        ...action,
                         display: {
-                            ...action
+                            ...item.display,
+                            ...action.display,
                         }
                     }
                 }
                 return item;
             });
             this.onChange(data);
-        }else {
+        } else {
             const custom = {
                 ...action,
-                type:'CUSTOM',
-                enable:true,
-                id:IdUtils.generateId(),
+                type: 'CUSTOM',
+                enable: true,
+                id: IdUtils.generateId(),
             }
-            this.onChange([...this.data,custom]);
+            this.onChange([...this.data, custom]);
         }
 
     }
@@ -90,7 +85,7 @@ export class ActionManager {
                 enable: true,
                 title: title,
                 type: type,
-            }
+            } as FlowAction;
         });
         this.onChange(list);
         return list;

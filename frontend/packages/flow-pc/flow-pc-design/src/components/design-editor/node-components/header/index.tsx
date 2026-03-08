@@ -6,7 +6,7 @@ import {usePanelManager} from "@flowgram.ai/panel-manager-plugin";
 import {Field, FieldRenderProps} from "@flowgram.ai/fixed-layout-editor";
 import {CloseOutlined, EditOutlined} from "@ant-design/icons";
 import {NodeIcon} from "@/components/design-editor/components/node-icon";
-import {NodeType} from "@/components/design-editor/typings/node-type";
+import {NodeType} from "@flow-engine/flow-types";
 import {FlowNodeRegistry} from "@/components/design-editor/typings";
 import {useNodeRenderContext} from "@/components/design-editor/hooks/use-node-render-context";
 
