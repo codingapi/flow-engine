@@ -1,19 +1,20 @@
 # @flow-engine/flow-core
 
-Flow Engine 前端核心库，提供与后端 API 交互的基础功能。
+Flow Engine 前端核心框架库，提供 HTTP 客户端、Hooks、Presenter 等基础能力（不包含 UI 组件）。
 
 ## 简介
 
-`flow-core` 是 Flow Engine 的核心前端库，包含:
+`flow-core` 是 Flow Engine 的核心框架库，提供与 UI 无关的基础能力：
 
-- HTTP 客户端封装 (基于 axios)
-- API 服务接口定义
-- 通用类型和工具函数
+- HTTP 客户端封装（基于 axios）
+- React Hooks 工具
+- Presenter 模式实现
+- 通用工具函数
+- 全局状态管理
 
-### 核心依赖
+### 依赖关系
 
-- `axios` - HTTP 客户端
-- `react` + `react-dom` - React 框架
+- **依赖**: 无
 
 ## Setup
 
@@ -39,25 +40,92 @@ pnpm run dev
 
 ## 核心功能
 
-### API 服务
-
-提供与 Flow Engine 后端交互的 API 接口:
-
-- 流程定义 API
-- 流程实例 API
-- 待办/已办 API
-- 流程操作 API
-
 ### HTTP 客户端
 
-基于 axios 封装的 HTTP 客户端，支持:
+基于 axios 封装的 HTTP 客户端，提供:
 
-- 请求拦截
-- 响应拦截
-- 错误处理
+- 请求拦截器/响应拦截器
+- 统一的错误处理
 - 类型安全的请求/响应
+- 请求取消支持
+
+```typescript
+import { httpClient } from '@flow-engine/flow-core';
+
+// GET 请求
+const workflow = await httpClient.get<Workflow>('/api/workflows/1');
+
+// POST 请求
+const result = await httpClient.post<Workflow>('/api/workflows', workflowData);
+```
+
+### React Hooks
+
+提供常用的业务 Hooks:
+
+- `useWorkflow` - 工作流相关操作
+- `useFlowRecord` - 流程记录相关操作
+- `useApproval` - 审批相关操作
+- 自定义 Hooks 工具
+
+### Presenter 模式
+
+实现业务逻辑与 UI 分离的 Presenter 模式:
+
+```typescript
+import { Presenter } from '@flow-engine/flow-core';
+
+class WorkflowPresenter extends Presenter {
+  async loadWorkflow(id: string): Promise<Workflow> {
+    // 加载工作流
+  }
+
+  async saveWorkflow(workflow: Workflow): Promise<void> {
+    // 保存工作流
+  }
+}
+```
+
+### 工具函数
+
+提供通用工具函数:
+
+- 日期格式化
+- 字符串处理
+- 对象深拷贝
+- 类型判断
+
+## 模块结构
+
+```
+flow-core/
+├── src/
+│   ├── http/           # HTTP 客户端
+│   ├── hooks/          # React Hooks
+│   ├── presenter/      # Presenter 基类
+│   ├── utils/          # 工具函数
+│   └── types/          # 基础类型定义
+└── README.md
+```
+
+## 使用示例
+
+```typescript
+import { httpClient, useWorkflow, WorkflowPresenter } from '@flow-engine/flow-core';
+
+// 使用 HTTP 客户端
+const workflows = await httpClient.get<Workflow[]>('/api/workflows');
+
+// 使用 Hooks
+const { data, loading, error } = useWorkflow('wf-001');
+
+// 使用 Presenter
+const presenter = new WorkflowPresenter();
+await presenter.loadWorkflow('wf-001');
+```
 
 ## Learn more
 
 - [Rslib documentation](https://lib.rsbuild.io/) - Rslib 特性和 API
 - [Flow Engine Docs](https://github.com/codingapi/flow-engine) - 完整文档
+- [CLAUDE.md](../../CLAUDE.md) - 开发指南

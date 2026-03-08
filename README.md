@@ -291,7 +291,7 @@ pnpm run dev:app-mobile
 ### 八层架构
 
 1. **流程层** (Workflow Layer) - 流程定义层
-2. **节点层** (Node Layer) - 节点层（12种节点类型）
+2. **节点层** (Node Layer) - 节点层（15种节点类型）
 3. **动作层** (Action Layer) - 动作层（8种动作类型）
 4. **记录层** (Record Layer) - 记录层
 5. **会话层** (Session Layer) - 会话层
