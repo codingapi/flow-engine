@@ -12,6 +12,9 @@ export const ActionConfigModal: React.FC<ActionModalProps> = (props) => {
             title={"编辑按钮"}
             width={"65%"}
             destroyOnHidden={true}
+            onOk={()=>{
+                props.form.submit();
+            }}
         >
             <ActionForm
                 form={props.form}

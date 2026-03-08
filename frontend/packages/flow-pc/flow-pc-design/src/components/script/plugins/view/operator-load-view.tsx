@@ -23,11 +23,12 @@ export const OperatorLoadPluginView: React.FC<OperatorLoadViewPlugin> = (props) 
             initialValues={{
                 ...data
             }}
+            layout="vertical"
         >
             <Form.Item
                 name={"type"}
-                label={"类型"}
-                tooltip={"选择人员类型"}
+                label={"指定人员"}
+                tooltip={"选择指定人员"}
             >
                 <Select
                     options={[
