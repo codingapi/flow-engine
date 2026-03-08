@@ -36,7 +36,7 @@ public class CustomAction extends BaseAction {
         this.enable = true;
         this.type = ActionType.CUSTOM.name();
         this.display = new ActionDisplay(this.title);
-        this.script = CustomScript.defaultCustomScript();
+        this.script = CustomScript.defaultScript();
     }
 
     @Override

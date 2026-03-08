@@ -1,5 +1,6 @@
 package com.codingapi.flow.script.action;
 
+import com.codingapi.flow.script.ScriptDefaultConstants;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -10,8 +11,6 @@ import lombok.Getter;
  */
 @AllArgsConstructor
 public class CustomScript {
-
-    public static final String SCRIPT_DEFAULT = "def run(session){return 'PASS'}";
 
     @Getter
     private final String script;
@@ -26,8 +25,8 @@ public class CustomScript {
     /**
      * 默认节点脚本
      */
-    public static CustomScript defaultCustomScript() {
-        return new CustomScript(SCRIPT_DEFAULT);
+    public static CustomScript defaultScript() {
+        return new CustomScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_CUSTOM);
     }
 
 }
