@@ -2,6 +2,7 @@ import {FormInstance} from "antd";
 import {FlowActionManager} from "@/components/design-editor/node-components/action/manager";
 
 export interface ActionModalProps {
+    nodeId:string;
     open: boolean;
     onCancel: () => void;
     form: FormInstance<any>;
@@ -10,6 +11,7 @@ export interface ActionModalProps {
 }
 
 export interface ActionFormProps {
+    nodeId:string;
     manager: FlowActionManager;
     form: FormInstance<any>;
     onFinish: (values: any) => void;
@@ -18,4 +20,5 @@ export interface ActionFormProps {
 export interface ActionSelectOption {
     label: string;
     value: string;
+    danger?:boolean;
 }

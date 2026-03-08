@@ -45,9 +45,10 @@ export class FlowActionListPresenter {
                 if (item.id === actionId) {
                     return {
                         ...item,
-                        title: action.title,
+                        ...action,
                         display: {
-                            ...action
+                            ...item.display,
+                            ...action.display,
                         }
                     }
                 }

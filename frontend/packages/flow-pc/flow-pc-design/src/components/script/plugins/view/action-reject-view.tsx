@@ -2,19 +2,19 @@ import React from "react";
 import {ConditionRejectViewPlugin, VIEW_KEY} from "@/components/script/plugins/action-reject-view-type";
 import {ViewBindPlugin} from "@flow-engine/flow-core";
 import {useDesignContext} from "@/components/design-panel/hooks/use-design-context";
-import {RejectNodeManager} from "@/components/script/services/action-reject";
+import {ActionRejectService} from "@/components/script/services/action-reject";
+import {Select} from "antd";
 
 
-const useActionRejectManager = () => {
-    const {state} = useDesignContext();
-    const nodes = state.workflow.nodes || [];
-    return new RejectNodeManager(nodes);
+const useActionRejectService = (nodeId: string) => {
+    const {context} = useDesignContext();
+    const nodeManager = context.getPresenter().getNodeManager();
+    return new ActionRejectService(nodeManager);
 }
-
 
 export const ConditionRejectView: React.FC<ConditionRejectViewPlugin> = (props) => {
 
-    const rejectNodeManager = useActionRejectManager();
+    const rejectService = useActionRejectService(props.nodeId);
     const ConditionRejectViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
 
     if (ConditionRejectViewComponent) {
@@ -23,15 +23,21 @@ export const ConditionRejectView: React.FC<ConditionRejectViewPlugin> = (props) 
         );
     }
 
+    const handleChange = (option: any) => {
+        const script = rejectService.getScript(option);
+        props.onChange?.(script);
+    }
+
     return (
-        <div
-            style={{
-                marginTop: "8px",
-                padding: "8px",
-            }}
-        >
-            reject
-            {rejectNodeManager.getSize()}
-        </div>
+       <>
+           <Select
+               options={rejectService.getOptions(props.nodeId)}
+               value={rejectService.getValue(props.value)}
+               onChange={(value, option) => {
+                   handleChange(option);
+               }}
+               placeholder={"请选择拒绝退回到的节点"}
+           />
+       </>
     )
 }

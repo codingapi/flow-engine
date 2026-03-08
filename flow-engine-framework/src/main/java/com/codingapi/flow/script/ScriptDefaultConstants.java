@@ -21,6 +21,7 @@ public class ScriptDefaultConstants {
      */
     public static final String SCRIPT_DEFAULT_ACTION_REJECT = """
             // @SCRIPT_TITLE 返回开始节点
+            // @SCRIPT_META {"type":"START"}
             def run(request){
                 return request.getStartNode().getId();
             }

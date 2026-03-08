@@ -68,6 +68,7 @@ export const ActionTable: React.FC<ActionTableProps> = (props) => {
                             <Space>
                                 <a
                                     onClick={() => {
+                                        form.resetFields();
                                         form.setFieldsValue(record);
                                         setVisible(true);
                                     }}
@@ -113,7 +114,9 @@ export const ActionTable: React.FC<ActionTableProps> = (props) => {
                 }}
                 pagination={false}
             />
+
             <ActionConfigModal
+                nodeId={node.id}
                 open={visible}
                 manager={presenter.getFlowActionManager()}
                 form={form}

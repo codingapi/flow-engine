@@ -13,8 +13,11 @@ export const RejectActionForm:React.FC<ActionFormProps> = (props)=>{
                 <Form.Item
                     name={"script"}
                     label={"拒绝策略"}
+                    help={"配置拒绝时跳转的节点"}
                 >
-                    <ConditionRejectView/>
+                    <ConditionRejectView
+                        nodeId={props.nodeId}
+                    />
                 </Form.Item>
             </Col>
         </Row>

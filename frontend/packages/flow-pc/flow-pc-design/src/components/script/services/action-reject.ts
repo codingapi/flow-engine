@@ -1,45 +1,69 @@
 import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
-import {FlowNode} from "@/components/design-panel/types";
+import {ActionSelectOption} from "@/components/script/typings";
+import {NodeManger} from "@/components/design-panel/manager/node";
 
+export class ActionRejectService {
 
-export class RejectNodeManager {
+    private readonly nodeManger: NodeManger;
 
-    private readonly nodes:FlowNode[];
-
-    constructor(nodes: FlowNode[]) {
-        this.nodes = nodes;
+    public constructor(nodeManger: NodeManger) {
+        this.nodeManger = nodeManger;
     }
 
-    public getSize(){
-        return this.nodes.length;
+    public getOptions(nodeId: string) {
+        const options: ActionSelectOption[] = [];
+        const backNodes = this.nodeManger.getBackNodes(nodeId);
+        for (const node of backNodes) {
+            options.push({
+                label: node.name,
+                value: node.id,
+            })
+        }
+        options.push({
+            label: '终止流程',
+            value: 'TERMINATE',
+            danger: true,
+        })
+        return options;
     }
+
+    public getValue(script?: string) {
+        const type = ActionRejectScriptUtils.getType(script);
+        const node = this.nodeManger.getNodeByType(type);
+        if (node) {
+            return node.id;
+        }
+        return type;
+    }
+
+    public getScript(option: ActionSelectOption) {
+        return ActionRejectScriptUtils.update(option);
+    }
+
 }
 
 export class ActionRejectScriptUtils {
 
-    public static update(type: string, script: string) {
-        let groovy;
-        if (script) {
-            const returnData = GroovyScriptConvertorUtil.getReturnScript(script).trim();
-            groovy = script.replace(returnData, `'${type}'`);
-            groovy = GroovyScriptConvertorUtil.updateScriptMeta(groovy, `{"type":"${type}"}`);
-        } else {
-            groovy = `// @CUSTOM_SCRIPT 自定义脚本，返回的数据为动作类型
-            // @SCRIPT_META {"type":"${type}"}
+    public static update(option: ActionSelectOption) {
+        const groovy = `// @CUSTOM_SCRIPT 跳转到 ${option.label}  
+            // @SCRIPT_META {"type":"${option.value}"}
             def run(request){
-                return '${type}';
+                return '${option.value}';
             }
             `
-        }
         return GroovyScriptConvertorUtil.formatScript(groovy);
     }
 
 
-    public static getType(script:string){
-        const meta = GroovyScriptConvertorUtil.getScriptMeta(script);
-        const data = JSON.parse(meta);
-        if(data){
-            return data.type;
+    public static getType(script?: string) {
+        if (script) {
+            const meta = GroovyScriptConvertorUtil.getScriptMeta(script);
+            if (meta) {
+                const data = JSON.parse(meta);
+                if (data) {
+                    return data.type;
+                }
+            }
         }
         return undefined;
     }

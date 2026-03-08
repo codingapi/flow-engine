@@ -17,6 +17,7 @@ export const ActionConfigModal: React.FC<ActionModalProps> = (props) => {
             }}
         >
             <ActionForm
+                nodeId={props.nodeId}
                 form={props.form}
                 manager={props.manager}
                 onFinish={(values) => {
