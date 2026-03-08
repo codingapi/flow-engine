@@ -18,7 +18,6 @@ export interface ActionFormProps {
 }
 
 export interface ActionSelectOption {
-    label: string;
+    label: any;
     value: string;
-    danger?:boolean;
 }

@@ -22,7 +22,6 @@ export class ActionRejectService {
         options.push({
             label: '终止流程',
             value: 'TERMINATE',
-            danger: true,
         })
         return options;
     }

@@ -102,7 +102,7 @@ export interface TransferViewPlugin {
 }
 ```
 
-### 流程设计
+### 流程设计-节点配置
 
 * 流程条件控制界面
 ```
@@ -231,6 +231,50 @@ export interface TriggerViewPlugin {
     script: string;
     /** 变量映射列表 */
     variables: GroovyVariableMapping[];
+    /** 确认回调 */
+    onChange: (script: string) => void;
+}
+```
+
+### 流程设计-动作配置
+
+* 自定义按钮触发脚本界面
+```
+import {ActionSelectOption} from "@/components/script/typings";
+
+export const VIEW_KEY = 'ConditionCustomViewPlugin';
+
+export interface ConditionCustomViewPlugin {
+    // 当前的脚本
+    value?: string;
+    // 脚本更改回掉
+    onChange?: (value: string) => void;
+    // 可选择的动作范围
+    options:ActionSelectOption[];
+}
+```
+
+* 拒绝动作界面
+```
+export const VIEW_KEY = 'ConditionRejectViewPlugin';
+
+export interface ConditionRejectViewPlugin {
+    // 当前节点id
+    nodeId:string;
+    // 当前的脚本
+    value?: string;
+    // 脚本更改回掉
+    onChange?: (value: string) => void;
+}
+```
+
+* 委派/转办/加签/界面 与（节点人员选择界面一致）
+```
+export const VIEW_KEY = 'OperatorLoadViewPlugin';
+
+export interface OperatorLoadViewPlugin {
+    /** 当前脚本 */
+    script: string;
     /** 确认回调 */
     onChange: (script: string) => void;
 }
