@@ -1,6 +1,6 @@
 import React from "react";
 import {Field, FieldRenderProps} from "@flowgram.ai/fixed-layout-editor";
-import {ActionTable} from "@/components/design-editor/node-components/action/table";
+import {ActionTable} from "@/components/design-editor/node-components/action";
 
 export const TabAction: React.FC = () => {
 

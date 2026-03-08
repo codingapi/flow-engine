@@ -7,7 +7,7 @@ import {ViewBindPlugin} from "@flow-engine/flow-core";
 import {SCRIPT_DEFAULT_ERROR_TRIGGER} from "@/components/script/default-script";
 import {useNodeRouterManager} from "@/components/design-panel/hooks/use-node-router-manager";
 import {useNodeRenderContext} from "@/components/design-editor/hooks/use-node-render-context";
-import {ErrorTriggerScriptUtils} from "@/components/script/services/error-trigger";
+import {ErrorTriggerScriptUtils} from "@/components/script/services/node-error-trigger";
 import {useScriptMetaData} from "@/components/script/hooks/use-script-meta-data";
 
 /**

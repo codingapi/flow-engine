@@ -1,5 +1,6 @@
 package com.codingapi.flow.script.action;
 
+import com.codingapi.flow.script.ScriptDefaultConstants;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -12,28 +13,22 @@ import lombok.Getter;
 @AllArgsConstructor
 public class RejectActionScript {
 
-    public static final String SCRIPT_START = "def run(session){return new com.codingapi.flow.script.action.RejectActionScript.RejectResult(session.getStartNode().getId())}";
-    public static final String SCRIPT_TERMINATE = "def run(session){return new com.codingapi.flow.script.action.RejectActionScript.RejectResult(\"TERMINATE\")}";
+    public static final String TYPE_TERMINATE = "TERMINATE";
+
 
     @Getter
     private final String script;
 
     public RejectResult execute(FlowSession session) {
-        return ScriptRuntimeContext.getInstance().run(script, RejectResult.class, session);
+        String result =  ScriptRuntimeContext.getInstance().run(script, String.class, session);
+        return new RejectResult(result);
     }
 
     /**
      * 退回至发起节点
      */
-    public static RejectActionScript startScript() {
-        return new RejectActionScript(SCRIPT_START);
-    }
-
-    /**
-     * 终止流程
-     */
-    public static RejectActionScript terminateScript() {
-        return new RejectActionScript(SCRIPT_TERMINATE);
+    public static RejectActionScript defaultScript() {
+        return new RejectActionScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_REJECT);
     }
 
 
@@ -58,7 +53,7 @@ public class RejectActionScript {
         }
 
         public RejectResult(String result) {
-            if (result.equals("TERMINATE")) {
+            if (result.equals(TYPE_TERMINATE)) {
                 this.type = RejectType.TERMINATE;
             } else {
                 this.type = RejectType.RETURN_NODE;

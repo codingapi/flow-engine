@@ -1,9 +1,20 @@
 import React from "react";
-import {NodeType} from "@/components/design-editor/typings/node-type";
-import {Button, Flex, Space,Input,theme} from "antd";
-import {ApiOutlined, AuditOutlined, BellOutlined, BranchesOutlined, ClockCircleOutlined, CloseOutlined, EditOutlined,
+import {NodeType} from "@flow-engine/flow-types";
+import {theme} from "antd";
+import {
+    ApiOutlined,
+    AuditOutlined,
+    BellOutlined,
+    BranchesOutlined,
+    ClockCircleOutlined,
+    EditOutlined,
     MergeOutlined,
-    NodeExpandOutlined, PoweroffOutlined, PullRequestOutlined, ShareAltOutlined, UserOutlined} from "@ant-design/icons";
+    NodeExpandOutlined,
+    PoweroffOutlined,
+    PullRequestOutlined,
+    ShareAltOutlined,
+    UserOutlined
+} from "@ant-design/icons";
 
 
 interface NodeIconProps {

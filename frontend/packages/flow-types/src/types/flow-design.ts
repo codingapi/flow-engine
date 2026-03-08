@@ -2,7 +2,7 @@
  * 节点类型
  */
 export type NodeType =
-    // 审批
+// 审批
     "APPROVAL" |
     // 分支控制
     "CONDITION" |
@@ -37,7 +37,7 @@ export type NodeType =
  * 操作类型
  */
 export type ActionType =
-    // 保存
+// 保存
     'SAVE'|
     // 通过，流程继续往下流转
     'PASS'|

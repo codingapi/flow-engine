@@ -1,6 +1,5 @@
 // Tab布局类型
-import {NodeType} from "@/components/design-editor/typings/node-type";
-import {FlowForm} from "@flow-engine/flow-types";
+import {FlowForm,NodeType} from "@flow-engine/flow-types";
 
 export type TabPanelType = 'base' | 'form' | 'flow' | 'setting';
 

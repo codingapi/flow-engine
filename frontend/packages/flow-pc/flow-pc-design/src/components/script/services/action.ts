@@ -1,17 +1,18 @@
-import {actionOptions, ActionType} from "@/components/design-editor/typings/node-type";
+import {actionOptions, ActionType} from "@flow-engine/flow-types";
 import {nanoid} from "nanoid";
 import {IdUtils} from "@/utils";
+import {FlowAction} from "@flow-engine/flow-types";
 
 export class ActionManager {
-    private readonly data: any[];
-    private readonly onChange: (data: any[]) => void;
+    private readonly data: FlowAction[];
+    private readonly onChange: (data: FlowAction[]) => void;
 
-    public constructor(data: any[], onChange: (data: any[]) => void) {
+    public constructor(data: FlowAction[], onChange: (data: FlowAction[]) => void) {
         this.onChange = onChange;
         this.data = data;
     }
 
-    public getActionOptions() {
+    public getCurrentNodeActionOptions() {
         const actions = this.data.filter(item => item.type !== "CUSTOM");
         const options:any[] = [];
         for (const action of actions) {
@@ -90,7 +91,7 @@ export class ActionManager {
                 enable: true,
                 title: title,
                 type: type,
-            }
+            } as FlowAction;
         });
         this.onChange(list);
         return list;
