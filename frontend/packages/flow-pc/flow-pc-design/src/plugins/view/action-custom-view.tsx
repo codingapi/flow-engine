@@ -6,13 +6,13 @@ import {ActionCustomViewPlugin, VIEW_KEY} from "@/plugins/action-custom-view-typ
 import {ViewBindPlugin} from "@flow-engine/flow-core";
 
 
-export const ConditionCustomView: React.FC<ActionCustomViewPlugin> = (props) => {
+export const ActionCustomView: React.FC<ActionCustomViewPlugin> = (props) => {
 
-    const ConditionCustomViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
+    const ActionCustomViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
 
-    if (ConditionCustomViewComponent) {
+    if (ActionCustomViewComponent) {
         return (
-            <ConditionCustomViewComponent {...props} />
+            <ActionCustomViewComponent {...props} />
         );
     }
 

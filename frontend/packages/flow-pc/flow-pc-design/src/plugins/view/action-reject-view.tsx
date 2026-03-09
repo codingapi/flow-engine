@@ -12,14 +12,14 @@ const useActionRejectService = (nodeId: string) => {
     return new ActionRejectService(nodeManager);
 }
 
-export const ConditionRejectView: React.FC<ActionRejectViewPlugin> = (props) => {
+export const ActionRejectView: React.FC<ActionRejectViewPlugin> = (props) => {
 
     const rejectService = useActionRejectService(props.nodeId);
-    const ConditionRejectViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
+    const ActionRejectViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
 
-    if (ConditionRejectViewComponent) {
+    if (ActionRejectViewComponent) {
         return (
-            <ConditionRejectViewComponent {...props} />
+            <ActionRejectViewComponent {...props} />
         );
     }
 

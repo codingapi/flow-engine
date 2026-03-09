@@ -1,7 +1,7 @@
 import React from "react";
 import {ActionFormProps} from "@/components/script/typings";
 import {Col, Form, Row} from "antd";
-import {ConditionRejectView} from "@/plugins/view/action-reject-view";
+import {ActionRejectView} from "@/plugins/view/action-reject-view";
 
 
 export const RejectActionForm:React.FC<ActionFormProps> = (props)=>{
@@ -16,7 +16,7 @@ export const RejectActionForm:React.FC<ActionFormProps> = (props)=>{
                     label={"拒绝策略"}
                     help={"配置拒绝时跳转的节点"}
                 >
-                    <ConditionRejectView
+                    <ActionRejectView
                         nodeId={props.nodeId}
                     />
                 </Form.Item>
