@@ -21,7 +21,13 @@
     "watch:flow-pc-design": "pnpm -F  @flow-engine/flow-pc-design dev",
     "watch:flow-pc-form": "pnpm -F  @flow-engine/flow-pc-form dev",
     "watch:flow-pc-ui": "pnpm -F  @flow-engine/flow-pc-ui dev",
-    "watch:flow-pc-approval": "pnpm -F  @flow-engine/flow-pc-approval dev"
+    "watch:flow-pc-approval": "pnpm -F  @flow-engine/flow-pc-approval dev",
+    "test:flow-core": "pnpm -F  @flow-engine/flow-core test",
+    "test:flow-pc-approval": "pnpm -F  @flow-engine/flow-pc-approval test",
+    "test:flow-pc-design": "pnpm -F  @flow-engine/flow-pc-design test",
+    "test:flow-pc-form": "pnpm -F  @flow-engine/flow-pc-form test",
+    "test:flow-pc-ui": "pnpm -F  @flow-engine/flow-pc-ui test",
+    "test": "pnpm run test:flow-core && pnpm run test:flow-pc-approval && pnpm run test:flow-pc-design && pnpm run test:flow-pc-form && pnpm run test:flow-pc-ui"
   },
   "keywords": [],
   "author": "",
