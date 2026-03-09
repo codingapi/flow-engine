@@ -9,7 +9,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(basePackages = {"com.codingapi.example.repository"})
 @SpringBootApplication
 public class ServerApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(ServerApplication.class, args);
     }
+
 }
