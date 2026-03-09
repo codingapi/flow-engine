@@ -1,7 +1,7 @@
 import React from "react";
 import {ActionFormProps} from "@/components/script/typings";
 import {Col, Form, Row} from "antd";
-import {ConditionCustomView} from "@/plugins/view/action-custom-view";
+import {ActionCustomView} from "@/plugins/view/action-custom-view";
 
 export const CustomActionForm: React.FC<ActionFormProps> = (props) => {
 
@@ -22,7 +22,7 @@ export const CustomActionForm: React.FC<ActionFormProps> = (props) => {
                         }
                     ]}
                 >
-                    <ConditionCustomView
+                    <ActionCustomView
                         options={actionOptionTypes}
                     />
                 </Form.Item>
