@@ -1,5 +1,5 @@
 {
-  "name": "@flow-engine/app-mobile",
+  "name": "@flow-example/app-mobile",
   "version": "1.0.0",
   "private": true,
   "type": "module",
