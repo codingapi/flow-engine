@@ -3,7 +3,7 @@ import {GroovyScriptContent, GroovyScriptModal} from "@/components/script/compon
 import {ScriptType} from "@/components/script/typings";
 import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
-import {OperatorLoadPluginView} from "@/components/script/plugins/view/operator-load-view";
+import {OperatorLoadPluginView} from "@/plugins/view/operator-load-view";
 import {SCRIPT_DEFAULT_OPERATOR_LOAD} from "@/components/script/default-script";
 
 interface OperatorLoadConfigModalProps{

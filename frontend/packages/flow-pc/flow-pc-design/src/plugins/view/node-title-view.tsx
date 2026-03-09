@@ -5,7 +5,7 @@ import {GroovyScriptPreview} from "@/components/script/components/groovy-script-
 import {VariablePicker} from "@/components/script/components/variable-picker";
 import {Button, Input, Space} from "antd";
 import {CodeOutlined, ReloadOutlined} from "@ant-design/icons";
-import {NodeTitleViewPlugin, VIEW_KEY} from "@/components/script/plugins/node-title-view-type";
+import {NodeTitleViewPlugin, VIEW_KEY} from "@/plugins/node-title-view-type";
 import {ViewBindPlugin} from "@flow-engine/flow-core";
 import {SCRIPT_DEFAULT_NODE_TITLE} from "@/components/script/default-script";
 

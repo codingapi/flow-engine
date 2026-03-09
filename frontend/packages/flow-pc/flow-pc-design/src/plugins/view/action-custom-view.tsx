@@ -2,11 +2,11 @@ import React from "react";
 import {ActionCustomScriptUtils} from "@/components/script/services/action-custom";
 import {GroovyCodeEditor} from "@/components/groovy-code";
 import {Select} from "antd";
-import {ConditionCustomViewPlugin, VIEW_KEY} from "@/components/script/plugins/action-custom-view-type";
+import {ActionCustomViewPlugin, VIEW_KEY} from "@/plugins/action-custom-view-type";
 import {ViewBindPlugin} from "@flow-engine/flow-core";
 
 
-export const ConditionCustomView: React.FC<ConditionCustomViewPlugin> = (props) => {
+export const ConditionCustomView: React.FC<ActionCustomViewPlugin> = (props) => {
 
     const ConditionCustomViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);
 

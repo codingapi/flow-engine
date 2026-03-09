@@ -1,5 +1,5 @@
 import React from "react";
-import {ConditionRejectViewPlugin, VIEW_KEY} from "@/components/script/plugins/action-reject-view-type";
+import {ActionRejectViewPlugin, VIEW_KEY} from "@/plugins/action-reject-view-type";
 import {ViewBindPlugin} from "@flow-engine/flow-core";
 import {useDesignContext} from "@/components/design-panel/hooks/use-design-context";
 import {ActionRejectService} from "@/components/script/services/action-reject";
@@ -12,7 +12,7 @@ const useActionRejectService = (nodeId: string) => {
     return new ActionRejectService(nodeManager);
 }
 
-export const ConditionRejectView: React.FC<ConditionRejectViewPlugin> = (props) => {
+export const ConditionRejectView: React.FC<ActionRejectViewPlugin> = (props) => {
 
     const rejectService = useActionRejectService(props.nodeId);
     const ConditionRejectViewComponent = ViewBindPlugin.getInstance().get(VIEW_KEY);

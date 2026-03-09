@@ -2,7 +2,7 @@ import React from "react";
 import {FlowActionProps} from "./type";
 import {Button, Form, message, Modal} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
-import {ReturnView} from "@/components/flow-approval/plugins/view/return-view";
+import {ReturnView} from "@/plugins/view/return-view";
 import {ActionButton} from "@/components/flow-approval/components/action-button";
 
 /**

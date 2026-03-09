@@ -4,7 +4,7 @@ import {GroovyScriptContent, GroovyScriptModal} from "@/components/script/compon
 import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
 import {SCRIPT_DEFAULT_ROUTER} from "@/components/script/default-script";
-import {RouterPluginView} from "@/components/script/plugins/view/router-view";
+import {RouterPluginView} from "@/plugins/view/router-view";
 
 export interface RouterConfigModalProps {
     /** 是否展示 **/

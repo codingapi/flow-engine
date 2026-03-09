@@ -2,7 +2,7 @@ import React from "react";
 import {FlowActionProps} from "./type";
 import {Form, Input, message, Modal} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
-import {SignKeyView} from "@/components/flow-approval/plugins/view/sign-key-view";
+import {SignKeyView} from "@/plugins/view/sign-key-view";
 import {ActionButton} from "@/components/flow-approval/components/action-button";
 
 const {TextArea} = Input;

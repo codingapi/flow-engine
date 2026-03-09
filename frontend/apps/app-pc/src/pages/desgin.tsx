@@ -1,8 +1,8 @@
 import React from "react";
-import { DesignList } from '@flow-engine/flow-pc-design';
+import {DesignList} from '@flow-engine/flow-pc-design';
 
 
-const DesignPage: React.FC = () => {
+const DesignPage = () => {
 
     return (
         <div>

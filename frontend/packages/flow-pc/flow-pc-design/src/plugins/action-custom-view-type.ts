@@ -1,8 +1,8 @@
 import {ActionSelectOption} from "@/components/script/typings";
 
-export const VIEW_KEY = 'ConditionCustomViewPlugin';
+export const VIEW_KEY = 'ActionCustomViewPlugin';
 
-export interface ConditionCustomViewPlugin {
+export interface ActionCustomViewPlugin {
     // 当前的脚本
     value?: string;
     // 脚本更改回掉
