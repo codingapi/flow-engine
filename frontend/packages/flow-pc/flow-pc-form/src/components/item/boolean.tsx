@@ -38,6 +38,7 @@ export const FormItemBoolean: React.FC<FormItemProps> = (props) => {
             rules={rules}
             tooltip={props.tooltip}
             help={props.help}
+            hidden={props.hidden}
         >
             <$Switch
                 defaultValue={props.defaultValue}

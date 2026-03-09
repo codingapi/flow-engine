@@ -10,7 +10,7 @@ export const Body = ()=>{
     const tabPanelType = state.view.tabPanel;
 
     return (
-        <>
+        <div>
             {tabPanelType ==='form' && (
                 <TabForm/>
             )}
@@ -23,7 +23,7 @@ export const Body = ()=>{
             {tabPanelType ==='setting' && (
                 <TabSetting/>
             )}
-        </>
+        </div>
     )
 }
 

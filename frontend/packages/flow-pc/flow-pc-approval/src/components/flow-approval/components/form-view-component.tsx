@@ -14,6 +14,7 @@ export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
     const ViewComponent = ViewBindPlugin.getInstance().get(state.flow?.view || 'default') || FlowFormView;
 
     const flowForm = state.flow?.form;
+    const fieldPermissions = state.flow?.fieldPermissions || [];
 
     // 是否可合并审批
     const mergeable = state.flow?.mergeable || false;
@@ -66,6 +67,7 @@ export const FormViewComponent: React.FC<FormViewComponentProps> = (props) => {
                 {viewForms.map((item, index) => (
                     <ViewComponent
                         key={index}
+                        fieldPermissions={fieldPermissions}
                         review={review}
                         meta={flowForm}
                         form={item.instance}

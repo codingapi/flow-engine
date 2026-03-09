@@ -39,6 +39,7 @@ export const FormItemString: React.FC<FormItemProps> = (props) => {
             rules={rules}
             tooltip={props.tooltip}
             help={props.help}
+            hidden={props.hidden}
         >
             <$Input
                 defaultValue={props.defaultValue}

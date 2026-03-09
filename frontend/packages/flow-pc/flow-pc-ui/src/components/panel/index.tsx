@@ -12,8 +12,8 @@ export const Panel: React.FC<PanelProps> = (props) => {
             justify='center'
             vertical={true}
             style={{
-                marginLeft: '20%',
-                marginRight: '20%',
+                marginLeft: '10%',
+                marginRight: '10%',
             }}
         >
             {props.children}

@@ -1,6 +1,6 @@
 import React from "react";
 import {Field, FieldRenderProps} from "@flowgram.ai/fixed-layout-editor";
-import {PromissionTable} from "@/components/design-editor/node-components/promission/table";
+import {PromissionTable} from "@/components/design-editor/node-components/promission";
 
 export const TabPromission: React.FC = () => {
 

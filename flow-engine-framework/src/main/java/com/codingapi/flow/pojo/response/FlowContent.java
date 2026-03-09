@@ -2,6 +2,7 @@ package com.codingapi.flow.pojo.response;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
@@ -79,6 +80,11 @@ public class FlowContent {
      * 表单元数据
      */
     private FlowForm form;
+
+    /**
+     * 表单字段权限
+     */
+    private List<FormFieldPermission> fieldPermissions;
     /**
      * 流程记录
      */
@@ -134,6 +140,7 @@ public class FlowContent {
         this.nodeId = currentNode.getId();
         this.nodeName = currentNode.getName();
         this.nodeType = currentNode.getType();
+        this.fieldPermissions = strategyManager.getFieldPermissions();
         Map<String,Object> nodeData = currentNode.toMap();
         this.view = (String) nodeData.get("view");
     }

@@ -27,6 +27,21 @@ export const dataTypeOptions = [
 ]
 
 /**
+ * 字段权限类型
+ */
+export type FieldPermissionType = 'READ' | 'WRITE' | 'HIDDEN';
+
+
+/**
+ * 字段权限
+ */
+export interface FieldPermission {
+    formCode:string;
+    fieldCode:string;
+    type:FieldPermissionType;
+}
+
+/**
  *  流程表单字段元数据
  */
 export interface FormField {
@@ -38,6 +53,8 @@ export interface FormField {
     code: string;
     // 数据类型
     type: DataType;
+    // 是否隐藏
+    hidden:boolean;
     // 是否必填
     required: boolean;
     // 默认值
@@ -231,6 +248,8 @@ export interface FlowContent {
     signRequired: boolean;
     // 表单元数据
     form: FlowForm;
+    /** 表单字段权限*/
+    fieldPermissions: FieldPermission[];
     // 待办记录
     todos: FlowTodo[];
     // 操作按钮
