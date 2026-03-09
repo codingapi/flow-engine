@@ -23,6 +23,20 @@
         </dependency>
 
         <dependency>
+            <groupId>com.dameng</groupId>
+            <artifactId>DmJdbcDriver11</artifactId>
+            <version>8.1.4.41033</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.dameng</groupId>
+            <artifactId>DmDialect-for-hibernate6.6</artifactId>
+            <version>8.1.4.93</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.codingapi.springboot</groupId>
             <artifactId>springboot-starter-security</artifactId>
         </dependency>
