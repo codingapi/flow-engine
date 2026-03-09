@@ -1,7 +1,7 @@
 import React from "react";
 import {ActionFormProps} from "@/components/script/typings";
 import {Col, Form, Row} from "antd";
-import {ConditionRejectView} from "@/components/script/plugins/view/action-reject-view";
+import {ConditionRejectView} from "@/plugins/view/action-reject-view";
 
 
 export const RejectActionForm:React.FC<ActionFormProps> = (props)=>{

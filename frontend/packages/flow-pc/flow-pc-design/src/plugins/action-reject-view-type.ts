@@ -1,6 +1,6 @@
-export const VIEW_KEY = 'ConditionRejectViewPlugin';
+export const VIEW_KEY = 'ActionRejectViewPlugin';
 
-export interface ConditionRejectViewPlugin {
+export interface ActionRejectViewPlugin {
     // 当前节点id
     nodeId:string;
     // 当前的脚本

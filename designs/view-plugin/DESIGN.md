@@ -62,18 +62,6 @@ export interface DelegateViewPlugin {
 }
 ```
 
-* 流程操作 退回流程
-```
-export const VIEW_KEY = 'ReturnViewPlugin';
-
-export interface ReturnViewPlugin {
-    /** 返回用户 */
-    onChange?: (value: string|string[]) => void;
-    /** 当前用户 */
-    value?: string|string[];
-}
-```
-
 * 流程操作 提交时的获取签名界面
 ```
 import {FlowOperator} from "@flow-engine/flow-types";
@@ -242,9 +230,9 @@ export interface TriggerViewPlugin {
 ```
 import {ActionSelectOption} from "@/components/script/typings";
 
-export const VIEW_KEY = 'ConditionCustomViewPlugin';
+export const VIEW_KEY = 'ActionCustomViewPlugin';
 
-export interface ConditionCustomViewPlugin {
+export interface ActionCustomViewPlugin {
     // 当前的脚本
     value?: string;
     // 脚本更改回掉
@@ -256,9 +244,9 @@ export interface ConditionCustomViewPlugin {
 
 * 拒绝动作界面
 ```
-export const VIEW_KEY = 'ConditionRejectViewPlugin';
+export const VIEW_KEY = 'ActionRejectViewPlugin';
 
-export interface ConditionRejectViewPlugin {
+export interface ActionRejectViewPlugin {
     // 当前节点id
     nodeId:string;
     // 当前的脚本

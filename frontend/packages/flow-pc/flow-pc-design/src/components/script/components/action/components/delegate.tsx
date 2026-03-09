@@ -1,6 +1,6 @@
 import React from "react";
 import {ActionFormProps} from "@/components/script/typings";
-import {OperatorLoadPluginView} from "@/components/script/plugins/view/operator-load-view";
+import {OperatorLoadPluginView} from "@/plugins/view/operator-load-view";
 import {Col, Form, Row } from "antd";
 
 

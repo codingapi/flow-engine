@@ -1,7 +1,7 @@
 import React from "react";
 import {ActionFormProps} from "@/components/script/typings";
 import {Col, Form, Row} from "antd";
-import {OperatorLoadPluginView} from "@/components/script/plugins/view/operator-load-view";
+import {OperatorLoadPluginView} from "@/plugins/view/operator-load-view";
 
 
 interface AddAuditInputProps{

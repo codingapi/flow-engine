@@ -1,5 +1,5 @@
 import React from "react";
-import {RouterViewPlugin, VIEW_KEY} from "@/components/script/plugins/router-view-type";
+import {RouterViewPlugin, VIEW_KEY} from "@/plugins/router-view-type";
 import {ViewBindPlugin} from "@flow-engine/flow-core";
 import {SCRIPT_DEFAULT_ROUTER} from "@/components/script/default-script";
 import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";

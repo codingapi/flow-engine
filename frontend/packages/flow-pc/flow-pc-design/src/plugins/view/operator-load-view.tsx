@@ -1,5 +1,5 @@
 import React from "react";
-import {OperatorLoadViewPlugin, VIEW_KEY} from "@/components/script/plugins/operator-load-view-type";
+import {OperatorLoadViewPlugin, VIEW_KEY} from "@/plugins/operator-load-view-type";
 import {Button, Form, Select, Space} from "antd";
 import {ViewBindPlugin} from "@flow-engine/flow-core";
 import {SCRIPT_DEFAULT_OPERATOR_LOAD} from "@/components/script/default-script";

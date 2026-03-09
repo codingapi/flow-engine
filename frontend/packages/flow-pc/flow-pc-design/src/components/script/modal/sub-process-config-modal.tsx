@@ -4,7 +4,7 @@ import {GroovyScriptContent, GroovyScriptModal} from "@/components/script/compon
 import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
 import {SCRIPT_DEFAULT_SUB_PROCESS} from "@/components/script/default-script";
-import {SubProcessPluginView} from "@/components/script/plugins/view/sub-process-view";
+import {SubProcessPluginView} from "@/plugins/view/sub-process-view";
 
 export interface SubProcessConfigModalProps {
     /** 是否展示 **/

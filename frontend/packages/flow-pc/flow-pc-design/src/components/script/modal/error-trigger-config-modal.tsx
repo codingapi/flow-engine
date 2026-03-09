@@ -4,7 +4,7 @@ import {GroovyScriptContent, GroovyScriptModal} from "@/components/script/compon
 import {GroovyScriptConvertorUtil} from "@flow-engine/flow-core";
 import {AdvancedScriptEditor} from "@/components/script/components/advanced-script-editor";
 import {SCRIPT_DEFAULT_ERROR_TRIGGER} from "@/components/script/default-script";
-import {ErrorTriggerPluginView} from "@/components/script/plugins/view/error-trigger-view";
+import {ErrorTriggerPluginView} from "@/plugins/view/error-trigger-view";
 
 export interface ErrorTriggerConfigModalProps {
     /** 是否展示 **/

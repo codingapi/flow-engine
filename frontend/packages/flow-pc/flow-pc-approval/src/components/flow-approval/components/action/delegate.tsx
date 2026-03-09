@@ -2,7 +2,7 @@ import React from "react";
 import {FlowActionProps} from "./type";
 import {Form, message, Modal} from "antd";
 import {useApprovalContext} from "@/components/flow-approval/hooks/use-approval-context";
-import {DelegateView} from "@/components/flow-approval/plugins/view/delegate-view";
+import {DelegateView} from "@/plugins/view/delegate-view";
 import {ActionButton} from "@/components/flow-approval/components/action-button";
 
 /**
