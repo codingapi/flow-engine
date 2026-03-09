@@ -3,14 +3,14 @@ package com.codingapi.flow.infra;
 import com.codingapi.flow.infra.jpa.*;
 import com.codingapi.flow.infra.repository.impl.*;
 import com.codingapi.flow.repository.*;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.context.annotation.Import;
 
 @Configuration
-@EntityScan(basePackages = "com.codingapi.flow.infra.entity")
-@EnableJpaRepositories(basePackages = "com.codingapi.flow.infra.jpa")
+@ConditionalOnClass(name = "org.springframework.data.jpa.repository.JpaRepository")
+@Import(FlowJpaPackageRegistrar.class)
 public class AutoConfiguration {
 
     @Bean
