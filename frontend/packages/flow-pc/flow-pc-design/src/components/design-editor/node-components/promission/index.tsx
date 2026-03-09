@@ -1,7 +1,7 @@
 import React from "react";
 import {Tabs,Switch} from "antd";
 import {Table} from "@flow-engine/flow-pc-ui";
-import {PromissionManager} from "@/components/design-editor/node-components/promission/index";
+import {PromissionPresenter} from "./presenter";
 import {useDesignContext} from "@/components/design-panel/hooks/use-design-context";
 
 interface PromissionTableProps {
@@ -12,12 +12,12 @@ interface PromissionTableProps {
 interface FormPromissionTableProps {
     title: string;
     code: string;
-    promissionManager:PromissionManager;
+    presenter:PromissionPresenter;
 }
 
 const FormPromissionTable: React.FC<FormPromissionTableProps> = (props) => {
     const code = props.code;
-    const promissionManager = props.promissionManager;
+    const promissionManager = props.presenter;
     const datasource = promissionManager.getDatasource(code);
 
     const columns = [
@@ -106,8 +106,8 @@ const FormPromissionTable: React.FC<FormPromissionTableProps> = (props) => {
 export const PromissionTable: React.FC<PromissionTableProps> = (props) => {
     const {state} = useDesignContext();
     const form = state.workflow.form;
-    const promissionManager = new PromissionManager(form,props.value, props.onChange);
-    promissionManager.initFormPromission();
+    const presenter = new PromissionPresenter(form,props.value, props.onChange);
+    presenter.initFormPromission();
 
     const formList = form.subForms || [];
 
@@ -119,7 +119,7 @@ export const PromissionTable: React.FC<PromissionTableProps> = (props) => {
                 <FormPromissionTable
                     title={item.name}
                     code={item.code}
-                    promissionManager={promissionManager}
+                    presenter={presenter}
                 />
             )
         }
@@ -130,7 +130,7 @@ export const PromissionTable: React.FC<PromissionTableProps> = (props) => {
             <FormPromissionTable
                 title={form?.name || '主表单'}
                 code={form?.code || ''}
-                promissionManager={promissionManager}
+                presenter={presenter}
             />
 
             {items && items.length > 0 && (

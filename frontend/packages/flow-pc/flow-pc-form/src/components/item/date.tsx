@@ -44,6 +44,7 @@ export const FormItemDate: React.FC<FormItemProps> = (props) => {
             rules={rules}
             tooltip={props.tooltip}
             help={props.help}
+            hidden={props.hidden}
         >
             <$Date
                 defaultValue={props.defaultValue}

@@ -118,10 +118,19 @@ const FormFieldModal: React.FC<FormFieldModalProps> = (props) => {
                             />
                         </Form.Item>
                     </Col>
-                    <Col span={12}>
+                    <Col span={6}>
                         <Form.Item
                             name={"required"}
                             label={"是否必填"}
+                            labelCol={labelCol}
+                        >
+                            <Switch/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={6}>
+                        <Form.Item
+                            name={"hidden"}
+                            label={"是否隐藏"}
                             labelCol={labelCol}
                         >
                             <Switch/>
@@ -274,6 +283,13 @@ const FormTable: React.FC<FormTableProps> = (props) => {
             title: '是否为空',
             render: (value) => {
                 return value ? '必填' : '非必填'
+            }
+        },
+        {
+            dataIndex: 'hidden',
+            title: '是否隐藏',
+            render: (value) => {
+                return value ? '隐藏' : '展示'
             }
         },
         {

@@ -17,6 +17,8 @@ public class FormField {
     private String code;
     // 字段类型
     private DataType type;
+    // 是否隐藏
+    private boolean hidden;
     // 是否必填
     private boolean required;
     // 默认值

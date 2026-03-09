@@ -1,13 +1,14 @@
 import {FlowForm} from "@flow-engine/flow-types";
+import {FieldPermission} from "@flow-engine/flow-types";
 
-export class PromissionManager {
+export class PromissionPresenter {
 
-    private data: any[];
-    private readonly onChange: (data: any[]) => void;
+    private data: FieldPermission[];
+    private readonly onChange: (value: FieldPermission[]) => void;
     private readonly form: FlowForm;
     private readonly formList:FlowForm[];
 
-    public constructor(form: FlowForm, data: any[], onChange: (data: any[]) => void) {
+    public constructor(form: FlowForm, data: FieldPermission[], onChange: (data: FieldPermission[]) => void) {
         this.form = form;
         this.onChange = onChange;
         this.data = data;

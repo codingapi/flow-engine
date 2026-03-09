@@ -24,6 +24,7 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
 
     /**
      * 表单字段权限
+     * 若为空时，代表字段全部可写
      */
     private List<FormFieldPermission> fieldPermissions;
 
@@ -44,10 +45,12 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
     @Override
     public void verifyNode(FlowForm form) {
         Map<String, DataType> fieldTypes = form.loadAllFieldTypeMaps();
-        for (FormFieldPermission permission : fieldPermissions) {
-            String key = permission.getFormCode() + "." + permission.getFieldCode();
-            if (!fieldTypes.containsKey(key)) {
-                throw FlowValidationException.fieldNotFound(key);
+        if(fieldPermissions!=null) {
+            for (FormFieldPermission permission : fieldPermissions) {
+                String key = permission.getFormCode() + "." + permission.getFieldCode();
+                if (!fieldTypes.containsKey(key)) {
+                    throw FlowValidationException.fieldNotFound(key);
+                }
             }
         }
     }
@@ -57,37 +60,39 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
         FlowForm flowForm = session.getFormData().getFlowForm();
         Map<String, Object> currentData = session.getCurrentRecord().getFormData();
         Map<String, Object> latestData = session.getFormData().toMapData();
-        for (FormFieldPermission permission : fieldPermissions) {
-            // 子表
-            if (flowForm.isSubForm(permission.getFormCode())) {
-                if (permission.getType() == PermissionType.READ) {
-                    List<Map<String, Object>> currentSubFormData = (List<Map<String, Object>>) currentData.get(permission.getFormCode());
-                    List<Map<String, Object>> latestSubFormData = (List<Map<String, Object>>) latestData.get(permission.getFormCode());
-                    if (currentSubFormData == null || latestSubFormData == null) {
-                        throw FlowValidationException.nodeRequired("form");
-                    }
+        if(fieldPermissions!=null) {
+            for (FormFieldPermission permission : fieldPermissions) {
+                // 子表
+                if (flowForm.isSubForm(permission.getFormCode())) {
+                    if (permission.getType() == PermissionType.READ) {
+                        List<Map<String, Object>> currentSubFormData = (List<Map<String, Object>>) currentData.get(permission.getFormCode());
+                        List<Map<String, Object>> latestSubFormData = (List<Map<String, Object>>) latestData.get(permission.getFormCode());
+                        if (currentSubFormData == null || latestSubFormData == null) {
+                            throw FlowValidationException.nodeRequired("form");
+                        }
 
-                    if (currentSubFormData.size() != latestSubFormData.size()) {
-                        throw FlowValidationException.nodeRequired("form");
-                    }
+                        if (currentSubFormData.size() != latestSubFormData.size()) {
+                            throw FlowValidationException.nodeRequired("form");
+                        }
 
-                    for (int i = 0; i < currentSubFormData.size(); i++) {
-                        Map<String, Object> currentSubFormItem = currentSubFormData.get(i);
-                        Map<String, Object> latestSubFormItem = latestSubFormData.get(i);
-                        Object currentValue = currentSubFormItem.get(permission.getFieldCode());
-                        Object latestValue = latestSubFormItem.get(permission.getFieldCode());
+                        for (int i = 0; i < currentSubFormData.size(); i++) {
+                            Map<String, Object> currentSubFormItem = currentSubFormData.get(i);
+                            Map<String, Object> latestSubFormItem = latestSubFormData.get(i);
+                            Object currentValue = currentSubFormItem.get(permission.getFieldCode());
+                            Object latestValue = latestSubFormItem.get(permission.getFieldCode());
+                            if (!currentValue.equals(latestValue)) {
+                                throw FlowValidationException.fieldReadOnly(permission.getFieldCode());
+                            }
+                        }
+                    }
+                } else {
+                    // 在只读权限下不允许修改数据
+                    if (permission.getType() == PermissionType.READ) {
+                        Object currentValue = currentData.get(permission.getFieldCode());
+                        Object latestValue = latestData.get(permission.getFieldCode());
                         if (!currentValue.equals(latestValue)) {
                             throw FlowValidationException.fieldReadOnly(permission.getFieldCode());
                         }
-                    }
-                }
-            } else {
-                // 在只读权限下不允许修改数据
-                if (permission.getType() == PermissionType.READ) {
-                    Object currentValue = currentData.get(permission.getFieldCode());
-                    Object latestValue = latestData.get(permission.getFieldCode());
-                    if (!currentValue.equals(latestValue)) {
-                        throw FlowValidationException.fieldReadOnly(permission.getFieldCode());
                     }
                 }
             }

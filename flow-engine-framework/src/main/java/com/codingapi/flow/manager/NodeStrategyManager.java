@@ -2,6 +2,7 @@ package com.codingapi.flow.manager;
 
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.*;
 import lombok.Getter;
@@ -154,6 +155,17 @@ public class NodeStrategyManager {
         return new OperatorManager(new ArrayList<>());
     }
 
+    /**
+     * 获取节点的字段权限配置
+     */
+    public List<FormFieldPermission> getFieldPermissions() {
+        FormFieldPermissionStrategy formFieldPermissionStrategy = this.getStrategy(FormFieldPermissionStrategy.class);
+        if(formFieldPermissionStrategy!=null){
+            return formFieldPermissionStrategy.getFieldPermissions();
+        }
+        return new ArrayList<>();
+    }
+
     public void verifySession(FlowSession session) {
         for (INodeStrategy strategy : strategies) {
             strategy.verifySession(session);
@@ -185,4 +197,6 @@ public class NodeStrategyManager {
         }
         return null;
     }
+
+
 }
