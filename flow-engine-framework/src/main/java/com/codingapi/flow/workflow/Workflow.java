@@ -77,12 +77,6 @@ public class Workflow {
      */
     private List<IFlowNode> nodes;
 
-
-    /**
-     * 流程设计
-     */
-    private String schema;
-
     /**
      * 流程策略
      */
@@ -158,10 +152,6 @@ public class Workflow {
         this.nodes = nodes;
     }
 
-    protected void setSchema(String schema) {
-        this.schema = schema;
-    }
-
     protected void setCreatedTime(long createdTime) {
         this.createdTime = createdTime;
     }
@@ -180,7 +170,7 @@ public class Workflow {
      *
      * @return json
      */
-    public String toJson(boolean hasSchema) {
+    public String toJson() {
         Map<String, Object> map = new HashMap<>();
         map.put("id", id);
         map.put("code", code);
@@ -195,7 +185,6 @@ public class Workflow {
         map.put("nodes", nodes.stream().map(IFlowNode::toMap).toList());
         map.put("createdTime", String.valueOf(createdTime));
         map.put("updatedTime", String.valueOf(updatedTime));
-        map.put("schema", hasSchema ? schema : null);
         map.put("strategies", strategies.stream().map(IWorkflowStrategy::toMap).toList());
         return JSON.toJSONString(map);
     }
@@ -210,7 +199,6 @@ public class Workflow {
         workflow.setId((String) data.get("id"));
         workflow.setCode((String) data.get("code"));
         workflow.setTitle((String) data.get("title"));
-        workflow.setSchema((String) data.get("schema"));
         workflow.setCreatedTime(Long.parseLong((String) data.get("createdTime")));
         workflow.setUpdatedTime(Long.parseLong((String) data.get("updatedTime")));
         workflow.setCreatedOperator(GatewayContext.getInstance().getFlowOperator(createOperator));

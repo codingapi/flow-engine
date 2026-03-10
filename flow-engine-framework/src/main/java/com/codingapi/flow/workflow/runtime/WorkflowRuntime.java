@@ -42,7 +42,7 @@ public class WorkflowRuntime {
 
 
     public WorkflowRuntime(Workflow workflow) {
-        this.workflow = workflow.toJson(false);
+        this.workflow = workflow.toJson();
         this.workId = workflow.getId();
         this.workCode = workflow.getCode();
         this.workTitle = workflow.getTitle();

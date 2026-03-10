@@ -88,7 +88,7 @@ class WorkflowBuilderTest {
         assertEquals(3, workflow.getNodes().size());
 
 
-        String json = workflow.toJson(true);
+        String json = workflow.toJson();
         System.out.println(json);
 
         Workflow workflowBck = Workflow.formJson(json);
@@ -100,7 +100,6 @@ class WorkflowBuilderTest {
         assertEquals(workflow.getCreatedOperator().getUserId(), workflowBck.getCreatedOperator().getUserId());
         assertEquals(workflow.getForm().getCode(), workflowBck.getForm().getCode());
         assertEquals(workflow.getNodes().size(), workflowBck.getNodes().size());
-        assertEquals(workflow.getSchema(), workflowBck.getSchema());
         assertEquals(workflow.getNodes().get(0).getId(), workflowBck.getNodes().get(0).getId());
 
     }

@@ -66,7 +66,7 @@ public class WorkflowController {
         Workflow workflow = WorkflowBuilder.builder()
                 .build(false);
         workflow.addDefaultNodesAndEdges();
-        JSONObject jsonObject = JSONObject.parseObject(workflow.toJson(true));
+        JSONObject jsonObject = JSONObject.parseObject(workflow.toJson());
         return SingleResponse.of(jsonObject);
     }
 
@@ -95,7 +95,7 @@ public class WorkflowController {
     @GetMapping("/load")
     public SingleResponse<JSONObject> load(String id) {
         Workflow workflow = workflowService.getWorkflow(id);
-        JSONObject jsonObject = JSONObject.parseObject(workflow.toJson(true));
+        JSONObject jsonObject = JSONObject.parseObject(workflow.toJson());
         return SingleResponse.of(jsonObject);
     }
 

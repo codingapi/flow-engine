@@ -78,10 +78,6 @@ public class WorkflowVersion {
      */
     private List<IFlowNode> nodes;
 
-    /**
-     * 流程设计
-     */
-    private String schema;
 
     /**
      * 流程策略
@@ -118,7 +114,6 @@ public class WorkflowVersion {
         this.form = workflow.getForm();
         this.operatorCreateScript = workflow.getOperatorCreateScript();
         this.nodes = workflow.getNodes();
-        this.schema = workflow.getSchema();
         this.strategies = workflow.getStrategies();
         this.enable = workflow.isEnable();
         this.current = true;
@@ -135,7 +130,6 @@ public class WorkflowVersion {
                 this.form,
                 this.operatorCreateScript,
                 this.nodes,
-                this.schema,
                 this.strategies,
                 this.enable
         );

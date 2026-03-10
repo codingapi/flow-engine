@@ -34,7 +34,6 @@ public class WorkflowVersionConvertor {
         entity.setForm(formMetaConvertor.convertToDatabaseColumn(workflowVersion.getForm()));
         entity.setOperatorCreateScript(operatorMatchScriptConvertor.convertToDatabaseColumn(workflowVersion.getOperatorCreateScript()));
         entity.setNodes(flowNodeListConvertor.convertToDatabaseColumn(workflowVersion.getNodes()));
-        entity.setSchema(workflowVersion.getSchema());
         entity.setStrategies(workflowStrategyListConvertor.convertToDatabaseColumn(workflowVersion.getStrategies()));
         entity.setEnable(workflowVersion.isEnable());
         return entity;
@@ -57,7 +56,6 @@ public class WorkflowVersionConvertor {
                 formMetaConvertor.convertToEntityAttribute(entity.getForm()),
                 operatorMatchScriptConvertor.convertToEntityAttribute(entity.getOperatorCreateScript()),
                 flowNodeListConvertor.convertToEntityAttribute(entity.getNodes()),
-                entity.getSchema(),
                 workflowStrategyListConvertor.convertToEntityAttribute(entity.getStrategies()),
                 entity.getEnable());
     }
