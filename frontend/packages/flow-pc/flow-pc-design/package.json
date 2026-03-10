@@ -37,7 +37,7 @@
     "@flowgram.ai/fixed-semi-materials": "1.0.8",
     "@flowgram.ai/form-materials": "1.0.8",
     "@flowgram.ai/minimap-plugin": "1.0.8",
-    "@flowgram.ai/panel-manager-plugin": "^1.0.8",
+    "@flowgram.ai/panel-manager-plugin": "1.0.8",
     "@lezer/highlight": "^1.2.3",
     "@reduxjs/toolkit": "^2.11.2",
     "antd": "^6.2.1",
