@@ -1,13 +1,14 @@
 package com.codingapi.flow.context;
 
-import com.codingapi.flow.context.service.FlowRecordSaveService;
 import com.codingapi.flow.domain.DelayTask;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.*;
+import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.FlowService;
+import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.service.impl.FlowActionService;
 import com.codingapi.flow.service.impl.FlowDelayTriggerService;
 import com.codingapi.flow.session.FlowSession;
@@ -27,15 +28,9 @@ public class RepositoryHolderContext {
     }
 
     @Getter
-    private WorkflowRepository workflowRepository;
+    private WorkflowService workflowService;
     @Getter
-    private WorkflowRuntimeRepository workflowRuntimeRepository;
-    @Getter
-    private FlowRecordRepository flowRecordRepository;
-    @Getter
-    private FlowTodoRecordRepository flowTodoRecordRepository;
-    @Getter
-    private FlowTodoMergeRepository flowTodoMergeRepository;
+    private FlowRecordService flowRecordService;
     @Getter
     private FlowOperatorGateway flowOperatorGateway;
     @Getter
@@ -51,12 +46,9 @@ public class RepositoryHolderContext {
     public boolean isRegistered() {
         return parallelBranchRepository != null
                 && delayTaskRepository != null
-                && workflowRuntimeRepository != null
-                && flowRecordRepository != null
-                && flowTodoRecordRepository != null
-                && flowTodoMergeRepository != null
+                && workflowService != null
+                && flowRecordService != null
                 && flowOperatorGateway != null
-                && workflowRepository != null
                 && urgeIntervalRepository != null;
     }
 
@@ -67,20 +59,14 @@ public class RepositoryHolderContext {
         }
     }
 
-    public void register(WorkflowRepository workflowRepository,
-                         WorkflowRuntimeRepository workflowRuntimeRepository,
-                         FlowRecordRepository flowRecordRepository,
-                         FlowTodoRecordRepository flowTodoRecordRepository,
-                         FlowTodoMergeRepository flowTodoMergeRepository,
+    public void register(WorkflowService workflowService,
+                         FlowRecordService flowRecordService,
                          FlowOperatorGateway flowOperatorGateway,
                          ParallelBranchRepository parallelBranchRepository,
                          DelayTaskRepository delayTaskRepository,
                          UrgeIntervalRepository urgeIntervalRepository) {
-        this.workflowRepository = workflowRepository;
-        this.workflowRuntimeRepository = workflowRuntimeRepository;
-        this.flowRecordRepository = flowRecordRepository;
-        this.flowTodoRecordRepository = flowTodoRecordRepository;
-        this.flowTodoMergeRepository = flowTodoMergeRepository;
+        this.workflowService = workflowService;
+        this.flowRecordService = flowRecordService;
         this.flowOperatorGateway = flowOperatorGateway;
         this.parallelBranchRepository = parallelBranchRepository;
         this.delayTaskRepository = delayTaskRepository;
@@ -98,8 +84,8 @@ public class RepositoryHolderContext {
         this.verify();
         return new FlowDelayTriggerService(task,
                 flowOperatorGateway,
-                flowRecordRepository,
-                workflowRuntimeRepository);
+                flowRecordService,
+                workflowService);
     }
 
 
@@ -122,19 +108,17 @@ public class RepositoryHolderContext {
      */
     public FlowService createFlowService() {
         this.verify();
-        return new FlowService(workflowRepository,
+        return new FlowService(
+                workflowService,
                 flowOperatorGateway,
-                flowRecordRepository,
-                flowTodoRecordRepository,
-                flowTodoMergeRepository,
-                workflowRuntimeRepository,
+                flowRecordService,
                 parallelBranchRepository,
                 delayTaskRepository,
                 urgeIntervalRepository);
     }
 
     public FlowRecord getRecordById(long id) {
-        return flowRecordRepository.get(id);
+        return flowRecordService.getFlowRecord(id);
     }
 
     public List<IFlowOperator> findOperatorByIds(List<Long> ids) {
@@ -157,25 +141,23 @@ public class RepositoryHolderContext {
 
 
     public void saveRecords(List<FlowRecord> flowRecords) {
-        FlowRecordSaveService flowRecordSaveService = new FlowRecordSaveService(flowRecords);
-        flowRecordSaveService.saveAll();
+        flowRecordService.saveFlowRecords(flowRecords);
     }
 
     public void saveRecord(FlowRecord flowRecord) {
-        FlowRecordSaveService flowRecordSaveService = new FlowRecordSaveService(flowRecord);
-        flowRecordSaveService.saveAll();
+        flowRecordService.saveFlowRecord(flowRecord);
     }
 
     public List<FlowRecord> findCurrentNodeRecords(long fromId, String nodeId) {
-        return flowRecordRepository.findCurrentNodeRecords(fromId, nodeId);
+        return flowRecordService.findFlowRecordCurrentNodeRecords(fromId, nodeId);
     }
 
     public List<FlowRecord> findProcessRecords(String processId) {
-        return flowRecordRepository.findProcessRecords(processId);
+        return flowRecordService.findFlowRecordByProcessId(processId);
     }
 
     public List<FlowRecord> findAfterRecords(String processId, long currentId) {
-        return flowRecordRepository.findAfterRecords(processId, currentId);
+        return flowRecordService.findFlowRecordAfterRecords(processId, currentId);
     }
 
     public int getParallelBranchTriggerCount(String parallelId) {

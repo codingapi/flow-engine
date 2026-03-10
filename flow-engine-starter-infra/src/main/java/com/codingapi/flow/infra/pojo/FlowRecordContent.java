@@ -140,7 +140,7 @@ public class FlowRecordContent {
     public static FlowRecordContent convert(FlowRecordEntity record){
         FlowRecordContent content = new FlowRecordContent();
         content.setProcessId(record.getProcessId());
-        content.setWorkBackupId(record.getWorkBackupId());
+        content.setWorkBackupId(record.getWorkRuntimeId());
         content.setWorkCode(record.getWorkCode());
         content.setNodeId(record.getNodeId());
         content.setNodeType(record.getNodeType());

@@ -6,6 +6,7 @@ import {initialData as defaultInitialData} from './initial-data';
 import {FlowNodeRegistries} from './nodes';
 import "./index.scss";
 import {FlowDocumentJSON} from "@/components/design-editor/typings";
+import {EditorVersion} from "@/components/design-editor/version";
 
 
 export interface FlowEditorAction {
@@ -51,6 +52,7 @@ export const FlowEditor: React.FC<FlowEditorProps> = (props) => {
         >
             <EditorRenderer/>
             <EditorTools/>
+            <EditorVersion/>
         </FixedLayoutEditorProvider>
     )
 }

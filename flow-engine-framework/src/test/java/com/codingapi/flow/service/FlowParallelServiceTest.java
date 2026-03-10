@@ -35,11 +35,14 @@ class FlowParallelServiceTest {
     private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
     private final UserGateway userGateway = new UserGateway();
     private final WorkflowRuntimeRepository workflowRuntimeRepository = new WorkflowRuntimeRepositoryImpl();
+    private final WorkflowVersionRepository workflowVersionRepository = new WorkflowVersionRepositoryImpl();
     private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
     private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
     private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
     private final UrgeIntervalRepository urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
-    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, flowTodoRecordRepository, flowTodoMergeRepository, workflowRuntimeRepository, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
+    private final WorkflowService workflowService = new WorkflowService(workflowVersionRepository,workflowRepository,workflowRuntimeRepository);
+    private final FlowRecordService flowRecordService = new FlowRecordService(flowTodoRecordRepository,flowTodoMergeRepository,flowRecordRepository);
+    private final FlowService flowService = new FlowService(workflowService, userGateway, flowRecordService, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
 
 
     /**
@@ -204,7 +207,7 @@ class FlowParallelServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
 
         List<IFlowNode> nextNodes = workflow.nextNodes(bossApprovalNode1);

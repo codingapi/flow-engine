@@ -1,5 +1,7 @@
 package com.codingapi.flow.service.impl;
 
+import com.codingapi.flow.service.FlowRecordService;
+import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.domain.UrgeInterval;
@@ -12,9 +14,7 @@ import com.codingapi.flow.manager.WorkflowStrategyManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowUrgeRequest;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.repository.UrgeIntervalRepository;
-import com.codingapi.flow.repository.WorkflowRuntimeRepository;
 import com.codingapi.flow.strategy.workflow.UrgeStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.springboot.framework.event.EventPusher;
@@ -28,17 +28,17 @@ import java.util.List;
 public class FlowUrgeService {
 
     private final FlowUrgeRequest request;
-    private final FlowRecordRepository flowRecordRepository;
+    private final FlowRecordService flowRecordService;
     private final FlowOperatorGateway flowOperatorGateway;
     private final UrgeIntervalRepository urgeIntervalRepository;
-    private final WorkflowRuntimeRepository workflowRuntimeRepository;
+    private final WorkflowService workflowService;
 
     public FlowUrgeService(FlowUrgeRequest request) {
         this.request = request;
-        this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
+        this.flowRecordService = RepositoryHolderContext.getInstance().getFlowRecordService();
         this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
         this.urgeIntervalRepository = RepositoryHolderContext.getInstance().getUrgeIntervalRepository();
-        this.workflowRuntimeRepository = RepositoryHolderContext.getInstance().getWorkflowRuntimeRepository();
+        this.workflowService = RepositoryHolderContext.getInstance().getWorkflowService();
     }
 
     /**
@@ -47,7 +47,7 @@ public class FlowUrgeService {
     public void urge() {
         request.verify();
         // 验证当前用户
-        FlowRecord currentRecord = flowRecordRepository.get(request.getRecordId());
+        FlowRecord currentRecord = flowRecordService.getFlowRecord(request.getRecordId());
         if (currentRecord == null) {
             throw FlowNotFoundException.record(request.getRecordId());
         }
@@ -65,7 +65,7 @@ public class FlowUrgeService {
 
         UrgeInterval urgeInterval = urgeIntervalRepository.getLatest(currentRecord.getProcessId(), request.getRecordId());
         if (urgeInterval != null) {
-            WorkflowRuntime workflowRuntime = workflowRuntimeRepository.get(currentRecord.getWorkBackupId());
+            WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(currentRecord.getWorkRuntimeId());
             Workflow workflow = workflowRuntime.toWorkflow();
             WorkflowStrategyManager strategyManager = workflow.strategyManager();
             if (strategyManager.isEnableUrge()) {
@@ -78,7 +78,7 @@ public class FlowUrgeService {
 
         IFlowOperator currentOperator = flowOperatorGateway.get(currentOperatorId);
 
-        List<FlowRecord> todoRecords = flowRecordRepository.findTodoRecords(currentRecord.getProcessId());
+        List<FlowRecord> todoRecords = flowRecordService.findFlowRecordTodoRecords(currentRecord.getProcessId());
         // 保存催办记录
         urgeIntervalRepository.save(new UrgeInterval(currentRecord));
 

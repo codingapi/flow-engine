@@ -6,7 +6,9 @@ import com.codingapi.flow.register.FlowScriptContextRegister;
 import com.codingapi.flow.register.GatewayContextRegister;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.runner.FlowDelayTaskRunner;
+import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.FlowService;
+import com.codingapi.flow.service.WorkflowService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,22 +37,16 @@ public class AutoConfiguration {
 
     @Bean
     public RepositoryHolderContextRegister repositoryHolderContextRegister(
-            WorkflowRepository workflowRepository,
-            WorkflowRuntimeRepository workflowRuntimeRepository,
-            FlowRecordRepository flowRecordRepository,
-            FlowTodoRecordRepository flowTodoRecordRepository,
-            FlowTodoMergeRepository flowTodoMergeRepository,
+            WorkflowService workflowService,
+            FlowRecordService flowRecordService,
             FlowOperatorGateway flowOperatorGateway,
             ParallelBranchRepository parallelBranchRepository,
             DelayTaskRepository delayTaskRepository,
             UrgeIntervalRepository urgeIntervalRepository
     ) {
         return new RepositoryHolderContextRegister(
-                workflowRepository,
-                workflowRuntimeRepository,
-                flowRecordRepository,
-                flowTodoRecordRepository,
-                flowTodoMergeRepository,
+                workflowService,
+                flowRecordService,
                 flowOperatorGateway,
                 parallelBranchRepository,
                 delayTaskRepository,
@@ -59,24 +55,28 @@ public class AutoConfiguration {
     }
 
     @Bean
+    public FlowRecordService flowRecordService(FlowTodoRecordRepository flowTodoRecordRepository,FlowTodoMergeRepository flowTodoMergeRepository,FlowRecordRepository flowRecordRepository){
+        return new FlowRecordService(flowTodoRecordRepository,flowTodoMergeRepository,flowRecordRepository);
+    }
+
+    @Bean
+    public WorkflowService workflowService(WorkflowVersionRepository workflowVersionRepository,WorkflowRepository workflowRepository,WorkflowRuntimeRepository workflowRuntimeRepository){
+        return new WorkflowService(workflowVersionRepository,workflowRepository,workflowRuntimeRepository);
+    }
+
+    @Bean
     public FlowService flowService(
-            WorkflowRepository workflowRepository,
+            WorkflowService workflowService,
             FlowOperatorGateway flowOperatorGateway,
-            FlowRecordRepository flowRecordRepository,
-            FlowTodoRecordRepository flowTodoRecordRepository,
-            FlowTodoMergeRepository flowTodoMergeRepository,
-            WorkflowRuntimeRepository workflowRuntimeRepository,
+            FlowRecordService flowRecordService,
             ParallelBranchRepository parallelBranchRepository,
             DelayTaskRepository delayTaskRepository,
             UrgeIntervalRepository urgeIntervalRepository
     ) {
         return new FlowService(
-                workflowRepository,
+                workflowService,
                 flowOperatorGateway,
-                flowRecordRepository,
-                flowTodoRecordRepository,
-                flowTodoMergeRepository,
-                workflowRuntimeRepository,
+                flowRecordService,
                 parallelBranchRepository,
                 delayTaskRepository,
                 urgeIntervalRepository

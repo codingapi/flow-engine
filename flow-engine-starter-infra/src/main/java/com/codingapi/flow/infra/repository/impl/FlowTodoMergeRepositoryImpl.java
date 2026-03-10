@@ -28,7 +28,7 @@ public class FlowTodoMergeRepositoryImpl implements FlowTodoMergeRepository {
     }
 
     @Override
-    public void remove(FlowTodoMerge todoMerge) {
+    public void delete(FlowTodoMerge todoMerge) {
         flowTodoMargeEntityRepository.deleteById(todoMerge.getId());
     }
 

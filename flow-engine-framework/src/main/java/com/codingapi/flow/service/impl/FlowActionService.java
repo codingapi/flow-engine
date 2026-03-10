@@ -1,7 +1,6 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
@@ -12,11 +11,12 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.FlowRecordRepository;
-import com.codingapi.flow.repository.WorkflowRuntimeRepository;
+import com.codingapi.flow.service.FlowRecordService;
+import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 
 /**
  * 节点动作服务
@@ -25,14 +25,14 @@ public class FlowActionService {
 
     private final FlowActionRequest request;
     private final FlowOperatorGateway flowOperatorGateway;
-    private final FlowRecordRepository flowRecordRepository;
-    private final WorkflowRuntimeRepository workflowRuntimeRepository;
+    private final FlowRecordService flowRecordService;
+    private final WorkflowService workflowService;
 
     public FlowActionService(FlowActionRequest request) {
         this.request = request;
         this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
-        this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
-        this.workflowRuntimeRepository = RepositoryHolderContext.getInstance().getWorkflowRuntimeRepository();
+        this.flowRecordService = RepositoryHolderContext.getInstance().getFlowRecordService();
+        this.workflowService = RepositoryHolderContext.getInstance().getWorkflowService();
     }
 
     public void action() {
@@ -43,7 +43,7 @@ public class FlowActionService {
         if (currentOperator == null) {
             throw FlowNotFoundException.operator(request.getAdvice().getOperatorId());
         }
-        FlowRecord flowRecord = flowRecordRepository.get(request.getRecordId());
+        FlowRecord flowRecord = flowRecordService.getFlowRecord(request.getRecordId());
         if (flowRecord == null) {
             throw FlowNotFoundException.record(request.getRecordId());
         }
@@ -51,9 +51,9 @@ public class FlowActionService {
             throw FlowStateException.recordAlreadyDone();
         }
 
-        WorkflowRuntime workflowRuntime = workflowRuntimeRepository.get(flowRecord.getWorkBackupId());
+        WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(flowRecord.getWorkRuntimeId());
         if (workflowRuntime == null) {
-            throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + " not found");
+            throw FlowNotFoundException.workflow(flowRecord.getWorkRuntimeId() + " not found");
         }
 
         Workflow workflow = workflowRuntime.toWorkflow();

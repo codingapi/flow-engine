@@ -2,12 +2,13 @@ package com.codingapi.flow.api.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.codingapi.flow.api.pojo.NodeCreateRequest;
+import com.codingapi.flow.api.pojo.WorkflowUpdateVersionNameRequest;
 import com.codingapi.flow.node.IBlockNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.repository.WorkflowRepository;
+import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
 import com.codingapi.springboot.framework.dto.request.IdRequest;
@@ -25,25 +26,37 @@ import java.util.Map;
 @AllArgsConstructor
 public class WorkflowController {
 
-    private final WorkflowRepository workflowRepository;
+    private final WorkflowService workflowService;
 
     @PostMapping("/remove")
     public Response remove(@RequestBody IdRequest request) {
-        Workflow workflow = workflowRepository.get(request.getStringId());
-        workflowRepository.delete(workflow);
+        workflowService.delete(request.getStringId());
+        return Response.buildSuccess();
+    }
+
+    @PostMapping("/updateVersionName")
+    public Response updateVersionName(@RequestBody WorkflowUpdateVersionNameRequest request) {
+        workflowService.updateVersionName(request.getId(),request.getName());
+        return Response.buildSuccess();
+    }
+
+
+    @PostMapping("/changeVersion")
+    public Response changeVersion(@RequestBody IdRequest request) {
+        workflowService.changeVersion(request.getLongId());
         return Response.buildSuccess();
     }
 
 
     @PostMapping("/changeState")
     public Response changeState(@RequestBody IdRequest request) {
-        Workflow workflow = workflowRepository.get(request.getStringId());
+        Workflow workflow = workflowService.getWorkflow(request.getStringId());
         if (workflow.isDisable()) {
             workflow.enable();
         } else {
             workflow.disable();
         }
-        workflowRepository.save(workflow);
+        workflowService.saveWorkflow(workflow);
         return Response.buildSuccess();
     }
 
@@ -75,13 +88,13 @@ public class WorkflowController {
         }
         Workflow workflow = Workflow.formJson(request.toJSONString());
         workflow.updateTime();
-        workflowRepository.save(workflow);
+        workflowService.saveWorkflow(workflow);
         return Response.buildSuccess();
     }
 
     @GetMapping("/load")
     public SingleResponse<JSONObject> load(String id) {
-        Workflow workflow = workflowRepository.get(id);
+        Workflow workflow = workflowService.getWorkflow(id);
         JSONObject jsonObject = JSONObject.parseObject(workflow.toJson(true));
         return SingleResponse.of(jsonObject);
     }

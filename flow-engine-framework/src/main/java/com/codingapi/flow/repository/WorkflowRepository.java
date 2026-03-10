@@ -11,6 +11,6 @@ public interface WorkflowRepository {
 
     Workflow get(String id);
 
-    void delete(Workflow workflow);
+    void delete(String id);
 
 }

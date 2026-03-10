@@ -2,6 +2,8 @@ package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
+import com.codingapi.flow.service.FlowRecordService;
+import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
@@ -15,9 +17,6 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowProcessNodeRequest;
 import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.FlowRecordRepository;
-import com.codingapi.flow.repository.WorkflowRuntimeRepository;
-import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
@@ -33,9 +32,8 @@ public class FlowProcessNodeService {
 
     private final FlowProcessNodeRequest request;
     private final IFlowOperator currentOperator;
-    private final FlowRecordRepository flowRecordRepository;
-    private final WorkflowRepository workflowRepository;
-    private final WorkflowRuntimeRepository workflowRuntimeRepository;
+    private final FlowRecordService flowRecordService;
+    private final WorkflowService workflowService;
 
     // 当前的流程记录，当id为workId时flowRecord为空
     private FlowRecord flowRecord;
@@ -50,9 +48,8 @@ public class FlowProcessNodeService {
     public FlowProcessNodeService(FlowProcessNodeRequest request) {
         this.request = request;
         this.currentOperator = RepositoryHolderContext.getInstance().getOperatorById(request.getOperatorId());
-        this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
-        this.workflowRepository = RepositoryHolderContext.getInstance().getWorkflowRepository();
-        this.workflowRuntimeRepository = RepositoryHolderContext.getInstance().getWorkflowRuntimeRepository();
+        this.flowRecordService = RepositoryHolderContext.getInstance().getFlowRecordService();
+        this.workflowService = RepositoryHolderContext.getInstance().getWorkflowService();
         this.nodeList = new ArrayList<>();
         this.loadWorkflow();
     }
@@ -61,17 +58,17 @@ public class FlowProcessNodeService {
     private void loadWorkflow() {
         String id = this.request.getId();
         if (this.request.isCreateWorkflow()) {
-            this.workflow = workflowRepository.get(id);
+            this.workflow = workflowService.getWorkflow(id);
             this.currentNode = this.workflow.getStartNode();
         } else {
-            FlowRecord flowRecord = flowRecordRepository.get(Long.parseLong(id));
+            FlowRecord flowRecord = flowRecordService.getFlowRecord(Long.parseLong(id));
             if (flowRecord == null) {
                 throw FlowNotFoundException.record(Long.parseLong(id));
             }
             this.flowRecord = flowRecord;
-            WorkflowRuntime workflowRuntime = workflowRuntimeRepository.get(flowRecord.getWorkBackupId());
+            WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(flowRecord.getWorkRuntimeId());
             if (workflowRuntime == null) {
-                throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + " not found");
+                throw FlowNotFoundException.workflow(flowRecord.getWorkRuntimeId() + " not found");
             }
             this.workflow = workflowRuntime.toWorkflow();
             this.currentNode = this.workflow.getFlowNode(flowRecord.getNodeId());
@@ -81,10 +78,10 @@ public class FlowProcessNodeService {
     public List<ProcessNode> processNodes() {
         long backupId = 0;
         if (this.flowRecord != null) {
-            backupId = this.flowRecord.getWorkBackupId();
+            backupId = this.flowRecord.getWorkRuntimeId();
             // 如果当前记录已结束，则不查询后续流程
             if(this.flowRecord.isDone()){
-                List<FlowRecord> historyRecords =  flowRecordRepository.findProcessRecords(this.flowRecord.getProcessId());
+                List<FlowRecord> historyRecords =  flowRecordService.findFlowRecordByProcessId(this.flowRecord.getProcessId());
                 for (FlowRecord historyRecord : historyRecords) {
                     ProcessNode processNode = new ProcessNode(historyRecord, this.workflow);
                     nodeList.add(processNode);
@@ -97,7 +94,7 @@ public class FlowProcessNodeService {
                 return this.nodeList;
             }else {
                 // 查询历史记录
-                List<FlowRecord> historyRecords = flowRecordRepository.findBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
+                List<FlowRecord> historyRecords = flowRecordService.findFlowRecordBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
                 for (FlowRecord historyRecord : historyRecords) {
                     ProcessNode processNode = new ProcessNode(historyRecord, this.workflow);
                     nodeList.add(processNode);

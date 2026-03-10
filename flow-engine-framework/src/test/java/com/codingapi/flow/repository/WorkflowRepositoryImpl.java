@@ -20,7 +20,7 @@ public class WorkflowRepositoryImpl implements WorkflowRepository {
     }
 
     @Override
-    public void delete(Workflow workflow) {
-        cache.remove(workflow.getId());
+    public void delete(String id) {
+        cache.remove(id);
     }
 }

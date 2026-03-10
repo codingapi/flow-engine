@@ -1,7 +1,6 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordStartEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
@@ -16,10 +15,10 @@ import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.WorkflowRuntimeRepository;
-import com.codingapi.flow.repository.WorkflowRepository;
+import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.springboot.framework.event.EventPusher;
 
 import java.util.ArrayList;
@@ -32,19 +31,17 @@ public class FlowCreateService {
 
     private final FlowCreateRequest request;
     private final FlowOperatorGateway flowOperatorGateway;
-    private final WorkflowRepository workflowRepository;
-    private final WorkflowRuntimeRepository workflowRuntimeRepository;
+    private final WorkflowService workflowService;
 
     public FlowCreateService(FlowCreateRequest request) {
         this.request = request;
         this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
-        this.workflowRepository = RepositoryHolderContext.getInstance().getWorkflowRepository();
-        this.workflowRuntimeRepository = RepositoryHolderContext.getInstance().getWorkflowRuntimeRepository();
+        this.workflowService = RepositoryHolderContext.getInstance().getWorkflowService();
     }
 
     public long create() {
         request.verify();
-        Workflow workflow = workflowRepository.get(request.getWorkId());
+        Workflow workflow = workflowService.getWorkflow(request.getWorkId());
         if (workflow == null) {
             throw FlowNotFoundException.workflow(request.getWorkId());
         }
@@ -53,10 +50,10 @@ public class FlowCreateService {
         }
         workflow.verify();
         // 获取备份
-        WorkflowRuntime workflowRuntime = workflowRuntimeRepository.getByWorkId(workflow.getId(), workflow.getUpdatedTime());
+        WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(workflow.getId(), workflow.getUpdatedTime());
         if (workflowRuntime == null) {
             workflowRuntime = new WorkflowRuntime(workflow);
-            workflowRuntimeRepository.save(workflowRuntime);
+            workflowService.saveWorkflowRuntime(workflowRuntime);
         }
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getOperatorId());

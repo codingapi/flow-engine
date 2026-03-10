@@ -10,7 +10,7 @@ public interface FlowTodoRecordRepository {
 
     FlowTodoRecord getByMergeKey(String key);
 
-    void remove(FlowTodoRecord margeRecord);
+    void delete(FlowTodoRecord margeRecord);
 
     void save(FlowTodoRecord margeRecord);
 

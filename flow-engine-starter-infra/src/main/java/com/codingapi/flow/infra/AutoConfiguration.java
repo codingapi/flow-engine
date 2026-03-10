@@ -39,6 +39,11 @@ public class AutoConfiguration {
     }
 
     @Bean
+    public WorkflowVersionRepository workflowVersionRepository(WorkflowVersionEntityRepository workflowVersionEntityRepository){
+        return new WorkflowVersionRepositoryImpl(workflowVersionEntityRepository);
+    }
+
+    @Bean
     public FlowRecordRepository flowRecordRepository(FlowRecordEntityRepository flowRecordEntityRepository){
         return new FlowRecordRepositoryImpl(flowRecordEntityRepository);
     }
