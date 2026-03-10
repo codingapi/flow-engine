@@ -1,6 +1,6 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.backup.WorkflowBackup;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.domain.UrgeInterval;
 import com.codingapi.flow.event.FlowRecordUrgeEvent;
@@ -14,7 +14,7 @@ import com.codingapi.flow.pojo.request.FlowUrgeRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.repository.UrgeIntervalRepository;
-import com.codingapi.flow.repository.WorkflowBackupRepository;
+import com.codingapi.flow.repository.WorkflowRuntimeRepository;
 import com.codingapi.flow.strategy.workflow.UrgeStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.springboot.framework.event.EventPusher;
@@ -31,14 +31,14 @@ public class FlowUrgeService {
     private final FlowRecordRepository flowRecordRepository;
     private final FlowOperatorGateway flowOperatorGateway;
     private final UrgeIntervalRepository urgeIntervalRepository;
-    private final WorkflowBackupRepository workflowBackupRepository;
+    private final WorkflowRuntimeRepository workflowRuntimeRepository;
 
     public FlowUrgeService(FlowUrgeRequest request) {
         this.request = request;
         this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
         this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
         this.urgeIntervalRepository = RepositoryHolderContext.getInstance().getUrgeIntervalRepository();
-        this.workflowBackupRepository = RepositoryHolderContext.getInstance().getWorkflowBackupRepository();
+        this.workflowRuntimeRepository = RepositoryHolderContext.getInstance().getWorkflowRuntimeRepository();
     }
 
     /**
@@ -65,8 +65,8 @@ public class FlowUrgeService {
 
         UrgeInterval urgeInterval = urgeIntervalRepository.getLatest(currentRecord.getProcessId(), request.getRecordId());
         if (urgeInterval != null) {
-            WorkflowBackup workflowBackup = workflowBackupRepository.get(currentRecord.getWorkBackupId());
-            Workflow workflow = workflowBackup.toWorkflow();
+            WorkflowRuntime workflowRuntime = workflowRuntimeRepository.get(currentRecord.getWorkBackupId());
+            Workflow workflow = workflowRuntime.toWorkflow();
             WorkflowStrategyManager strategyManager = workflow.strategyManager();
             if (strategyManager.isEnableUrge()) {
                 UrgeStrategy urgeStrategy = strategyManager.getStrategy(UrgeStrategy.class);

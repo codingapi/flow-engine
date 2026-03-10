@@ -42,12 +42,12 @@ public class FlowDetailServiceTest {
     private final FlowTodoMergeRepositoryImpl flowTodoMergeRepository = new FlowTodoMergeRepositoryImpl();
     private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
     private final UserGateway userGateway = new UserGateway();
-    private final WorkflowBackupRepository workflowBackupRepository = new WorkflowBackupRepositoryImpl();
+    private final WorkflowRuntimeRepository workflowRuntimeRepository = new WorkflowRuntimeRepositoryImpl();
     private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
     private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
     private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
     private final UrgeIntervalRepository urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
-    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, flowTodoRecordRepository, flowTodoMergeRepository, workflowBackupRepository, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
+    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, flowTodoRecordRepository, flowTodoMergeRepository, workflowRuntimeRepository, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
 
 
     /**

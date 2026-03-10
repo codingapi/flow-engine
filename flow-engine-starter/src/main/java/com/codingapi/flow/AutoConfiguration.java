@@ -36,7 +36,7 @@ public class AutoConfiguration {
     @Bean
     public RepositoryHolderContextRegister repositoryHolderContextRegister(
             WorkflowRepository workflowRepository,
-            WorkflowBackupRepository workflowBackupRepository,
+            WorkflowRuntimeRepository workflowRuntimeRepository,
             FlowRecordRepository flowRecordRepository,
             FlowTodoRecordRepository flowTodoRecordRepository,
             FlowTodoMergeRepository flowTodoMergeRepository,
@@ -47,7 +47,7 @@ public class AutoConfiguration {
     ) {
         return new RepositoryHolderContextRegister(
                 workflowRepository,
-                workflowBackupRepository,
+                workflowRuntimeRepository,
                 flowRecordRepository,
                 flowTodoRecordRepository,
                 flowTodoMergeRepository,
@@ -65,7 +65,7 @@ public class AutoConfiguration {
             FlowRecordRepository flowRecordRepository,
             FlowTodoRecordRepository flowTodoRecordRepository,
             FlowTodoMergeRepository flowTodoMergeRepository,
-            WorkflowBackupRepository workflowBackupRepository,
+            WorkflowRuntimeRepository workflowRuntimeRepository,
             ParallelBranchRepository parallelBranchRepository,
             DelayTaskRepository delayTaskRepository,
             UrgeIntervalRepository urgeIntervalRepository
@@ -76,7 +76,7 @@ public class AutoConfiguration {
                 flowRecordRepository,
                 flowTodoRecordRepository,
                 flowTodoMergeRepository,
-                workflowBackupRepository,
+                workflowRuntimeRepository,
                 parallelBranchRepository,
                 delayTaskRepository,
                 urgeIntervalRepository

@@ -29,7 +29,7 @@ public class RepositoryHolderContext {
     @Getter
     private WorkflowRepository workflowRepository;
     @Getter
-    private WorkflowBackupRepository workflowBackupRepository;
+    private WorkflowRuntimeRepository workflowRuntimeRepository;
     @Getter
     private FlowRecordRepository flowRecordRepository;
     @Getter
@@ -51,7 +51,7 @@ public class RepositoryHolderContext {
     public boolean isRegistered() {
         return parallelBranchRepository != null
                 && delayTaskRepository != null
-                && workflowBackupRepository != null
+                && workflowRuntimeRepository != null
                 && flowRecordRepository != null
                 && flowTodoRecordRepository != null
                 && flowTodoMergeRepository != null
@@ -68,7 +68,7 @@ public class RepositoryHolderContext {
     }
 
     public void register(WorkflowRepository workflowRepository,
-                         WorkflowBackupRepository workflowBackupRepository,
+                         WorkflowRuntimeRepository workflowRuntimeRepository,
                          FlowRecordRepository flowRecordRepository,
                          FlowTodoRecordRepository flowTodoRecordRepository,
                          FlowTodoMergeRepository flowTodoMergeRepository,
@@ -77,7 +77,7 @@ public class RepositoryHolderContext {
                          DelayTaskRepository delayTaskRepository,
                          UrgeIntervalRepository urgeIntervalRepository) {
         this.workflowRepository = workflowRepository;
-        this.workflowBackupRepository = workflowBackupRepository;
+        this.workflowRuntimeRepository = workflowRuntimeRepository;
         this.flowRecordRepository = flowRecordRepository;
         this.flowTodoRecordRepository = flowTodoRecordRepository;
         this.flowTodoMergeRepository = flowTodoMergeRepository;
@@ -99,7 +99,7 @@ public class RepositoryHolderContext {
         return new FlowDelayTriggerService(task,
                 flowOperatorGateway,
                 flowRecordRepository,
-                workflowBackupRepository);
+                workflowRuntimeRepository);
     }
 
 
@@ -127,7 +127,7 @@ public class RepositoryHolderContext {
                 flowRecordRepository,
                 flowTodoRecordRepository,
                 flowTodoMergeRepository,
-                workflowBackupRepository,
+                workflowRuntimeRepository,
                 parallelBranchRepository,
                 delayTaskRepository,
                 urgeIntervalRepository);

@@ -22,13 +22,13 @@ public class FlowService {
                        FlowRecordRepository flowRecordRepository,
                        FlowTodoRecordRepository flowTodoRecordRepository,
                        FlowTodoMergeRepository flowTodoMergeRepository,
-                       WorkflowBackupRepository workflowBackupRepository,
+                       WorkflowRuntimeRepository workflowRuntimeRepository,
                        ParallelBranchRepository parallelBranchRepository,
                        DelayTaskRepository delayTaskRepository,
                        UrgeIntervalRepository urgeIntervalRepository) {
         RepositoryHolderContext.getInstance()
                 .register(workflowRepository,
-                        workflowBackupRepository,
+                        workflowRuntimeRepository,
                         flowRecordRepository,
                         flowTodoRecordRepository,
                         flowTodoMergeRepository,

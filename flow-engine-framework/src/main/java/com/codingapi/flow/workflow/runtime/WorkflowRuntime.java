@@ -1,4 +1,4 @@
-package com.codingapi.flow.backup;
+package com.codingapi.flow.workflow.runtime;
 
 import com.codingapi.flow.workflow.Workflow;
 import lombok.AllArgsConstructor;
@@ -6,11 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 流程备份
+ * 运行流程备份数据
  */
 @Getter
 @AllArgsConstructor
-public class WorkflowBackup {
+public class WorkflowRuntime {
 
     @Setter
     private long id;
@@ -41,7 +41,7 @@ public class WorkflowBackup {
     private String workflow;
 
 
-    public WorkflowBackup(Workflow workflow) {
+    public WorkflowRuntime(Workflow workflow) {
         this.workflow = workflow.toJson(false);
         this.workId = workflow.getId();
         this.workCode = workflow.getCode();

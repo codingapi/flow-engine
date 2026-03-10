@@ -10,7 +10,7 @@ import org.springframework.beans.factory.InitializingBean;
 public class RepositoryHolderContextRegister implements InitializingBean {
 
     private final WorkflowRepository workflowRepository;
-    private final WorkflowBackupRepository workflowBackupRepository;
+    private final WorkflowRuntimeRepository workflowRuntimeRepository;
     private final FlowRecordRepository flowRecordRepository;
     private final FlowTodoRecordRepository flowTodoRecordRepository;
     private final FlowTodoMergeRepository flowTodoMergeRepository;
@@ -24,7 +24,7 @@ public class RepositoryHolderContextRegister implements InitializingBean {
 
         RepositoryHolderContext.getInstance().register(
                 workflowRepository,
-                workflowBackupRepository,
+                workflowRuntimeRepository,
                 flowRecordRepository,
                 flowTodoRecordRepository,
                 flowTodoMergeRepository,

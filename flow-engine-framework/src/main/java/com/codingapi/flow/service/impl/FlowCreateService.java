@@ -1,7 +1,7 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.backup.WorkflowBackup;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordStartEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
@@ -16,7 +16,7 @@ import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.WorkflowBackupRepository;
+import com.codingapi.flow.repository.WorkflowRuntimeRepository;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
@@ -33,13 +33,13 @@ public class FlowCreateService {
     private final FlowCreateRequest request;
     private final FlowOperatorGateway flowOperatorGateway;
     private final WorkflowRepository workflowRepository;
-    private final WorkflowBackupRepository workflowBackupRepository;
+    private final WorkflowRuntimeRepository workflowRuntimeRepository;
 
     public FlowCreateService(FlowCreateRequest request) {
         this.request = request;
         this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
         this.workflowRepository = RepositoryHolderContext.getInstance().getWorkflowRepository();
-        this.workflowBackupRepository = RepositoryHolderContext.getInstance().getWorkflowBackupRepository();
+        this.workflowRuntimeRepository = RepositoryHolderContext.getInstance().getWorkflowRuntimeRepository();
     }
 
     public long create() {
@@ -53,10 +53,10 @@ public class FlowCreateService {
         }
         workflow.verify();
         // 获取备份
-        WorkflowBackup workflowBackup = workflowBackupRepository.getByWorkId(workflow.getId(), workflow.getUpdatedTime());
-        if (workflowBackup == null) {
-            workflowBackup = new WorkflowBackup(workflow);
-            workflowBackupRepository.save(workflowBackup);
+        WorkflowRuntime workflowRuntime = workflowRuntimeRepository.getByWorkId(workflow.getId(), workflow.getUpdatedTime());
+        if (workflowRuntime == null) {
+            workflowRuntime = new WorkflowRuntime(workflow);
+            workflowRuntimeRepository.save(workflowRuntime);
         }
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getOperatorId());
@@ -69,7 +69,7 @@ public class FlowCreateService {
 
         StartNode currentNode = (StartNode) workflow.getStartNode();
         IFlowAction action = currentNode.actionManager().getActionById(request.getActionId());
-        FlowSession session = FlowSession.startSession(currentOperator, workflow, currentNode, action, formData, workflowBackup.getId());
+        FlowSession session = FlowSession.startSession(currentOperator, workflow, currentNode, action, formData, workflowRuntime.getId());
 
         List<FlowRecord> flowRecords = currentNode.generateCurrentRecords(session);
 

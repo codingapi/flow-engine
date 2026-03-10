@@ -1,7 +1,7 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.backup.WorkflowBackup;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
@@ -13,7 +13,7 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
-import com.codingapi.flow.repository.WorkflowBackupRepository;
+import com.codingapi.flow.repository.WorkflowRuntimeRepository;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
@@ -26,13 +26,13 @@ public class FlowActionService {
     private final FlowActionRequest request;
     private final FlowOperatorGateway flowOperatorGateway;
     private final FlowRecordRepository flowRecordRepository;
-    private final WorkflowBackupRepository workflowBackupRepository;
+    private final WorkflowRuntimeRepository workflowRuntimeRepository;
 
     public FlowActionService(FlowActionRequest request) {
         this.request = request;
         this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
         this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
-        this.workflowBackupRepository = RepositoryHolderContext.getInstance().getWorkflowBackupRepository();
+        this.workflowRuntimeRepository = RepositoryHolderContext.getInstance().getWorkflowRuntimeRepository();
     }
 
     public void action() {
@@ -51,12 +51,12 @@ public class FlowActionService {
             throw FlowStateException.recordAlreadyDone();
         }
 
-        WorkflowBackup workflowBackup = workflowBackupRepository.get(flowRecord.getWorkBackupId());
-        if (workflowBackup == null) {
+        WorkflowRuntime workflowRuntime = workflowRuntimeRepository.get(flowRecord.getWorkBackupId());
+        if (workflowRuntime == null) {
             throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + " not found");
         }
 
-        Workflow workflow = workflowBackup.toWorkflow();
+        Workflow workflow = workflowRuntime.toWorkflow();
 
         long recordOperatorId = flowRecord.getCurrentOperatorId();
         WorkflowStrategyManager workflowStrategyManager = workflow.strategyManager();

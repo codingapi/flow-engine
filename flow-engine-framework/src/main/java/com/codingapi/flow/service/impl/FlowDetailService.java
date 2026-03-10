@@ -1,6 +1,6 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.backup.WorkflowBackup;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.node.IFlowNode;
@@ -24,14 +24,14 @@ public class FlowDetailService {
     private final IFlowOperator currentOperator;
     private final FlowRecordRepository flowRecordRepository;
     private final WorkflowRepository workflowRepository;
-    private final WorkflowBackupRepository workflowBackupRepository;
+    private final WorkflowRuntimeRepository workflowRuntimeRepository;
 
     public FlowDetailService(FlowDetailRequest request) {
         this.request = request;
         this.currentOperator = RepositoryHolderContext.getInstance().getOperatorById(request.getOperatorId());
         this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
         this.workflowRepository = RepositoryHolderContext.getInstance().getWorkflowRepository();
-        this.workflowBackupRepository = RepositoryHolderContext.getInstance().getWorkflowBackupRepository();
+        this.workflowRuntimeRepository = RepositoryHolderContext.getInstance().getWorkflowRuntimeRepository();
     }
 
     public FlowContent detail() {
@@ -46,11 +46,11 @@ public class FlowDetailService {
             if (flowRecord == null) {
                 throw FlowNotFoundException.record(Long.parseLong(this.request.getId()));
             }
-            WorkflowBackup workflowBackup = workflowBackupRepository.get(flowRecord.getWorkBackupId());
-            if (workflowBackup == null) {
+            WorkflowRuntime workflowRuntime = workflowRuntimeRepository.get(flowRecord.getWorkBackupId());
+            if (workflowRuntime == null) {
                 throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + " not found");
             }
-            Workflow workflow = workflowBackup.toWorkflow();
+            Workflow workflow = workflowRuntime.toWorkflow();
 
             if(!flowRecord.isReadable()){
                 flowRecord.read();

@@ -2,7 +2,7 @@ package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
-import com.codingapi.flow.backup.WorkflowBackup;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.form.FormData;
@@ -16,7 +16,7 @@ import com.codingapi.flow.pojo.request.FlowProcessNodeRequest;
 import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
-import com.codingapi.flow.repository.WorkflowBackupRepository;
+import com.codingapi.flow.repository.WorkflowRuntimeRepository;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
@@ -35,7 +35,7 @@ public class FlowProcessNodeService {
     private final IFlowOperator currentOperator;
     private final FlowRecordRepository flowRecordRepository;
     private final WorkflowRepository workflowRepository;
-    private final WorkflowBackupRepository workflowBackupRepository;
+    private final WorkflowRuntimeRepository workflowRuntimeRepository;
 
     // 当前的流程记录，当id为workId时flowRecord为空
     private FlowRecord flowRecord;
@@ -52,7 +52,7 @@ public class FlowProcessNodeService {
         this.currentOperator = RepositoryHolderContext.getInstance().getOperatorById(request.getOperatorId());
         this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
         this.workflowRepository = RepositoryHolderContext.getInstance().getWorkflowRepository();
-        this.workflowBackupRepository = RepositoryHolderContext.getInstance().getWorkflowBackupRepository();
+        this.workflowRuntimeRepository = RepositoryHolderContext.getInstance().getWorkflowRuntimeRepository();
         this.nodeList = new ArrayList<>();
         this.loadWorkflow();
     }
@@ -69,11 +69,11 @@ public class FlowProcessNodeService {
                 throw FlowNotFoundException.record(Long.parseLong(id));
             }
             this.flowRecord = flowRecord;
-            WorkflowBackup workflowBackup = workflowBackupRepository.get(flowRecord.getWorkBackupId());
-            if (workflowBackup == null) {
+            WorkflowRuntime workflowRuntime = workflowRuntimeRepository.get(flowRecord.getWorkBackupId());
+            if (workflowRuntime == null) {
                 throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + " not found");
             }
-            this.workflow = workflowBackup.toWorkflow();
+            this.workflow = workflowRuntime.toWorkflow();
             this.currentNode = this.workflow.getFlowNode(flowRecord.getNodeId());
         }
     }
