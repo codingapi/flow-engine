@@ -24,6 +24,9 @@ export const VersionContent: React.FC<VersionContentProps> = (props) => {
                         onVersionChange={async (versionId) => {
                             await props.presenter.changeVersion(versionId);
                         }}
+                        onVersionRemove={async (versionId)=>{
+                            await props.presenter.deleteVersion(versionId);
+                        }}
                     />
                 )
             })}

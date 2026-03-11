@@ -8,10 +8,12 @@ export interface WorkflowVersion {
 
 export interface VersionApi {
 
-     loadVersions(workId: string): Promise<WorkflowVersion[]>;
+    loadVersions(workId: string): Promise<WorkflowVersion[]>;
 
-     updateVersionName(id:number, versionName: string): Promise<void>;
+    updateVersionName(id: number, versionName: string): Promise<void>;
 
-    changeVersion(id:number): Promise<void>;
+    changeVersion(id: number): Promise<void>;
+
+    deleteVersion(id: number): Promise<void>;
 
 }

@@ -1,5 +1,6 @@
 package com.codingapi.flow.service;
 
+import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.repository.WorkflowRuntimeRepository;
 import com.codingapi.flow.repository.WorkflowVersionRepository;
@@ -29,7 +30,7 @@ public class WorkflowService {
         if (versionList != null) {
 
             if (!creatable) {
-                versionList.stream().filter(WorkflowVersion::isCurrent).findFirst().ifPresent(current ->{
+                versionList.stream().filter(WorkflowVersion::isCurrent).findFirst().ifPresent(current -> {
                     currentVersion.setId(current.getId());
                     currentVersion.setVersionName(current.getVersionName());
                 });
@@ -57,18 +58,26 @@ public class WorkflowService {
         return workflowRepository.get(workId);
     }
 
+    public void deleteVersion(long versionId) {
+        WorkflowVersion version = workflowVersionRepository.get(versionId);
+        if (version != null && version.isCurrent()) {
+            throw FlowExecutionException.removeWorkflowError();
+        }
+        workflowVersionRepository.delete(versionId);
+    }
+
 
     public void changeVersion(long versionId) {
         WorkflowVersion currentVersion = workflowVersionRepository.get(versionId);
         List<WorkflowVersion> versionList = workflowVersionRepository.findVersion(currentVersion.getWorkId());
         if (versionList != null) {
-           for (WorkflowVersion version:versionList){
-               if(currentVersion.getId() == version.getId()){
-                   version.enableVersion();
-               }else {
-                   version.disableVersion();
-               }
-           }
+            for (WorkflowVersion version : versionList) {
+                if (currentVersion.getId() == version.getId()) {
+                    version.enableVersion();
+                } else {
+                    version.disableVersion();
+                }
+            }
         }
         workflowVersionRepository.saveAll(versionList);
         workflowRepository.save(currentVersion.toWorkflow());
@@ -90,7 +99,7 @@ public class WorkflowService {
 
     public void saveWorkflow(Workflow workflow) {
         WorkflowVersion workflowVersion = new WorkflowVersion(workflow);
-        this.saveWorkflowVersion(workflowVersion,false);
+        this.saveWorkflowVersion(workflowVersion, false);
     }
 
     public void saveWorkflowRuntime(WorkflowRuntime workflowRuntime) {

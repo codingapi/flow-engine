@@ -1,5 +1,5 @@
 import {VersionApi, WorkflowVersion} from "./types";
-import {updateVersionName as updateVersionNameApi, versions, changeVersion as changeVersionApi} from "@/api/workflow";
+import {updateVersionName as updateVersionNameApi, versions, changeVersion as changeVersionApi,deleteVersion as deleteVersionApi } from "@/api/workflow";
 
 export class VersionApiImpl implements VersionApi {
 
@@ -20,6 +20,10 @@ export class VersionApiImpl implements VersionApi {
 
     changeVersion = async (id: number) => {
         await changeVersionApi(id);
+    }
+
+    deleteVersion = async (id: number) => {
+        await deleteVersionApi(id);
     }
 
 }

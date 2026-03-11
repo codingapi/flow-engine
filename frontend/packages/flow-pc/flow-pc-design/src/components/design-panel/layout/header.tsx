@@ -3,6 +3,7 @@ import {Button, Form, Input, message, Popover, Space, Tabs} from "antd";
 import {LayoutHeaderHeight, TabPanelType} from "../types";
 import {useDesignContext} from "../hooks/use-design-context";
 import {CloseOutlined, SaveOutlined} from "@ant-design/icons";
+import {EventBus} from "@flow-engine/flow-core";
 
 const Left = () => {
     return (
@@ -40,6 +41,8 @@ const SaveAsButton = () => {
                                 context.save(values.name).then(()=>{
                                     setVisible(false);
                                     message.success('版本已保存');
+
+                                    EventBus.getInstance().emit('VersionChangeEvent');
                                 });
                             }}
                         >

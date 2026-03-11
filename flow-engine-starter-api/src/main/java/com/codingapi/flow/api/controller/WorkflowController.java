@@ -50,6 +50,13 @@ public class WorkflowController {
     }
 
 
+    @PostMapping("/deleteVersion")
+    public Response deleteVersion(@RequestBody IdRequest request) {
+        workflowService.deleteVersion(request.getLongId());
+        return Response.buildSuccess();
+    }
+
+
     @PostMapping("/changeState")
     public Response changeState(@RequestBody IdRequest request) {
         Workflow workflow = workflowService.getWorkflow(request.getStringId());

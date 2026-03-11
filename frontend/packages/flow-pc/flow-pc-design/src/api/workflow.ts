@@ -24,6 +24,10 @@ export const changeVersion = (id:any) => {
     return httpClient.post('/api/cmd/workflow/changeVersion',{id});
 }
 
+export const deleteVersion = (id:any) => {
+    return httpClient.post('/api/cmd/workflow/deleteVersion',{id});
+}
+
 export const changeState = (id:string) => {
     return httpClient.post('/api/cmd/workflow/changeState',{id});
 }

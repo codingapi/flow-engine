@@ -10,6 +10,7 @@ interface VersionItemProps {
     version: WorkflowVersion;
     onUpdateVersionName: (id: number, name: string) => Promise<void>;
     onVersionChange: (id: number) => Promise<void>;
+    onVersionRemove: (id: number) => Promise<void>;
 }
 
 export const VersionItem: React.FC<VersionItemProps> = (props) => {
@@ -80,6 +81,20 @@ export const VersionItem: React.FC<VersionItemProps> = (props) => {
                                 setEditeVisible(true)
                             }}
                         >编辑</a>
+
+                        {!version.current && (
+                            <Popconfirm
+                                title={"确认要删除到该版本吗？"}
+                                onConfirm={async () => {
+                                    props.onVersionRemove(version.id).then(() => {
+                                        message.success("版本已删除");
+                                    });
+                                }}
+                            >
+                                <a>删除</a>
+                            </Popconfirm>
+                        )}
+
                         {!version.current && (
                             <Popconfirm
                                 title={"确认要切换到该版本吗？"}

@@ -4,10 +4,21 @@ import {Button, Popover} from "antd";
 import {HistoryOutlined} from "@ant-design/icons";
 import {useVersionPresenter} from "@/components/design-editor/version/hooks/use-version-presenter";
 import {VersionContent} from "./components/version-content";
+import {EventBus} from "@flow-engine/flow-core";
 
 export const EditorVersion = () => {
 
     const {state, presenter} = useVersionPresenter();
+
+    React.useEffect(()=>{
+        EventBus.getInstance().on('VersionChangeEvent',()=>{
+            presenter.initState();
+        });
+
+        return () => {
+            EventBus.getInstance().off('VersionChangeEvent');
+        }
+    },[]);
 
     return (
         <VersionContainer>

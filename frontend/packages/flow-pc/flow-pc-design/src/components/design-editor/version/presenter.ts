@@ -36,4 +36,10 @@ export class VersionPresenter {
         await this.initState();
     }
 
+    public async deleteVersion(id: number) {
+        await this.api.deleteVersion(id);
+        await this.initState();
+    }
+
+
 }
