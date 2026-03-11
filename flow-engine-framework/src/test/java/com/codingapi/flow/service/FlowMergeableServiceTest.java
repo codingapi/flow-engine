@@ -38,19 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FlowMergeableServiceTest {
 
-    private final FlowTodoRecordRepositoryImpl flowTodoRecordRepository = new FlowTodoRecordRepositoryImpl();
-    private final FlowTodoMergeRepositoryImpl flowTodoMergeRepository = new FlowTodoMergeRepositoryImpl();
-    private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
-    private final UserGateway userGateway = new UserGateway();
-    private final WorkflowRuntimeRepository workflowRuntimeRepository = new WorkflowRuntimeRepositoryImpl();
-    private final WorkflowVersionRepository workflowVersionRepository = new WorkflowVersionRepositoryImpl();
-    private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
-    private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
-    private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
-    private final UrgeIntervalRepository urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
-    private final WorkflowService workflowService = new WorkflowService(workflowVersionRepository,workflowRepository,workflowRuntimeRepository);
-    private final FlowRecordService flowRecordService = new FlowRecordService(flowTodoRecordRepository,flowTodoMergeRepository,flowRecordRepository);
-    private final FlowService flowService = new FlowService(workflowService, userGateway, flowRecordService, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
+    private final FlowServiceFactory factory = new FlowServiceFactory();
 
 
     /**
@@ -61,10 +49,10 @@ public class FlowMergeableServiceTest {
 
         User user = new User(1, "user");
         User boss = new User(2, "boss");
-        userGateway.save(user);
-        userGateway.save(boss);
+        factory.userGateway.save(user);
+        factory.userGateway.save(boss);
 
-        GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
+        GatewayContext.getInstance().setFlowOperatorGateway(factory.userGateway);
 
         FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
@@ -113,7 +101,7 @@ public class FlowMergeableServiceTest {
                 .addNode(endNode)
                 .build();
 
-         workflowService.saveWorkflow(workflow);
+        factory.workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
@@ -126,20 +114,20 @@ public class FlowMergeableServiceTest {
             userCreateRequest.setFormData(data);
             userCreateRequest.setActionId(startActions.get(0).id());
             userCreateRequest.setOperatorId(user.getUserId());
-            flowService.create(userCreateRequest);
+            factory.flowService.create(userCreateRequest);
 
-            List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
+            List<FlowRecord> userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
             assertEquals(1, userRecordList.size());
 
             FlowActionRequest userRequest = new FlowActionRequest();
             userRequest.setFormData(data);
             userRequest.setRecordId(userRecordList.get(0).getId());
             userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
-            flowService.action(userRequest);
+            factory.flowService.action(userRequest);
         }
 
 
-        List<FlowRecord> bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        List<FlowRecord> bossRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(count, bossRecordList.size());
         assertEquals(count, bossRecordList.stream().filter(FlowRecord::isMergeable).toList().size());
 
@@ -147,11 +135,11 @@ public class FlowMergeableServiceTest {
         Set<String> set = new HashSet<>(mergeIdList);
         assertEquals(1,set.size());
 
-        List<FlowTodoRecord> todoRecords = flowTodoRecordRepository.findByOperatorId(boss.getUserId());
+        List<FlowTodoRecord> todoRecords = factory.flowTodoRecordRepository.findByOperatorId(boss.getUserId());
         assertEquals(1, todoRecords.size());
 
         FlowTodoRecord todoMargeRecord = todoRecords.get(0);
-        List<FlowTodoMerge> mergeList = flowTodoMergeRepository.findByTodoId(todoMargeRecord.getId());
+        List<FlowTodoMerge> mergeList = factory.flowTodoMergeRepository.findByTodoId(todoMargeRecord.getId());
         assertEquals(count, mergeList.size());
 
 
@@ -162,19 +150,19 @@ public class FlowMergeableServiceTest {
             bossRequest.setFormData(data);
             bossRequest.setRecordId(bossRecordList.get(i).getId());
             bossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", boss.getUserId()));
-            flowService.action(bossRequest);
+            factory.flowService.action(bossRequest);
         }
 
         for(int i=0;i<count;i++) {
-            List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(i).getProcessId());
+            List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bossRecordList.get(i).getProcessId());
             assertEquals(2, records.size());
             assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
         }
 
-        List<FlowTodoRecord> todoRecordList = flowTodoRecordRepository.findAll();
+        List<FlowTodoRecord> todoRecordList = factory.flowTodoRecordRepository.findAll();
         assertEquals(0, todoRecordList.size());
 
-        List<FlowTodoMerge> todoMargeList = flowTodoMergeRepository.findAll();
+        List<FlowTodoMerge> todoMargeList = factory.flowTodoMergeRepository.findAll();
         assertEquals(0, todoMargeList.size());
      }
 

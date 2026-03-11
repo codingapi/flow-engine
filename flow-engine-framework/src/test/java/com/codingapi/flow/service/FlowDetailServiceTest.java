@@ -10,7 +10,6 @@ import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
-import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
@@ -22,7 +21,6 @@ import com.codingapi.flow.pojo.request.FlowProcessNodeRequest;
 import com.codingapi.flow.pojo.response.FlowContent;
 import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.*;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.user.User;
@@ -38,19 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class FlowDetailServiceTest {
 
-    private final FlowTodoRecordRepositoryImpl flowTodoRecordRepository = new FlowTodoRecordRepositoryImpl();
-    private final FlowTodoMergeRepositoryImpl flowTodoMergeRepository = new FlowTodoMergeRepositoryImpl();
-    private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
-    private final UserGateway userGateway = new UserGateway();
-    private final WorkflowRuntimeRepository workflowRuntimeRepository = new WorkflowRuntimeRepositoryImpl();
-    private final WorkflowVersionRepository workflowVersionRepository = new WorkflowVersionRepositoryImpl();
-    private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
-    private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
-    private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
-    private final UrgeIntervalRepository urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
-    private final WorkflowService workflowService = new WorkflowService(workflowVersionRepository,workflowRepository,workflowRuntimeRepository);
-    private final FlowRecordService flowRecordService = new FlowRecordService(flowTodoRecordRepository,flowTodoMergeRepository,flowRecordRepository);
-    private final FlowService flowService = new FlowService(workflowService, userGateway, flowRecordService, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
+    private final FlowServiceFactory factory = new FlowServiceFactory();
 
 
     /**
@@ -61,10 +47,10 @@ public class FlowDetailServiceTest {
 
         User user = new User(1, "user");
         User boss = new User(2, "boss");
-        userGateway.save(user);
-        userGateway.save(boss);
+        factory.userGateway.save(user);
+        factory.userGateway.save(boss);
 
-        GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
+        GatewayContext.getInstance().setFlowOperatorGateway(factory.userGateway);
 
         FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
@@ -112,9 +98,9 @@ public class FlowDetailServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowService.saveWorkflow(workflow);
+        factory.workflowService.saveWorkflow(workflow);
 
-        FlowContent detail = flowService.detail(new FlowDetailRequest(workflow.getId(), user.getUserId()));
+        FlowContent detail = factory.flowService.detail(new FlowDetailRequest(workflow.getId(), user.getUserId()));
         assertEquals(detail.getForm().getCode(), form.getCode());
         assertEquals(detail.getActions().size(), startNode.actionManager().getActions().size());
         assertNull(detail.getTodos());
@@ -129,12 +115,12 @@ public class FlowDetailServiceTest {
         userCreateRequest.setFormData(data);
         userCreateRequest.setActionId(startActions.get(0).id());
         userCreateRequest.setOperatorId(user.getUserId());
-        flowService.create(userCreateRequest);
+        factory.flowService.create(userCreateRequest);
 
-        List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
+        List<FlowRecord> userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
         assertEquals(1, userRecordList.size());
 
-        detail = flowService.detail(new FlowDetailRequest(userRecordList.get(0).getId(), user.getUserId()));
+        detail = factory.flowService.detail(new FlowDetailRequest(userRecordList.get(0).getId(), user.getUserId()));
         assertEquals(detail.getForm().getCode(), form.getCode());
         assertEquals(detail.getActions().size(), startNode.actionManager().getActions().size());
         assertEquals(1, detail.getTodos().size());
@@ -146,12 +132,12 @@ public class FlowDetailServiceTest {
         userRequest.setFormData(data);
         userRequest.setRecordId(userRecordList.get(0).getId());
         userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
-        flowService.action(userRequest);
+        factory.flowService.action(userRequest);
 
-        List<FlowRecord> bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        List<FlowRecord> bossRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, bossRecordList.size());
 
-        detail = flowService.detail(new FlowDetailRequest(bossRecordList.get(0).getId(),boss.getUserId()));
+        detail = factory.flowService.detail(new FlowDetailRequest(bossRecordList.get(0).getId(),boss.getUserId()));
         assertEquals(detail.getForm().getCode(), form.getCode());
         assertEquals(detail.getActions().size(), bossNode.actionManager().getActions().size());
         assertEquals(1, detail.getTodos().size());
@@ -164,9 +150,9 @@ public class FlowDetailServiceTest {
         bossRequest.setFormData(data);
         bossRequest.setRecordId(bossRecordList.get(0).getId());
         bossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", boss.getUserId()));
-        flowService.action(bossRequest);
+        factory.flowService.action(bossRequest);
 
-        List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
+        List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
         assertEquals(2, records.size());
         assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
@@ -183,10 +169,10 @@ public class FlowDetailServiceTest {
 
         User user = new User(1, "user");
         User boss = new User(2, "boss");
-        userGateway.save(user);
-        userGateway.save(boss);
+        factory.userGateway.save(user);
+        factory.userGateway.save(boss);
 
-        GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
+        GatewayContext.getInstance().setFlowOperatorGateway(factory.userGateway);
 
         FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
@@ -234,11 +220,11 @@ public class FlowDetailServiceTest {
                 .addNode(endNode)
                 .build();
 
-         workflowService.saveWorkflow(workflow);
+         factory.workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
-        List<ProcessNode> nodeList = flowService.processNodes(new FlowProcessNodeRequest(workflow.getId(), user.getUserId(),data));
+        List<ProcessNode> nodeList = factory.flowService.processNodes(new FlowProcessNodeRequest(workflow.getId(), user.getUserId(),data));
         assertEquals(3,nodeList.size());
         assertEquals(0,nodeList.stream().filter(ProcessNode::isHistory).toList().size());
 
@@ -248,12 +234,12 @@ public class FlowDetailServiceTest {
         userCreateRequest.setFormData(data);
         userCreateRequest.setActionId(startActions.get(0).id());
         userCreateRequest.setOperatorId(user.getUserId());
-        flowService.create(userCreateRequest);
+        factory.flowService.create(userCreateRequest);
 
-        List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
+        List<FlowRecord> userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
         assertEquals(1, userRecordList.size());
 
-        nodeList = flowService.processNodes(new FlowProcessNodeRequest(userRecordList.get(0).getId(), user.getUserId(),data));
+        nodeList = factory.flowService.processNodes(new FlowProcessNodeRequest(userRecordList.get(0).getId(), user.getUserId(),data));
         assertEquals(3,nodeList.size());
         assertEquals(0,nodeList.stream().filter(ProcessNode::isHistory).toList().size());
 
@@ -262,13 +248,13 @@ public class FlowDetailServiceTest {
         userRequest.setFormData(data);
         userRequest.setRecordId(userRecordList.get(0).getId());
         userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
-        flowService.action(userRequest);
+        factory.flowService.action(userRequest);
 
-        List<FlowRecord> bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        List<FlowRecord> bossRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, bossRecordList.size());
 
 
-        nodeList = flowService.processNodes(new FlowProcessNodeRequest(bossRecordList.get(0).getId(), boss.getUserId(),data));
+        nodeList = factory.flowService.processNodes(new FlowProcessNodeRequest(bossRecordList.get(0).getId(), boss.getUserId(),data));
         assertEquals(3,nodeList.size());
         assertEquals(1,nodeList.stream().filter(ProcessNode::isHistory).toList().size());
 
@@ -278,9 +264,9 @@ public class FlowDetailServiceTest {
         bossRequest.setFormData(data);
         bossRequest.setRecordId(bossRecordList.get(0).getId());
         bossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", boss.getUserId()));
-        flowService.action(bossRequest);
+        factory.flowService.action(bossRequest);
 
-        List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
+        List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
         assertEquals(2, records.size());
         assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 

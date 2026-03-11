@@ -1,12 +1,10 @@
 package com.codingapi.flow.service;
 
-import com.codingapi.flow.context.RepositoryHolderContext;
-import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.pojo.request.*;
 import com.codingapi.flow.pojo.response.FlowContent;
 import com.codingapi.flow.pojo.response.ProcessNode;
-import com.codingapi.flow.repository.*;
 import com.codingapi.flow.service.impl.*;
+import com.codingapi.flow.session.IRepositoryHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -17,19 +15,10 @@ import java.util.List;
 @Transactional
 public class FlowService {
 
-    public FlowService(WorkflowService workflowService,
-                       FlowOperatorGateway flowOperatorGateway,
-                       FlowRecordService flowRecordService,
-                       ParallelBranchRepository parallelBranchRepository,
-                       DelayTaskRepository delayTaskRepository,
-                       UrgeIntervalRepository urgeIntervalRepository) {
-        RepositoryHolderContext.getInstance()
-                .register(workflowService,
-                        flowRecordService,
-                        flowOperatorGateway,
-                        parallelBranchRepository,
-                        delayTaskRepository,
-                        urgeIntervalRepository);
+    private final IRepositoryHolder repositoryHolder;
+
+    public FlowService(IRepositoryHolder repositoryHolder) {
+        this.repositoryHolder = repositoryHolder;
     }
 
     /**
@@ -38,10 +27,9 @@ public class FlowService {
      * @return 流程详情
      */
     public FlowContent detail(FlowDetailRequest request) {
-        FlowDetailService flowDetailService = new FlowDetailService(request);
+        FlowDetailService flowDetailService = new FlowDetailService(request,this.repositoryHolder);
         return flowDetailService.detail();
     }
-
 
 
     /**
@@ -50,7 +38,7 @@ public class FlowService {
      * @return 流程节点记录列表
      */
     public List<ProcessNode> processNodes(FlowProcessNodeRequest request) {
-        FlowProcessNodeService flowProcessNodeService = new FlowProcessNodeService(request);
+        FlowProcessNodeService flowProcessNodeService = new FlowProcessNodeService(request,this.repositoryHolder);
         return flowProcessNodeService.processNodes();
     }
 
@@ -61,7 +49,7 @@ public class FlowService {
      * @return 创建的流程id
      */
     public long create(FlowCreateRequest request) {
-        FlowCreateService flowCreateService = new FlowCreateService(request);
+        FlowCreateService flowCreateService = new FlowCreateService(request,this.repositoryHolder);
         return flowCreateService.create();
     }
 
@@ -71,7 +59,7 @@ public class FlowService {
      * @param request 审批请求
      */
     public void action(FlowActionRequest request) {
-        FlowActionService flowActionService = new FlowActionService(request);
+        FlowActionService flowActionService = new FlowActionService(request,this.repositoryHolder);
         flowActionService.action();
     }
 
@@ -81,7 +69,7 @@ public class FlowService {
      * @param request 撤销请求
      */
     public void revoke(FlowRevokeRequest request) {
-        FlowRevokeService flowRevokeService = new FlowRevokeService(request);
+        FlowRevokeService flowRevokeService = new FlowRevokeService(request,this.repositoryHolder);
         flowRevokeService.revoke();
     }
 
@@ -90,7 +78,7 @@ public class FlowService {
      * 催办
      */
     public void urge(FlowUrgeRequest request) {
-        FlowUrgeService flowUrgeService = new FlowUrgeService(request);
+        FlowUrgeService flowUrgeService = new FlowUrgeService(request,this.repositoryHolder);
         flowUrgeService.urge();
     }
 }

@@ -9,6 +9,7 @@ import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.DelayStrategy;
 import com.codingapi.flow.strategy.node.INodeStrategy;
 import com.codingapi.flow.utils.RandomUtils;
@@ -32,13 +33,14 @@ public class DelayNode extends BaseFlowNode implements IDisplayNode {
 
     @Override
     public boolean handle(FlowSession session) {
+        IRepositoryHolder repositoryHolder = session.getRepositoryHolder();
         if(super.handle(session)) {
             NodeStrategyManager nodeStrategyManager = this.strategyManager();
             DelayStrategy delayStrategy = nodeStrategyManager.getStrategy(DelayStrategy.class);
             if (delayStrategy != null) {
                 FlowRecord currentRecord = session.getCurrentRecord();
                 DelayTask delayTask = new DelayTask(delayStrategy, currentRecord, this.getId());
-                DelayTaskManager.getInstance().addTask(delayTask);
+                DelayTaskManager.getInstance().addTask(delayTask,repositoryHolder);
             }
             return false;
         }

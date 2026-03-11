@@ -1,9 +1,5 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.service.FlowRecordService;
-import com.codingapi.flow.service.WorkflowService;
-import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowNotFoundException;
@@ -12,8 +8,12 @@ import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.pojo.request.FlowRevokeRequest;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.service.FlowRecordService;
+import com.codingapi.flow.service.WorkflowService;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.RevokeStrategy;
 import com.codingapi.flow.workflow.Workflow;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.springboot.framework.event.EventPusher;
 
 import java.util.ArrayList;
@@ -27,11 +27,13 @@ public class FlowRevokeService {
     private final FlowRevokeRequest request;
     private final FlowRecordService flowRecordService;
     private final WorkflowService workflowService;
+    private final IRepositoryHolder repositoryHolder;
 
-    public FlowRevokeService(FlowRevokeRequest request) {
+    public FlowRevokeService(FlowRevokeRequest request,IRepositoryHolder repositoryHolder) {
         this.request = request;
-        this.flowRecordService = RepositoryHolderContext.getInstance().getFlowRecordService();
-        this.workflowService = RepositoryHolderContext.getInstance().getWorkflowService();
+        this.flowRecordService = repositoryHolder.getFlowRecordService();
+        this.workflowService = repositoryHolder.getWorkflowService();
+        this.repositoryHolder = repositoryHolder;
     }
 
     public void revoke() {
@@ -93,7 +95,7 @@ public class FlowRevokeService {
             recordList.add(afterRecord);
         }
 
-        RepositoryHolderContext.getInstance().saveRecords(recordList);
+        repositoryHolder.saveRecords(recordList);
         flowEvents.forEach(EventPusher::push);
 
     }

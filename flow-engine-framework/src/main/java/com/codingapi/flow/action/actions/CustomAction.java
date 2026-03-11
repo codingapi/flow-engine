@@ -4,12 +4,12 @@ import com.codingapi.flow.action.ActionDisplay;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.BaseAction;
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.script.action.CustomScript;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.utils.RandomUtils;
 import org.springframework.util.StringUtils;
 
@@ -41,6 +41,7 @@ public class CustomAction extends BaseAction {
 
     @Override
     public void run(FlowSession flowSession) {
+        IRepositoryHolder repositoryHolder = flowSession.getRepositoryHolder();
         String actionType = script.execute(flowSession);
         IFlowNode currentNode = flowSession.getCurrentNode();
         ActionManager actionManager = currentNode.actionManager();
@@ -52,7 +53,7 @@ public class CustomAction extends BaseAction {
         }
 
         FlowSession triggerSession = flowSession.updateSession(nextAction);
-        RepositoryHolderContext.getInstance().createFlowActionService(triggerSession).action();
+        repositoryHolder.createFlowActionService(triggerSession).action();
     }
 
     @Override

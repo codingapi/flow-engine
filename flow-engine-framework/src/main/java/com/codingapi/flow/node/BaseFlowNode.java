@@ -4,7 +4,6 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.common.IMapConvertor;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.manager.ActionManager;
@@ -15,6 +14,7 @@ import com.codingapi.flow.node.nodes.HandleNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.INodeStrategy;
 import lombok.Getter;
 import lombok.Setter;
@@ -210,15 +210,16 @@ public abstract class BaseFlowNode implements IFlowNode {
      * 是否等待并行节点的汇聚
      */
     public boolean isWaitRecordMargeParallelNode(FlowSession session) {
+        IRepositoryHolder repositoryHolder = session.getRepositoryHolder();
         FlowRecord currentRecord = session.getCurrentRecord();
         if (currentRecord != null && this.getId().equals(currentRecord.getParallelBranchNodeId())) {
-            RepositoryHolderContext.getInstance().addParallelTriggerCount(currentRecord.getParallelId());
+            repositoryHolder.addParallelTriggerCount(currentRecord.getParallelId());
             int parallelBranchTotal = currentRecord.getParallelBranchTotal();
-            int parallelBranchCount = RepositoryHolderContext.getInstance().getParallelBranchTriggerCount(currentRecord.getParallelId());
+            int parallelBranchCount = repositoryHolder.getParallelBranchTriggerCount(currentRecord.getParallelId());
             if (parallelBranchCount == parallelBranchTotal) {
                 // 清空并行节点，防止数据继续继承到后续节点
                 currentRecord.clearParallel();
-                RepositoryHolderContext.getInstance().clearParallelTriggerCount(currentRecord.getParallelId());
+                repositoryHolder.clearParallelTriggerCount(currentRecord.getParallelId());
             }
             return parallelBranchCount != parallelBranchTotal;
         }

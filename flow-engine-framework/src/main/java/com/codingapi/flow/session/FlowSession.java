@@ -22,6 +22,11 @@ import java.util.List;
 public class FlowSession {
 
     /**
+     * 资源持有者
+     */
+    private final IRepositoryHolder repositoryHolder;
+
+    /**
      * 当前操作者
      */
     private final IFlowOperator currentOperator;
@@ -65,7 +70,8 @@ public class FlowSession {
     private final FlowAdvice advice;
 
 
-    public FlowSession(IFlowOperator currentOperator,
+    public FlowSession(IRepositoryHolder repositoryHolder,
+                       IFlowOperator currentOperator,
                        Workflow workflow,
                        IFlowNode currentNode,
                        IFlowAction currentAction,
@@ -74,6 +80,7 @@ public class FlowSession {
                        List<FlowRecord> currentNodeRecords,
                        long backupId,
                        FlowAdvice advice) {
+        this.repositoryHolder = repositoryHolder;
         this.currentOperator = currentOperator;
         this.workflow = workflow;
         this.currentAction = currentAction;
@@ -111,13 +118,15 @@ public class FlowSession {
      * @param backupId        流程备份id
      * @return 新的会话
      */
-    public static FlowSession startSession(IFlowOperator currentOperator,
-                                           Workflow workflow,
-                                           IFlowNode currentNode,
-                                           IFlowAction currentAction,
-                                           FormData formData,
-                                           long backupId) {
-        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, null, new ArrayList<>(), backupId, new FlowAdvice());
+    public static FlowSession startSession(
+            IRepositoryHolder repositoryHolder,
+            IFlowOperator currentOperator,
+            Workflow workflow,
+            IFlowNode currentNode,
+            IFlowAction currentAction,
+            FormData formData,
+            long backupId) {
+        return new FlowSession(repositoryHolder, currentOperator, workflow, currentNode, currentAction, formData, null, new ArrayList<>(), backupId, new FlowAdvice());
     }
 
 
@@ -212,7 +221,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowNode currentNode) {
-        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
+        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
     }
 
 
@@ -223,7 +232,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowAction currentAction) {
-        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
+        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
     }
 
     /**
@@ -233,7 +242,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowOperator currentOperator) {
-        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
+        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.codingapi.flow.context;
 
 import com.codingapi.flow.domain.DelayTask;
+import com.codingapi.flow.domain.UrgeInterval;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -12,6 +13,7 @@ import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.service.impl.FlowActionService;
 import com.codingapi.flow.service.impl.FlowDelayTriggerService;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import lombok.Getter;
 
 import java.util.List;
@@ -19,7 +21,7 @@ import java.util.List;
 /**
  *  流程引擎仓库持有者上下文,负责持有流程引擎相关的仓库实例,并提供相关服务的构建方法
  */
-public class RepositoryHolderContext {
+public class RepositoryHolderContext implements IRepositoryHolder {
 
     @Getter
     private final static RepositoryHolderContext instance = new RepositoryHolderContext();
@@ -82,10 +84,7 @@ public class RepositoryHolderContext {
      */
     public FlowDelayTriggerService createDelayTriggerService(DelayTask task) {
         this.verify();
-        return new FlowDelayTriggerService(task,
-                flowOperatorGateway,
-                flowRecordService,
-                workflowService);
+        return new FlowDelayTriggerService(task,this);
     }
 
 
@@ -97,7 +96,7 @@ public class RepositoryHolderContext {
      */
     public FlowActionService createFlowActionService(FlowSession flowSession) {
         this.verify();
-        return new FlowActionService(flowSession.toActionRequest());
+        return new FlowActionService(flowSession.toActionRequest(),this);
     }
 
 
@@ -108,13 +107,7 @@ public class RepositoryHolderContext {
      */
     public FlowService createFlowService() {
         this.verify();
-        return new FlowService(
-                workflowService,
-                flowOperatorGateway,
-                flowRecordService,
-                parallelBranchRepository,
-                delayTaskRepository,
-                urgeIntervalRepository);
+        return new FlowService(this);
     }
 
     public FlowRecord getRecordById(long id) {
@@ -176,5 +169,13 @@ public class RepositoryHolderContext {
         return delayTaskRepository.findAll();
     }
 
+    @Override
+    public void saveUrgeInterval(UrgeInterval interval) {
+        urgeIntervalRepository.save(interval);
+    }
 
+    @Override
+    public UrgeInterval getLatestUrgeInterval(String processId, long recordId) {
+        return urgeIntervalRepository.getLatest(processId, recordId);
+    }
 }

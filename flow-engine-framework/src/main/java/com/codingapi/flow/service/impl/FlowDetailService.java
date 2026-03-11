@@ -1,6 +1,5 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -9,6 +8,7 @@ import com.codingapi.flow.pojo.response.FlowContent;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.WorkflowService;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 
@@ -23,12 +23,14 @@ public class FlowDetailService {
     private final IFlowOperator currentOperator;
     private final FlowRecordService flowRecordService;
     private final WorkflowService workflowService;
+    private final IRepositoryHolder repositoryHolder;
 
-    public FlowDetailService(FlowDetailRequest request) {
+    public FlowDetailService(FlowDetailRequest request, IRepositoryHolder repositoryHolder) {
         this.request = request;
-        this.currentOperator = RepositoryHolderContext.getInstance().getOperatorById(request.getOperatorId());
-        this.flowRecordService = RepositoryHolderContext.getInstance().getFlowRecordService();
-        this.workflowService = RepositoryHolderContext.getInstance().getWorkflowService();
+        this.currentOperator = repositoryHolder.getOperatorById(request.getOperatorId());
+        this.flowRecordService = repositoryHolder.getFlowRecordService();
+        this.workflowService = repositoryHolder.getWorkflowService();
+        this.repositoryHolder = repositoryHolder;
     }
 
     public FlowContent detail() {
@@ -37,7 +39,7 @@ public class FlowDetailService {
             if (workflow == null) {
                 throw FlowNotFoundException.workflow(this.request.getId());
             }
-            return new FlowContentFactory(workflow, null, currentOperator).create();
+            return new FlowContentFactory(workflow, null, currentOperator,repositoryHolder.getFlowRecordService()).create();
         } else {
             FlowRecord flowRecord = flowRecordService.getFlowRecord(Long.parseLong(this.request.getId()));
             if (flowRecord == null) {
@@ -51,10 +53,10 @@ public class FlowDetailService {
 
             if(!flowRecord.isReadable()){
                 flowRecord.read();
-                RepositoryHolderContext.getInstance().saveRecord(flowRecord);
+                repositoryHolder.saveRecord(flowRecord);
             }
 
-            return new FlowContentFactory(workflow, flowRecord,currentOperator).create();
+            return new FlowContentFactory(workflow, flowRecord,currentOperator,repositoryHolder.getFlowRecordService()).create();
         }
     }
 
@@ -67,11 +69,11 @@ public class FlowDetailService {
 
         private final FlowRecordService flowRecordService;
 
-        public FlowContentFactory(Workflow workflow, FlowRecord flowRecord,IFlowOperator currentOperator) {
+        public FlowContentFactory(Workflow workflow, FlowRecord flowRecord,IFlowOperator currentOperator,FlowRecordService flowRecordService) {
             this.workflow = workflow;
             this.flowRecord = flowRecord;
             this.currentOperator = currentOperator;
-            this.flowRecordService = RepositoryHolderContext.getInstance().getFlowRecordService();
+            this.flowRecordService = flowRecordService;
             this.flowContent = new FlowContent();
 
         }

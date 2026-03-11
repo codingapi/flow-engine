@@ -1,7 +1,6 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.domain.DelayTask;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.form.FormData;
@@ -13,22 +12,31 @@ import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
-import lombok.AllArgsConstructor;
 
 import java.util.List;
 
 /**
  * 延时触发服务
  */
-@AllArgsConstructor
 public class FlowDelayTriggerService {
 
     private final DelayTask delayTask;
     private final FlowOperatorGateway flowOperatorGateway;
     private final FlowRecordService flowRecordService;
     private final WorkflowService workflowService;
+
+    private final IRepositoryHolder repositoryHolder;
+
+    public FlowDelayTriggerService(DelayTask delayTask, IRepositoryHolder repositoryHolder) {
+        this.delayTask = delayTask;
+        this.flowOperatorGateway = repositoryHolder.getFlowOperatorGateway();
+        this.flowRecordService = repositoryHolder.getFlowRecordService();
+        this.workflowService = repositoryHolder.getWorkflowService();
+        this.repositoryHolder = repositoryHolder;
+    }
 
     /**
      * 延期任务触发执行
@@ -53,13 +61,13 @@ public class FlowDelayTriggerService {
         formData.reset(flowRecord.getFormData());
 
         FlowAdvice advice = flowRecord.toAdvice(workflow);
-        List<FlowRecord> currentRecords = RepositoryHolderContext.getInstance().findCurrentNodeRecords(flowRecord.getFromId(), flowRecord.getNodeId());
+        List<FlowRecord> currentRecords = repositoryHolder.findCurrentNodeRecords(flowRecord.getFromId(), flowRecord.getNodeId());
 
         // 获取延迟任务节点
         IFlowNode delayNode = workflow.getFlowNode(delayTask.getDelayNodeId());
 
         // 执行后续任务
-        FlowSession flowSession = new FlowSession(currentOperator, workflow, delayNode, flowAction, formData, flowRecord, currentRecords, flowRecord.getWorkRuntimeId(), advice);
+        FlowSession flowSession = new FlowSession(this.repositoryHolder,currentOperator, workflow, delayNode, flowAction, formData, flowRecord, currentRecords, flowRecord.getWorkRuntimeId(), advice);
         flowAction.run(flowSession);
 
     }
