@@ -7,7 +7,7 @@ import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.script.node.NodeTitleScript;
-import com.codingapi.flow.service.FlowServiceFactory;
+import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class NodeTitleIntegrationTest {
 
 
-    private final FlowServiceFactory factory = new FlowServiceFactory();
+    private final MyFlowServiceFactory factory = new MyFlowServiceFactory();
 
 
     @Test

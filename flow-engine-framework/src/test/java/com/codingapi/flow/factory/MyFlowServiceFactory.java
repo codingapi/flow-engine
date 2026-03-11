@@ -1,11 +1,14 @@
-package com.codingapi.flow.service;
+package com.codingapi.flow.factory;
 
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.repository.*;
+import com.codingapi.flow.service.FlowRecordService;
+import com.codingapi.flow.service.FlowService;
+import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.session.IRepositoryHolder;
 
-public class FlowServiceFactory {
+public class MyFlowServiceFactory {
 
     public FlowTodoRecordRepositoryImpl flowTodoRecordRepository;
     public FlowTodoMergeRepositoryImpl flowTodoMergeRepository;
@@ -22,7 +25,7 @@ public class FlowServiceFactory {
     public FlowService flowService;
     public IRepositoryHolder repositoryHolder;
 
-    public FlowServiceFactory() {
+    public MyFlowServiceFactory() {
         flowTodoRecordRepository = new FlowTodoRecordRepositoryImpl();
         flowTodoMergeRepository = new FlowTodoMergeRepositoryImpl();
         flowRecordRepository = new FlowRecordRepositoryImpl();

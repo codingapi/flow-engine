@@ -3,6 +3,8 @@ package com.codingapi.flow.api.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.codingapi.flow.api.pojo.NodeCreateRequest;
 import com.codingapi.flow.api.pojo.WorkflowUpdateVersionNameRequest;
+import com.codingapi.flow.context.GatewayContext;
+import com.codingapi.flow.mock.FlowServiceMockFactory;
 import com.codingapi.flow.node.IBlockNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
@@ -67,6 +69,11 @@ public class WorkflowController {
         }
         workflowService.saveWorkflow(workflow);
         return Response.buildSuccess();
+    }
+
+    @PostMapping("/mock")
+    public SingleResponse<String> mock() {
+        return SingleResponse.of(FlowServiceMockFactory.getInstance().create(GatewayContext.getInstance().getFlowOperatorGateway()));
     }
 
 

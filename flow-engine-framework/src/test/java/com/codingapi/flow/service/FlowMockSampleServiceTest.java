@@ -6,11 +6,12 @@ import com.codingapi.flow.builder.ActionBuilder;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
-import com.codingapi.flow.factory.MyFlowServiceFactory;
+import com.codingapi.flow.factory.MyFlowServiceMockFactory;
 import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
+import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.node.nodes.*;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
@@ -35,9 +36,9 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class FlowSampleServiceTest {
+class FlowMockSampleServiceTest {
 
-    private final MyFlowServiceFactory factory = new MyFlowServiceFactory();
+    private final MyFlowServiceMockFactory factory = new MyFlowServiceMockFactory();
 
     @Test
     void create() {

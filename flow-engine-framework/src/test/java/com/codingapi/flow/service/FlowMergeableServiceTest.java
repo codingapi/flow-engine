@@ -6,11 +6,11 @@ import com.codingapi.flow.builder.ActionBuilder;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
+import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
-import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
@@ -20,7 +20,6 @@ import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.record.FlowTodoMerge;
 import com.codingapi.flow.record.FlowTodoRecord;
-import com.codingapi.flow.repository.*;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.strategy.node.RecordMergeStrategy;
@@ -38,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FlowMergeableServiceTest {
 
-    private final FlowServiceFactory factory = new FlowServiceFactory();
+    private final MyFlowServiceFactory factory = new MyFlowServiceFactory();
 
 
     /**

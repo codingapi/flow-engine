@@ -5,6 +5,7 @@ import com.codingapi.flow.pojo.response.FlowContent;
 import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.service.impl.*;
 import com.codingapi.flow.session.IRepositoryHolder;
+import lombok.Getter;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 @Transactional
 public class FlowService {
 
+    @Getter
     private final IRepositoryHolder repositoryHolder;
 
     public FlowService(IRepositoryHolder repositoryHolder) {
