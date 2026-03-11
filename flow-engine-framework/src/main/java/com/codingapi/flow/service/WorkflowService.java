@@ -19,18 +19,24 @@ public class WorkflowService {
     private final WorkflowRuntimeRepository workflowRuntimeRepository;
 
 
-    public void saveWorkflowVersion(WorkflowVersion workflowVersion) {
+    public void saveWorkflowVersion(WorkflowVersion currentVersion, boolean creatable) {
         List<WorkflowVersion> updateList = new ArrayList<>();
 
-        workflowVersion.enableVersion();
-        updateList.add(workflowVersion);
+        currentVersion.enableVersion();
+        updateList.add(currentVersion);
 
-        List<WorkflowVersion> versionList = workflowVersionRepository.findVersion(workflowVersion.getWorkId());
+        List<WorkflowVersion> versionList = workflowVersionRepository.findVersion(currentVersion.getWorkId());
         if (versionList != null) {
-            versionList.stream().filter(WorkflowVersion::isCurrent).findFirst().ifPresent(current -> workflowVersion.setId(current.getId()));
+
+            if (!creatable) {
+                versionList.stream().filter(WorkflowVersion::isCurrent).findFirst().ifPresent(current ->{
+                    currentVersion.setId(current.getId());
+                    currentVersion.setVersionName(current.getVersionName());
+                });
+            }
 
             for (WorkflowVersion version : versionList) {
-                if (version.getId() != workflowVersion.getId()) {
+                if (version.getId() != currentVersion.getId()) {
                     version.disableVersion();
                     updateList.add(version);
                 }
@@ -38,7 +44,7 @@ public class WorkflowService {
         }
 
         workflowVersionRepository.saveAll(updateList);
-        Workflow workflow = workflowVersion.toWorkflow();
+        Workflow workflow = currentVersion.toWorkflow();
         workflowRepository.save(workflow);
     }
 
@@ -53,10 +59,20 @@ public class WorkflowService {
 
 
     public void changeVersion(long versionId) {
-        WorkflowVersion workflowVersion = workflowVersionRepository.get(versionId);
-        if (workflowVersion != null) {
-            this.saveWorkflowVersion(workflowVersion);
+        WorkflowVersion currentVersion = workflowVersionRepository.get(versionId);
+        List<WorkflowVersion> versionList = workflowVersionRepository.findVersion(currentVersion.getWorkId());
+        if (versionList != null) {
+           for (WorkflowVersion version:versionList){
+               if(currentVersion.getId() == version.getId()){
+                   version.enableVersion();
+               }else {
+                   version.disableVersion();
+               }
+           }
         }
+        workflowVersionRepository.saveAll(versionList);
+        workflowRepository.save(currentVersion.toWorkflow());
+
     }
 
     public void updateVersionName(long versionId, String versionName) {
@@ -74,7 +90,7 @@ public class WorkflowService {
 
     public void saveWorkflow(Workflow workflow) {
         WorkflowVersion workflowVersion = new WorkflowVersion(workflow);
-        this.saveWorkflowVersion(workflowVersion);
+        this.saveWorkflowVersion(workflowVersion,false);
     }
 
     public void saveWorkflowRuntime(WorkflowRuntime workflowRuntime) {

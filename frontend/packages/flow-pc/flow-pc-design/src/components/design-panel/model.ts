@@ -18,6 +18,7 @@ export class DesignPanelApiImpl implements DesignPanelApi {
         await workflowSave(body);
     }
 
+
     public async createNode(type: string) {
         const data =  await workflowCreateNode(type);
         return data.data as FlowNode;

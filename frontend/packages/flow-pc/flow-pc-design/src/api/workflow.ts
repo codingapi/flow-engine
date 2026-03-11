@@ -20,8 +20,8 @@ export const updateVersionName = (body:any) => {
     return httpClient.post('/api/cmd/workflow/updateVersionName',body);
 }
 
-export const changeVersion = (versionId:string) => {
-    return httpClient.post('/api/cmd/workflow/changeVersion',versionId);
+export const changeVersion = (id:any) => {
+    return httpClient.post('/api/cmd/workflow/changeVersion',{id});
 }
 
 export const changeState = (id:string) => {

@@ -7,14 +7,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class WorkflowVersionOption {
 
-    private String label;
-    private String value;
+    private long id;
+    private String versionName;
     private boolean current;
+    private long updatedTime;
 
-    public WorkflowVersionOption(long value, String label, boolean current) {
-        this.value = String.valueOf(value);
-        this.label = label;
+    public WorkflowVersionOption(long id, String versionName, boolean current,long updatedTime) {
+        this.id = id;
+        this.versionName = versionName;
         this.current = current;
+        this.updatedTime = updatedTime;
     }
 
 

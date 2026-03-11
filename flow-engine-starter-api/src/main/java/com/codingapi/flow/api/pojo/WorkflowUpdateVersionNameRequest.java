@@ -6,5 +6,5 @@ import lombok.Data;
 public class WorkflowUpdateVersionNameRequest {
 
     private long id;
-    private String name;
+    private String versionName;
 }

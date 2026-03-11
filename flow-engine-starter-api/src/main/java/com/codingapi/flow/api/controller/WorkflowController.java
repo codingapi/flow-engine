@@ -11,11 +11,13 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
+import com.codingapi.flow.workflow.WorkflowVersion;
 import com.codingapi.springboot.framework.dto.request.IdRequest;
 import com.codingapi.springboot.framework.dto.response.Response;
 import com.codingapi.springboot.framework.dto.response.SingleResponse;
 import com.codingapi.springboot.framework.user.UserContext;
 import lombok.AllArgsConstructor;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -36,7 +38,7 @@ public class WorkflowController {
 
     @PostMapping("/updateVersionName")
     public Response updateVersionName(@RequestBody WorkflowUpdateVersionNameRequest request) {
-        workflowService.updateVersionName(request.getId(),request.getName());
+        workflowService.updateVersionName(request.getId(), request.getVersionName());
         return Response.buildSuccess();
     }
 
@@ -88,7 +90,14 @@ public class WorkflowController {
         }
         Workflow workflow = Workflow.formJson(request.toJSONString());
         workflow.updateTime();
-        workflowService.saveWorkflow(workflow);
+        String versionName = request.getString("versionName");
+        if (StringUtils.hasText(versionName)) {
+            WorkflowVersion workflowVersion = new WorkflowVersion(workflow);
+            workflowVersion.setVersionName(versionName);
+            workflowService.saveWorkflowVersion(workflowVersion,true);
+        } else {
+            workflowService.saveWorkflow(workflow);
+        }
         return Response.buildSuccess();
     }
 

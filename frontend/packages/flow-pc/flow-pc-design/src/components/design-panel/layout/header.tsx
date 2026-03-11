@@ -1,8 +1,8 @@
 import React from "react";
-import {Button, message, Space, Tabs} from "antd";
+import {Button, Input, message, Popover, Space, Tabs} from "antd";
 import {LayoutHeaderHeight, TabPanelType} from "../types";
 import {useDesignContext} from "../hooks/use-design-context";
-import {CloseOutlined, SaveOutlined } from "@ant-design/icons";
+import {CloseOutlined, SaveOutlined} from "@ant-design/icons";
 
 const Left = () => {
     return (
@@ -12,16 +12,73 @@ const Left = () => {
     )
 }
 
+
+const SaveAsButton = () => {
+
+    const [visible, setVisible] = React.useState(false);
+    const [name, setName] = React.useState<string>();
+    const {context} = useDesignContext();
+
+    const handleOk = () => {
+        context.save(name);
+    }
+
+    return (
+        <Popover
+            title={"另存版本"}
+            placement={"bottom"}
+            trigger={"click"}
+            open={visible}
+            content={() => {
+                return (
+                    <div>
+                        <Input
+                            placeholder={"请输入版本名称"}
+                            value={name}
+                            onChange={(e) => {
+                                setName(e.target.value)
+                            }}
+                        />
+                        <Space
+                            style={{
+                                marginTop: 8,
+                            }}
+                        >
+                            <Button
+                                onClick={handleOk}
+                            >确定</Button>
+                            <Button
+                                onClick={() => {
+                                    setVisible(false);
+                                }}
+                            >取消</Button>
+                        </Space>
+                    </div>
+                )
+            }}
+        >
+            <Button
+                icon={<SaveOutlined/>}
+                onClick={() => {
+                    setVisible(true)
+                }}
+            >
+                另存版本
+            </Button>
+        </Popover>
+    )
+}
+
 const Right = () => {
     const {context} = useDesignContext();
 
     return (
         <Space style={{
-            width: 150,
-            marginRight:20
+            marginRight: 20
         }}>
+
             <Button
-                icon={<SaveOutlined />}
+                icon={<SaveOutlined/>}
                 type="primary"
                 onClick={() => {
                     context.save().then(() => {
@@ -29,8 +86,9 @@ const Right = () => {
                     });
                 }}
             >保存</Button>
+            <SaveAsButton/>
             <Button
-                icon={<CloseOutlined />}
+                icon={<CloseOutlined/>}
                 onClick={() => {
                     context.close();
                 }}
