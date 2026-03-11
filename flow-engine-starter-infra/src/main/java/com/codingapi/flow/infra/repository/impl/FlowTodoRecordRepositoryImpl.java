@@ -27,7 +27,7 @@ public class FlowTodoRecordRepositoryImpl implements FlowTodoRecordRepository {
     }
 
     @Override
-    public void remove(FlowTodoRecord margeRecord) {
+    public void delete(FlowTodoRecord margeRecord) {
         flowTodoRecordEntityRepository.deleteById(margeRecord.getId());
     }
 

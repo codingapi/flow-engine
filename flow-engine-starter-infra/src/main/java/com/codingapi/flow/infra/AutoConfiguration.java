@@ -34,8 +34,13 @@ public class AutoConfiguration {
     }
 
     @Bean
-    public WorkflowBackupRepository workflowBackupRepository(WorkflowBackupEntityRepository workflowBackupEntityRepository){
-        return new WorkflowBackupRepositoryImpl(workflowBackupEntityRepository);
+    public WorkflowRuntimeRepository workflowRuntimeRepository(WorkflowRuntimeEntityRepository workflowRuntimeEntityRepository){
+        return new WorkflowRuntimeRepositoryImpl(workflowRuntimeEntityRepository);
+    }
+
+    @Bean
+    public WorkflowVersionRepository workflowVersionRepository(WorkflowVersionEntityRepository workflowVersionEntityRepository){
+        return new WorkflowVersionRepositoryImpl(workflowVersionEntityRepository);
     }
 
     @Bean

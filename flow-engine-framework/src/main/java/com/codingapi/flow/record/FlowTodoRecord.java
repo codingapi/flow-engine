@@ -114,7 +114,7 @@ public class FlowTodoRecord {
 
     public void update(FlowRecord flowRecord) {
         this.processId = flowRecord.getProcessId();
-        this.workBackupId = flowRecord.getWorkBackupId();
+        this.workBackupId = flowRecord.getWorkRuntimeId();
         this.workCode = flowRecord.getWorkCode();
         this.nodeId = flowRecord.getNodeId();
         this.nodeType = flowRecord.getNodeType();

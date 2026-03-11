@@ -42,12 +42,15 @@ class FlowSampleServiceTest {
     private final FlowTodoMergeRepositoryImpl flowTodoMergeRepository = new FlowTodoMergeRepositoryImpl();
     private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
     private final UserGateway userGateway = new UserGateway();
-    private final WorkflowBackupRepository workflowBackupRepository = new WorkflowBackupRepositoryImpl();
+    private final WorkflowRuntimeRepository workflowRuntimeRepository = new WorkflowRuntimeRepositoryImpl();
+    private final WorkflowVersionRepository workflowVersionRepository = new WorkflowVersionRepositoryImpl();
     private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
     private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
     private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
     private final UrgeIntervalRepository urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
-    private final FlowService flowService = new FlowService(workflowRepository, userGateway, flowRecordRepository, flowTodoRecordRepository, flowTodoMergeRepository, workflowBackupRepository, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
+    private final WorkflowService workflowService = new WorkflowService(workflowVersionRepository,workflowRepository,workflowRuntimeRepository);
+    private final FlowRecordService flowRecordService = new FlowRecordService(flowTodoRecordRepository,flowTodoMergeRepository,flowRecordRepository);
+    private final FlowService flowService = new FlowService(workflowService, userGateway, flowRecordService, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
 
     @Test
     void create() {
@@ -102,7 +105,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
@@ -180,7 +183,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
@@ -279,7 +282,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
@@ -378,7 +381,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
         List<IFlowAction> startActions = startNode.actionManager().getActions();
@@ -499,7 +502,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 3, "reason", "leave");
         List<IFlowAction> startActions = startNode.actionManager().getActions();
@@ -602,7 +605,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
         List<IFlowAction> startActions = startNode.actionManager().getActions();
@@ -765,7 +768,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 3, "reason", "leave");
 
@@ -941,7 +944,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 3, "reason", "leave");
         List<IFlowAction> startActions = startNode.actionManager().getActions();
@@ -1115,7 +1118,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 2, "reason", "leave");
 
@@ -1235,7 +1238,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         List<IFlowAction> startActions = startNode.actionManager().getActions();
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
@@ -1348,7 +1351,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
@@ -1452,7 +1455,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
@@ -1552,7 +1555,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = new HashMap<>(Map.of("name", "lorne", "days", 1, "reason", "leave"));
 
@@ -1667,7 +1670,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = new HashMap<>(Map.of("name", "lorne", "days", 1, "reason", "leave"));
 
@@ -1792,7 +1795,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = new HashMap<>(Map.of("name", "lorne", "days", 1, "reason", "leave"));
 
@@ -1907,7 +1910,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = new HashMap<>(Map.of("name", "lorne", "days", 1, "reason", "leave"));
 
@@ -2030,7 +2033,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = new HashMap<>(Map.of("name", "lorne", "days", 1, "reason", "leave"));
 
@@ -2151,7 +2154,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = new HashMap<>(Map.of("name", "lorne", "days", 1, "reason", "leave"));
 
@@ -2249,7 +2252,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
@@ -2368,7 +2371,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
@@ -2478,7 +2481,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
@@ -2581,7 +2584,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
@@ -2684,7 +2687,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowRepository.save(workflow);
+         workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 

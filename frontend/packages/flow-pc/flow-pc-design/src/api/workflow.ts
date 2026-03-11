@@ -8,8 +8,24 @@ export const options = () => {
     return httpClient.get('/api/query/workflow/options');
 }
 
+export const versions = (workId:string) => {
+    return httpClient.get('/api/query/workflow/versions',{id:workId});
+}
+
 export const remove = (id:string) => {
     return httpClient.post('/api/cmd/workflow/remove',{id});
+}
+
+export const updateVersionName = (body:any) => {
+    return httpClient.post('/api/cmd/workflow/updateVersionName',body);
+}
+
+export const changeVersion = (id:any) => {
+    return httpClient.post('/api/cmd/workflow/changeVersion',{id});
+}
+
+export const deleteVersion = (id:any) => {
+    return httpClient.post('/api/cmd/workflow/deleteVersion',{id});
 }
 
 export const changeState = (id:string) => {

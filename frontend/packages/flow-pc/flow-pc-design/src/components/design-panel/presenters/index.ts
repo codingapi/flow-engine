@@ -129,7 +129,7 @@ export class Presenter {
         this.updateWorkflowForm(form);
     }
 
-    public async save() {
+    public async save(versionName?:string) {
         const values = this.formActionContext.save() as any;
         this.updateWorkflow(values);
         const latest = {
@@ -138,7 +138,11 @@ export class Presenter {
         };
         const convertor = new WorkflowConvertor(latest.workflow);
         const apiData = convertor.toApi();
-        await this.api.save(apiData);
+
+        await this.api.save({
+            ...apiData,
+            versionName
+        });
         console.log('save latest:', apiData);
     }
 

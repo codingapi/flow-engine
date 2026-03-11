@@ -1,7 +1,6 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.backup.WorkflowBackup;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.domain.DelayTask;
 import com.codingapi.flow.exception.FlowNotFoundException;
@@ -10,11 +9,12 @@ import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.FlowRecordRepository;
-import com.codingapi.flow.repository.WorkflowBackupRepository;
+import com.codingapi.flow.service.FlowRecordService;
+import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
@@ -27,24 +27,24 @@ public class FlowDelayTriggerService {
 
     private final DelayTask delayTask;
     private final FlowOperatorGateway flowOperatorGateway;
-    private final FlowRecordRepository flowRecordRepository;
-    private final WorkflowBackupRepository workflowBackupRepository;
+    private final FlowRecordService flowRecordService;
+    private final WorkflowService workflowService;
 
     /**
      * 延期任务触发执行
      */
     public void trigger() {
-        FlowRecord flowRecord = flowRecordRepository.get(delayTask.getCurrentRecordId());
+        FlowRecord flowRecord = flowRecordService.getFlowRecord(delayTask.getCurrentRecordId());
         if (flowRecord == null) {
             throw FlowNotFoundException.record(delayTask.getCurrentRecordId());
         }
 
-        WorkflowBackup workflowBackup = workflowBackupRepository.get(flowRecord.getWorkBackupId());
-        if (workflowBackup == null) {
-            throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + " not found");
+        WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(flowRecord.getWorkRuntimeId());
+        if (workflowRuntime == null) {
+            throw FlowNotFoundException.workflow(flowRecord.getWorkRuntimeId() + " not found");
         }
 
-        Workflow workflow = workflowBackup.toWorkflow();
+        Workflow workflow = workflowRuntime.toWorkflow();
         IFlowNode currentNode = workflow.getFlowNode(flowRecord.getNodeId());
 
         IFlowOperator currentOperator = flowOperatorGateway.get(flowRecord.getCurrentOperatorId());
@@ -59,7 +59,7 @@ public class FlowDelayTriggerService {
         IFlowNode delayNode = workflow.getFlowNode(delayTask.getDelayNodeId());
 
         // 执行后续任务
-        FlowSession flowSession = new FlowSession(currentOperator, workflow, delayNode, flowAction, formData, flowRecord, currentRecords, flowRecord.getWorkBackupId(), advice);
+        FlowSession flowSession = new FlowSession(currentOperator, workflow, delayNode, flowAction, formData, flowRecord, currentRecords, flowRecord.getWorkRuntimeId(), advice);
         flowAction.run(flowSession);
 
     }

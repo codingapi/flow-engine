@@ -7,3 +7,4 @@ export * from "./object.ts";
 export * from "./table.ts";
 export * from "./view-plugin.ts";
 export * from "./groovy.ts";
+export * from "./event.ts";

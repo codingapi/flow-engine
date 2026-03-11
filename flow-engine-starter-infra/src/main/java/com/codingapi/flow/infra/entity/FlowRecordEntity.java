@@ -16,7 +16,7 @@ public class FlowRecordEntity {
     /**
      * 工作id
      */
-    private Long workBackupId;
+    private Long workRuntimeId;
     /**
      * 流程编码
      */

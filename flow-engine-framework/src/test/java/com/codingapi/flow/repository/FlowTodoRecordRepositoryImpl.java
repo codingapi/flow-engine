@@ -31,7 +31,7 @@ public class FlowTodoRecordRepositoryImpl implements FlowTodoRecordRepository {
     }
 
     @Override
-    public void remove(FlowTodoRecord margeRecord) {
+    public void delete(FlowTodoRecord margeRecord) {
         cacheByMageKey.remove(margeRecord.getMergeKey());
         cache.remove(margeRecord.getId());
     }

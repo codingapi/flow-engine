@@ -17,21 +17,15 @@ import java.util.List;
 @Transactional
 public class FlowService {
 
-    public FlowService(WorkflowRepository workflowRepository,
+    public FlowService(WorkflowService workflowService,
                        FlowOperatorGateway flowOperatorGateway,
-                       FlowRecordRepository flowRecordRepository,
-                       FlowTodoRecordRepository flowTodoRecordRepository,
-                       FlowTodoMergeRepository flowTodoMergeRepository,
-                       WorkflowBackupRepository workflowBackupRepository,
+                       FlowRecordService flowRecordService,
                        ParallelBranchRepository parallelBranchRepository,
                        DelayTaskRepository delayTaskRepository,
                        UrgeIntervalRepository urgeIntervalRepository) {
         RepositoryHolderContext.getInstance()
-                .register(workflowRepository,
-                        workflowBackupRepository,
-                        flowRecordRepository,
-                        flowTodoRecordRepository,
-                        flowTodoMergeRepository,
+                .register(workflowService,
+                        flowRecordService,
                         flowOperatorGateway,
                         parallelBranchRepository,
                         delayTaskRepository,

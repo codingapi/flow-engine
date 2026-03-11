@@ -1,8 +1,9 @@
 import React from "react";
-import {Button, message, Space, Tabs} from "antd";
+import {Button, Form, Input, message, Popover, Space, Tabs} from "antd";
 import {LayoutHeaderHeight, TabPanelType} from "../types";
 import {useDesignContext} from "../hooks/use-design-context";
-import {CloseOutlined, SaveOutlined } from "@ant-design/icons";
+import {CloseOutlined, SaveOutlined} from "@ant-design/icons";
+import {EventBus} from "@flow-engine/flow-core";
 
 const Left = () => {
     return (
@@ -12,16 +13,98 @@ const Left = () => {
     )
 }
 
+
+const SaveAsButton = () => {
+
+    const [visible, setVisible] = React.useState(false);
+    const [form] = Form.useForm();
+    const {context} = useDesignContext();
+
+    React.useEffect(()=>{
+        if(!visible){
+            form.resetFields();
+        }
+    },[visible]);
+
+    return (
+        <Popover
+            placement={"bottom"}
+            trigger={"click"}
+            open={visible}
+            content={() => {
+                return (
+                    <div>
+                        <Form
+                            layout={"vertical"}
+                            form={form}
+                            onFinish={(values)=>{
+                                context.save(values.name).then(()=>{
+                                    setVisible(false);
+                                    message.success('版本已保存');
+
+                                    EventBus.getInstance().emit('VersionChangeEvent');
+                                });
+                            }}
+                        >
+                            <Form.Item
+                                name="name"
+                                label={"版本名称"}
+                                required={true}
+                                rules={[
+                                    {
+                                        required: true,
+                                        message:'请输入版本名称'
+                                    }
+                                ]}
+                            >
+                                <Input
+                                    placeholder={"请输入版本名称"}
+                                />
+                            </Form.Item>
+                        </Form>
+                        <Space
+                            style={{
+                                marginTop: 8,
+                            }}
+                        >
+                            <Button
+                                onClick={()=>{
+                                    form.submit();
+                                }}
+                                type="primary"
+                            >确定</Button>
+                            <Button
+                                onClick={() => {
+                                    setVisible(false);
+                                }}
+                            >取消</Button>
+                        </Space>
+                    </div>
+                )
+            }}
+        >
+            <Button
+                icon={<SaveOutlined/>}
+                onClick={() => {
+                    setVisible(true)
+                }}
+            >
+                版本另存
+            </Button>
+        </Popover>
+    )
+}
+
 const Right = () => {
     const {context} = useDesignContext();
 
     return (
         <Space style={{
-            width: 150,
-            marginRight:20
+            marginRight: 20
         }}>
+
             <Button
-                icon={<SaveOutlined />}
+                icon={<SaveOutlined/>}
                 type="primary"
                 onClick={() => {
                     context.save().then(() => {
@@ -29,8 +112,9 @@ const Right = () => {
                     });
                 }}
             >保存</Button>
+            <SaveAsButton/>
             <Button
-                icon={<CloseOutlined />}
+                icon={<CloseOutlined/>}
                 onClick={() => {
                     context.close();
                 }}

@@ -1,6 +1,8 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.backup.WorkflowBackup;
+import com.codingapi.flow.service.FlowRecordService;
+import com.codingapi.flow.service.WorkflowService;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -10,8 +12,6 @@ import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.pojo.request.FlowRevokeRequest;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.FlowRecordRepository;
-import com.codingapi.flow.repository.WorkflowBackupRepository;
 import com.codingapi.flow.strategy.node.RevokeStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.springboot.framework.event.EventPusher;
@@ -25,19 +25,19 @@ import java.util.List;
 public class FlowRevokeService {
 
     private final FlowRevokeRequest request;
-    private final FlowRecordRepository flowRecordRepository;
-    private final WorkflowBackupRepository workflowBackupRepository;
+    private final FlowRecordService flowRecordService;
+    private final WorkflowService workflowService;
 
     public FlowRevokeService(FlowRevokeRequest request) {
         this.request = request;
-        this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
-        this.workflowBackupRepository = RepositoryHolderContext.getInstance().getWorkflowBackupRepository();
+        this.flowRecordService = RepositoryHolderContext.getInstance().getFlowRecordService();
+        this.workflowService = RepositoryHolderContext.getInstance().getWorkflowService();
     }
 
     public void revoke() {
         request.verify();
         // 验证当前用户
-        FlowRecord currentRecord = flowRecordRepository.get(request.getRecordId());
+        FlowRecord currentRecord = flowRecordService.getFlowRecord(request.getRecordId());
         if (currentRecord == null) {
             throw FlowNotFoundException.record(request.getRecordId());
         }
@@ -51,11 +51,11 @@ public class FlowRevokeService {
         if (currentOperatorId != request.getOperatorId()) {
             throw FlowStateException.operatorNotMatch();
         }
-        WorkflowBackup workflowBackup = workflowBackupRepository.get(currentRecord.getWorkBackupId());
-        if (workflowBackup == null) {
-            throw FlowNotFoundException.workflow(currentRecord.getWorkBackupId() + " not found");
+        WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(currentRecord.getWorkRuntimeId());
+        if (workflowRuntime == null) {
+            throw FlowNotFoundException.workflow(currentRecord.getWorkRuntimeId() + " not found");
         }
-        Workflow workflow = workflowBackup.toWorkflow();
+        Workflow workflow = workflowRuntime.toWorkflow();
         IFlowNode currentNode = workflow.getFlowNode(currentRecord.getNodeId());
         NodeStrategyManager nodeStrategyManager = currentNode.strategyManager();
         RevokeStrategy revokeStrategy = nodeStrategyManager.getStrategy(RevokeStrategy.class);
@@ -63,7 +63,7 @@ public class FlowRevokeService {
             throw FlowStateException.nodeNotSupportRevoke();
         }
 
-        List<FlowRecord> afterRecords = flowRecordRepository.findAfterRecords(currentRecord.getProcessId(), currentRecord.getId());
+        List<FlowRecord> afterRecords = flowRecordService.findFlowRecordAfterRecords(currentRecord.getProcessId(), currentRecord.getId());
         // 退回下级记录, 如果下级记录都完成则不允许退回
         if (revokeStrategy.isRemoveNext()) {
             List<FlowRecord> nextRecords = afterRecords.stream()

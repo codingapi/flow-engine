@@ -47,7 +47,7 @@ public class FlowRecord {
     /**
      * 工作id
      */
-    private long workBackupId;
+    private long workRuntimeId;
     /**
      * 流程编码
      */
@@ -245,11 +245,11 @@ public class FlowRecord {
 
     /**
      * 数据合并的依据,当开启时值为固定值，否则为随机数据
-     * 相同的 {@link FlowRecord#currentOperatorId} {@link FlowRecord#workBackupId} {@link FlowRecord#nodeId}字段的数据合并到一条记录上。
+     * 相同的 {@link FlowRecord#currentOperatorId} {@link FlowRecord#workRuntimeId} {@link FlowRecord#nodeId}字段的数据合并到一条记录上。
      */
     public String getMergeKey() {
         if (mergeable) {
-            return String.format("%s-%s-%s", currentOperatorId, workBackupId, nodeId);
+            return String.format("%s-%s-%s", currentOperatorId, workRuntimeId, nodeId);
         } else {
             return String.valueOf(id);
         }
@@ -263,7 +263,7 @@ public class FlowRecord {
         // 获取转交之后的审批人
         IFlowOperator currentOperator = flowSession.loadFinalForwardOperator(sourceOperator);
         this.workCode = flowSession.getWorkCode();
-        this.workBackupId = flowSession.getBackupId();
+        this.workRuntimeId = flowSession.getBackupId();
         this.nodeId = flowSession.getCurrentNodeId();
         this.nodeType = flowSession.getCurrentNodeType();
         this.nodeName = flowSession.getCurrentNodeName();
@@ -591,7 +591,7 @@ public class FlowRecord {
                 formData,
                 this,
                 currentRecords,
-                this.workBackupId,
+                this.workRuntimeId,
                 advice
         );
     }

@@ -55,6 +55,16 @@ public class FlowExecutionException extends FlowException {
     }
 
     /**
+     * remove version error
+     *
+     * @return exception
+     */
+    public static FlowExecutionException removeWorkflowError() {
+        return new FlowExecutionException("execution.workflowVersion.removeError",
+                "current version don't remove.");
+    }
+
+    /**
      * Create record size error
      *
      * @return exception

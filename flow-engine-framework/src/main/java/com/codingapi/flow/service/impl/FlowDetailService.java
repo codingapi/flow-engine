@@ -1,6 +1,8 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.backup.WorkflowBackup;
+import com.codingapi.flow.service.FlowRecordService;
+import com.codingapi.flow.service.WorkflowService;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.node.IFlowNode;
@@ -10,7 +12,6 @@ import com.codingapi.flow.pojo.response.FlowContent;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.record.FlowTodoMerge;
 import com.codingapi.flow.record.FlowTodoRecord;
-import com.codingapi.flow.repository.*;
 import com.codingapi.flow.workflow.Workflow;
 
 import java.util.List;
@@ -22,35 +23,33 @@ public class FlowDetailService {
 
     private final FlowDetailRequest request;
     private final IFlowOperator currentOperator;
-    private final FlowRecordRepository flowRecordRepository;
-    private final WorkflowRepository workflowRepository;
-    private final WorkflowBackupRepository workflowBackupRepository;
+    private final FlowRecordService flowRecordService;
+    private final WorkflowService workflowService;
 
     public FlowDetailService(FlowDetailRequest request) {
         this.request = request;
         this.currentOperator = RepositoryHolderContext.getInstance().getOperatorById(request.getOperatorId());
-        this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
-        this.workflowRepository = RepositoryHolderContext.getInstance().getWorkflowRepository();
-        this.workflowBackupRepository = RepositoryHolderContext.getInstance().getWorkflowBackupRepository();
+        this.flowRecordService = RepositoryHolderContext.getInstance().getFlowRecordService();
+        this.workflowService = RepositoryHolderContext.getInstance().getWorkflowService();
     }
 
     public FlowContent detail() {
         if (this.request.isCreateWorkflow()) {
-            Workflow workflow = workflowRepository.get(this.request.getId());
+            Workflow workflow = workflowService.getWorkflow(this.request.getId());
             if (workflow == null) {
                 throw FlowNotFoundException.workflow(this.request.getId());
             }
             return new FlowContentFactory(workflow, null, currentOperator).create();
         } else {
-            FlowRecord flowRecord = flowRecordRepository.get(Long.parseLong(this.request.getId()));
+            FlowRecord flowRecord = flowRecordService.getFlowRecord(Long.parseLong(this.request.getId()));
             if (flowRecord == null) {
                 throw FlowNotFoundException.record(Long.parseLong(this.request.getId()));
             }
-            WorkflowBackup workflowBackup = workflowBackupRepository.get(flowRecord.getWorkBackupId());
-            if (workflowBackup == null) {
-                throw FlowNotFoundException.workflow(flowRecord.getWorkBackupId() + " not found");
+            WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(flowRecord.getWorkRuntimeId());
+            if (workflowRuntime == null) {
+                throw FlowNotFoundException.workflow(flowRecord.getWorkRuntimeId() + " not found");
             }
-            Workflow workflow = workflowBackup.toWorkflow();
+            Workflow workflow = workflowRuntime.toWorkflow();
 
             if(!flowRecord.isReadable()){
                 flowRecord.read();
@@ -68,17 +67,13 @@ public class FlowDetailService {
         private final FlowRecord flowRecord;
         private final FlowContent flowContent;
 
-        private final FlowTodoMergeRepository flowTodoMergeRepository;
-        private final FlowTodoRecordRepository flowTodoRecordRepository;
-        private final FlowRecordRepository flowRecordRepository;
+        private final FlowRecordService flowRecordService;
 
         public FlowContentFactory(Workflow workflow, FlowRecord flowRecord,IFlowOperator currentOperator) {
             this.workflow = workflow;
             this.flowRecord = flowRecord;
             this.currentOperator = currentOperator;
-            this.flowTodoMergeRepository = RepositoryHolderContext.getInstance().getFlowTodoMergeRepository();
-            this.flowTodoRecordRepository = RepositoryHolderContext.getInstance().getFlowTodoRecordRepository();
-            this.flowRecordRepository = RepositoryHolderContext.getInstance().getFlowRecordRepository();
+            this.flowRecordService = RepositoryHolderContext.getInstance().getFlowRecordService();
             this.flowContent = new FlowContent();
 
         }
@@ -94,9 +89,9 @@ public class FlowDetailService {
         private void loadTodoFlowRecords(){
             if(this.flowRecord!=null){
                 if(this.flowRecord.isMergeable()){
-                    FlowTodoRecord todoRecord = flowTodoRecordRepository.getByMergeKey(flowRecord.getMergeKey());
-                    List<FlowTodoMerge> todoMerges = flowTodoMergeRepository.findByTodoId(todoRecord.getId());
-                    List<FlowRecord> margeRecords = flowRecordRepository.findByIds(todoMerges.stream().map(FlowTodoMerge::getRecordId).toList());
+                    FlowTodoRecord todoRecord = flowRecordService.getFlowTodoByMergeKey(flowRecord.getMergeKey());
+                    List<FlowTodoMerge> todoMerges = flowRecordService.findFlowTodoMergeByTodoId(todoRecord.getId());
+                    List<FlowRecord> margeRecords = flowRecordService.findFlowRecordByIds(todoMerges.stream().map(FlowTodoMerge::getRecordId).toList());
                     this.flowContent.pushRecords(this.flowRecord, margeRecords);
                 }else {
                     this.flowContent.pushRecords(this.flowRecord,List.of(this.flowRecord));
@@ -107,7 +102,7 @@ public class FlowDetailService {
 
         private void loadHistoryRecords() {
             if (flowRecord != null) {
-                List<FlowRecord> historyRecords = flowRecordRepository.findBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
+                List<FlowRecord> historyRecords = flowRecordService.findFlowRecordBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
                 this.flowContent.pushHistory(workflow,historyRecords);
             }
         }

@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "t_flow_workflow_backup")
-public class WorkflowBackupEntity {
+@Table(name = "t_flow_workflow_runtime")
+public class WorkflowRuntimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

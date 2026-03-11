@@ -3,17 +3,16 @@ package com.codingapi.flow.register;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.repository.*;
+import com.codingapi.flow.service.FlowRecordService;
+import com.codingapi.flow.service.WorkflowService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.InitializingBean;
 
 @AllArgsConstructor
 public class RepositoryHolderContextRegister implements InitializingBean {
 
-    private final WorkflowRepository workflowRepository;
-    private final WorkflowBackupRepository workflowBackupRepository;
-    private final FlowRecordRepository flowRecordRepository;
-    private final FlowTodoRecordRepository flowTodoRecordRepository;
-    private final FlowTodoMergeRepository flowTodoMergeRepository;
+    private final WorkflowService workflowService;
+    private final FlowRecordService flowRecordService;
     private final FlowOperatorGateway flowOperatorGateway;
     private final ParallelBranchRepository parallelBranchRepository;
     private final DelayTaskRepository delayTaskRepository;
@@ -23,11 +22,8 @@ public class RepositoryHolderContextRegister implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
 
         RepositoryHolderContext.getInstance().register(
-                workflowRepository,
-                workflowBackupRepository,
-                flowRecordRepository,
-                flowTodoRecordRepository,
-                flowTodoMergeRepository,
+                workflowService,
+                flowRecordService,
                 flowOperatorGateway,
                 parallelBranchRepository,
                 delayTaskRepository,

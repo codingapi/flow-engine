@@ -8,7 +8,7 @@ public interface FlowTodoMergeRepository {
 
     void saveAll(List<FlowTodoMerge> list);
 
-    void remove(FlowTodoMerge todoMerge);
+    void delete(FlowTodoMerge todoMerge);
 
     List<FlowTodoMerge> findByTodoId(long todoId);
 

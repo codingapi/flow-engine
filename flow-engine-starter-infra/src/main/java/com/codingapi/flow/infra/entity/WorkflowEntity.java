@@ -60,13 +60,6 @@ public class WorkflowEntity {
     private String nodes;
 
     /**
-     * 流程设计
-     */
-    @Lob
-    @Column(name = "schema_meta")
-    private String schema;
-
-    /**
      * 流程策略
      */
     @Lob

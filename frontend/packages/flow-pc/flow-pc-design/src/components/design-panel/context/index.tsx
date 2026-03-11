@@ -17,9 +17,8 @@ export class DesignPanelContextScope {
         this.props.onClose?.();
     }
 
-    public async save() {
-        await this.presenter.save();
-        this.close();
+    public async save(versionName?:string) {
+        await this.presenter.save(versionName);
     }
 
     public syncState(state: State) {
