@@ -1,8 +1,4 @@
 #!/usr/bin/env bash
 
-cd ../flow-frontend
-pnpm i
-pnpm clean
-
 cd ../
 mvn clean
