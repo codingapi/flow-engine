@@ -210,7 +210,7 @@ public class FlowRecord {
     private long timeoutTime;
     /**
      * 是否可合并
-     * {@link FlowRecord#getMergeKey()}
+     * {@link FlowRecord#getTodoKey()}
      */
     private boolean mergeable;
     /**
@@ -247,7 +247,7 @@ public class FlowRecord {
      * 数据合并的依据,当开启时值为固定值，否则为随机数据
      * 相同的 {@link FlowRecord#currentOperatorId} {@link FlowRecord#workRuntimeId} {@link FlowRecord#nodeId}字段的数据合并到一条记录上。
      */
-    public String getMergeKey() {
+    public String getTodoKey() {
         if (mergeable) {
             return String.format("%s-%s-%s", currentOperatorId, workRuntimeId, nodeId);
         } else {

@@ -71,7 +71,7 @@ public class FlowRecordContent {
 
     /**
      * 合并记录id,当存在合并记录数据时待办记录数量不会增加，内容会更新至最新的待办数据信息。
-     * {@link FlowRecord#getMergeKey()}
+     * {@link FlowRecord#getTodoKey()}
      */
     private String mergeKey;
 

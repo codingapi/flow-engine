@@ -44,7 +44,7 @@ class FlowRecordSaveService {
         List<FlowTodoRecord> flowTodoRecords = new ArrayList<>();
         for (FlowRecord flowRecord : flowRecords) {
             if (flowRecord.isTodo()) {
-                FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByMergeKey(flowRecord.getMergeKey());
+                FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByTodoKey(flowRecord.getTodoKey());
                 if (todoMargeRecord == null) {
                     todoMargeRecord = new FlowTodoRecord(flowRecord);
                 } else {
@@ -83,7 +83,7 @@ class FlowRecordSaveService {
         for (FlowRecord flowRecord : flowRecords) {
             if (flowRecord.isDone()) {
                 if (flowRecord.isMergeable()) {
-                    FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByMergeKey(flowRecord.getMergeKey());
+                    FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByTodoKey(flowRecord.getTodoKey());
                     if (todoMargeRecord != null) {
                         List<FlowTodoMerge> margeRelations = flowTodoMergeRepository.findByTodoId(todoMargeRecord.getId());
                         if (margeRelations != null && !margeRelations.isEmpty()) {
@@ -101,7 +101,14 @@ class FlowRecordSaveService {
                         }
                     }
                 } else {
-                    FlowTodoRecord flowTodoRecord = flowTodoRecordRepository.getByMergeKey(flowRecord.getMergeKey());
+                    FlowTodoRecord flowTodoRecord = flowTodoRecordRepository.getByTodoKey(flowRecord.getTodoKey());
+                    if (flowTodoRecord != null) {
+                        flowTodoRecordRepository.delete(flowTodoRecord);
+                    }
+                }
+            }else {
+                if(flowRecord.isRevoked()){
+                    FlowTodoRecord flowTodoRecord = flowTodoRecordRepository.getByTodoKey(flowRecord.getTodoKey());
                     if (flowTodoRecord != null) {
                         flowTodoRecordRepository.delete(flowTodoRecord);
                     }

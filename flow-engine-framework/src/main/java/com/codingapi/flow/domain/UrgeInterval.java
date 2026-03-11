@@ -21,6 +21,6 @@ public class UrgeInterval {
     public UrgeInterval(FlowRecord flowRecord) {
         this.processId = flowRecord.getProcessId();
         this.recordId = flowRecord.getId();
-        this.createTime = flowRecord.getCreateTime();
+        this.createTime = System.currentTimeMillis();
     }
 }

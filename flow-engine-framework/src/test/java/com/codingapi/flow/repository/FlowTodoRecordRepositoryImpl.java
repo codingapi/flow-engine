@@ -37,7 +37,7 @@ public class FlowTodoRecordRepositoryImpl implements FlowTodoRecordRepository {
     }
 
     @Override
-    public FlowTodoRecord getByMergeKey(String key) {
+    public FlowTodoRecord getByTodoKey(String key) {
         return cacheByMageKey.get(key);
     }
 

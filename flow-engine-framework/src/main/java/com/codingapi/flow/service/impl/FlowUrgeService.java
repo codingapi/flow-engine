@@ -71,7 +71,7 @@ public class FlowUrgeService {
             if (strategyManager.isEnableUrge()) {
                 UrgeStrategy urgeStrategy = strategyManager.getStrategy(UrgeStrategy.class);
                 if (!urgeStrategy.hasUrge(urgeInterval)) {
-                    throw FlowStateException.recordNotSupportUrge();
+                    throw FlowStateException.recordLimitUrgeError();
                 }
             }
         }

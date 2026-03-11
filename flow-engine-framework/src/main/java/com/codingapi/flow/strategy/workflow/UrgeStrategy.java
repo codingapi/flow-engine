@@ -56,7 +56,7 @@ public class UrgeStrategy extends BaseStrategy {
     }
 
     /**
-     * 是否有催办
+     * 是否可催办
      */
     public boolean hasUrge(UrgeInterval urgeInterval) {
         long interval = this.interval * 1000L;
