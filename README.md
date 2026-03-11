@@ -208,7 +208,7 @@ flow-engine
 ├── flow-engine-starter           # Spring Boot Starter
 ├── flow-engine-starter-infra     # 持久化层 Starter
 ├── flow-engine-example           # 示例项目
-└── frontend                      # 前端项目
+└── flow-frontend                 # 前端项目（Git Submodule）
     ├── apps
     │   ├── app-pc                # PC端应用
     │   └── app-mobile            # 移动端应用
@@ -260,7 +260,7 @@ mvn spring-boot:run
 ### 前端
 
 ```bash
-cd frontend
+cd flow-frontend
 
 # 安装依赖
 pnpm install

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd ../frontend
+cd ../flow-frontend
 pnpm i
 pnpm run build
 pnpm run build:app-pc

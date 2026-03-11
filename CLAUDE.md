@@ -31,7 +31,7 @@ cd flow-engine-example && mvn spring-boot:run
 
 ```bash
 # 安装依赖（使用 pnpm，而非 npm）
-cd frontend && pnpm install
+cd flow-frontend && pnpm install
 
 # 构建所有包
 pnpm run build
@@ -96,7 +96,7 @@ pnpm run dev:app-mobile # 移动端应用
 |--------|-------------|------|
 | `flow-core` | 核心框架库（HTTP、Hooks、Presenter 等），不包含 UI 组件 | 无 |
 | `flow-types` | TypeScript 类型定义（流程实例、表单、审批等业务类型） | flow-core |
-| `flow-pc-ui` | PC 端基础 UI 组件库（按钮、输入框等原子组件） | 无 |
+| `flow-pc-ui` | PC 端基础 UI 组件库（按钮、输入框等原子组件） | flow-core |
 | `flow-pc-form` | PC 端表单相关组件（表单设计器、表单渲染等） | flow-core, flow-types |
 | `flow-pc-design` | PC 端流程设计器组件（节点配置、属性面板等） | flow-core, flow-types, flow-pc-ui |
 | `flow-pc-approval` | PC 端审批页面（待办/已办/审批处理等） | flow-pc-design, flow-pc-ui |
@@ -105,21 +105,21 @@ pnpm run dev:app-mobile # 移动端应用
 
 ```
 flow-core (无UI)
-    ↑
+    ↑       ↑
+    │       └── flow-pc-ui (基础UI)
+    │
 flow-types (类型定义)
     ↑       ↑
     │       └── flow-pc-form
     │               ↑
     └───────→ flow-pc-design ──→ flow-pc-approval
-                    ↑
-            flow-pc-ui (基础UI)
 ```
 
 **模块划分原则**：
 
 - **flow-core**：全局框架依赖，只包含与 UI 无关的基础能力（HTTP、状态管理、工具函数等）
 - **flow-types**：全局类型定义，包含流程审批相关的业务类型（手机端和 PC 端共用）
-- **flow-pc-ui**：PC 端基础 UI 组件库，提供原子化组件
+- **flow-pc-ui**：PC 端基础 UI 组件库，提供原子化组件，依赖 flow-core
 - **flow-pc-form**：表单相关功能，依赖 flow-core + flow-types
 - **flow-pc-design**：流程设计器功能，包含节点配置、属性面板、脚本配置等
 - **flow-pc-approval**：审批页面功能，依赖 flow-pc-design
