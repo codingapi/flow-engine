@@ -5,6 +5,7 @@ import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.manager.NodeStrategyManager;
+import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.pojo.request.FlowRevokeRequest;
 import com.codingapi.flow.record.FlowRecord;
@@ -88,7 +89,7 @@ public class FlowRevokeService {
         currentRecord.clearDone();
 
         recordList.add(currentRecord);
-        flowEvents.add(new FlowRecordTodoEvent(currentRecord));
+        flowEvents.add(new FlowRecordTodoEvent(currentRecord,repositoryHolder instanceof MockRepositoryHolder));
 
         for (FlowRecord afterRecord : afterRecords) {
             afterRecord.revoke();

@@ -23,7 +23,7 @@ public class FlowTodoRecordRepositoryImpl implements FlowTodoRecordRepository {
 
     @Override
     public FlowTodoRecord getByTodoKey(String key) {
-        return FlowTodoRecordConvertor.convert(flowTodoRecordEntityRepository.getByMergeKey(key));
+        return FlowTodoRecordConvertor.convert(flowTodoRecordEntityRepository.getByTodoKey(key));
     }
 
     @Override

@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface FlowTodoRecordEntityRepository extends FastRepository<FlowTodoRecordEntity,Long> {
 
-    FlowTodoRecordEntity getByMergeKey(String mergeKey);
+    FlowTodoRecordEntity getByTodoKey(String todoKey);
 
 
     @Query("from FlowTodoRecordEntity r where r.currentOperatorId = ?1")

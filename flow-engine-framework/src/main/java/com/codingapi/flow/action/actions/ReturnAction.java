@@ -6,6 +6,7 @@ import com.codingapi.flow.action.BaseAction;
 import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
+import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -47,14 +48,14 @@ public class ReturnAction extends BaseAction {
         currentRecord.update(flowSession, true);
         recordList.add(currentRecord);
 
-        flowEvents.add(new FlowRecordDoneEvent(currentRecord));
+        flowEvents.add(new FlowRecordDoneEvent(currentRecord,repositoryHolder instanceof MockRepositoryHolder));
 
         List<FlowRecord> flowRecords = backNode.generateCurrentRecords(flowSession.updateSession(backNode));
         recordList.addAll(flowRecords);
 
         for (FlowRecord record : flowRecords) {
             if (record.isShow()) {
-                flowEvents.add(new FlowRecordTodoEvent(record));
+                flowEvents.add(new FlowRecordTodoEvent(record,repositoryHolder instanceof MockRepositoryHolder));
             }
         }
 

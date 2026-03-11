@@ -9,6 +9,7 @@ import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.manager.OperatorManager;
+import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.OperatorLoadScript;
@@ -59,7 +60,7 @@ public class DelegateAction extends BaseAction {
         currentRecord.update(flowSession, true);
 
         recordList.add(currentRecord);
-        flowEvents.add(new FlowRecordDoneEvent(currentRecord));
+        flowEvents.add(new FlowRecordDoneEvent(currentRecord,repositoryHolder instanceof MockRepositoryHolder));
 
         List<IFlowOperator> operators = flowSession.getAdvice().getForwardOperators();
 
@@ -76,7 +77,7 @@ public class DelegateAction extends BaseAction {
             FlowRecord flowRecord = currentRecord.create(flowSession.updateSession(operator));
             flowRecord.resetDelegate(currentRecord);
             recordList.add(flowRecord);
-            flowEvents.add(new FlowRecordTodoEvent(flowRecord));
+            flowEvents.add(new FlowRecordTodoEvent(flowRecord,repositoryHolder instanceof MockRepositoryHolder));
         }
 
         repositoryHolder.saveRecords(recordList);

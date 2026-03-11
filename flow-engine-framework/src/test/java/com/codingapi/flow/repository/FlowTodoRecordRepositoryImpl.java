@@ -20,7 +20,7 @@ public class FlowTodoRecordRepositoryImpl implements FlowTodoRecordRepository {
             record.setId(id);
             cache.put(id, record);
         }
-        cacheByMageKey.put(record.getMergeKey(), record);
+        cacheByMageKey.put(record.getTodoKey(), record);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class FlowTodoRecordRepositoryImpl implements FlowTodoRecordRepository {
 
     @Override
     public void delete(FlowTodoRecord margeRecord) {
-        cacheByMageKey.remove(margeRecord.getMergeKey());
+        cacheByMageKey.remove(margeRecord.getTodoKey());
         cache.remove(margeRecord.getId());
     }
 

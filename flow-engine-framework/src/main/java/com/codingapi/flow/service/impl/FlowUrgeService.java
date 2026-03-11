@@ -7,6 +7,7 @@ import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.manager.WorkflowStrategyManager;
+import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowUrgeRequest;
 import com.codingapi.flow.record.FlowRecord;
@@ -84,7 +85,7 @@ public class FlowUrgeService {
         List<IFlowEvent> flowEvents = new ArrayList<>();
 
         for (FlowRecord todoRecord : todoRecords) {
-            flowEvents.add(new FlowRecordUrgeEvent(todoRecord, currentOperator));
+            flowEvents.add(new FlowRecordUrgeEvent(todoRecord, currentOperator,repositoryHolder instanceof MockRepositoryHolder));
         }
 
         flowEvents.forEach(EventPusher::push);

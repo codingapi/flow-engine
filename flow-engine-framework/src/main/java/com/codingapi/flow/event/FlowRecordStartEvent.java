@@ -13,4 +13,5 @@ public class FlowRecordStartEvent implements IFlowEvent {
 
     private final FlowRecord flowRecord;
 
+    private final boolean mock;
 }

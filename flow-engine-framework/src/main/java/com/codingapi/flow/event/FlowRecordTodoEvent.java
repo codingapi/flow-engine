@@ -13,4 +13,5 @@ public class FlowRecordTodoEvent implements IFlowEvent {
 
     private final FlowRecord flowRecord;
 
+    private final boolean mock;
 }

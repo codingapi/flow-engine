@@ -16,6 +16,12 @@ public class FlowRecordRepositoryMockImpl implements FlowRecordRepository {
         return cache.get(id);
     }
 
+    public List<FlowRecord> findAll(){
+        return this.cache.values().stream()
+                .filter(item->!item.isRevoked())
+                .toList();
+    }
+
     @Override
     public List<FlowRecord> findByIds(List<Long> ids) {
         return ids.stream().map(cache::get).toList();
@@ -27,6 +33,10 @@ public class FlowRecordRepositoryMockImpl implements FlowRecordRepository {
 
     public List<FlowRecord> findDoneByOperator(long operatorId) {
         return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId && !flowRecord.isTodo()).toList();
+    }
+
+    public List<FlowRecord> findNotifyByOperator(long operatorId) {
+        return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId && flowRecord.isNotify()).toList();
     }
 
 

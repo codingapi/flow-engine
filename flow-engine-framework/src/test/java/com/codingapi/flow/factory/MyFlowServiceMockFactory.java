@@ -1,6 +1,7 @@
 package com.codingapi.flow.factory;
 
 import com.codingapi.flow.gateway.impl.UserGateway;
+import com.codingapi.flow.mock.FlowQueryMockService;
 import com.codingapi.flow.mock.FlowServiceMockFactory;
 import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.mock.repository.*;
@@ -24,6 +25,7 @@ public class MyFlowServiceMockFactory {
     public FlowService flowService;
     public MockRepositoryHolder repositoryHolder;
     public UserGateway userGateway;
+    public FlowQueryMockService flowQueryMockService;
 
     public MyFlowServiceMockFactory() {
         userGateway = new UserGateway();
@@ -41,5 +43,6 @@ public class MyFlowServiceMockFactory {
         urgeIntervalRepository = (UrgeIntervalRepositoryMockImpl) repositoryHolder.getUrgeIntervalRepository();
         workflowService = repositoryHolder.getWorkflowService();
         flowRecordService = repositoryHolder.getFlowRecordService();
+        flowQueryMockService = FlowServiceMockFactory.getInstance().getFlowQueryService(key);
     }
 }

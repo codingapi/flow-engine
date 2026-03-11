@@ -11,13 +11,13 @@ import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
-import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.node.nodes.*;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.pojo.request.FlowRevokeRequest;
 import com.codingapi.flow.pojo.request.FlowUrgeRequest;
+import com.codingapi.flow.pojo.response.FlowRecordContent;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.script.runtime.IBeanFactory;
@@ -29,6 +29,8 @@ import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.HashMap;
 import java.util.List;
@@ -207,6 +209,23 @@ class FlowMockSampleServiceTest {
         List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
         assertEquals(2, records.size());
         assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
+
+
+        Page<FlowRecordContent> page = factory.flowQueryMockService.findAll(PageRequest.of(1, 10));
+        assertEquals(2, page.getTotalElements());
+        assertEquals(2, page.getContent().size());
+
+        page = factory.flowQueryMockService.findDoneRecordPage(user.getUserId(), PageRequest.of(1, 10));
+        assertEquals(1, page.getTotalElements());
+        assertEquals(1, page.getContent().size());
+
+        page = factory.flowQueryMockService.findNotifyRecordPage(user.getUserId(),PageRequest.of(1, 10));
+        assertEquals(0, page.getTotalElements());
+        assertEquals(0, page.getContent().size());
+
+        page = factory.flowQueryMockService.findTodoRecordPage(user.getUserId(),PageRequest.of(1, 10));
+        assertEquals(0, page.getTotalElements());
+        assertEquals(0, page.getContent().size());
 
     }
 

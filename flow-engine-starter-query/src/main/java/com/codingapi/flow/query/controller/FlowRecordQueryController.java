@@ -1,11 +1,12 @@
 package com.codingapi.flow.query.controller;
 
+import com.codingapi.flow.infra.convert.FlowRecordContentConvertor;
 import com.codingapi.flow.infra.entity.FlowRecordEntity;
 import com.codingapi.flow.infra.entity.FlowTodoRecordEntity;
 import com.codingapi.flow.infra.jpa.FlowRecordEntityRepository;
 import com.codingapi.flow.infra.jpa.FlowTodoRecordEntityRepository;
-import com.codingapi.flow.infra.pojo.FlowRecordContent;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.pojo.response.FlowRecordContent;
 import com.codingapi.springboot.framework.dto.request.Relation;
 import com.codingapi.springboot.framework.dto.request.SearchRequest;
 import com.codingapi.springboot.framework.dto.response.MultiResponse;
@@ -34,7 +35,7 @@ public class FlowRecordQueryController {
         request.addSort(Sort.by("id").descending());
         request.addFilter("revoked", Relation.EQUAL,false);
         Page<FlowRecordEntity> page = flowRecordEntityRepository.searchRequest(request);
-        return MultiResponse.of(page.map(FlowRecordContent::convert));
+        return MultiResponse.of(page.map(FlowRecordContentConvertor::convert));
     }
 
 
@@ -46,7 +47,7 @@ public class FlowRecordQueryController {
         IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
         PageRequest pageRequest = request.toPageRequest(FlowRecordEntity.class);
         Page<FlowTodoRecordEntity> page = flowTodoRecordEntityRepository.findTodoRecordPage(current.getUserId(),pageRequest.withSort(Sort.by("id").descending()));
-        return MultiResponse.of(page.map(FlowRecordContent::convert));
+        return MultiResponse.of(page.map(FlowRecordContentConvertor::convert));
     }
 
     /**
@@ -57,7 +58,7 @@ public class FlowRecordQueryController {
         IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
         PageRequest pageRequest = request.toPageRequest(FlowRecordEntity.class);
         Page<FlowRecordEntity> page =flowRecordEntityRepository.findNotifyRecordPage(current.getUserId(),pageRequest.withSort(Sort.by("id").descending()));
-        return MultiResponse.of(page.map(FlowRecordContent::convert));
+        return MultiResponse.of(page.map(FlowRecordContentConvertor::convert));
     }
 
 
@@ -69,6 +70,6 @@ public class FlowRecordQueryController {
         IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
         PageRequest pageRequest = request.toPageRequest(FlowRecordEntity.class);
         Page<FlowRecordEntity> page =flowRecordEntityRepository.findDoneRecordPage(current.getUserId(),pageRequest.withSort(Sort.by("id").descending()));
-        return MultiResponse.of(page.map(FlowRecordContent::convert));
+        return MultiResponse.of(page.map(FlowRecordContentConvertor::convert));
     }
 }

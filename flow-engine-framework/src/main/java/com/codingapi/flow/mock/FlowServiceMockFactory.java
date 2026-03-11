@@ -31,6 +31,15 @@ public class FlowServiceMockFactory {
         return this.cache.get(key);
     }
 
+    public FlowQueryMockService getFlowQueryService(String key) {
+        FlowService flowService = this.getFlowService(key);
+        if (flowService != null) {
+            MockRepositoryHolder mockRepositoryHolder = (MockRepositoryHolder) flowService.getRepositoryHolder();
+            return new FlowQueryMockService(mockRepositoryHolder);
+        }
+        return null;
+    }
+
     public void clear(String key) {
         this.cache.remove(key);
     }
