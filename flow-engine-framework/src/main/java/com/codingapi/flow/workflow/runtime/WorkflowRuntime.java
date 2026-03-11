@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * 运行流程备份数据
+ * 运行时的流程配置
  */
 @Getter
 @AllArgsConstructor
