@@ -88,7 +88,7 @@ public class FlowRecord {
      */
     private long readTime;
     /**
-     * 流程id
+     * 流程惟一标识
      * 每一次流程启动时生成，直到流程结束
      */
     private String processId;

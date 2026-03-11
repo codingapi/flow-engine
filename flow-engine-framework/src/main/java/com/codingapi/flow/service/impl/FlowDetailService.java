@@ -1,8 +1,5 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.service.FlowRecordService;
-import com.codingapi.flow.service.WorkflowService;
-import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.node.IFlowNode;
@@ -10,9 +7,10 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowDetailRequest;
 import com.codingapi.flow.pojo.response.FlowContent;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.record.FlowTodoMerge;
-import com.codingapi.flow.record.FlowTodoRecord;
+import com.codingapi.flow.service.FlowRecordService;
+import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.workflow.Workflow;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 
 import java.util.List;
 
@@ -89,9 +87,7 @@ public class FlowDetailService {
         private void loadTodoFlowRecords(){
             if(this.flowRecord!=null){
                 if(this.flowRecord.isMergeable()){
-                    FlowTodoRecord todoRecord = flowRecordService.getFlowTodoByMergeKey(flowRecord.getMergeKey());
-                    List<FlowTodoMerge> todoMerges = flowRecordService.findFlowTodoMergeByTodoId(todoRecord.getId());
-                    List<FlowRecord> margeRecords = flowRecordService.findFlowRecordByIds(todoMerges.stream().map(FlowTodoMerge::getRecordId).toList());
+                    List<FlowRecord> margeRecords = flowRecordService.getMergeRecord(flowRecord.getMergeKey());
                     this.flowContent.pushRecords(this.flowRecord, margeRecords);
                 }else {
                     this.flowContent.pushRecords(this.flowRecord,List.of(this.flowRecord));
