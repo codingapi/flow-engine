@@ -461,7 +461,7 @@ public class FlowRecord {
         NodeStrategyManager nodeStrategyManager = currentNode.strategyManager();
         this.setTitle(nodeStrategyManager.generateTitle(flowSession));
         this.setTimeoutTime(nodeStrategyManager.getTimeoutTime());
-        this.setMergeable(nodeStrategyManager.isMergeable());
+        this.setMergeable(nodeStrategyManager.isEnableMergeable());
         this.update(flowSession, true);
         this.notify = true;
         this.forwardOperatorId = 0;

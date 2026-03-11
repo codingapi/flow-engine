@@ -38,11 +38,24 @@ public class NodeStrategyManager {
     /**
      * 是否可合并
      */
-    public boolean isMergeable() {
+    public boolean isEnableMergeable() {
         List<INodeStrategy> strategies = this.strategies;
         for (INodeStrategy strategy : strategies) {
             if (strategy instanceof RecordMergeStrategy) {
                 return ((RecordMergeStrategy) strategy).isEnable();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 是否支持撤回
+     */
+    public boolean isEnableRevoke(){
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof RevokeStrategy) {
+                return ((RevokeStrategy) strategy).isEnable();
             }
         }
         return false;
