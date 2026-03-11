@@ -8,7 +8,7 @@ public interface FlowTodoRecordRepository {
 
     void saveAll(List<FlowTodoRecord> margeRecords);
 
-    FlowTodoRecord getByMergeKey(String key);
+    FlowTodoRecord getByTodoKey(String key);
 
     void delete(FlowTodoRecord margeRecord);
 

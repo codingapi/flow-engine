@@ -64,7 +64,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         NodeStrategyManager nodeStrategyManager = this.strategyManager();
         flowRecord.setTitle(nodeStrategyManager.generateTitle(session));
         flowRecord.setTimeoutTime(nodeStrategyManager.getTimeoutTime());
-        flowRecord.setMergeable(nodeStrategyManager.isMergeable());
+        flowRecord.setMergeable(nodeStrategyManager.isEnableMergeable());
         flowRecord.newRecord();
     }
 

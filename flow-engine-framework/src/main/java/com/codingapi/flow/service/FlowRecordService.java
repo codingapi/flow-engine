@@ -48,7 +48,7 @@ public class FlowRecordService {
      * @return 流程合并记录
      */
     public List<FlowRecord> getMergeRecord(String mergeKey){
-        FlowTodoRecord todoRecord = flowTodoRecordRepository.getByMergeKey(mergeKey);
+        FlowTodoRecord todoRecord = flowTodoRecordRepository.getByTodoKey(mergeKey);
         List<FlowTodoMerge> todoMerges = flowTodoMergeRepository.findByTodoId(todoRecord.getId());
         return this.findFlowRecordByIds(todoMerges.stream().map(FlowTodoMerge::getRecordId).toList());
     }

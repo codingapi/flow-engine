@@ -6,6 +6,7 @@ import com.codingapi.flow.infra.jpa.FlowRecordEntityRepository;
 import com.codingapi.flow.infra.jpa.FlowTodoRecordEntityRepository;
 import com.codingapi.flow.infra.pojo.FlowRecordContent;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.springboot.framework.dto.request.Relation;
 import com.codingapi.springboot.framework.dto.request.SearchRequest;
 import com.codingapi.springboot.framework.dto.response.MultiResponse;
 import com.codingapi.springboot.framework.user.UserContext;
@@ -31,6 +32,7 @@ public class FlowRecordQueryController {
     @GetMapping("/list")
     public MultiResponse<FlowRecordContent> list(SearchRequest request) {
         request.addSort(Sort.by("id").descending());
+        request.addFilter("revoked", Relation.EQUAL,false);
         Page<FlowRecordEntity> page = flowRecordEntityRepository.searchRequest(request);
         return MultiResponse.of(page.map(FlowRecordContent::convert));
     }

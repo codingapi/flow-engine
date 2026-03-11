@@ -86,8 +86,8 @@ public class FlowDetailService {
 
         private void loadTodoFlowRecords(){
             if(this.flowRecord!=null){
-                if(this.flowRecord.isMergeable()){
-                    List<FlowRecord> margeRecords = flowRecordService.getMergeRecord(flowRecord.getMergeKey());
+                if(this.flowRecord.isMergeable() && this.flowRecord.isTodo()){
+                    List<FlowRecord> margeRecords = flowRecordService.getMergeRecord(flowRecord.getTodoKey());
                     this.flowContent.pushRecords(this.flowRecord, margeRecords);
                 }else {
                     this.flowContent.pushRecords(this.flowRecord,List.of(this.flowRecord));
@@ -122,6 +122,8 @@ public class FlowDetailService {
             this.loadCurrentNode();
             this.loadTodoFlowRecords();
             this.loadHistoryRecords();
+
+            flowContent.setOperationAction(this.workflow,this.flowRecord);
             return flowContent;
         }
     }

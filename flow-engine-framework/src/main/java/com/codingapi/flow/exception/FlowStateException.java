@@ -114,7 +114,7 @@ public class FlowStateException extends FlowException {
      *
      * @return exception
      */
-    public static FlowStateException recordNotSupportUrge() {
-        return new FlowStateException("record.notSupportUrge", "record not support urge");
+    public static FlowStateException recordLimitUrgeError() {
+        return new FlowStateException("record.urge.limit", "record urge limit error");
     }
 }

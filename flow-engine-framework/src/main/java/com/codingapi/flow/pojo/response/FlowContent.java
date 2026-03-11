@@ -93,7 +93,7 @@ public class FlowContent {
     /**
      * 流程按钮
      */
-    private List<Map<String,Object>> actions;
+    private List<Map<String, Object>> actions;
 
     /**
      * 是否可合并
@@ -130,6 +130,44 @@ public class FlowContent {
      */
     private List<NodeOption> nodes;
 
+    /**
+     * 支持撤销
+     */
+    private boolean revoke;
+
+    /**
+     * 支持催办
+     */
+    private boolean urge;
+
+
+    /**
+     * 设置操作动作按钮
+     *
+     */
+    public void setOperationAction(Workflow workflow, FlowRecord flowRecord) {
+        if (flowRecord == null) {
+            this.revoke = false;
+            this.urge = false;
+        } else {
+            if (flowRecord.isFinish()) {
+                this.revoke = false;
+                this.urge = false;
+            }
+
+            if (flowRecord.isTodo()) {
+                this.revoke = false;
+                this.urge = false;
+            }
+
+            if (flowRecord.isDone() && !flowRecord.isFinish()) {
+                IFlowNode node = workflow.getFlowNode(flowRecord.getNodeId());
+                this.revoke = node.strategyManager().isEnableRevoke();
+                this.urge = workflow.strategyManager().isEnableUrge();
+            }
+        }
+    }
+
 
     public void pushCurrentNode(IFlowNode currentNode) {
         ActionManager actionManager = currentNode.actionManager();
@@ -141,7 +179,7 @@ public class FlowContent {
         this.nodeName = currentNode.getName();
         this.nodeType = currentNode.getType();
         this.fieldPermissions = strategyManager.getFieldPermissions();
-        Map<String,Object> nodeData = currentNode.toMap();
+        Map<String, Object> nodeData = currentNode.toMap();
         this.view = (String) nodeData.get("view");
     }
 
@@ -162,7 +200,7 @@ public class FlowContent {
         this.title = record.getTitle();
 
         this.todos = new ArrayList<>();
-        for (FlowRecord item : mergeRecords){
+        for (FlowRecord item : mergeRecords) {
             Body body = new Body();
             body.setRecordId(item.getId());
             body.setTitle(item.getTitle());
@@ -173,9 +211,9 @@ public class FlowContent {
         }
     }
 
-    public void pushHistory(Workflow workflow,List<FlowRecord> historyRecords) {
+    public void pushHistory(Workflow workflow, List<FlowRecord> historyRecords) {
         this.histories = new ArrayList<>();
-        for (FlowRecord item : historyRecords){
+        for (FlowRecord item : historyRecords) {
             IFlowNode node = workflow.getFlowNode(item.getNodeId());
             History history = new History();
             history.setRecordId(item.getId());
@@ -193,18 +231,18 @@ public class FlowContent {
 
     public void pushCurrentOperator(IFlowOperator currentOperator) {
         this.currentOperator = new FlowOperator(currentOperator);
-        this.createOperator =  new FlowOperator(currentOperator);
+        this.createOperator = new FlowOperator(currentOperator);
     }
 
 
     @Data
-    public static class History{
+    public static class History {
         /**
          * 流程编号
          */
         private long recordId;
         /**
-         *  流程标题
+         * 流程标题
          */
         private String title;
 
@@ -246,15 +284,15 @@ public class FlowContent {
     @Data
     public static class Body {
         /**
-         *  流程记录编号
+         * 流程记录编号
          */
         private long recordId;
         /**
-         *  流程标题
+         * 流程标题
          */
         private String title;
         /**
-         *  表单数据
+         * 表单数据
          */
         private Map<String, Object> data;
 

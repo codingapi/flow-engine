@@ -1,10 +1,7 @@
 package com.codingapi.flow.api.controller;
 
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.pojo.request.FlowActionRequest;
-import com.codingapi.flow.pojo.request.FlowCreateRequest;
-import com.codingapi.flow.pojo.request.FlowDetailRequest;
-import com.codingapi.flow.pojo.request.FlowProcessNodeRequest;
+import com.codingapi.flow.pojo.request.*;
 import com.codingapi.flow.pojo.response.FlowContent;
 import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.service.FlowService;
@@ -42,6 +39,21 @@ public class FlowRecordController {
         IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
         request.setOperatorId(current.getUserId());
         return SingleResponse.of(flowService.create(request));
+    }
+
+
+    @PostMapping("/urge")
+    public Response urge(@RequestBody IdRequest request) {
+        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
+        flowService.urge(new FlowUrgeRequest(request.getLongId(),current.getUserId()));
+        return Response.buildSuccess();
+    }
+
+    @PostMapping("/revoke")
+    public Response revoke(@RequestBody IdRequest request) {
+        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
+        flowService.revoke(new FlowRevokeRequest(request.getLongId(),current.getUserId()));
+        return Response.buildSuccess();
     }
 
 

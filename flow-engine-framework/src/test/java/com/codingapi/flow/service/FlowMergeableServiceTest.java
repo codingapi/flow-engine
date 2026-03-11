@@ -143,7 +143,7 @@ public class FlowMergeableServiceTest {
         assertEquals(count, bossRecordList.size());
         assertEquals(count, bossRecordList.stream().filter(FlowRecord::isMergeable).toList().size());
 
-        List<String> mergeIdList = bossRecordList.stream().map(FlowRecord::getMergeKey).toList();
+        List<String> mergeIdList = bossRecordList.stream().map(FlowRecord::getTodoKey).toList();
         Set<String> set = new HashSet<>(mergeIdList);
         assertEquals(1,set.size());
 
