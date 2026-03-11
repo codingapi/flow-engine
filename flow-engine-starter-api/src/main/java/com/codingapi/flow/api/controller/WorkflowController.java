@@ -76,6 +76,12 @@ public class WorkflowController {
         return SingleResponse.of(FlowServiceMockFactory.getInstance().create(GatewayContext.getInstance().getFlowOperatorGateway()));
     }
 
+    @PostMapping("/cleanMock")
+    public Response mock(@RequestBody IdRequest request) {
+        FlowServiceMockFactory.getInstance().clear(request.getStringId());
+        return Response.buildSuccess();
+    }
+
 
     @PostMapping("/create")
     public SingleResponse<JSONObject> create() {
