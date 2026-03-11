@@ -1,3 +1,4 @@
 [submodule "flow-frontend"]
 	path = flow-frontend
 	url = git@github.com:codingapi/flow-frontend.git
+	branch = main
