@@ -373,4 +373,11 @@ public class Workflow {
     public void updateTime() {
         this.updatedTime = System.currentTimeMillis();
     }
+
+    public void resetWorkflow() {
+        this.id = RandomUtils.generateStringId();
+        this.code = RandomUtils.generateWorkflowCode();
+        this.createdTime = System.currentTimeMillis();
+        this.updateTime();
+    }
 }

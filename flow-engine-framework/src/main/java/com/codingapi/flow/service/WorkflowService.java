@@ -4,6 +4,7 @@ import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.repository.WorkflowRuntimeRepository;
 import com.codingapi.flow.repository.WorkflowVersionRepository;
+import com.codingapi.flow.utils.Base64Utils;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowVersion;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
@@ -163,5 +164,18 @@ public class WorkflowService {
      */
     public WorkflowRuntime getWorkflowRuntime(String workId, long workVersion) {
         return this.workflowRuntimeRepository.getByWorkId(workId, workVersion);
+    }
+
+    /**
+     * 导入流程
+     * @param body base64
+     * @return 流程id
+     */
+    public String importWorkflow(String body) {
+        String json = Base64Utils.toJson(body);
+        Workflow workflow = Workflow.formJson(json);
+        workflow.resetWorkflow();
+        this.saveWorkflow(workflow);
+        return workflow.getId();
     }
 }
