@@ -1,7 +1,7 @@
 package com.codingapi.flow.mock;
 
 import com.codingapi.flow.gateway.FlowOperatorGateway;
-import com.codingapi.flow.mock.server.FlowRecordQueryMockService;
+import com.codingapi.flow.mock.service.FlowRecordQueryMockService;
 import com.codingapi.flow.service.FlowService;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
@@ -9,6 +9,9 @@ import lombok.Getter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 模拟示例构建工厂
+ */
 public class MockInstanceFactory {
 
     private final Map<String, MockInstance> cache;

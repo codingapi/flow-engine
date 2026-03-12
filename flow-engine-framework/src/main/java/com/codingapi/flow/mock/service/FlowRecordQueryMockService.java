@@ -1,4 +1,4 @@
-package com.codingapi.flow.mock.server;
+package com.codingapi.flow.mock.service;
 
 import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.mock.repository.FlowRecordRepositoryMockImpl;

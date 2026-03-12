@@ -18,6 +18,9 @@ import lombok.Getter;
 
 import java.util.List;
 
+/**
+ * 模拟仓库持有者对象
+ */
 @Getter
 public class MockRepositoryHolder implements IRepositoryHolder {
 
