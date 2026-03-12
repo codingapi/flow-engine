@@ -211,19 +211,19 @@ class FlowMockSampleServiceTest {
         assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
 
-        Page<FlowRecordContent> page = factory.flowRecordQueryMockService.findAll(PageRequest.of(1, 10));
+        Page<FlowRecordContent> page = factory.flowRecordQueryMockService.findAll(PageRequest.of(0, 10));
         assertEquals(2, page.getTotalElements());
         assertEquals(2, page.getContent().size());
 
-        page = factory.flowRecordQueryMockService.findDoneRecordPage(user.getUserId(), PageRequest.of(1, 10));
+        page = factory.flowRecordQueryMockService.findDoneRecordPage(user.getUserId(), PageRequest.of(0, 10));
         assertEquals(1, page.getTotalElements());
         assertEquals(1, page.getContent().size());
 
-        page = factory.flowRecordQueryMockService.findNotifyRecordPage(user.getUserId(),PageRequest.of(1, 10));
+        page = factory.flowRecordQueryMockService.findNotifyRecordPage(user.getUserId(),PageRequest.of(0, 10));
         assertEquals(0, page.getTotalElements());
         assertEquals(0, page.getContent().size());
 
-        page = factory.flowRecordQueryMockService.findTodoRecordPage(user.getUserId(),PageRequest.of(1, 10));
+        page = factory.flowRecordQueryMockService.findTodoRecordPage(user.getUserId(),PageRequest.of(0, 10));
         assertEquals(0, page.getTotalElements());
         assertEquals(0, page.getContent().size());
 

@@ -69,6 +69,7 @@ public class FlowRecordQueryController {
     @GetMapping("/todo")
     public MultiResponse<FlowRecordContent> todo(SearchRequest request) {
         long operatorId = loadCurrentOperatorId();
+        FlowRecordQueryService flowRecordQueryService = loadFlowService();
         PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize()).withSort(Sort.by("id").descending());
         return MultiResponse.of(flowRecordQueryService.findTodoRecordPage(operatorId,pageRequest));
     }
@@ -79,6 +80,7 @@ public class FlowRecordQueryController {
     @GetMapping("/notify")
     public MultiResponse<FlowRecordContent> notify(SearchRequest request) {
         long operatorId = loadCurrentOperatorId();
+        FlowRecordQueryService flowRecordQueryService = loadFlowService();
         PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize()).withSort(Sort.by("id").descending());
         return MultiResponse.of(flowRecordQueryService.findNotifyRecordPage(operatorId,pageRequest));
     }
@@ -90,6 +92,7 @@ public class FlowRecordQueryController {
     @GetMapping("/done")
     public MultiResponse<FlowRecordContent> done(SearchRequest request) {
         long operatorId = loadCurrentOperatorId();
+        FlowRecordQueryService flowRecordQueryService = loadFlowService();
         PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize()).withSort(Sort.by("id").descending());
         return MultiResponse.of(flowRecordQueryService.findDoneRecordPage(operatorId,pageRequest));
     }

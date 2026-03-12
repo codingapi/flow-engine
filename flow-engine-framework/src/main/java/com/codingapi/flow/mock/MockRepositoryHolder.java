@@ -37,7 +37,8 @@ public class MockRepositoryHolder implements IRepositoryHolder {
     private final WorkflowService workflowService;
     private final FlowOperatorGateway flowOperatorGateway;
 
-    public MockRepositoryHolder(FlowOperatorGateway flowOperatorGateway) {
+    public MockRepositoryHolder(FlowOperatorGateway flowOperatorGateway,
+                                WorkflowRepository workflowRepository) {
         this.flowOperatorGateway = flowOperatorGateway;
         this.delayTaskRepository = new DelayTaskRepositoryMockImpl();
         this.flowRecordRepository = new FlowRecordRepositoryMockImpl();
@@ -45,7 +46,7 @@ public class MockRepositoryHolder implements IRepositoryHolder {
         this.flowTodoRecordRepository = new FlowTodoRecordRepositoryMockImpl();
         this.parallelBranchRepository = new ParallelBranchRepositoryMockImpl();
         this.urgeIntervalRepository = new UrgeIntervalRepositoryMockImpl();
-        this.workflowRepository = new WorkflowRepositoryMockImpl();
+        this.workflowRepository = workflowRepository;
         this.workflowRuntimeRepository = new WorkflowRuntimeRepositoryMockImpl();
         this.workflowVersionRepository = new WorkflowVersionRepositoryMockImpl();
         this.flowRecordService = new FlowRecordService(flowTodoRecordRepository, flowTodoMergeRepository, flowRecordRepository);

@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class FlowRecordQueryMockService implements FlowRecordQueryService {
 
-    private final static int CURRENT_OFFSET = -1;
+    private final static int CURRENT_OFFSET = 0;
 
     private final MockRepositoryHolder mockRepositoryHolder;
 

@@ -6,6 +6,7 @@ import com.codingapi.flow.mock.MockInstanceFactory;
 import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.mock.repository.*;
 import com.codingapi.flow.query.FlowRecordQueryService;
+import com.codingapi.flow.repository.WorkflowRepositoryImpl;
 import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.FlowService;
 import com.codingapi.flow.service.WorkflowService;
@@ -17,7 +18,7 @@ public class MyFlowServiceMockFactory {
     public FlowRecordRepositoryMockImpl flowRecordRepository;
     public WorkflowRuntimeRepositoryMockImpl workflowRuntimeRepository;
     public WorkflowVersionRepositoryMockImpl workflowVersionRepository;
-    public WorkflowRepositoryMockImpl workflowRepository;
+    public WorkflowRepositoryImpl workflowRepository;
     public ParallelBranchRepositoryMockImpl parallelBranchRepository;
     public DelayTaskRepositoryMockImpl delayTaskRepository;
     public UrgeIntervalRepositoryMockImpl urgeIntervalRepository;
@@ -30,7 +31,8 @@ public class MyFlowServiceMockFactory {
 
     public MyFlowServiceMockFactory() {
         userGateway = new UserGateway();
-        MockInstance mockInstance = MockInstanceFactory.getInstance().create(userGateway);
+        workflowRepository = new WorkflowRepositoryImpl();
+        MockInstance mockInstance = MockInstanceFactory.getInstance().create(userGateway,workflowRepository);
         flowService = mockInstance.getFlowService();
         repositoryHolder = (MockRepositoryHolder)flowService.getRepositoryHolder();
         flowTodoRecordRepository = (FlowTodoRecordRepositoryMockImpl)repositoryHolder.getFlowTodoRecordRepository();
@@ -38,7 +40,6 @@ public class MyFlowServiceMockFactory {
         flowRecordRepository = (FlowRecordRepositoryMockImpl) repositoryHolder.getFlowRecordRepository();
         workflowRuntimeRepository = (WorkflowRuntimeRepositoryMockImpl) repositoryHolder.getWorkflowRuntimeRepository();
         workflowVersionRepository = (WorkflowVersionRepositoryMockImpl)repositoryHolder.getWorkflowVersionRepository();
-        workflowRepository = (WorkflowRepositoryMockImpl) repositoryHolder.getWorkflowRepository();
         parallelBranchRepository = (ParallelBranchRepositoryMockImpl) repositoryHolder.getParallelBranchRepository();
         delayTaskRepository = (DelayTaskRepositoryMockImpl) repositoryHolder.getDelayTaskRepository();
         urgeIntervalRepository = (UrgeIntervalRepositoryMockImpl) repositoryHolder.getUrgeIntervalRepository();

@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.codingapi.flow.api.pojo.NodeCreateRequest;
 import com.codingapi.flow.api.pojo.WorkflowUpdateVersionNameRequest;
 import com.codingapi.flow.context.GatewayContext;
+import com.codingapi.flow.context.RepositoryHolderContext;
+import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.mock.MockInstance;
 import com.codingapi.flow.mock.MockInstanceFactory;
 import com.codingapi.flow.node.IBlockNode;
@@ -11,6 +13,7 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
@@ -32,6 +35,8 @@ import java.util.Map;
 public class WorkflowController {
 
     private final WorkflowService workflowService;
+    private final WorkflowRepository workflowRepository;
+    private final FlowOperatorGateway flowOperatorGateway;
 
     @PostMapping("/remove")
     public Response remove(@RequestBody IdRequest request) {
@@ -74,7 +79,7 @@ public class WorkflowController {
 
     @PostMapping("/mock")
     public SingleResponse<String> mock() {
-        MockInstance mockInstance = MockInstanceFactory.getInstance().create(GatewayContext.getInstance().getFlowOperatorGateway());
+        MockInstance mockInstance = MockInstanceFactory.getInstance().create(flowOperatorGateway,workflowRepository);
         return SingleResponse.of(mockInstance.getMockKey());
     }
 
