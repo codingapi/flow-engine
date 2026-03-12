@@ -4,7 +4,6 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.event.FlowRecordFinishEvent;
-import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.NodeType;
@@ -75,7 +74,7 @@ public class EndNode extends BaseFlowNode implements IDisplayNode {
         });
         repositoryHolder.saveRecords(recordList);
         // 流程是否正常结束
-        EventPusher.push(new FlowRecordFinishEvent(latestRecord,repositoryHolder instanceof MockRepositoryHolder));
+        EventPusher.push(new FlowRecordFinishEvent(latestRecord,session.isMock()));
     }
 
 

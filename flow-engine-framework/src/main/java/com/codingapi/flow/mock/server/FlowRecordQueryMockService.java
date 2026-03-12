@@ -1,11 +1,10 @@
-package com.codingapi.flow.mock;
+package com.codingapi.flow.mock.server;
 
+import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.mock.repository.FlowRecordRepositoryMockImpl;
 import com.codingapi.flow.mock.repository.FlowTodoRecordRepositoryMockImpl;
 import com.codingapi.flow.pojo.response.FlowRecordContent;
-import com.codingapi.springboot.framework.dto.offset.ICurrentOffset;
-import com.codingapi.springboot.framework.dto.offset.context.CurrentPageOffsetContext;
-import com.codingapi.springboot.framework.dto.request.SearchRequest;
+import com.codingapi.flow.query.FlowRecordQueryService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 @AllArgsConstructor
-public class FlowQueryMockService {
+public class FlowRecordQueryMockService implements FlowRecordQueryService {
 
     private final static int CURRENT_OFFSET = -1;
 
@@ -51,25 +50,28 @@ public class FlowQueryMockService {
         return new PageImpl<>(currentPage, PageRequest.of(pageNumber,pageSize), totalSize);
     }
 
+    @Override
     public Page<FlowRecordContent> findAll(PageRequest request) {
         FlowRecordRepositoryMockImpl flowRecordRepositoryMock = (FlowRecordRepositoryMockImpl) mockRepositoryHolder.getFlowRecordRepository();
         List<FlowRecordContent> recordList = flowRecordRepositoryMock.findAll().stream().map(FlowRecordContent::convert).toList();
         return this.toPage(recordList, request);
     }
 
-
+    @Override
     public Page<FlowRecordContent> findTodoRecordPage(long userId, PageRequest request) {
         FlowTodoRecordRepositoryMockImpl flowTodoRecordRepositoryMock = (FlowTodoRecordRepositoryMockImpl) mockRepositoryHolder.getFlowTodoRecordRepository();
         List<FlowRecordContent> recordList = flowTodoRecordRepositoryMock.findByOperatorId(userId).stream().map(FlowRecordContent::convert).toList();
         return this.toPage(recordList, request);
     }
 
+    @Override
     public Page<FlowRecordContent> findNotifyRecordPage(long userId, PageRequest request) {
         FlowRecordRepositoryMockImpl flowRecordRepositoryMock = (FlowRecordRepositoryMockImpl) mockRepositoryHolder.getFlowRecordRepository();
         List<FlowRecordContent> recordList = flowRecordRepositoryMock.findNotifyByOperator(userId).stream().map(FlowRecordContent::convert).toList();
         return toPage(recordList, request);
     }
 
+    @Override
     public Page<FlowRecordContent> findDoneRecordPage(long userId, PageRequest request) {
         FlowRecordRepositoryMockImpl flowRecordRepositoryMock = (FlowRecordRepositoryMockImpl) mockRepositoryHolder.getFlowRecordRepository();
         List<FlowRecordContent> recordList = flowRecordRepositoryMock.findDoneByOperator(userId).stream().map(FlowRecordContent::convert).toList();

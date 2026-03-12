@@ -10,7 +10,6 @@ import com.codingapi.flow.exception.FlowPermissionException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
-import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
@@ -90,8 +89,8 @@ public class FlowCreateService {
 
         List<IFlowEvent> events = new ArrayList<>();
         for (FlowRecord flowRecord : flowRecords) {
-            events.add(new FlowRecordStartEvent(flowRecord,repositoryHolder instanceof MockRepositoryHolder));
-            events.add(new FlowRecordTodoEvent(flowRecord,repositoryHolder instanceof MockRepositoryHolder));
+            events.add(new FlowRecordStartEvent(flowRecord,session.isMock()));
+            events.add(new FlowRecordTodoEvent(flowRecord,session.isMock()));
         }
 
         // 推送事件

@@ -7,7 +7,6 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowStateException;
-import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.action.RejectActionScript;
@@ -98,7 +97,7 @@ public class RejectAction extends BaseAction {
             recordList.addAll(records);
             for (FlowRecord record : records) {
                 if (record.isShow()) {
-                    flowEvents.add(new FlowRecordTodoEvent(record,repositoryHolder instanceof MockRepositoryHolder));
+                    flowEvents.add(new FlowRecordTodoEvent(record, flowSession.isMock()));
                 }
             }
         }

@@ -4,7 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.codingapi.flow.api.pojo.NodeCreateRequest;
 import com.codingapi.flow.api.pojo.WorkflowUpdateVersionNameRequest;
 import com.codingapi.flow.context.GatewayContext;
-import com.codingapi.flow.mock.FlowServiceMockFactory;
+import com.codingapi.flow.mock.MockInstance;
+import com.codingapi.flow.mock.MockInstanceFactory;
 import com.codingapi.flow.node.IBlockNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
@@ -73,12 +74,13 @@ public class WorkflowController {
 
     @PostMapping("/mock")
     public SingleResponse<String> mock() {
-        return SingleResponse.of(FlowServiceMockFactory.getInstance().create(GatewayContext.getInstance().getFlowOperatorGateway()));
+        MockInstance mockInstance = MockInstanceFactory.getInstance().create(GatewayContext.getInstance().getFlowOperatorGateway());
+        return SingleResponse.of(mockInstance.getMockKey());
     }
 
     @PostMapping("/cleanMock")
     public Response mock(@RequestBody IdRequest request) {
-        FlowServiceMockFactory.getInstance().clear(request.getStringId());
+        MockInstanceFactory.getInstance().clear(request.getStringId());
         return Response.buildSuccess();
     }
 

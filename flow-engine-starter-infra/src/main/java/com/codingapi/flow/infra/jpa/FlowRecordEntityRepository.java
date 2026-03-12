@@ -12,6 +12,9 @@ public interface FlowRecordEntityRepository extends FastRepository<FlowRecordEnt
 
     FlowRecordEntity getFlowRecordEntityById(long id);
 
+    @Query("from FlowRecordEntity r where r.revoked = false")
+    Page<FlowRecordEntity> findAllFlowRecords(PageRequest pageRequest);
+
     @Query("from FlowRecordEntity r where r.id in ?1")
     List<FlowRecordEntity> findByIds(List<Long> ids);
 

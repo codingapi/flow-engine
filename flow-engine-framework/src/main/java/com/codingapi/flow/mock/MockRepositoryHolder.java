@@ -33,10 +33,8 @@ public class MockRepositoryHolder implements IRepositoryHolder {
     private final FlowRecordService flowRecordService;
     private final WorkflowService workflowService;
     private final FlowOperatorGateway flowOperatorGateway;
-    private final String mockKey;
 
-    public MockRepositoryHolder(String mockKey, FlowOperatorGateway flowOperatorGateway) {
-        this.mockKey = mockKey;
+    public MockRepositoryHolder(FlowOperatorGateway flowOperatorGateway) {
         this.flowOperatorGateway = flowOperatorGateway;
         this.delayTaskRepository = new DelayTaskRepositoryMockImpl();
         this.flowRecordRepository = new FlowRecordRepositoryMockImpl();

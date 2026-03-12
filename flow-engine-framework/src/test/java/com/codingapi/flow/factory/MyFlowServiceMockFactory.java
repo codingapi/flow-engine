@@ -1,10 +1,11 @@
 package com.codingapi.flow.factory;
 
 import com.codingapi.flow.gateway.impl.UserGateway;
-import com.codingapi.flow.mock.FlowQueryMockService;
-import com.codingapi.flow.mock.FlowServiceMockFactory;
+import com.codingapi.flow.mock.MockInstance;
+import com.codingapi.flow.mock.MockInstanceFactory;
 import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.mock.repository.*;
+import com.codingapi.flow.query.FlowRecordQueryService;
 import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.FlowService;
 import com.codingapi.flow.service.WorkflowService;
@@ -25,12 +26,12 @@ public class MyFlowServiceMockFactory {
     public FlowService flowService;
     public MockRepositoryHolder repositoryHolder;
     public UserGateway userGateway;
-    public FlowQueryMockService flowQueryMockService;
+    public FlowRecordQueryService flowRecordQueryMockService;
 
     public MyFlowServiceMockFactory() {
         userGateway = new UserGateway();
-        String key = FlowServiceMockFactory.getInstance().create(userGateway);
-        flowService = FlowServiceMockFactory.getInstance().getFlowService(key);
+        MockInstance mockInstance = MockInstanceFactory.getInstance().create(userGateway);
+        flowService = mockInstance.getFlowService();
         repositoryHolder = (MockRepositoryHolder)flowService.getRepositoryHolder();
         flowTodoRecordRepository = (FlowTodoRecordRepositoryMockImpl)repositoryHolder.getFlowTodoRecordRepository();
         flowTodoMergeRepository = (FlowTodoMergeRepositoryMockImpl)repositoryHolder.getFlowTodoMergeRepository();
@@ -43,6 +44,6 @@ public class MyFlowServiceMockFactory {
         urgeIntervalRepository = (UrgeIntervalRepositoryMockImpl) repositoryHolder.getUrgeIntervalRepository();
         workflowService = repositoryHolder.getWorkflowService();
         flowRecordService = repositoryHolder.getFlowRecordService();
-        flowQueryMockService = FlowServiceMockFactory.getInstance().getFlowQueryService(key);
+        flowRecordQueryMockService = mockInstance.getFlowRecordQueryService();
     }
 }

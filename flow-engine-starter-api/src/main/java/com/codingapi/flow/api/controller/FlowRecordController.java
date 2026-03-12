@@ -1,6 +1,7 @@
 package com.codingapi.flow.api.controller;
 
-import com.codingapi.flow.mock.FlowServiceMockFactory;
+import com.codingapi.flow.mock.MockInstance;
+import com.codingapi.flow.mock.MockInstanceFactory;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.*;
 import com.codingapi.flow.pojo.response.FlowContent;
@@ -30,33 +31,47 @@ public class FlowRecordController {
         HttpServletRequest request = attributes.getRequest();
         String key = request.getParameter("mockKey");
         if(StringUtils.hasText(key)) {
-            return FlowServiceMockFactory.getInstance().getFlowService(key);
+            MockInstance mockInstance = MockInstanceFactory.getInstance().getMockInstance(key);
+            if(mockInstance!=null){
+                return mockInstance.getFlowService();
+            }
+        }
+        return this.flowService;
+    }
+
+    private long loadCurrentOperatorId(){
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+        String key = request.getParameter("operatorId");
+        if(StringUtils.hasText(key)) {
+            return Long.parseLong(key);
         }else {
-            return this.flowService;
+            IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
+            return current.getUserId();
         }
     }
 
     @GetMapping("/detail")
     public SingleResponse<FlowContent> detail(IdRequest idRequest) {
         FlowService flowService = this.loadFlowService();
-        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
-        return SingleResponse.of(flowService.detail(new FlowDetailRequest(idRequest.getStringId(), current.getUserId())));
+        long operatorId = loadCurrentOperatorId();
+        return SingleResponse.of(flowService.detail(new FlowDetailRequest(idRequest.getStringId(), operatorId)));
     }
 
 
     @PostMapping("/processNodes")
     public MultiResponse<ProcessNode> processNodes(@RequestBody FlowProcessNodeRequest request) {
         FlowService flowService = this.loadFlowService();
-        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
-        request.setOperatorId(current.getUserId());
+        long operatorId = loadCurrentOperatorId();
+        request.setOperatorId(operatorId);
         return MultiResponse.of(flowService.processNodes(request));
     }
 
     @PostMapping("/create")
     public SingleResponse<Long> create(@RequestBody FlowCreateRequest request) {
         FlowService flowService = this.loadFlowService();
-        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
-        request.setOperatorId(current.getUserId());
+        long operatorId = loadCurrentOperatorId();
+        request.setOperatorId(operatorId);
         return SingleResponse.of(flowService.create(request));
     }
 
@@ -64,16 +79,16 @@ public class FlowRecordController {
     @PostMapping("/urge")
     public Response urge(@RequestBody IdRequest request) {
         FlowService flowService = this.loadFlowService();
-        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
-        flowService.urge(new FlowUrgeRequest(request.getLongId(),current.getUserId()));
+        long operatorId = loadCurrentOperatorId();
+        flowService.urge(new FlowUrgeRequest(request.getLongId(),operatorId));
         return Response.buildSuccess();
     }
 
     @PostMapping("/revoke")
     public Response revoke(@RequestBody IdRequest request) {
         FlowService flowService = this.loadFlowService();
-        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
-        flowService.revoke(new FlowRevokeRequest(request.getLongId(),current.getUserId()));
+        long operatorId = loadCurrentOperatorId();
+        flowService.revoke(new FlowRevokeRequest(request.getLongId(),operatorId));
         return Response.buildSuccess();
     }
 
@@ -81,8 +96,8 @@ public class FlowRecordController {
     @PostMapping("/action")
     public Response action(@RequestBody FlowActionRequest request) {
         FlowService flowService = this.loadFlowService();
-        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
-        request.updateOperatorId(current.getUserId());
+        long operatorId = loadCurrentOperatorId();
+        request.updateOperatorId(operatorId);
         flowService.action(request);
         return Response.buildSuccess();
     }

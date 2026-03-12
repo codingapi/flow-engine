@@ -9,7 +9,6 @@ import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
-import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
@@ -108,7 +107,7 @@ public class AddAuditAction extends BaseAction {
 
         for (FlowRecord record : flowRecords) {
             if (record.isShow()) {
-                flowEvents.add(new FlowRecordTodoEvent(record,repositoryHolder instanceof MockRepositoryHolder));
+                flowEvents.add(new FlowRecordTodoEvent(record, flowSession.isMock()));
             }
         }
 

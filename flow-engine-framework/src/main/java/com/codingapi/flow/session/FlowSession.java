@@ -2,6 +2,7 @@ package com.codingapi.flow.session;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormData;
+import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
@@ -92,6 +93,13 @@ public class FlowSession {
         this.advice = advice;
     }
 
+
+    /**
+     * 是否是mock
+     */
+    public boolean isMock(){
+        return this.repositoryHolder instanceof MockRepositoryHolder;
+    }
 
     /**
      * 获取转交之后的审批人
