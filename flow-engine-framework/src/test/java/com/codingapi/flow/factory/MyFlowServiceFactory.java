@@ -1,5 +1,6 @@
 package com.codingapi.flow.factory;
 
+import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.repository.*;
@@ -42,6 +43,8 @@ public class MyFlowServiceFactory {
         RepositoryHolderContext.getInstance().register(workflowService, flowRecordService, userGateway, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
         repositoryHolder = RepositoryHolderContext.getInstance();
         this.flowService = new FlowService(this.repositoryHolder);
+
+        GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
     }
 
 }

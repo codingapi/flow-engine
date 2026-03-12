@@ -5,10 +5,12 @@ import com.codingapi.flow.infra.entity.WorkflowVersionEntity;
 import com.codingapi.flow.infra.jpa.WorkflowVersionEntityRepository;
 import com.codingapi.flow.repository.WorkflowVersionRepository;
 import com.codingapi.flow.workflow.WorkflowVersion;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
 
+@Transactional
 @AllArgsConstructor
 public class WorkflowVersionRepositoryImpl implements WorkflowVersionRepository {
 

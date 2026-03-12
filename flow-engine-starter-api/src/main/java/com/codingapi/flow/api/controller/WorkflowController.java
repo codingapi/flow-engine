@@ -3,8 +3,7 @@ package com.codingapi.flow.api.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.codingapi.flow.api.pojo.NodeCreateRequest;
 import com.codingapi.flow.api.pojo.WorkflowUpdateVersionNameRequest;
-import com.codingapi.flow.context.GatewayContext;
-import com.codingapi.flow.context.RepositoryHolderContext;
+import com.codingapi.flow.exception.FlowPermissionException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.mock.MockInstance;
 import com.codingapi.flow.mock.MockInstanceFactory;
@@ -21,11 +20,15 @@ import com.codingapi.flow.workflow.WorkflowVersion;
 import com.codingapi.springboot.framework.dto.request.IdRequest;
 import com.codingapi.springboot.framework.dto.response.Response;
 import com.codingapi.springboot.framework.dto.response.SingleResponse;
+import com.codingapi.springboot.framework.exception.LocaleMessageException;
 import com.codingapi.springboot.framework.user.UserContext;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 
@@ -79,7 +82,13 @@ public class WorkflowController {
 
     @PostMapping("/mock")
     public SingleResponse<String> mock() {
-        MockInstance mockInstance = MockInstanceFactory.getInstance().create(flowOperatorGateway,workflowRepository);
+        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
+        if (current != null) {
+            if (!current.isFlowManager()) {
+                throw FlowPermissionException.accessDenied(current.getName());
+            }
+        }
+        MockInstance mockInstance = MockInstanceFactory.getInstance().create(flowOperatorGateway, workflowRepository);
         return SingleResponse.of(mockInstance.getMockKey());
     }
 
@@ -89,7 +98,6 @@ public class WorkflowController {
         return Response.buildSuccess();
     }
 
-
     @PostMapping("/create")
     public SingleResponse<JSONObject> create() {
         Workflow workflow = WorkflowBuilder.builder()
@@ -97,6 +105,28 @@ public class WorkflowController {
         workflow.addDefaultNodesAndEdges();
         JSONObject jsonObject = JSONObject.parseObject(workflow.toJson());
         return SingleResponse.of(jsonObject);
+    }
+
+    @PostMapping("/import")
+    public SingleResponse<String> importWorkflow(@RequestBody JSONObject body) {
+        String workId = workflowService.importWorkflow(body.getString("file"));
+        return SingleResponse.of(workId);
+    }
+
+    @GetMapping("/export")
+    public void export(IdRequest request, HttpServletResponse response) {
+        Workflow workflow = workflowService.getWorkflow(request.getStringId());
+        JSONObject jsonObject = JSONObject.parseObject(workflow.toJson());
+        try {
+            response.setContentType("application/json;charset=UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            String fileName = URLEncoder.encode("workflow_" + request.getStringId() + ".json", StandardCharsets.UTF_8);
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+            response.getWriter().write(jsonObject.toJSONString());
+            response.getWriter().flush();
+        } catch (Exception e) {
+            throw new LocaleMessageException("export.error", e);
+        }
     }
 
     @PostMapping("/create-node")
@@ -121,7 +151,7 @@ public class WorkflowController {
         if (StringUtils.hasText(versionName)) {
             WorkflowVersion workflowVersion = new WorkflowVersion(workflow);
             workflowVersion.setVersionName(versionName);
-            workflowService.saveWorkflowVersion(workflowVersion,true);
+            workflowService.saveWorkflowVersion(workflowVersion, true);
         } else {
             workflowService.saveWorkflow(workflow);
         }
