@@ -1,9 +1,5 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.service.FlowRecordService;
-import com.codingapi.flow.service.WorkflowService;
-import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.domain.UrgeInterval;
 import com.codingapi.flow.event.FlowRecordUrgeEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -11,12 +7,16 @@ import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.manager.WorkflowStrategyManager;
+import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowUrgeRequest;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.UrgeIntervalRepository;
+import com.codingapi.flow.service.FlowRecordService;
+import com.codingapi.flow.service.WorkflowService;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.workflow.UrgeStrategy;
 import com.codingapi.flow.workflow.Workflow;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.springboot.framework.event.EventPusher;
 
 import java.util.ArrayList;
@@ -30,15 +30,15 @@ public class FlowUrgeService {
     private final FlowUrgeRequest request;
     private final FlowRecordService flowRecordService;
     private final FlowOperatorGateway flowOperatorGateway;
-    private final UrgeIntervalRepository urgeIntervalRepository;
     private final WorkflowService workflowService;
+    private final IRepositoryHolder repositoryHolder;
 
-    public FlowUrgeService(FlowUrgeRequest request) {
+    public FlowUrgeService(FlowUrgeRequest request,IRepositoryHolder repositoryHolder) {
         this.request = request;
-        this.flowRecordService = RepositoryHolderContext.getInstance().getFlowRecordService();
-        this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
-        this.urgeIntervalRepository = RepositoryHolderContext.getInstance().getUrgeIntervalRepository();
-        this.workflowService = RepositoryHolderContext.getInstance().getWorkflowService();
+        this.flowRecordService = repositoryHolder.getFlowRecordService();
+        this.flowOperatorGateway = repositoryHolder.getFlowOperatorGateway();
+        this.workflowService = repositoryHolder.getWorkflowService();
+        this.repositoryHolder = repositoryHolder;
     }
 
     /**
@@ -63,7 +63,7 @@ public class FlowUrgeService {
             throw FlowStateException.operatorNotMatch();
         }
 
-        UrgeInterval urgeInterval = urgeIntervalRepository.getLatest(currentRecord.getProcessId(), request.getRecordId());
+        UrgeInterval urgeInterval = repositoryHolder.getLatestUrgeInterval(currentRecord.getProcessId(), request.getRecordId());
         if (urgeInterval != null) {
             WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(currentRecord.getWorkRuntimeId());
             Workflow workflow = workflowRuntime.toWorkflow();
@@ -80,12 +80,12 @@ public class FlowUrgeService {
 
         List<FlowRecord> todoRecords = flowRecordService.findFlowRecordTodoRecords(currentRecord.getProcessId());
         // 保存催办记录
-        urgeIntervalRepository.save(new UrgeInterval(currentRecord));
+        repositoryHolder.saveUrgeInterval(new UrgeInterval(currentRecord));
 
         List<IFlowEvent> flowEvents = new ArrayList<>();
 
         for (FlowRecord todoRecord : todoRecords) {
-            flowEvents.add(new FlowRecordUrgeEvent(todoRecord, currentOperator));
+            flowEvents.add(new FlowRecordUrgeEvent(todoRecord, currentOperator,repositoryHolder instanceof MockRepositoryHolder));
         }
 
         flowEvents.forEach(EventPusher::push);

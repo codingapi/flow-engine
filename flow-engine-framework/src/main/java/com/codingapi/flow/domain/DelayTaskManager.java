@@ -1,7 +1,7 @@
 package com.codingapi.flow.domain;
 
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.service.impl.FlowDelayTriggerService;
+import com.codingapi.flow.session.IRepositoryHolder;
 import lombok.Getter;
 
 import java.util.*;
@@ -25,13 +25,12 @@ public class DelayTaskManager {
     /**
      * 加载任务并执行
      */
-    public void start() {
+    public void start(IRepositoryHolder repositoryHolder) {
         System.out.println("flow delay task starting...");
-        RepositoryHolderContext.getInstance().verify();
-        List<DelayTask> delayTasks = RepositoryHolderContext.getInstance().findDelayTasks();
+        List<DelayTask> delayTasks = repositoryHolder.findDelayTasks();
         if (delayTasks != null && !delayTasks.isEmpty()) {
             for (DelayTask delayTask : delayTasks) {
-                this.addTask(delayTask);
+                this.addTask(delayTask,repositoryHolder);
             }
         }
         System.out.println("flow delay task started");
@@ -53,9 +52,9 @@ public class DelayTaskManager {
     /**
      * 添加任务队列
      */
-    public void addTask(DelayTask task) {
-        RepositoryHolderContext.getInstance().saveDelayTask(task);
-        this.delayJobs.add(new DelayJob(task));
+    public void addTask(DelayTask task,IRepositoryHolder repositoryHolder) {
+        repositoryHolder.saveDelayTask(task);
+        this.delayJobs.add(new DelayJob(task,repositoryHolder));
     }
 
     /**
@@ -65,26 +64,26 @@ public class DelayTaskManager {
         private final DelayTask task;
         private final Timer timer;
 
-        public DelayJob(DelayTask task) {
+        public DelayJob(DelayTask task,IRepositoryHolder repositoryHolder) {
             this.task = task;
             this.timer = new Timer();
-            this.start();
+            this.start(repositoryHolder);
         }
 
         public void close() {
             this.timer.cancel();
         }
 
-        private void start() {
+        private void start(IRepositoryHolder repositoryHolder) {
             this.timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
 
-                    FlowDelayTriggerService flowDelayTriggerService = RepositoryHolderContext.getInstance().createDelayTriggerService(task);
+                    FlowDelayTriggerService flowDelayTriggerService = repositoryHolder.createDelayTriggerService(task);
 
                     flowDelayTriggerService.trigger();
 
-                    RepositoryHolderContext.getInstance().deleteDelayTask(task);
+                    repositoryHolder.deleteDelayTask(task);
                 }
             }, new Date(task.getTriggerTime()));
         }

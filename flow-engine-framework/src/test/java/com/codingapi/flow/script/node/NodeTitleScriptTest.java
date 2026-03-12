@@ -6,6 +6,7 @@ import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
+import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
@@ -15,10 +16,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class NodeTitleScriptTest {
 
+    private final MyFlowServiceFactory factory = new MyFlowServiceFactory();
+
+
     @Test
     void testExecuteWithSimpleScript() {
         NodeTitleScript script = new NodeTitleScript("def run(request){return '你有一条待办'}");
         FlowSession session = new FlowSession(
+                factory.repositoryHolder,
             new User(1, "张三"),
             null,
             null,
@@ -59,7 +64,7 @@ class NodeTitleScriptTest {
         FormData data = new FormData(form);
         data.getDataBody().set("days", 5);
 
-        FlowSession session = FlowSession.startSession(user, workflow, startNode, startNode.getActions().get(0), data, 0);
+        FlowSession session = FlowSession.startSession(factory.repositoryHolder,user, workflow, startNode, startNode.getActions().get(0), data, 0);
 
         String result = titleScript.execute(session);
         assertNotNull(result);

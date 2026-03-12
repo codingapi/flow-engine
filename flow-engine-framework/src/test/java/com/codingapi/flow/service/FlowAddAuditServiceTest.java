@@ -6,11 +6,11 @@ import com.codingapi.flow.builder.ActionBuilder;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
+import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
-import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
@@ -18,7 +18,6 @@ import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.*;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.user.User;
@@ -35,19 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class FlowAddAuditServiceTest {
 
 
-    private final FlowTodoRecordRepositoryImpl flowTodoRecordRepository = new FlowTodoRecordRepositoryImpl();
-    private final FlowTodoMergeRepositoryImpl flowTodoMergeRepository = new FlowTodoMergeRepositoryImpl();
-    private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
-    private final UserGateway userGateway = new UserGateway();
-    private final WorkflowRuntimeRepository workflowRuntimeRepository = new WorkflowRuntimeRepositoryImpl();
-    private final WorkflowVersionRepository workflowVersionRepository = new WorkflowVersionRepositoryImpl();
-    private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
-    private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
-    private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
-    private final UrgeIntervalRepository urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
-    private final WorkflowService workflowService = new WorkflowService(workflowVersionRepository,workflowRepository,workflowRuntimeRepository);
-    private final FlowRecordService flowRecordService = new FlowRecordService(flowTodoRecordRepository,flowTodoMergeRepository,flowRecordRepository);
-    private final FlowService flowService = new FlowService(workflowService, userGateway, flowRecordService, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
+    private final MyFlowServiceFactory factory = new MyFlowServiceFactory();
 
 
 
@@ -61,11 +48,11 @@ public class FlowAddAuditServiceTest {
         User depart = new User(2, "depart");
         User boss = new User(3, "boss");
 
-        userGateway.save(user);
-        userGateway.save(boss);
-        userGateway.save(depart);
+        factory.userGateway.save(user);
+        factory.userGateway.save(boss);
+        factory.userGateway.save(depart);
 
-        GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
+        GatewayContext.getInstance().setFlowOperatorGateway(factory.userGateway);
 
         FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
@@ -127,7 +114,7 @@ public class FlowAddAuditServiceTest {
                 .addNode(endNode)
                 .build();
 
-        workflowService.saveWorkflow(workflow);
+        factory.workflowService.saveWorkflow(workflow);
 
         Map<String, Object> data = new HashMap<>(Map.of("name", "lorne", "days", 1, "reason", "leave"));
 
@@ -137,18 +124,18 @@ public class FlowAddAuditServiceTest {
         userCreateRequest.setFormData(data);
         userCreateRequest.setActionId(startActions.get(0).id());
         userCreateRequest.setOperatorId(user.getUserId());
-        flowService.create(userCreateRequest);
+        factory.flowService.create(userCreateRequest);
 
-        List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
+        List<FlowRecord> userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
         assertEquals(1, userRecordList.size());
 
         FlowActionRequest userRequest = new FlowActionRequest();
         userRequest.setFormData(data);
         userRequest.setRecordId(userRecordList.get(0).getId());
         userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
-        flowService.action(userRequest);
+        factory.flowService.action(userRequest);
 
-        List<FlowRecord> departRecordList = flowRecordRepository.findTodoByOperator(depart.getUserId());
+        List<FlowRecord> departRecordList = factory.flowRecordRepository.findTodoByOperator(depart.getUserId());
         assertEquals(1, departRecordList.size());
 
 
@@ -161,27 +148,27 @@ public class FlowAddAuditServiceTest {
         FlowAdviceBody addAuditAdviceBody = new FlowAdviceBody(departActions.get(3).id(), depart.getUserId());
         addAuditAdviceBody.setForwardOperatorIds(List.of(depart.getUserId()));
         addAuditRequest.setAdvice(addAuditAdviceBody);
-        flowService.action(addAuditRequest);
+        factory.flowService.action(addAuditRequest);
 
-        departRecordList = flowRecordRepository.findTodoByOperator(depart.getUserId());
+        departRecordList = factory.flowRecordRepository.findTodoByOperator(depart.getUserId());
         assertEquals(1, departRecordList.size());
 
         FlowActionRequest departRequest = new FlowActionRequest();
         departRequest.setFormData(data);
         departRequest.setRecordId(departRecordList.get(0).getId());
         departRequest.setAdvice(new FlowAdviceBody(departActions.get(0).id(), "同意", depart.getUserId()));
-        flowService.action(departRequest);
+        factory.flowService.action(departRequest);
 
-        departRecordList = flowRecordRepository.findTodoByOperator(depart.getUserId());
+        departRecordList = factory.flowRecordRepository.findTodoByOperator(depart.getUserId());
         assertEquals(1, departRecordList.size());
 
         departRequest = new FlowActionRequest();
         departRequest.setFormData(data);
         departRequest.setRecordId(departRecordList.get(0).getId());
         departRequest.setAdvice(new FlowAdviceBody(departActions.get(0).id(), "同意", depart.getUserId()));
-        flowService.action(departRequest);
+        factory.flowService.action(departRequest);
 
-        List<FlowRecord> bossRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        List<FlowRecord> bossRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, bossRecordList.size());
 
         List<IFlowAction> bossActions = bossNode.actionManager().getActions();
@@ -190,9 +177,9 @@ public class FlowAddAuditServiceTest {
         bossRequest.setFormData(data);
         bossRequest.setRecordId(bossRecordList.get(0).getId());
         bossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", boss.getUserId()));
-        flowService.action(bossRequest);
+        factory.flowService.action(bossRequest);
 
-        List<FlowRecord> records = flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
+        List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
         assertEquals(4, records.size());
         assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
 

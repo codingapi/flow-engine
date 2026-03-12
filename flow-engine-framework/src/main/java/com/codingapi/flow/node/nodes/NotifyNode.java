@@ -2,7 +2,6 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.node.BaseAuditNode;
@@ -11,6 +10,7 @@ import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.*;
 import com.codingapi.flow.utils.RandomUtils;
 
@@ -41,6 +41,7 @@ public class NotifyNode extends BaseAuditNode implements IDisplayNode {
 
     @Override
     public boolean handle(FlowSession session) {
+        IRepositoryHolder repositoryHolder = session.getRepositoryHolder();
         if (this.isWaitRecordMargeParallelNode(session)) {
             return false;
         }
@@ -48,7 +49,7 @@ public class NotifyNode extends BaseAuditNode implements IDisplayNode {
         for (FlowRecord record : records) {
             this.fillNewRecord(session, record);
         }
-        RepositoryHolderContext.getInstance().saveRecords(records);
+        repositoryHolder.saveRecords(records);
         return true;
     }
 

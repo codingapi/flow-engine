@@ -12,6 +12,7 @@ import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
+import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
@@ -23,6 +24,10 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ErrorTriggerScriptTest {
+
+    private final MyFlowServiceFactory factory = new MyFlowServiceFactory();
+
+
 
     @Test
     void execute() {
@@ -77,7 +82,7 @@ class ErrorTriggerScriptTest {
         FormData data = new FormData(form);
         data.getDataBody().set("name", "张三").set("days", 10).set("reason", "事由");
 
-        FlowSession flowSession = FlowSession.startSession(user, workflow, startNode, startNode.getActions().get(0), data, 0);
+        FlowSession flowSession = FlowSession.startSession(factory.repositoryHolder,user, workflow, startNode, startNode.getActions().get(0), data, 0);
 
         ErrorTriggerScript errorNodeTriggerScript = ErrorTriggerScript.defaultScript();
         ErrorThrow errorThrow = errorNodeTriggerScript.execute(flowSession);

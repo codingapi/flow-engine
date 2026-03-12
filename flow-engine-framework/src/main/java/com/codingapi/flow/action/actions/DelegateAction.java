@@ -4,7 +4,6 @@ import com.codingapi.flow.action.ActionDisplay;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.BaseAction;
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -14,6 +13,7 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.springboot.framework.event.EventPusher;
 import org.springframework.util.StringUtils;
@@ -51,6 +51,7 @@ public class DelegateAction extends BaseAction {
 
     @Override
     public void run(FlowSession flowSession) {
+        IRepositoryHolder repositoryHolder = flowSession.getRepositoryHolder();
         List<IFlowEvent> flowEvents = new ArrayList<>();
         List<FlowRecord> recordList = new ArrayList<>();
 
@@ -58,7 +59,7 @@ public class DelegateAction extends BaseAction {
         currentRecord.update(flowSession, true);
 
         recordList.add(currentRecord);
-        flowEvents.add(new FlowRecordDoneEvent(currentRecord));
+        flowEvents.add(new FlowRecordDoneEvent(currentRecord, flowSession.isMock()));
 
         List<IFlowOperator> operators = flowSession.getAdvice().getForwardOperators();
 
@@ -75,10 +76,10 @@ public class DelegateAction extends BaseAction {
             FlowRecord flowRecord = currentRecord.create(flowSession.updateSession(operator));
             flowRecord.resetDelegate(currentRecord);
             recordList.add(flowRecord);
-            flowEvents.add(new FlowRecordTodoEvent(flowRecord));
+            flowEvents.add(new FlowRecordTodoEvent(flowRecord, flowSession.isMock()));
         }
 
-        RepositoryHolderContext.getInstance().saveRecords(recordList);
+        repositoryHolder.saveRecords(recordList);
         flowEvents.forEach(EventPusher::push);
 
     }

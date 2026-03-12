@@ -16,4 +16,6 @@ public class FlowRecordUrgeEvent implements IFlowEvent {
 
     private final IFlowOperator urgeOperator;
 
+    private final boolean mock;
+
 }

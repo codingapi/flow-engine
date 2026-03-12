@@ -17,6 +17,7 @@ public class RepositoryHolderContextRegister implements InitializingBean {
     private final ParallelBranchRepository parallelBranchRepository;
     private final DelayTaskRepository delayTaskRepository;
     private final UrgeIntervalRepository urgeIntervalRepository;
+    private final GatewayContextRegister gatewayContextRegister;
 
     @Override
     public void afterPropertiesSet() throws Exception {

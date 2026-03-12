@@ -4,7 +4,6 @@ import com.codingapi.flow.action.ActionDisplay;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.BaseAction;
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowStateException;
@@ -12,6 +11,7 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.action.RejectActionScript;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.springboot.framework.event.EventPusher;
 import lombok.Getter;
@@ -84,6 +84,7 @@ public class RejectAction extends BaseAction {
 
     @Override
     public void run(FlowSession flowSession) {
+        IRepositoryHolder repositoryHolder = flowSession.getRepositoryHolder();
         List<IFlowEvent> flowEvents = new ArrayList<>();
         List<FlowRecord> recordList = new ArrayList<>();
 
@@ -96,11 +97,11 @@ public class RejectAction extends BaseAction {
             recordList.addAll(records);
             for (FlowRecord record : records) {
                 if (record.isShow()) {
-                    flowEvents.add(new FlowRecordTodoEvent(record));
+                    flowEvents.add(new FlowRecordTodoEvent(record, flowSession.isMock()));
                 }
             }
         }
-        RepositoryHolderContext.getInstance().saveRecords(recordList);
+        repositoryHolder.saveRecords(recordList);
         flowEvents.forEach(EventPusher::push);
 
     }

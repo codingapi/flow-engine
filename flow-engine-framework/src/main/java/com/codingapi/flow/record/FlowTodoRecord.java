@@ -82,7 +82,7 @@ public class FlowTodoRecord {
      * 合并记录id,当存在合并记录数据时待办记录数量不会增加，内容会更新至最新的待办数据信息。
      * {@link FlowRecord#getTodoKey()}
      */
-    private String mergeKey;
+    private String todoKey;
 
     /**
      * 合并记录数量
@@ -126,7 +126,7 @@ public class FlowTodoRecord {
         this.createTime = flowRecord.getCreateTime();
         this.createOperatorId = flowRecord.getCreateOperatorId();
         this.createOperatorName = flowRecord.getCreateOperatorName();
-        this.mergeKey = flowRecord.getTodoKey();
+        this.todoKey = flowRecord.getTodoKey();
         this.mergeable = flowRecord.isMergeable();
         this.recordId = flowRecord.getId();
         this.timeoutTime = flowRecord.getTimeoutTime();

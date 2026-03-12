@@ -24,7 +24,7 @@ public class FlowTodoRecordConvertor {
                 entity.getCreateTime(),
                 entity.getCreateOperatorId(),
                 entity.getCreateOperatorName(),
-                entity.getMergeKey(),
+                entity.getTodoKey(),
                 entity.getMargeCount(),
                 entity.getMergeable(),
                 entity.getRecordId(),
@@ -55,7 +55,7 @@ public class FlowTodoRecordConvertor {
         entity.setCreateTime(record.getCreateTime());
         entity.setCreateOperatorId(record.getCreateOperatorId());
         entity.setCreateOperatorName(record.getCreateOperatorName());
-        entity.setMergeKey(record.getMergeKey());
+        entity.setTodoKey(record.getTodoKey());
         entity.setMargeCount(record.getMargeCount());
         entity.setMergeable(record.isMergeable());
         entity.setRecordId(record.getRecordId());

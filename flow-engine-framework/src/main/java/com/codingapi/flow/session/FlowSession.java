@@ -2,6 +2,7 @@ package com.codingapi.flow.session;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormData;
+import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
@@ -20,6 +21,11 @@ import java.util.List;
  */
 @Getter
 public class FlowSession {
+
+    /**
+     * 资源持有者
+     */
+    private final IRepositoryHolder repositoryHolder;
 
     /**
      * 当前操作者
@@ -65,7 +71,8 @@ public class FlowSession {
     private final FlowAdvice advice;
 
 
-    public FlowSession(IFlowOperator currentOperator,
+    public FlowSession(IRepositoryHolder repositoryHolder,
+                       IFlowOperator currentOperator,
                        Workflow workflow,
                        IFlowNode currentNode,
                        IFlowAction currentAction,
@@ -74,6 +81,7 @@ public class FlowSession {
                        List<FlowRecord> currentNodeRecords,
                        long backupId,
                        FlowAdvice advice) {
+        this.repositoryHolder = repositoryHolder;
         this.currentOperator = currentOperator;
         this.workflow = workflow;
         this.currentAction = currentAction;
@@ -85,6 +93,13 @@ public class FlowSession {
         this.advice = advice;
     }
 
+
+    /**
+     * 是否是mock
+     */
+    public boolean isMock(){
+        return this.repositoryHolder instanceof MockRepositoryHolder;
+    }
 
     /**
      * 获取转交之后的审批人
@@ -111,13 +126,15 @@ public class FlowSession {
      * @param backupId        流程备份id
      * @return 新的会话
      */
-    public static FlowSession startSession(IFlowOperator currentOperator,
-                                           Workflow workflow,
-                                           IFlowNode currentNode,
-                                           IFlowAction currentAction,
-                                           FormData formData,
-                                           long backupId) {
-        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, null, new ArrayList<>(), backupId, new FlowAdvice());
+    public static FlowSession startSession(
+            IRepositoryHolder repositoryHolder,
+            IFlowOperator currentOperator,
+            Workflow workflow,
+            IFlowNode currentNode,
+            IFlowAction currentAction,
+            FormData formData,
+            long backupId) {
+        return new FlowSession(repositoryHolder, currentOperator, workflow, currentNode, currentAction, formData, null, new ArrayList<>(), backupId, new FlowAdvice());
     }
 
 
@@ -212,7 +229,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowNode currentNode) {
-        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
+        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
     }
 
 
@@ -223,7 +240,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowAction currentAction) {
-        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
+        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
     }
 
     /**
@@ -233,7 +250,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowOperator currentOperator) {
-        return new FlowSession(currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
+        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
     }
 
 }

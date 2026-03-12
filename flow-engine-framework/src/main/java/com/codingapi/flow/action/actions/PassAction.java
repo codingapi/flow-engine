@@ -3,7 +3,6 @@ package com.codingapi.flow.action.actions;
 import com.codingapi.flow.action.ActionDisplay;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.BaseAction;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -13,6 +12,7 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.springboot.framework.event.EventPusher;
 
@@ -66,6 +66,7 @@ public class PassAction extends BaseAction {
 
     @Override
     public void run(FlowSession flowSession) {
+        IRepositoryHolder repositoryHolder = flowSession.getRepositoryHolder();
         List<IFlowEvent> flowEvents = new ArrayList<>();
         List<FlowRecord> recordList = new ArrayList<>();
         FlowRecord currentRecord = flowSession.getCurrentRecord();
@@ -73,7 +74,7 @@ public class PassAction extends BaseAction {
         boolean isFinish = currentNode.isFinish(flowSession);
         currentRecord.update(flowSession, true);
         // 添加流程结束事件
-        flowEvents.add(new FlowRecordDoneEvent(currentRecord));
+        flowEvents.add(new FlowRecordDoneEvent(currentRecord,flowSession.isMock()));
         recordList.add(currentRecord);
 
         // 激活下一个按顺序审批的记录数据
@@ -84,7 +85,7 @@ public class PassAction extends BaseAction {
                 if (record.getNodeOrder() == currentRecord.getNodeOrder() + 1) {
                     record.show();
                     recordList.add(record);
-                    flowEvents.add(new FlowRecordTodoEvent(record));
+                    flowEvents.add(new FlowRecordTodoEvent(record,flowSession.isMock()));
                 }
             }
         }
@@ -92,23 +93,23 @@ public class PassAction extends BaseAction {
         if (isFinish) {
             // 是否转交审批人的流程
             if (currentRecord.isForward()) {
-                IFlowOperator forwardOperator = RepositoryHolderContext.getInstance().getOperatorById(currentRecord.getForwardOperatorId());
+                IFlowOperator forwardOperator = repositoryHolder.getOperatorById(currentRecord.getForwardOperatorId());
                 FlowRecord notifyRecord = currentRecord.create(flowSession.updateSession(forwardOperator));
                 notifyRecord.notifyRecord(flowSession.updateSession(forwardOperator));
                 // 如果不存储这个记录，若下一流程是结束流程时，无法更新流程状态为结束状态。
-                RepositoryHolderContext.getInstance().saveRecord(notifyRecord);
-                flowEvents.add(new FlowRecordDoneEvent(notifyRecord));
+                repositoryHolder.saveRecord(notifyRecord);
+                flowEvents.add(new FlowRecordDoneEvent(notifyRecord,flowSession.isMock()));
             }
 
             // 是否委托记录
             if (currentRecord.isDelegate()) {
-                FlowRecord delegateRecord = RepositoryHolderContext.getInstance().getRecordById(currentRecord.getDelegateId());
-                IFlowOperator delegateOperator = RepositoryHolderContext.getInstance().getOperatorById(delegateRecord.getCurrentOperatorId());
+                FlowRecord delegateRecord = repositoryHolder.getRecordById(currentRecord.getDelegateId());
+                IFlowOperator delegateOperator = repositoryHolder.getOperatorById(delegateRecord.getCurrentOperatorId());
                 FlowRecord rebackRecord = delegateRecord.create(flowSession.updateSession(delegateOperator));
                 rebackRecord.clearDelegate();
 
                 recordList.add(rebackRecord);
-                flowEvents.add(new FlowRecordTodoEvent(rebackRecord));
+                flowEvents.add(new FlowRecordTodoEvent(rebackRecord,flowSession.isMock()));
             } else {
                 this.triggerNode(flowSession, (triggerSession) -> {
                     List<FlowRecord> records = this.generateRecords(triggerSession);
@@ -116,9 +117,9 @@ public class PassAction extends BaseAction {
                         for (FlowRecord record : records) {
                             if (record.isShow()) {
                                 if (record.isNotify()) {
-                                    flowEvents.add(new FlowRecordDoneEvent(record));
+                                    flowEvents.add(new FlowRecordDoneEvent(record,flowSession.isMock()));
                                 } else {
-                                    flowEvents.add(new FlowRecordTodoEvent(record));
+                                    flowEvents.add(new FlowRecordTodoEvent(record,flowSession.isMock()));
                                 }
                             }
                         }
@@ -127,7 +128,7 @@ public class PassAction extends BaseAction {
                 });
             }
         }
-        RepositoryHolderContext.getInstance().saveRecords(recordList);
+        repositoryHolder.saveRecords(recordList);
 
         flowEvents.forEach(EventPusher::push);
     }

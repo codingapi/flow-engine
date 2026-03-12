@@ -1,5 +1,6 @@
 package com.codingapi.flow;
 
+import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.register.RepositoryHolderContextRegister;
 import com.codingapi.flow.register.FlowScriptContextRegister;
@@ -17,8 +18,8 @@ import org.springframework.context.annotation.Configuration;
 public class AutoConfiguration {
 
     @Bean
-    public FlowDelayTaskRunner delayTaskRunner() {
-        return new FlowDelayTaskRunner();
+    public FlowDelayTaskRunner delayTaskRunner(RepositoryHolderContextRegister repositoryHolderContextRegister) {
+        return new FlowDelayTaskRunner(RepositoryHolderContext.getInstance());
     }
 
     @Bean
@@ -42,7 +43,8 @@ public class AutoConfiguration {
             FlowOperatorGateway flowOperatorGateway,
             ParallelBranchRepository parallelBranchRepository,
             DelayTaskRepository delayTaskRepository,
-            UrgeIntervalRepository urgeIntervalRepository
+            UrgeIntervalRepository urgeIntervalRepository,
+            GatewayContextRegister gatewayContextRegister
     ) {
         return new RepositoryHolderContextRegister(
                 workflowService,
@@ -50,7 +52,8 @@ public class AutoConfiguration {
                 flowOperatorGateway,
                 parallelBranchRepository,
                 delayTaskRepository,
-                urgeIntervalRepository
+                urgeIntervalRepository,
+                gatewayContextRegister
         );
     }
 
@@ -65,21 +68,7 @@ public class AutoConfiguration {
     }
 
     @Bean
-    public FlowService flowService(
-            WorkflowService workflowService,
-            FlowOperatorGateway flowOperatorGateway,
-            FlowRecordService flowRecordService,
-            ParallelBranchRepository parallelBranchRepository,
-            DelayTaskRepository delayTaskRepository,
-            UrgeIntervalRepository urgeIntervalRepository
-    ) {
-        return new FlowService(
-                workflowService,
-                flowOperatorGateway,
-                flowRecordService,
-                parallelBranchRepository,
-                delayTaskRepository,
-                urgeIntervalRepository
-        );
+    public FlowService flowService(RepositoryHolderContextRegister repositoryHolderContextRegister) {
+        return new FlowService(RepositoryHolderContext.getInstance());
     }
 }

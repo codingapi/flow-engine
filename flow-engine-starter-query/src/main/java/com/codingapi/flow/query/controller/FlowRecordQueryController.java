@@ -1,40 +1,65 @@
 package com.codingapi.flow.query.controller;
 
-import com.codingapi.flow.infra.entity.FlowRecordEntity;
-import com.codingapi.flow.infra.entity.FlowTodoRecordEntity;
-import com.codingapi.flow.infra.jpa.FlowRecordEntityRepository;
-import com.codingapi.flow.infra.jpa.FlowTodoRecordEntityRepository;
-import com.codingapi.flow.infra.pojo.FlowRecordContent;
+import com.codingapi.flow.mock.MockInstance;
+import com.codingapi.flow.mock.MockInstanceFactory;
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.springboot.framework.dto.request.Relation;
+import com.codingapi.flow.pojo.response.FlowRecordContent;
+import com.codingapi.flow.query.FlowRecordQueryService;
 import com.codingapi.springboot.framework.dto.request.SearchRequest;
 import com.codingapi.springboot.framework.dto.response.MultiResponse;
 import com.codingapi.springboot.framework.user.UserContext;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @RestController
 @RequestMapping("/api/query/record")
 @AllArgsConstructor
 public class FlowRecordQueryController {
 
-    private final FlowRecordEntityRepository flowRecordEntityRepository;
-    private final FlowTodoRecordEntityRepository flowTodoRecordEntityRepository;
+    private final FlowRecordQueryService flowRecordQueryService;
+
+    private FlowRecordQueryService loadFlowService(){
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+        String key = request.getParameter("mockKey");
+        if(StringUtils.hasText(key)) {
+            MockInstance mockInstance = MockInstanceFactory.getInstance().getMockInstance(key);
+            if(mockInstance!=null){
+                return mockInstance.getFlowRecordQueryService();
+            }
+        }
+        return this.flowRecordQueryService;
+    }
+
+    private long loadCurrentOperatorId(){
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+        String key = request.getParameter("operatorId");
+        if(StringUtils.hasText(key)) {
+            return Long.parseLong(key);
+        }else {
+            IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
+            return current.getUserId();
+        }
+    }
+
 
     /**
      * 全部流程记录接口
      */
     @GetMapping("/list")
     public MultiResponse<FlowRecordContent> list(SearchRequest request) {
-        request.addSort(Sort.by("id").descending());
-        request.addFilter("revoked", Relation.EQUAL,false);
-        Page<FlowRecordEntity> page = flowRecordEntityRepository.searchRequest(request);
-        return MultiResponse.of(page.map(FlowRecordContent::convert));
+        FlowRecordQueryService flowRecordQueryService = loadFlowService();
+        PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize()).withSort(Sort.by("id").descending());
+        return MultiResponse.of(flowRecordQueryService.findAll(pageRequest));
     }
 
 
@@ -43,10 +68,10 @@ public class FlowRecordQueryController {
      */
     @GetMapping("/todo")
     public MultiResponse<FlowRecordContent> todo(SearchRequest request) {
-        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
-        PageRequest pageRequest = request.toPageRequest(FlowRecordEntity.class);
-        Page<FlowTodoRecordEntity> page = flowTodoRecordEntityRepository.findTodoRecordPage(current.getUserId(),pageRequest.withSort(Sort.by("id").descending()));
-        return MultiResponse.of(page.map(FlowRecordContent::convert));
+        long operatorId = loadCurrentOperatorId();
+        FlowRecordQueryService flowRecordQueryService = loadFlowService();
+        PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize()).withSort(Sort.by("id").descending());
+        return MultiResponse.of(flowRecordQueryService.findTodoRecordPage(operatorId,pageRequest));
     }
 
     /**
@@ -54,10 +79,10 @@ public class FlowRecordQueryController {
      */
     @GetMapping("/notify")
     public MultiResponse<FlowRecordContent> notify(SearchRequest request) {
-        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
-        PageRequest pageRequest = request.toPageRequest(FlowRecordEntity.class);
-        Page<FlowRecordEntity> page =flowRecordEntityRepository.findNotifyRecordPage(current.getUserId(),pageRequest.withSort(Sort.by("id").descending()));
-        return MultiResponse.of(page.map(FlowRecordContent::convert));
+        long operatorId = loadCurrentOperatorId();
+        FlowRecordQueryService flowRecordQueryService = loadFlowService();
+        PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize()).withSort(Sort.by("id").descending());
+        return MultiResponse.of(flowRecordQueryService.findNotifyRecordPage(operatorId,pageRequest));
     }
 
 
@@ -66,9 +91,9 @@ public class FlowRecordQueryController {
      */
     @GetMapping("/done")
     public MultiResponse<FlowRecordContent> done(SearchRequest request) {
-        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
-        PageRequest pageRequest = request.toPageRequest(FlowRecordEntity.class);
-        Page<FlowRecordEntity> page =flowRecordEntityRepository.findDoneRecordPage(current.getUserId(),pageRequest.withSort(Sort.by("id").descending()));
-        return MultiResponse.of(page.map(FlowRecordContent::convert));
+        long operatorId = loadCurrentOperatorId();
+        FlowRecordQueryService flowRecordQueryService = loadFlowService();
+        PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize()).withSort(Sort.by("id").descending());
+        return MultiResponse.of(flowRecordQueryService.findDoneRecordPage(operatorId,pageRequest));
     }
 }

@@ -7,4 +7,6 @@ import com.codingapi.springboot.framework.event.IAsyncEvent;
  */
 public interface IFlowEvent extends IAsyncEvent {
 
+    boolean isMock();
+
 }

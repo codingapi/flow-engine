@@ -1,7 +1,6 @@
 package com.codingapi.flow.record;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.manager.NodeStrategyManager;
@@ -10,6 +9,7 @@ import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.AllArgsConstructor;
@@ -571,19 +571,22 @@ public class FlowRecord {
 
     /**
      * 创建会话
+     * @param repositoryHolder 资源持有者
      * @param workflow 流程设计器
      * @param currentOperator 当前操作人
      * @param formData 表单数据
      * @param advice 节点审批信息
      * @return FlowSession
      */
-    public FlowSession createFlowSession( Workflow workflow,
-                                          IFlowOperator currentOperator,
-                                          FormData formData,
-                                          FlowAdvice advice) {
-        List<FlowRecord> currentRecords = RepositoryHolderContext.getInstance().findCurrentNodeRecords(this.getFromId(), this.getNodeId());
+    public FlowSession createFlowSession(IRepositoryHolder repositoryHolder,
+                                         Workflow workflow,
+                                         IFlowOperator currentOperator,
+                                         FormData formData,
+                                         FlowAdvice advice) {
+        List<FlowRecord> currentRecords = repositoryHolder.findCurrentNodeRecords(this.getFromId(), this.getNodeId());
         IFlowNode currentNode = workflow.getFlowNode(nodeId);
         return new FlowSession(
+                repositoryHolder,
                 currentOperator,
                 workflow,
                 currentNode,

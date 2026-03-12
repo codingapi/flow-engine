@@ -3,13 +3,13 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordFinishEvent;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.springboot.framework.event.EventPusher;
 
@@ -49,13 +49,14 @@ public class EndNode extends BaseFlowNode implements IDisplayNode {
 
     @Override
     public void fillNewRecord(FlowSession session, FlowRecord flowRecord) {
+        IRepositoryHolder repositoryHolder = session.getRepositoryHolder();
         flowRecord.over();
         IFlowAction currentAction = session.getCurrentAction();
         // 标记当前流程结束
         FlowRecord latestRecord = session.getCurrentRecord();
 
         // 添加历史记录到记录中
-        List<FlowRecord> historyRecords = RepositoryHolderContext.getInstance().findProcessRecords(latestRecord.getProcessId());
+        List<FlowRecord> historyRecords = repositoryHolder.findProcessRecords(latestRecord.getProcessId());
 
         // 同步当前处理的FlowRecord的数据
         List<FlowRecord> recordList = new ArrayList<>();
@@ -71,9 +72,9 @@ public class EndNode extends BaseFlowNode implements IDisplayNode {
         recordList.forEach(item -> {
             item.finish(currentAction instanceof PassAction);
         });
-        RepositoryHolderContext.getInstance().saveRecords(recordList);
+        repositoryHolder.saveRecords(recordList);
         // 流程是否正常结束
-        EventPusher.push(new FlowRecordFinishEvent(latestRecord));
+        EventPusher.push(new FlowRecordFinishEvent(latestRecord,session.isMock()));
     }
 
 

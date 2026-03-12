@@ -1,7 +1,6 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.form.FormData;
@@ -15,6 +14,7 @@ import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 
@@ -28,11 +28,14 @@ public class FlowActionService {
     private final FlowRecordService flowRecordService;
     private final WorkflowService workflowService;
 
-    public FlowActionService(FlowActionRequest request) {
+    private final IRepositoryHolder repositoryHolder;
+
+    public FlowActionService(FlowActionRequest request,IRepositoryHolder repositoryHolder) {
         this.request = request;
-        this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
-        this.flowRecordService = RepositoryHolderContext.getInstance().getFlowRecordService();
-        this.workflowService = RepositoryHolderContext.getInstance().getWorkflowService();
+        this.flowOperatorGateway = repositoryHolder.getFlowOperatorGateway();
+        this.flowRecordService = repositoryHolder.getFlowRecordService();
+        this.workflowService = repositoryHolder.getWorkflowService();
+        this.repositoryHolder = repositoryHolder;
     }
 
     public void action() {
@@ -76,7 +79,7 @@ public class FlowActionService {
         formData.reset(request.getFormData());
         FlowAdvice flowAdvice = request.toFlowAdvice(workflow, flowAction);
 
-        FlowSession session = flowRecord.createFlowSession(workflow,currentOperator,formData,flowAdvice);
+        FlowSession session = flowRecord.createFlowSession(this.repositoryHolder,workflow,currentOperator,formData,flowAdvice);
         // 验证会话
         currentNode.verifySession(session);
         // 执行动作

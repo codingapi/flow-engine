@@ -1,7 +1,6 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.event.FlowRecordStartEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -17,6 +16,7 @@ import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.springboot.framework.event.EventPusher;
@@ -32,11 +32,13 @@ public class FlowCreateService {
     private final FlowCreateRequest request;
     private final FlowOperatorGateway flowOperatorGateway;
     private final WorkflowService workflowService;
+    private final IRepositoryHolder repositoryHolder;
 
-    public FlowCreateService(FlowCreateRequest request) {
+    public FlowCreateService(FlowCreateRequest request,IRepositoryHolder repositoryHolder) {
         this.request = request;
-        this.flowOperatorGateway = RepositoryHolderContext.getInstance().getFlowOperatorGateway();
-        this.workflowService = RepositoryHolderContext.getInstance().getWorkflowService();
+        this.flowOperatorGateway = repositoryHolder.getFlowOperatorGateway();
+        this.workflowService = repositoryHolder.getWorkflowService();
+        this.repositoryHolder = repositoryHolder;
     }
 
     public long create() {
@@ -66,7 +68,7 @@ public class FlowCreateService {
 
         StartNode currentNode = (StartNode) workflow.getStartNode();
         IFlowAction action = currentNode.actionManager().getActionById(request.getActionId());
-        FlowSession session = FlowSession.startSession(currentOperator, workflow, currentNode, action, formData, workflowRuntime.getId());
+        FlowSession session = FlowSession.startSession(this.repositoryHolder,currentOperator, workflow, currentNode, action, formData, workflowRuntime.getId());
 
         List<FlowRecord> flowRecords = currentNode.generateCurrentRecords(session);
 
@@ -83,12 +85,12 @@ public class FlowCreateService {
             throw FlowExecutionException.createRecordSizeError();
         }
 
-        RepositoryHolderContext.getInstance().saveRecords(flowRecords);
+        repositoryHolder.saveRecords(flowRecords);
 
         List<IFlowEvent> events = new ArrayList<>();
         for (FlowRecord flowRecord : flowRecords) {
-            events.add(new FlowRecordStartEvent(flowRecord));
-            events.add(new FlowRecordTodoEvent(flowRecord));
+            events.add(new FlowRecordStartEvent(flowRecord,session.isMock()));
+            events.add(new FlowRecordTodoEvent(flowRecord,session.isMock()));
         }
 
         // 推送事件

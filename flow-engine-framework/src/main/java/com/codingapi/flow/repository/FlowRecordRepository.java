@@ -25,7 +25,7 @@ public interface FlowRecordRepository {
 
     /**
      * 保存流程
-     * 为何确保待办合并数据的一致性，保存流程需要通过 {@link com.codingapi.flow.context.RepositoryHolderContext#saveRecord(FlowRecord)} 保存
+     * 为何确保待办合并数据的一致性，保存流程需要通过 {@link com.codingapi.flow.session.IRepositoryHolder#saveRecord(FlowRecord)} 保存
      * @param flowRecord 流程记录
      */
     void save(FlowRecord flowRecord);

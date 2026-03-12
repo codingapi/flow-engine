@@ -1,11 +1,11 @@
 package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.common.IMapConvertor;
-import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.script.node.SubProcessScript;
 import com.codingapi.flow.service.FlowService;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -57,8 +57,9 @@ public class SubProcessStrategy extends BaseStrategy {
     }
 
     public void execute(FlowSession session) {
+        IRepositoryHolder repositoryHolder = session.getRepositoryHolder();
         FlowCreateRequest flowCreateRequest = subProcessScript.execute(session);
-        FlowService flowService = RepositoryHolderContext.getInstance().createFlowService();
+        FlowService flowService = repositoryHolder.createFlowService();
         long createRecordId = flowService.create(flowCreateRequest);
         if (submit) {
             flowService.action(flowCreateRequest.toActionRequest(createRecordId));

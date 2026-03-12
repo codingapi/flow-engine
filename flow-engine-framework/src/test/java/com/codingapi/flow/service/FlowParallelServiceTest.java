@@ -4,18 +4,17 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
+import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
-import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.*;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.*;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.user.User;
@@ -30,19 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FlowParallelServiceTest {
 
-    private final FlowTodoRecordRepositoryImpl flowTodoRecordRepository = new FlowTodoRecordRepositoryImpl();
-    private final FlowTodoMergeRepositoryImpl flowTodoMergeRepository = new FlowTodoMergeRepositoryImpl();
-    private final FlowRecordRepositoryImpl flowRecordRepository = new FlowRecordRepositoryImpl();
-    private final UserGateway userGateway = new UserGateway();
-    private final WorkflowRuntimeRepository workflowRuntimeRepository = new WorkflowRuntimeRepositoryImpl();
-    private final WorkflowVersionRepository workflowVersionRepository = new WorkflowVersionRepositoryImpl();
-    private final WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
-    private final ParallelBranchRepository parallelBranchRepository = new ParallelBranchRepositoryImpl();
-    private final DelayTaskRepository delayTaskRepository = new DelayTaskRepositoryImpl();
-    private final UrgeIntervalRepository urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
-    private final WorkflowService workflowService = new WorkflowService(workflowVersionRepository,workflowRepository,workflowRuntimeRepository);
-    private final FlowRecordService flowRecordService = new FlowRecordService(flowTodoRecordRepository,flowTodoMergeRepository,flowRecordRepository);
-    private final FlowService flowService = new FlowService(workflowService, userGateway, flowRecordService, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
+    private final MyFlowServiceFactory factory = new MyFlowServiceFactory();
 
 
     /**
@@ -54,11 +41,11 @@ class FlowParallelServiceTest {
         User user = new User(1, "user");
         User depart = new User(2, "depart");
         User boss = new User(3, "boss");
-        userGateway.save(user);
-        userGateway.save(depart);
-        userGateway.save(boss);
+        factory.userGateway.save(user);
+        factory.userGateway.save(depart);
+        factory.userGateway.save(boss);
 
-        GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
+        GatewayContext.getInstance().setFlowOperatorGateway(factory.userGateway);
 
         FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
@@ -207,7 +194,7 @@ class FlowParallelServiceTest {
                 .addNode(endNode)
                 .build();
 
-         workflowService.saveWorkflow(workflow);
+         factory.workflowService.saveWorkflow(workflow);
 
 
         List<IFlowNode> nextNodes = workflow.nextNodes(bossApprovalNode1);
@@ -225,21 +212,21 @@ class FlowParallelServiceTest {
         userCreateRequest.setActionId(startActions.get(0).id());
         userCreateRequest.setOperatorId(user.getUserId());
 
-        flowService.create(userCreateRequest);
+        factory.flowService.create(userCreateRequest);
 
-        List<FlowRecord> userRecordList = flowRecordRepository.findTodoByOperator(user.getUserId());
+        List<FlowRecord> userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
         assertEquals(1, userRecordList.size());
 
         FlowActionRequest userRequest = new FlowActionRequest();
         userRequest.setFormData(data);
         userRequest.setRecordId(userRecordList.get(0).getId());
         userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
-        flowService.action(userRequest);
+        factory.flowService.action(userRequest);
 
-        List<FlowRecord> departRecordList = flowRecordRepository.findTodoByOperator(depart.getUserId());
+        List<FlowRecord> departRecordList = factory.flowRecordRepository.findTodoByOperator(depart.getUserId());
         assertEquals(1, departRecordList.size());
 
-        List<FlowRecord> boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        List<FlowRecord> boosRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, boosRecordList.size());
 
         List<IFlowAction> departActions = departApprovalNode1.actionManager().getActions();
@@ -248,9 +235,9 @@ class FlowParallelServiceTest {
         departRequest.setFormData(data);
         departRequest.setRecordId(departRecordList.get(0).getId());
         departRequest.setAdvice(new FlowAdviceBody(departActions.get(0).id(), "同意", depart.getUserId()));
-        flowService.action(departRequest);
+        factory.flowService.action(departRequest);
 
-        boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        boosRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, boosRecordList.size());
 
         List<IFlowAction> bossActions = bossApprovalNode1.actionManager().getActions();
@@ -259,10 +246,10 @@ class FlowParallelServiceTest {
         dossRequest.setFormData(data);
         dossRequest.setRecordId(boosRecordList.get(0).getId());
         dossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", boss.getUserId()));
-        flowService.action(dossRequest);
+        factory.flowService.action(dossRequest);
 
 
-        boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        boosRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, boosRecordList.size());
 
         List<IFlowAction> bigBossActions = bigBossApprovalNode1.actionManager().getActions();
@@ -271,12 +258,12 @@ class FlowParallelServiceTest {
         bigBossRequest.setFormData(data);
         bigBossRequest.setRecordId(boosRecordList.get(0).getId());
         bigBossRequest.setAdvice(new FlowAdviceBody(bigBossActions.get(0).id(), "同意", boss.getUserId()));
-        flowService.action(bigBossRequest);
+        factory.flowService.action(bigBossRequest);
 
-        departRecordList = flowRecordRepository.findTodoByOperator(depart.getUserId());
+        departRecordList = factory.flowRecordRepository.findTodoByOperator(depart.getUserId());
         assertEquals(1, departRecordList.size());
 
-        boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        boosRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, boosRecordList.size());
 
 
@@ -286,9 +273,9 @@ class FlowParallelServiceTest {
         departRequest.setFormData(data);
         departRequest.setRecordId(departRecordList.get(0).getId());
         departRequest.setAdvice(new FlowAdviceBody(departActions.get(0).id(), "同意", depart.getUserId()));
-        flowService.action(departRequest);
+        factory.flowService.action(departRequest);
 
-        boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        boosRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, boosRecordList.size());
 
 
@@ -298,10 +285,10 @@ class FlowParallelServiceTest {
         dossRequest.setFormData(data);
         dossRequest.setRecordId(boosRecordList.get(0).getId());
         dossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), "同意", boss.getUserId()));
-        flowService.action(dossRequest);
+        factory.flowService.action(dossRequest);
 
 
-        boosRecordList = flowRecordRepository.findTodoByOperator(boss.getUserId());
+        boosRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, boosRecordList.size());
 
         bigBossActions = bigBossApprovalNode2.actionManager().getActions();
@@ -310,10 +297,10 @@ class FlowParallelServiceTest {
         bigBossRequest.setFormData(data);
         bigBossRequest.setRecordId(boosRecordList.get(0).getId());
         bigBossRequest.setAdvice(new FlowAdviceBody(bigBossActions.get(0).id(), "同意", boss.getUserId()));
-        flowService.action(bigBossRequest);
+        factory.flowService.action(bigBossRequest);
 
 
-        List<FlowRecord> records = flowRecordRepository.findProcessRecords(departRecordList.get(0).getProcessId());
+        List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(departRecordList.get(0).getProcessId());
         assertEquals(7, records.size());
         assertEquals(0, records.stream().filter(FlowRecord::isTodo).toList().size());
         assertEquals(7, records.stream().filter(FlowRecord::isFinish).toList().size());
