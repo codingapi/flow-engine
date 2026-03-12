@@ -25,7 +25,11 @@ public class FlowTodoRecordEntity {
     /**
      * 工作id
      */
-    private Long workBackupId;
+    private Long workflowRuntimeId;
+    /**
+     * 流程标题
+     */
+    private String workTitle;
     /**
      * 流程编码
      */

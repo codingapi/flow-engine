@@ -18,6 +18,10 @@ public class FlowRecordEntity {
      */
     private Long workRuntimeId;
     /**
+     * 流程标题
+     */
+    private String workTitle;
+    /**
      * 流程编码
      */
     private String workCode;

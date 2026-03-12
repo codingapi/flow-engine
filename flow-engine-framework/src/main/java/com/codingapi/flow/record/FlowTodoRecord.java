@@ -26,7 +26,12 @@ public class FlowTodoRecord {
     /**
      * 工作id
      */
-    private long workBackupId;
+    private long workflowRuntimeId;
+
+    /**
+     * 流程名称
+     */
+    private String workTitle;
     /**
      * 流程编码
      */
@@ -114,7 +119,8 @@ public class FlowTodoRecord {
 
     public void update(FlowRecord flowRecord) {
         this.processId = flowRecord.getProcessId();
-        this.workBackupId = flowRecord.getWorkRuntimeId();
+        this.workflowRuntimeId = flowRecord.getWorkRuntimeId();
+        this.workTitle = flowRecord.getWorkTitle();
         this.workCode = flowRecord.getWorkCode();
         this.nodeId = flowRecord.getNodeId();
         this.nodeType = flowRecord.getNodeType();

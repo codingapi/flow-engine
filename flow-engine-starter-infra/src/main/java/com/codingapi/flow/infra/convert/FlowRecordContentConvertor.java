@@ -11,7 +11,8 @@ public class FlowRecordContentConvertor {
     public static FlowRecordContent convert(FlowTodoRecordEntity todoRecord){
         FlowRecordContent content = new FlowRecordContent();
         content.setProcessId(todoRecord.getProcessId());
-        content.setWorkBackupId(todoRecord.getWorkBackupId());
+        content.setWorkflowRuntimeId(todoRecord.getWorkflowRuntimeId());
+        content.setWorkTitle(todoRecord.getWorkTitle());
         content.setWorkCode(todoRecord.getWorkCode());
         content.setNodeId(todoRecord.getNodeId());
         content.setNodeType(todoRecord.getNodeType());
@@ -38,7 +39,8 @@ public class FlowRecordContentConvertor {
     public static FlowRecordContent convert(FlowRecordEntity record){
         FlowRecordContent content = new FlowRecordContent();
         content.setProcessId(record.getProcessId());
-        content.setWorkBackupId(record.getWorkRuntimeId());
+        content.setWorkflowRuntimeId(record.getWorkRuntimeId());
+        content.setWorkTitle(record.getWorkTitle());
         content.setWorkCode(record.getWorkCode());
         content.setNodeId(record.getNodeId());
         content.setNodeType(record.getNodeType());

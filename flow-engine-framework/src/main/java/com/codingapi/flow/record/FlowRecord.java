@@ -48,6 +48,11 @@ public class FlowRecord {
      * 工作id
      */
     private long workRuntimeId;
+
+    /**
+     * 流程名称
+     */
+    private String workTitle;
     /**
      * 流程编码
      */
@@ -263,7 +268,8 @@ public class FlowRecord {
         // 获取转交之后的审批人
         IFlowOperator currentOperator = flowSession.loadFinalForwardOperator(sourceOperator);
         this.workCode = flowSession.getWorkCode();
-        this.workRuntimeId = flowSession.getBackupId();
+        this.workRuntimeId = flowSession.getWorkflowRuntimeId();
+        this.workTitle = flowSession.getWorkflow().getTitle();
         this.nodeId = flowSession.getCurrentNodeId();
         this.nodeType = flowSession.getCurrentNodeType();
         this.nodeName = flowSession.getCurrentNodeName();

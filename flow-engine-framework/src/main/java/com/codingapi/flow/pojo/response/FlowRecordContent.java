@@ -18,7 +18,11 @@ public class FlowRecordContent {
     /**
      * 工作id
      */
-    private Long workBackupId;
+    private Long workflowRuntimeId;
+    /**
+     * 流程标题
+     */
+    private String workTitle;
     /**
      * 流程编码
      */
@@ -114,7 +118,7 @@ public class FlowRecordContent {
     public static FlowRecordContent convert(FlowRecord record){
         FlowRecordContent content = new FlowRecordContent();
         content.setProcessId(record.getProcessId());
-        content.setWorkBackupId(record.getWorkRuntimeId());
+        content.setWorkflowRuntimeId(record.getWorkRuntimeId());
         content.setWorkCode(record.getWorkCode());
         content.setNodeId(record.getNodeId());
         content.setNodeType(record.getNodeType());
@@ -139,7 +143,7 @@ public class FlowRecordContent {
     public static FlowRecordContent convert(FlowTodoRecord todoRecord){
         FlowRecordContent content = new FlowRecordContent();
         content.setProcessId(todoRecord.getProcessId());
-        content.setWorkBackupId(todoRecord.getWorkBackupId());
+        content.setWorkflowRuntimeId(todoRecord.getWorkflowRuntimeId());
         content.setWorkCode(todoRecord.getWorkCode());
         content.setNodeId(todoRecord.getNodeId());
         content.setNodeType(todoRecord.getNodeType());

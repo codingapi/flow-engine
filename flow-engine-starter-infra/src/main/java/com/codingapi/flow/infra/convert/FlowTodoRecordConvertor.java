@@ -12,7 +12,8 @@ public class FlowTodoRecordConvertor {
         return new FlowTodoRecord(
                 entity.getId(),
                 entity.getProcessId(),
-                entity.getWorkBackupId(),
+                entity.getWorkflowRuntimeId(),
+                entity.getWorkTitle(),
                 entity.getWorkCode(),
                 entity.getNodeId(),
                 entity.getNodeType(),
@@ -43,7 +44,8 @@ public class FlowTodoRecordConvertor {
             entity.setId(record.getId());
         }
         entity.setProcessId(record.getProcessId());
-        entity.setWorkBackupId(record.getWorkBackupId());
+        entity.setWorkflowRuntimeId(record.getWorkflowRuntimeId());
+        entity.setWorkTitle(record.getWorkTitle());
         entity.setWorkCode(record.getWorkCode());
         entity.setNodeId(record.getNodeId());
         entity.setNodeType(record.getNodeType());
