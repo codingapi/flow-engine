@@ -204,6 +204,7 @@ public class FlowContent {
             Body body = new Body();
             body.setRecordId(item.getId());
             body.setSubmitOperator(new FlowOperator(item.getSubmitOperatorId(),item.getSubmitOperatorName()));
+            body.setCreatedOperator(new FlowOperator(record.getCreateOperatorId(),record.getCreateOperatorName()));
             body.setTitle(item.getTitle());
             body.setData(item.getFormData());
             body.setRecordState(item.getRecordState());
@@ -293,11 +294,17 @@ public class FlowContent {
          */
         private String title;
 
-
         /**
-         * 提交审批者
+         * 流程提交人
          */
         private FlowOperator submitOperator;
+
+
+
+        /**
+         * 流程创建者
+         */
+        private FlowOperator createdOperator;
 
 
         /**
