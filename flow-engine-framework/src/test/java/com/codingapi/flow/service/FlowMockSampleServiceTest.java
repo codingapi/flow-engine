@@ -2674,7 +2674,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
                         .addStrategy(new OperatorLoadStrategy("def run(request){return [-1]}"))
-                        .addStrategy(new ErrorTriggerStrategy("def run(request){ return $bind.createErrorThrow(3); }"))
+                        .addStrategy(new ErrorTriggerStrategy("def run(request){ return 3; }"))
                         .build()
                 )
                 .build();

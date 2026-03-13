@@ -33,6 +33,8 @@ class ErrorTriggerScriptTest {
     void execute() {
         User user = new User(1, "lorne");
 
+        factory.userGateway.save(user);
+
         FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
@@ -63,7 +65,7 @@ class ErrorTriggerScriptTest {
                                         .addPermission("leave", "reason", PermissionType.READ)
                                         .build()
                         ))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [request.getCreatedOperator()]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [request.getCreatedOperatorId()]}"))
                         .build()
                 )
                 .build();
@@ -91,7 +93,7 @@ class ErrorTriggerScriptTest {
 
         String script = """
             def run(request){ 
-                return $bind.createErrorThrow(request.getCreatedOperator());
+                return request.getCreatedOperatorId();
             }
             """;
 

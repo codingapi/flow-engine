@@ -2667,7 +2667,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
                         .addStrategy(new OperatorLoadStrategy("def run(request){return [-1]}"))
-                        .addStrategy(new ErrorTriggerStrategy("def run(request){ return $bind.createErrorThrow(3); }"))
+                        .addStrategy(new ErrorTriggerStrategy("def run(request){ return 3; }"))
                         .build()
                 )
                 .build();
@@ -2773,7 +2773,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
                         .addStrategy(new OperatorLoadStrategy("def run(request){return [-1]}"))
-                        .addStrategy(new ErrorTriggerStrategy("def run(request){ return $bind.createErrorThrow(request.getNode('" + startNode.getId() + "')); }"))
+                        .addStrategy(new ErrorTriggerStrategy("def run(request){ return '" + startNode.getId() + "'; }"))
                         .build()
                 )
                 .build();

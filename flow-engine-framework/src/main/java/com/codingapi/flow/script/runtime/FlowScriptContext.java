@@ -1,13 +1,10 @@
 package com.codingapi.flow.script.runtime;
 
-import com.codingapi.flow.error.ErrorThrow;
-import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,24 +24,6 @@ public class FlowScriptContext {
     private IBeanFactory beanFactory;
 
 
-    public ErrorThrow createErrorThrow(IFlowNode node) {
-        return ErrorThrow.builder()
-                .node(node)
-                .build();
-    }
-
-    public ErrorThrow createErrorThrow(List<Long> userIds) {
-        List<IFlowOperator> operators = beanFactory.findOperatorsByIds(userIds);
-        return ErrorThrow.builder()
-                .operators(operators)
-                .build();
-    }
-
-    public ErrorThrow createErrorThrow(long... userIds) {
-        List<Long> userIdList = Arrays.stream(userIds).boxed().toList();
-        return this.createErrorThrow(userIdList);
-    }
-
     public <T> T getBean(Class<T> clazz) {
         return beanFactory.getBean(clazz);
     }
@@ -57,7 +36,6 @@ public class FlowScriptContext {
         return beanFactory.getBeans(clazz);
     }
 
-
     public FlowRecord getRecordById(long id) {
         return beanFactory.getRecordById(id);
     }
@@ -65,7 +43,6 @@ public class FlowScriptContext {
     public IFlowOperator getOperatorById(long userId) {
         return beanFactory.getOperatorById(userId);
     }
-
 
     public List<IFlowOperator> findOperatorsByIds(List<Long> ids) {
         return beanFactory.findOperatorsByIds(ids);

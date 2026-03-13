@@ -31,12 +31,6 @@ public class GroovyScriptRequest {
     private String workflowCode;
 
     /**
-     * 流程编号
-     */
-    @Getter
-    private String workCode;
-
-    /**
      * 当前节点名称
      */
     @Getter
@@ -111,7 +105,6 @@ public class GroovyScriptRequest {
 
         // 提取流程编号（从record获取）
         if (session.getCurrentRecord() != null) {
-            this.workCode = session.getCurrentRecord().getWorkCode();
             this.submitOperatorId = session.getSubmitOperatorId();
             this.submitOperatorName = session.getSubmitOperatorName();
         }
@@ -130,6 +123,20 @@ public class GroovyScriptRequest {
      */
     public IFlowNode getNode(String nodeId){
         return flowSession.getNode(nodeId);
+    }
+
+    /**
+     * 是否流程管理员
+     */
+    public boolean isFlowManager(){
+        return this.currentOperator.isFlowManager();
+    }
+
+    /**
+     * 是否模拟测试
+     */
+    public boolean isMock(){
+        return this.flowSession.isMock();
     }
 
 

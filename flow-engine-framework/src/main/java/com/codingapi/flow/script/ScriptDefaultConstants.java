@@ -45,7 +45,7 @@ public class ScriptDefaultConstants {
             // @SCRIPT_TITLE 回退至开始节点 
             // @SCRIPT_META {"type":"node","node":"START"}
             def run(request){ 
-                return $bind.createErrorThrow(request.getStartNode());
+                return request.getStartNode().getId();
             }
             """;
 
