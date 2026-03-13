@@ -47,7 +47,7 @@ class NodeTitleScriptTest {
         FlowForm form = FlowFormBuilder.builder()
                 .name("请假流程")
                 .code("leave")
-                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假天数", "days", DataType.INTEGER)
                 .build();
 
         StartNode startNode = StartNode.builder().build();
