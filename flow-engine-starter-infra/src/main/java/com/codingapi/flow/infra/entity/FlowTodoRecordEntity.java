@@ -67,6 +67,16 @@ public class FlowTodoRecordEntity {
     private String currentOperatorName;
 
     /**
+     * 提交审批人Id
+     */
+    private Long submitOperatorId;
+
+    /**
+     * 提交审批人名称
+     */
+    private String submitOperatorName;
+
+    /**
      * 创建时间
      */
     private Long createTime;

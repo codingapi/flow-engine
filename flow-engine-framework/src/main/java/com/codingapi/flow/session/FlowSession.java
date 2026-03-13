@@ -179,6 +179,27 @@ public class FlowSession {
         return workflow.getCreatedOperator();
     }
 
+
+    /**
+     * 获取流程的提交者Id
+     */
+    public long getSubmitOperatorId(){
+        if(this.currentRecord!=null) {
+            return this.currentRecord.getCurrentOperatorId();
+        }
+        return 0;
+    }
+
+    /**
+     * 获取流程的提交者名称
+     */
+    public String getSubmitOperatorName(){
+        if(this.currentRecord!=null) {
+            return this.currentRecord.getCurrentOperatorName();
+        }
+        return null;
+    }
+
     /**
      * 获取流程设计编号
      */
@@ -253,4 +274,11 @@ public class FlowSession {
         return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
     }
 
+    /**
+     * 获取节点
+     * @param nodeId 节点id
+     */
+    public IFlowNode getNode(String nodeId) {
+        return this.workflow.getFlowNode(nodeId);
+    }
 }

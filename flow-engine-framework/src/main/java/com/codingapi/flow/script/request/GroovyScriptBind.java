@@ -20,16 +20,8 @@ public class GroovyScriptBind {
 
     private final FlowScriptContext context;
 
-    public ErrorThrow createErrorThrow(IFlowOperator operator) {
-        return context.createErrorThrow(operator);
-    }
-
     public ErrorThrow createErrorThrow(IFlowNode node) {
         return context.createErrorThrow(node);
-    }
-
-    public ErrorThrow createErrorThrow(IFlowOperator... operators) {
-        return context.createErrorThrow(operators);
     }
 
     public ErrorThrow createErrorThrow(List<Long> userIds) {

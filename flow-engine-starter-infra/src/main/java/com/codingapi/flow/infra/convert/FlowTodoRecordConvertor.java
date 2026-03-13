@@ -22,6 +22,8 @@ public class FlowTodoRecordConvertor {
                 entity.getReadTime(),
                 entity.getCurrentOperatorId(),
                 entity.getCurrentOperatorName(),
+                entity.getSubmitOperatorId(),
+                entity.getSubmitOperatorName(),
                 entity.getCreateTime(),
                 entity.getCreateOperatorId(),
                 entity.getCreateOperatorName(),
@@ -54,6 +56,8 @@ public class FlowTodoRecordConvertor {
         entity.setReadTime(record.getReadTime());
         entity.setCurrentOperatorId(record.getCurrentOperatorId());
         entity.setCurrentOperatorName(record.getCurrentOperatorName());
+        entity.setSubmitOperatorId(record.getSubmitOperatorId());
+        entity.setSubmitOperatorName(record.getSubmitOperatorName());
         entity.setCreateTime(record.getCreateTime());
         entity.setCreateOperatorId(record.getCreateOperatorId());
         entity.setCreateOperatorName(record.getCreateOperatorName());

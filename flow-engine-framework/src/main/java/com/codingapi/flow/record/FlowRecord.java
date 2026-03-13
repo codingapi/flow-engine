@@ -134,6 +134,16 @@ public class FlowRecord {
     private String currentOperatorName;
 
     /**
+     * 提交审批人Id
+     */
+    private long submitOperatorId;
+
+    /**
+     * 提交审批人名称
+     */
+    private String submitOperatorName;
+
+    /**
      * 代替的审批人Id
      */
     private long forwardOperatorId;
@@ -292,6 +302,9 @@ public class FlowRecord {
 
         this.currentOperatorId = currentOperator.getUserId();
         this.currentOperatorName = currentOperator.getName();
+
+        this.submitOperatorId = flowSession.getSubmitOperatorId();
+        this.submitOperatorName = flowSession.getSubmitOperatorName();
 
         this.advice = flowSession.getAdvice().getAdvice();
         this.signKey = flowSession.getAdvice().getSignKey();

@@ -40,7 +40,7 @@ class NodeTitleScriptTest {
 
     @Test
     void testExecuteWithVariableScript() {
-        String script = "def run(request){return request.getOperatorName() + '的审批'}";
+        String script = "def run(request){return request.getCurrentOperatorName() + '的审批'}";
         NodeTitleScript titleScript = new NodeTitleScript(script);
 
         User user = new User(1, "张三");

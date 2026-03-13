@@ -33,18 +33,6 @@ public class FlowScriptContext {
                 .build();
     }
 
-    public ErrorThrow createErrorThrow(IFlowOperator... operators) {
-        return ErrorThrow.builder()
-                .operators(List.of(operators))
-                .build();
-    }
-
-    public ErrorThrow createErrorThrow(IFlowOperator operator) {
-        return ErrorThrow.builder()
-                .operators(List.of(operator))
-                .build();
-    }
-
     public ErrorThrow createErrorThrow(List<Long> userIds) {
         List<IFlowOperator> operators = beanFactory.findOperatorsByIds(userIds);
         return ErrorThrow.builder()

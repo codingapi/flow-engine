@@ -79,7 +79,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -157,7 +157,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -273,7 +273,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -372,7 +372,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -460,7 +460,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -473,7 +473,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(3)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
                         .build()
                 )
                 .build();
@@ -596,7 +596,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -714,7 +714,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -727,7 +727,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(3)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
                         .build()
                 )
                 .build();
@@ -740,7 +740,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(3)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
                         .build()
                 )
                 .build();
@@ -885,7 +885,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -898,7 +898,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(3)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
                         .build()
                 )
                 .build();
@@ -911,7 +911,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(3)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
                         .build()
                 )
                 .build();
@@ -1064,7 +1064,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(3)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
                         .build()
                 )
                 .build();
@@ -1084,7 +1084,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -1224,7 +1224,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -1333,7 +1333,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -1441,7 +1441,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -1542,7 +1542,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -1657,7 +1657,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -1782,7 +1782,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -1897,7 +1897,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -2020,7 +2020,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -2138,7 +2138,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .actions(ActionBuilder.builder()
@@ -2239,7 +2239,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -2358,7 +2358,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -2468,7 +2468,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -2571,7 +2571,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -2673,7 +2673,7 @@ class FlowMockSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(-1)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [-1]}"))
                         .addStrategy(new ErrorTriggerStrategy("def run(request){ return $bind.createErrorThrow(3); }"))
                         .build()
                 )

@@ -101,12 +101,12 @@ public class FlowContent {
     private boolean mergeable;
 
     /**
-     * 发起者id
+     * 流程发起者
      */
     private FlowOperator createOperator;
 
     /**
-     * 当前审批者id
+     * 当前审批者
      */
     private FlowOperator currentOperator;
 
@@ -203,6 +203,7 @@ public class FlowContent {
         for (FlowRecord item : mergeRecords) {
             Body body = new Body();
             body.setRecordId(item.getId());
+            body.setSubmitOperator(new FlowOperator(item.getSubmitOperatorId(),item.getSubmitOperatorName()));
             body.setTitle(item.getTitle());
             body.setData(item.getFormData());
             body.setRecordState(item.getRecordState());
@@ -291,6 +292,14 @@ public class FlowContent {
          * 流程标题
          */
         private String title;
+
+
+        /**
+         * 提交审批者
+         */
+        private FlowOperator submitOperator;
+
+
         /**
          * 表单数据
          */

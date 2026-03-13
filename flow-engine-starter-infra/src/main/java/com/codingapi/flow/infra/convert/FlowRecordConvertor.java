@@ -32,6 +32,8 @@ public class FlowRecordConvertor {
                 entity.getSignKey(),
                 entity.getCurrentOperatorId(),
                 entity.getCurrentOperatorName(),
+                entity.getSubmitOperatorId(),
+                entity.getSubmitOperatorName(),
                 entity.getForwardOperatorId(),
                 entity.getForwardOperatorName(),
                 entity.getReturnNodeId(),
@@ -85,6 +87,8 @@ public class FlowRecordConvertor {
         entity.setSignKey(record.getSignKey());
         entity.setCurrentOperatorId(record.getCurrentOperatorId());
         entity.setCurrentOperatorName(record.getCurrentOperatorName());
+        entity.setSubmitOperatorId(record.getSubmitOperatorId());
+        entity.setSubmitOperatorName(record.getSubmitOperatorName());
         entity.setForwardOperatorId(record.getForwardOperatorId());
         entity.setForwardOperatorName(record.getForwardOperatorName());
         entity.setReturnNodeId(record.getReturnNodeId());

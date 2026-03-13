@@ -83,7 +83,7 @@ public class FlowDetailServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -205,7 +205,7 @@ public class FlowDetailServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();

@@ -100,6 +100,16 @@ public class FlowRecordEntity {
     private String currentOperatorName;
 
     /**
+     * 提交审批人Id
+     */
+    private Long submitOperatorId;
+
+    /**
+     * 提交审批人名称
+     */
+    private String submitOperatorName;
+
+    /**
      * 代替的审批人
      */
     private Long forwardOperatorId;

@@ -19,24 +19,6 @@ import java.util.Map;
 public class GroovyScriptRequest {
 
     /**
-     * 当前操作人姓名
-     */
-    @Getter
-    private String operatorName;
-
-    /**
-     * 当前操作人ID
-     */
-    @Getter
-    private long operatorId;
-
-    /**
-     * 是否流程管理员
-     */
-    @Getter
-    private Boolean isFlowManager;
-
-    /**
      * 流程标题
      */
     @Getter
@@ -53,12 +35,6 @@ public class GroovyScriptRequest {
      */
     @Getter
     private String workCode;
-
-    /**
-     * 流程创建人姓名
-     */
-    @Getter
-    private String creatorName;
 
     /**
      * 当前节点名称
@@ -86,14 +62,25 @@ public class GroovyScriptRequest {
     private IFlowOperator createdOperator;
 
     /**
-     * 当前操作人（上一节点审批人）
+     * 当前审批人
      */
     @Getter
     private IFlowOperator currentOperator;
 
+    /**
+     * 流程提交Id
+     */
+    @Getter
+    private long submitOperatorId;
+
+    /**
+     * 流程提交人姓名
+     */
+    @Getter
+    private String submitOperatorName;
+
 
     private final FlowSession flowSession;
-
 
     /**
      * 从FlowSession构建请求对象（模板方法模式）
@@ -104,17 +91,15 @@ public class GroovyScriptRequest {
         // 提取操作人信息
         if (session.getCurrentOperator() != null) {
             this.currentOperator = session.getCurrentOperator();
-            this.operatorName = session.getCurrentOperator().getName();
-            this.operatorId = (int) session.getCurrentOperator().getUserId();
-            this.isFlowManager = session.getCurrentOperator().isFlowManager();
         }
 
         // 提取流程信息
         if (session.getWorkflow() != null) {
             this.workflowTitle = session.getWorkflow().getTitle();
             this.workflowCode = session.getWorkflow().getCode();
+            // 提取创建人信息
             if (session.getWorkflow().getCreatedOperator() != null) {
-                this.creatorName = session.getWorkflow().getCreatedOperator().getName();
+                this.createdOperator = session.getWorkflow().getCreatedOperator();
             }
         }
 
@@ -127,16 +112,13 @@ public class GroovyScriptRequest {
         // 提取流程编号（从record获取）
         if (session.getCurrentRecord() != null) {
             this.workCode = session.getCurrentRecord().getWorkCode();
+            this.submitOperatorId = session.getSubmitOperatorId();
+            this.submitOperatorName = session.getSubmitOperatorName();
         }
 
         // 提取表单数据
         if (session.getFormData() != null) {
             this.formData = session.getFormData().toMapData();
-        }
-
-        // 提取创建人信息
-        if (session.getWorkflow() != null && session.getWorkflow().getCreatedOperator() != null) {
-            this.createdOperator = session.getWorkflow().getCreatedOperator();
         }
 
     }
@@ -147,7 +129,37 @@ public class GroovyScriptRequest {
      * @return 节点
      */
     public IFlowNode getNode(String nodeId){
-        return flowSession.getWorkflow().getFlowNode(nodeId);
+        return flowSession.getNode(nodeId);
+    }
+
+
+    /**
+     * 流程创建者Id
+     */
+    public long getCreatedOperatorId(){
+        return this.createdOperator.getUserId();
+    }
+
+    /**
+     * 流程创建者名称
+     */
+    public String getCreatedOperatorName(){
+        return this.createdOperator.getName();
+    }
+
+
+    /**
+     * 流程审批者Id
+     */
+    public long getCurrentOperatorId(){
+        return this.currentOperator.getUserId();
+    }
+
+    /**
+     * 流程审批者名称
+     */
+    public String getCurrentOperatorName(){
+        return this.currentOperator.getName();
     }
 
 

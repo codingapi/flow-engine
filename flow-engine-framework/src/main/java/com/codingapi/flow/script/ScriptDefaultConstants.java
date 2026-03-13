@@ -67,7 +67,7 @@ public class ScriptDefaultConstants {
             // @SCRIPT_TITLE 流程创建者 
             // @SCRIPT_META {"type":"creator"}
             def run(request){
-                return [request.getCreatedOperator()]
+                return [request.getCreatedOperatorId()]
             }
             """;
 
