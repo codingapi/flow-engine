@@ -25,7 +25,7 @@ class FormDataTest {
                         .code("record")
                         .addField("审批人", "approver", DataType.STRING)
                         .addField("审批结果", "result", DataType.STRING)
-                        .addField("审批时间", "time", DataType.DATE)
+                        .addField("审批时间", "time", DataType.STRING)
                         .build())
                 .build();
         FormData data = new FormData(form);

@@ -1,6 +1,7 @@
 package com.codingapi.flow.form;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class FlowFormBuilder {
 
@@ -23,11 +24,12 @@ public class FlowFormBuilder {
         return this;
     }
 
-    public FlowFormBuilder addField(String name, String code, DataType type) {
+    public FlowFormBuilder addField(String name, String code, DataType dataType) {
         FormField field = new FormField();
         field.setName(name);
         field.setCode(code);
-        field.setType(type);
+        field.setDataType(dataType);
+        field.setType(dataType.name().toLowerCase(Locale.ROOT));
         field.setRequired(true);
         field.setDefaultValue(null);
         return this.addField(field);

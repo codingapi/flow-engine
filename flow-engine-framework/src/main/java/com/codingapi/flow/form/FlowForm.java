@@ -66,13 +66,25 @@ public class FlowForm {
                 fieldMeta.setId((String) field.get("id"));
                 fieldMeta.setName((String) field.get("name"));
                 fieldMeta.setCode((String) field.get("code"));
-                fieldMeta.setType(DataType.valueOf((String) field.get("type")));
+                fieldMeta.setType((String) field.get("type"));
+                fieldMeta.setDataType(DataType.valueOf((String) field.get("dataType")));
                 fieldMeta.setRequired(Boolean.TRUE.equals(field.get("required")));
                 fieldMeta.setHidden(Boolean.TRUE.equals(field.get("hidden")));
                 fieldMeta.setDefaultValue((String) field.get("defaultValue"));
                 fieldMeta.setPlaceholder((String) field.get("placeholder"));
                 fieldMeta.setTooltip((String) field.get("tooltip"));
                 fieldMeta.setHelp((String) field.get("help"));
+                List<Map<String, Object>> attributes = (List<Map<String, Object>>)field.get("attributes");
+                if(attributes!=null) {
+                    List<FieldAttribute> attributeList = new ArrayList<>();
+                    for (Map<String, Object> attribute : attributes){
+                        FieldAttribute fieldAttribute = new FieldAttribute();
+                        fieldAttribute.setLabel((String) attribute.get("label"));
+                        fieldAttribute.setValue((String) attribute.get("value"));
+                        attributeList.add(fieldAttribute);
+                    }
+                    fieldMeta.setAttributes(attributeList);
+                }
                 fieldList.add(fieldMeta);
             }
         }
@@ -108,10 +120,10 @@ public class FlowForm {
         return fields.stream().filter(field -> field.getName().equals(fieldName)).findFirst().orElse(null);
     }
 
-    private void initFormFieldTypes(FlowForm form, Map<String, DataType> types) {
+    private void initFormFieldDataTypes(FlowForm form, Map<String, DataType> types) {
         for (FormField field : form.getFields()) {
             String key = form.getCode() + "." + field.getCode();
-            DataType type = field.getType();
+            DataType type = field.getDataType();
             types.put(key, type);
         }
     }
@@ -121,7 +133,7 @@ public class FlowForm {
      *
      * @return 表单字段类型
      */
-    public Map<String, DataType> loadAllFieldTypeMaps() {
+    public Map<String, DataType> loadAllFieldDataTypeMaps() {
         Map<String, DataType> types = new HashMap<>();
         List<FlowForm> forms = this.getSubForms();
         if (forms == null) {
@@ -129,7 +141,7 @@ public class FlowForm {
         }
         forms.add(this);
         for (FlowForm subForm : forms) {
-            this.initFormFieldTypes(subForm, types);
+            this.initFormFieldDataTypes(subForm, types);
         }
         return types;
     }
@@ -145,7 +157,7 @@ public class FlowForm {
         List<FlowForm> forms = new ArrayList<>();
         forms.add(this);
         for (FlowForm subForm : forms) {
-            this.initFormFieldTypes(subForm, types);
+            this.initFormFieldDataTypes(subForm, types);
         }
         return types;
     }
