@@ -79,6 +79,7 @@ public class FlowForm {
                     List<FieldAttribute> attributeList = new ArrayList<>();
                     for (Map<String, Object> attribute : attributes){
                         FieldAttribute fieldAttribute = new FieldAttribute();
+                        fieldAttribute.setKey((String) attribute.get("key"));
                         fieldAttribute.setLabel((String) attribute.get("label"));
                         fieldAttribute.setValue((String) attribute.get("value"));
                         attributeList.add(fieldAttribute);
