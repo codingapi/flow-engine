@@ -3,6 +3,8 @@ package com.codingapi.flow.form;
 import com.codingapi.flow.utils.RandomUtils;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * 表单字段元数据
  */
@@ -16,7 +18,9 @@ public class FormField {
     // 字段编号
     private String code;
     // 字段类型
-    private DataType type;
+    private String type;
+    // 数据类型
+    private DataType dataType;
     // 是否隐藏
     private boolean hidden;
     // 是否必填
@@ -29,6 +33,9 @@ public class FormField {
     private String tooltip;
     // 帮助提示
     private String help;
+    // 附加属性
+    private List<FieldAttribute> attributes;
+
 
     public FormField() {
         this.id = RandomUtils.generateStringId();

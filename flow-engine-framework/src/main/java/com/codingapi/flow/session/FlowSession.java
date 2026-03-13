@@ -63,7 +63,7 @@ public class FlowSession {
     /**
      * 流程备份id
      */
-    private final long backupId;
+    private final long workflowRuntimeId;
 
     /**
      * 审批意见
@@ -79,7 +79,7 @@ public class FlowSession {
                        FormData formData,
                        FlowRecord currentRecord,
                        List<FlowRecord> currentNodeRecords,
-                       long backupId,
+                       long workflowRuntimeId,
                        FlowAdvice advice) {
         this.repositoryHolder = repositoryHolder;
         this.currentOperator = currentOperator;
@@ -89,7 +89,7 @@ public class FlowSession {
         this.currentRecord = currentRecord;
         this.currentNodeRecords = currentNodeRecords;
         this.formData = formData;
-        this.backupId = backupId;
+        this.workflowRuntimeId = workflowRuntimeId;
         this.advice = advice;
     }
 
@@ -229,7 +229,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowNode currentNode) {
-        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
+        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
     }
 
 
@@ -240,7 +240,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowAction currentAction) {
-        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
+        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
     }
 
     /**
@@ -250,7 +250,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowOperator currentOperator) {
-        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, backupId, advice);
+        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
     }
 
 }

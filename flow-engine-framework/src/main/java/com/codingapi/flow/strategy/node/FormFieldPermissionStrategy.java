@@ -44,7 +44,7 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
      */
     @Override
     public void verifyNode(FlowForm form) {
-        Map<String, DataType> fieldTypes = form.loadAllFieldTypeMaps();
+        Map<String, DataType> fieldTypes = form.loadAllFieldDataTypeMaps();
         if(fieldPermissions!=null) {
             for (FormFieldPermission permission : fieldPermissions) {
                 String key = permission.getFormCode() + "." + permission.getFieldCode();
