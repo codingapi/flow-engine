@@ -10,6 +10,7 @@ public class ScriptDefaultConstants {
      */
     public static final String SCRIPT_DEFAULT_ACTION_CUSTOM = """
             // @SCRIPT_TITLE 默认条件 触发通过
+            // @SCRIPT_META {"trigger":"PASS"}
             def run(request){
                 return 'PASS';
             }
