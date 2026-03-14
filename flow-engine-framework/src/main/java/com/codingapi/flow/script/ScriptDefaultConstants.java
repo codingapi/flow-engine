@@ -10,6 +10,7 @@ public class ScriptDefaultConstants {
      */
     public static final String SCRIPT_DEFAULT_ACTION_CUSTOM = """
             // @SCRIPT_TITLE 默认条件 触发通过
+            // @SCRIPT_META {"trigger":"PASS"}
             def run(request){
                 return 'PASS';
             }
@@ -45,7 +46,7 @@ public class ScriptDefaultConstants {
             // @SCRIPT_TITLE 回退至开始节点 
             // @SCRIPT_META {"type":"node","node":"START"}
             def run(request){ 
-                return $bind.createErrorThrow(request.getStartNode());
+                return request.getStartNode().getId();
             }
             """;
 
@@ -67,7 +68,7 @@ public class ScriptDefaultConstants {
             // @SCRIPT_TITLE 流程创建者 
             // @SCRIPT_META {"type":"creator"}
             def run(request){
-                return [request.getCreatedOperator()]
+                return [request.getCreatedOperatorId()]
             }
             """;
 

@@ -70,6 +70,16 @@ public class FlowTodoRecord {
     private String currentOperatorName;
 
     /**
+     * 提交审批人Id
+     */
+    private long submitOperatorId;
+
+    /**
+     * 提交审批人名称
+     */
+    private String submitOperatorName;
+
+    /**
      * 创建时间
      */
     private long createTime;
@@ -129,6 +139,8 @@ public class FlowTodoRecord {
         this.readTime = flowRecord.getReadTime();
         this.currentOperatorId = flowRecord.getCurrentOperatorId();
         this.currentOperatorName = flowRecord.getCurrentOperatorName();
+        this.submitOperatorId = flowRecord.getSubmitOperatorId();
+        this.submitOperatorName = flowRecord.getSubmitOperatorName();
         this.createTime = flowRecord.getCreateTime();
         this.createOperatorId = flowRecord.getCreateOperatorId();
         this.createOperatorName = flowRecord.getCreateOperatorName();

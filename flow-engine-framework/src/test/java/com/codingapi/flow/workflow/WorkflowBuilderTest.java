@@ -38,7 +38,7 @@ class WorkflowBuilderTest {
                 .name("请假流程")
                 .code("leave")
                 .addField("请假人", "name", DataType.STRING)
-                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假天数", "days", DataType.INTEGER)
                 .addField("请假事由", "reason", DataType.STRING)
                 .build();
 
@@ -116,7 +116,7 @@ class WorkflowBuilderTest {
                 .name("请假流程")
                 .code("leave")
                 .addField("请假人", "name", DataType.STRING)
-                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假天数", "days", DataType.INTEGER)
                 .addField("请假事由", "reason", DataType.STRING)
                 .build();
 
@@ -183,7 +183,7 @@ class WorkflowBuilderTest {
                 .name("请假流程")
                 .code("leave")
                 .addField("请假人", "name", DataType.STRING)
-                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假天数", "days", DataType.INTEGER)
                 .addField("请假事由", "reason", DataType.STRING)
                 .build();
 

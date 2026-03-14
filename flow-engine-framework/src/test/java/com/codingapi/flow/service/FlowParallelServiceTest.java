@@ -51,7 +51,7 @@ class FlowParallelServiceTest {
                 .name("请假流程")
                 .code("leave")
                 .addField("请假人", "name", DataType.STRING)
-                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假天数", "days", DataType.INTEGER)
                 .addField("请假事由", "reason", DataType.STRING)
                 .build();
 
@@ -75,7 +75,7 @@ class FlowParallelServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -88,7 +88,7 @@ class FlowParallelServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(3)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
                         .build()
                 )
                 .build();
@@ -101,7 +101,7 @@ class FlowParallelServiceTest {
                                 .addPermission("leave", "days", PermissionType.READ)
                                 .addPermission("leave", "reason", PermissionType.READ)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(3)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
                         .build()
                 )
                 .build();
@@ -133,7 +133,7 @@ class FlowParallelServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(2)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
                         .build()
                 )
                 .build();
@@ -146,7 +146,7 @@ class FlowParallelServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(3)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
                         .build()
                 )
                 .build();
@@ -159,7 +159,7 @@ class FlowParallelServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [$bind.getOperatorById(3)]}"))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
                         .build()
                 )
                 .build();

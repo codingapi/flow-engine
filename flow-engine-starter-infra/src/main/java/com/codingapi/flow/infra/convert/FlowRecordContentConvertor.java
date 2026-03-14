@@ -21,6 +21,8 @@ public class FlowRecordContentConvertor {
         content.setReadTime(todoRecord.getReadTime());
         content.setCurrentOperatorId(todoRecord.getCurrentOperatorId());
         content.setCurrentOperatorName(todoRecord.getCurrentOperatorName());
+        content.setSubmitOperatorId(todoRecord.getSubmitOperatorId());
+        content.setSubmitOperatorName(todoRecord.getSubmitOperatorName());
         content.setCreateTime(todoRecord.getCreateTime());
         content.setCreateOperatorId(todoRecord.getCreateOperatorId());
         content.setCreateOperatorName(todoRecord.getCreateOperatorName());
@@ -49,6 +51,8 @@ public class FlowRecordContentConvertor {
         content.setReadTime(record.getReadTime());
         content.setCurrentOperatorId(record.getCurrentOperatorId());
         content.setCurrentOperatorName(record.getCurrentOperatorName());
+        content.setSubmitOperatorId(record.getSubmitOperatorId());
+        content.setSubmitOperatorName(record.getSubmitOperatorName());
         content.setCreateTime(record.getCreateTime());
         content.setCreateOperatorId(record.getCreateOperatorId());
         content.setCreateOperatorName(record.getCreateOperatorName());

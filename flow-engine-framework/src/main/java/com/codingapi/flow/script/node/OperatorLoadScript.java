@@ -8,6 +8,7 @@ import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +24,12 @@ public class OperatorLoadScript {
     @SuppressWarnings("unchecked")
     public List<IFlowOperator> execute(FlowSession session) {
         GroovyScriptRequest request = new GroovyScriptRequest(session);
-        return ScriptRuntimeContext.getInstance().run(script, List.class, request);
+        List<Object> userIds = ScriptRuntimeContext.getInstance().run(script, List.class, request);
+        List<Long> operatorIds = new ArrayList<>();
+        for (Object userId : userIds) {
+            operatorIds.add(Long.parseLong(String.valueOf(userId)));
+        }
+        return session.getRepositoryHolder().findOperatorByIds(operatorIds);
     }
 
     /**

@@ -29,7 +29,7 @@ class NodeTitleIntegrationTest {
     @Test
     void testTitleGenerationWithOperatorName() {
         NodeTitleScript script = new NodeTitleScript(
-            "def run(request){return \"审批人：\" + request.getOperatorName()}"
+            "def run(request){return \"审批人：\" + request.getCurrentOperatorName()}"
         );
 
         User user = new User(1, "张三");
@@ -50,7 +50,7 @@ class NodeTitleIntegrationTest {
                 .name("请假流程")
                 .code("leave")
                 .addField("请假人", "name", DataType.STRING)
-                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假天数", "days", DataType.INTEGER)
                 .addField("请假事由", "reason", DataType.STRING)
                 .build();
 
@@ -77,7 +77,7 @@ class NodeTitleIntegrationTest {
     @Test
     void testTitleGenerationWithMultipleVariables() {
         NodeTitleScript script = new NodeTitleScript(
-            "def run(request){return \"你好，\" + request.getOperatorName() + \"，请假\" + request.getFormData(\"days\") + \"天\"}"
+            "def run(request){return \"你好，\" + request.getCurrentOperatorName() + \"，请假\" + request.getFormData(\"days\") + \"天\"}"
         );
 
         User user = new User(1, "李四");
@@ -85,7 +85,7 @@ class NodeTitleIntegrationTest {
                 .name("请假流程")
                 .code("leave")
                 .addField("请假人", "name", DataType.STRING)
-                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假天数", "days", DataType.INTEGER)
                 .addField("请假事由", "reason", DataType.STRING)
                 .build();
 
@@ -125,7 +125,7 @@ class NodeTitleIntegrationTest {
     @Test
     void testTitleGenerationWithWorkflowTitle() {
         NodeTitleScript script = new NodeTitleScript(
-            "def run(request){return request.getWorkflowTitle() + \" - \" + request.getOperatorName()}"
+            "def run(request){return request.getWorkflowTitle() + \" - \" + request.getCurrentOperatorName()}"
         );
 
         User user = new User(1, "王五");
@@ -133,7 +133,7 @@ class NodeTitleIntegrationTest {
                 .name("请假流程")
                 .code("leave")
                 .addField("请假人", "name", DataType.STRING)
-                .addField("请假天数", "days", DataType.NUMBER)
+                .addField("请假天数", "days", DataType.INTEGER)
                 .addField("请假事由", "reason", DataType.STRING)
                 .build();
 

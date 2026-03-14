@@ -24,38 +24,10 @@ public class ErrorThrow {
      */
     private List<IFlowOperator> operators;
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
+    /**
+     * 是否为节点
+     */
     public boolean isNode() {
-        return node != null;
-    }
-
-    public static class Builder {
-        private IFlowNode node;
-        private List<IFlowOperator> operators;
-
-        public Builder node(IFlowNode node) {
-            this.node = node;
-            return this;
-        }
-
-        public Builder operators(IFlowOperator... operators) {
-            this.operators = List.of(operators);
-            return this;
-        }
-
-        public Builder operators(List<IFlowOperator> operators) {
-            this.operators = operators;
-            return this;
-        }
-
-        public ErrorThrow build() {
-            ErrorThrow errorThrow = new ErrorThrow();
-            errorThrow.setNode(node);
-            errorThrow.setOperators(operators);
-            return errorThrow;
-        }
+        return node!=null;
     }
 }
