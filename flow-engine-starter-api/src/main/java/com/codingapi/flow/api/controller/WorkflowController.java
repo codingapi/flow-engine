@@ -2,7 +2,9 @@ package com.codingapi.flow.api.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.codingapi.flow.api.pojo.NodeCreateRequest;
+import com.codingapi.flow.api.pojo.WorkflowMeta;
 import com.codingapi.flow.api.pojo.WorkflowUpdateVersionNameRequest;
+import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowPermissionException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.mock.MockInstance;
@@ -51,6 +53,15 @@ public class WorkflowController {
     public Response updateVersionName(@RequestBody WorkflowUpdateVersionNameRequest request) {
         workflowService.updateVersionName(request.getId(), request.getVersionName());
         return Response.buildSuccess();
+    }
+
+    @GetMapping("/meta")
+    public SingleResponse<WorkflowMeta> getMeta(IdRequest request){
+        Workflow workflow = workflowService.getWorkflow(request.getStringId());
+        if(workflow!=null){
+            return SingleResponse.of(new WorkflowMeta(workflow));
+        }
+        throw FlowNotFoundException.workflow(request.getStringId());
     }
 
 
