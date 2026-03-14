@@ -38,6 +38,11 @@ public class FlowContent {
     private String workId;
 
     /**
+     * 流程设计名称
+     */
+    private String workTitle;
+
+    /**
      * 流程编码
      */
     private String workCode;
@@ -194,21 +199,28 @@ public class FlowContent {
         this.recordId = record.getId();
         this.processId = record.getProcessId();
         this.createOperator = new FlowOperator(record.getCreateOperatorId(), record.getCreateOperatorName());
-        this.mergeable = record.isMergeable();
+        this.mergeable = record.isTodo() && record.isMergeable();
         this.flowState = record.getFlowState();
         this.recordState = record.getRecordState();
         this.title = record.getTitle();
+        this.workTitle = record.getWorkTitle();
 
         this.todos = new ArrayList<>();
         for (FlowRecord item : mergeRecords) {
             Body body = new Body();
             body.setRecordId(item.getId());
+            body.setProcessId(item.getProcessId());
+            body.setWorkTitle(item.getWorkTitle());
+            body.setNodeId(item.getNodeId());
+            body.setNodeName(item.getNodeName());
+            body.setNodeType(item.getNodeType());
             body.setSubmitOperator(new FlowOperator(item.getSubmitOperatorId(),item.getSubmitOperatorName()));
             body.setCreatedOperator(new FlowOperator(record.getCreateOperatorId(),record.getCreateOperatorName()));
             body.setTitle(item.getTitle());
             body.setData(item.getFormData());
             body.setRecordState(item.getRecordState());
             body.setFlowState(item.getFlowState());
+            body.setCreateTime(item.getCreateTime());
             this.todos.add(body);
         }
     }
@@ -289,6 +301,32 @@ public class FlowContent {
          * 流程记录编号
          */
         private long recordId;
+
+        /**
+         * 流程id
+         * 每一次流程启动时生成，直到流程结束
+         */
+        private String processId;
+
+        /**
+         * 流程设计名称
+         */
+        private String workTitle;
+
+        /**
+         * 节点Id
+         */
+        private String nodeId;
+
+        /**
+         * 节点名称
+         */
+        private String nodeName;
+
+        /**
+         * 节点类型
+         */
+        private String nodeType;
         /**
          * 流程标题
          */
@@ -300,12 +338,15 @@ public class FlowContent {
         private FlowOperator submitOperator;
 
 
-
         /**
          * 流程创建者
          */
         private FlowOperator createdOperator;
 
+        /**
+         * 流程创建时间
+         */
+        private long createTime;
 
         /**
          * 表单数据
