@@ -1,5 +1,6 @@
 package com.codingapi.flow.session;
 
+import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.mock.MockRepositoryHolder;
@@ -15,6 +16,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流程会话对象
@@ -139,22 +141,37 @@ public class FlowSession {
 
 
     /**
-     * 创建流程请求
+     * 创建流程请求，用于自流程的创建
      */
     public FlowCreateRequest toCreateRequest() {
-        FlowCreateRequest request = new FlowCreateRequest();
         IFlowNode startNode = workflow.getStartNode();
-        IFlowAction action = startNode.actionManager().getFirstAction();
-        request.setWorkId(workflow.getId());
-        request.setFormData(formData.toMapData());
-        request.setActionId(action.id());
-        request.setOperatorId(currentOperator.getUserId());
+        IFlowAction action = startNode.actionManager().getActionByType(ActionType.SAVE.name());
+        return this.toCreateRequest(workflow.getId(),currentOperator.getUserId(),action.id(),formData.toMapData());
+    }
+
+
+    /**
+     * 创建流程请求，用于自流程的创建
+     * @param workId 流程设计id
+     * @param actionId 动作类型
+     * @param formData 流程数据
+     */
+    public FlowCreateRequest toCreateRequest(String workId,
+                                           long operatorId,
+                                           String actionId,
+                                           Map<String,Object> formData){
+
+        FlowCreateRequest request = new FlowCreateRequest();
+        request.setActionId(actionId);
+        request.setWorkId(workId);
+        request.setOperatorId(operatorId);
+        request.setFormData(formData);
         return request;
     }
 
 
     /**
-     * 创建流程动作请求
+     * 创建流程动作请求，用于自定义脚本的执行
      */
     public FlowActionRequest toActionRequest() {
         FlowActionRequest request = new FlowActionRequest();
