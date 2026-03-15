@@ -32,7 +32,7 @@ public class FlowCreateRequest {
     private long operatorId;
 
     /**
-     * 父流程id
+     * 父流程id,系统自动赋值
      */
     private long parentRecordId;
 

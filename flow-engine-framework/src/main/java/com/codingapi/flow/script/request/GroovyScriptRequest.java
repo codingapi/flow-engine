@@ -187,6 +187,32 @@ public class GroovyScriptRequest {
         return flowSession.toCreateRequest();
     }
 
+    /**
+     * 创建流程请求，用于自流程的创建
+     * @param workId 流程设计id
+     * @param actionId 动作类型
+     * @param formData 流程数据
+     */
+    public FlowCreateRequest toCreateRequest(String workId,
+                                             long operatorId,
+                                             String actionId,
+                                             String formData){
+        return flowSession.toCreateRequest(workId, operatorId, actionId, formData);
+    }
+
+    /**
+     * 创建流程请求，用于自流程的创建
+     * @param workId 流程设计id
+     * @param actionId 动作类型
+     * @param formData 流程数据
+     */
+    public FlowCreateRequest toCreateRequest(String workId,
+                                             long operatorId,
+                                             String actionId,
+                                             Map<String,Object> formData){
+        return flowSession.toCreateRequest(workId, operatorId, actionId, formData);
+    }
+
 
     /**
      * 获取表单字段值（Groovy脚本调用）
