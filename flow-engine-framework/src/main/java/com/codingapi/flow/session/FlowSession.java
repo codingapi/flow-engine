@@ -1,5 +1,6 @@
 package com.codingapi.flow.session;
 
+import com.alibaba.fastjson.JSONObject;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormData;
@@ -149,6 +150,25 @@ public class FlowSession {
         return this.toCreateRequest(workflow.getId(),currentOperator.getUserId(),action.id(),formData.toMapData());
     }
 
+
+    /**
+     * 创建流程请求，用于自流程的创建
+     * @param workId 流程设计id
+     * @param actionId 动作类型
+     * @param formData 流程数据
+     */
+    public FlowCreateRequest toCreateRequest(String workId,
+                                             long operatorId,
+                                             String actionId,
+                                             String formData){
+
+        FlowCreateRequest request = new FlowCreateRequest();
+        request.setActionId(actionId);
+        request.setWorkId(workId);
+        request.setOperatorId(operatorId);
+        request.setFormData(JSONObject.parseObject(formData));
+        return request;
+    }
 
     /**
      * 创建流程请求，用于自流程的创建
