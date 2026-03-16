@@ -1,3 +1,5 @@
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/codingapi/flow-engine/blob/main/LICENSE)
+[![Maven Central](https://img.shields.io/maven-central/v/com.codingapi.flow/flow-engine-starter.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22com.codingapi.flow%22%20AND%20a:%22flow-engine-starter%22)
 # Flow Engine
 
 > 企业级流程引擎 - 可视化流程设计、动态表单配置、多节点类型流转
