@@ -210,18 +210,24 @@ flow-engine
 ├── flow-engine-starter           # Spring Boot Starter
 ├── flow-engine-starter-infra     # 持久化层 Starter
 ├── flow-engine-example           # 示例项目
-└── flow-frontend                 # 前端项目（Git Submodule）
+└── flow-frontend                 # 前端项目（独立 Git 仓库）
     ├── apps
-    │   ├── app-pc                # PC端应用
+    │   ├── app-pc                # PC 端应用
     │   └── app-mobile            # 移动端应用
     └── packages
-        ├── flow-core            # 核心 API 库
+        ├── flow-core            # 核心框架库（HTTP、Hooks、Presenter 等）
         ├── flow-types           # TypeScript 类型定义库
-        └── flow-pc              # PC 端组件库
-            ├── flow-pc-ui       # PC 端基础 UI 组件库
-            ├── flow-pc-form     # PC 端表单相关组件
-            ├── flow-pc-design   # PC 端流程设计器组件
-            └── flow-pc-approval # PC 端审批页面组件
+        ├── flow-icons           # 图标库
+        ├── flow-approval-presenter # 审批展示器框架
+        ├── flow-design          # 流程设计器组件库
+        ├── flow-pc              # PC 端组件库
+        │   ├── flow-pc-ui       # PC 端基础 UI 组件库
+        │   ├── flow-pc-form     # PC 端表单组件库
+        │   └── flow-pc-approval # PC 端审批组件库
+        └── flow-mobile          # 移动端组件库
+            ├── flow-mobile-ui       # 移动端基础 UI 组件库
+            ├── flow-mobile-form     # 移动端表单组件库
+            └── flow-mobile-approval # 移动端审批组件库
 ```
 
 ## 技术栈
@@ -237,10 +243,75 @@ flow-engine
 
 ### 前端
 
-- **React** - UI框架
+- **React 18** - UI 框架
 - **TypeScript** - 类型安全
-- **Rsbuild** - 构建工具
+- **Rsbuild/Rslib** - 构建工具
 - **pnpm** - 包管理器
+- **Ant Design** - PC 端 UI 组件库
+- **Ant Design Mobile** - 移动端 UI 组件库
+- **Redux Toolkit** - 状态管理
+- **Flowgram** - 流程设计器底层框架
+- **CodeMirror** - 代码编辑器
+- **Groovy** - 脚本语言支持
+
+## 前端模块架构
+
+### 模块划分原则
+
+- **flow-core**：全局框架依赖，只包含与 UI 无关的基础能力（HTTP、状态管理、工具函数等）
+- **flow-types**：全局类型定义，包含流程审批相关的业务类型（移动端和 PC 端共用）
+- **flow-icons**：图标库，提供统一的图标组件
+- **flow-approval-presenter**：审批展示器框架，基于 Redux 的状态管理
+- **flow-design**：流程设计器功能，包含节点配置、属性面板、脚本配置等
+- **flow-pc-***：PC 端专用组件库，依赖 Ant Design
+- **flow-mobile-***：移动端专用组件库，依赖 Ant Design Mobile
+
+### 前端模块依赖关系
+
+```
+flow-core (无 UI，基础框架)
+    ↑       ↑
+    │       └── flow-icons (图标库)
+    │       └── flow-approval-presenter (审批展示器框架)
+    │
+flow-types (类型定义)
+    ↑       ↑
+    │       └── flow-pc-form
+    │               ↑
+    └───────→ flow-pc-ui ──→ flow-pc-approval
+                        ↑
+                    flow-design ──→ app-pc
+
+flow-mobile-ui ──→ flow-mobile-form ──→ flow-mobile-approval ──→ app-mobile
+```
+
+### 前端模块说明
+
+#### 核心模块
+
+| 模块 | 描述 | 依赖 |
+|------|------|------|
+| `flow-core` | 核心框架库（HTTP、Hooks、Presenter 等），不包含 UI 组件 | 无 |
+| `flow-types` | TypeScript 类型定义（流程实例、表单、审批等业务类型） | flow-core |
+| `flow-icons` | 图标库 | flow-core |
+| `flow-approval-presenter` | 审批展示器框架（基于 Redux 的状态管理） | flow-core, flow-types |
+| `flow-design` | 流程设计器组件库（节点配置、属性面板、脚本配置等） | flow-core, flow-types, flow-icons, flow-pc-ui |
+
+#### PC 端模块
+
+| 模块 | 描述 | 依赖 |
+|------|------|------|
+| `flow-pc-ui` | PC 端基础 UI 组件库（按钮、输入框等原子组件） | flow-core |
+| `flow-pc-form` | PC 端表单组件库（表单设计器、表单渲染等） | flow-core, flow-types |
+| `flow-pc-approval` | PC 端审批组件库（待办/已办/审批处理等） | flow-core, flow-types, flow-icons, flow-approval-presenter, flow-pc-ui, flow-pc-form |
+
+#### 移动端模块
+
+| 模块 | 描述 | 依赖 |
+|------|------|------|
+| `flow-mobile-ui` | 移动端基础 UI 组件库 | flow-core |
+| `flow-mobile-form` | 移动端表单组件库 | flow-core, flow-types |
+| `flow-mobile-approval` | 移动端审批组件库 | flow-core, flow-types, flow-icons, flow-approval-presenter, flow-mobile-ui, flow-mobile-form |
 
 ## 快速开始
 
@@ -273,18 +344,32 @@ pnpm run build
 # 构建 PC 端所有组件库
 pnpm run build:flow-pc
 
-# 构建特定组件库
-pnpm run build:flow-core    # 核心 API 库
-pnpm run build:flow-types   # 类型定义库
-pnpm run build:flow-pc-ui   # 基础 UI 组件库
-pnpm run build:flow-pc-form # 表单组件库
-pnpm run build:flow-pc-design # 设计器组件库
-pnpm run build:flow-pc-approval # 审批组件库
+# 构建移动端所有组件库
+pnpm run build:flow-mobile
 
-# 启动 PC 端应用
+# 构建特定包
+pnpm run build:flow-core              # 核心框架库
+pnpm run build:flow-types             # 类型定义库
+pnpm run build:flow-icons             # 图标库
+pnpm run build:flow-approval-presenter # 审批展示器框架
+pnpm run build:flow-design            # 流程设计器组件库
+pnpm run build:flow-pc-ui             # PC 端基础 UI 组件库
+pnpm run build:flow-pc-form           # PC 端表单组件库
+pnpm run build:flow-pc-approval       # PC 端审批组件库
+pnpm run build:flow-mobile-ui         # 移动端基础 UI 组件库
+pnpm run build:flow-mobile-form       # 移动端表单组件库
+pnpm run build:flow-mobile-approval   # 移动端审批组件库
+
+# 构建 PC 端应用
+pnpm run build:app-pc
+
+# 构建移动端应用
+pnpm run build:app-mobile
+
+# 启动 PC 端应用（开发模式）
 pnpm run dev:app-pc
 
-# 启动移动端应用
+# 启动移动端应用（开发模式）
 pnpm run dev:app-mobile
 ```
 
@@ -388,6 +473,8 @@ category.subcategory.errorType
 
 ## 测试
 
+### 后端测试
+
 ```bash
 # 运行所有测试
 ./mvnw test
@@ -397,6 +484,24 @@ category.subcategory.errorType
 
 # 运行指定测试类
 ./mvnw test -Dtest=ScriptRuntimeContextTest
+```
+
+### 前端测试
+
+```bash
+cd flow-frontend
+
+# 运行所有测试
+pnpm run test
+
+# 运行特定包的测试
+pnpm run test:flow-core              # 核心框架库测试
+pnpm run test:flow-design            # 流程设计器测试
+pnpm run test:flow-pc                # PC 端组件测试
+pnpm run test:flow-pc-ui             # PC 端 UI 组件测试
+pnpm run test:flow-pc-form           # PC 端表单组件测试
+pnpm run test:flow-pc-approval       # PC 端审批组件测试
+pnpm run test:flow-mobile            # 移动端组件测试
 ```
 
 ## 许可证
