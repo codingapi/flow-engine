@@ -600,6 +600,8 @@ public class FlowRecord {
     public FlowSession createFlowSession(IRepositoryHolder repositoryHolder,
                                          Workflow workflow,
                                          IFlowOperator currentOperator,
+                                         IFlowOperator createdOperator,
+                                         IFlowOperator submitOperator,
                                          FormData formData,
                                          FlowAdvice advice) {
         List<FlowRecord> currentRecords = repositoryHolder.findCurrentNodeRecords(this.getFromId(), this.getNodeId());
@@ -607,6 +609,8 @@ public class FlowRecord {
         return new FlowSession(
                 repositoryHolder,
                 currentOperator,
+                createdOperator,
+                submitOperator,
                 workflow,
                 currentNode,
                 advice.getAction(),

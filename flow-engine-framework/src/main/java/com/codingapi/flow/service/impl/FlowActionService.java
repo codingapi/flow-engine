@@ -54,6 +54,9 @@ public class FlowActionService {
             throw FlowStateException.recordAlreadyDone();
         }
 
+        IFlowOperator createdOperator = flowOperatorGateway.get(flowRecord.getCreateOperatorId());
+        IFlowOperator submitOperator = flowOperatorGateway.get(flowRecord.getSubmitOperatorId());
+
         WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(flowRecord.getWorkRuntimeId());
         if (workflowRuntime == null) {
             throw FlowNotFoundException.workflow(flowRecord.getWorkRuntimeId() + " not found");
@@ -79,7 +82,7 @@ public class FlowActionService {
         formData.reset(request.getFormData());
         FlowAdvice flowAdvice = request.toFlowAdvice(workflow, flowAction);
 
-        FlowSession session = flowRecord.createFlowSession(this.repositoryHolder,workflow,currentOperator,formData,flowAdvice);
+        FlowSession session = flowRecord.createFlowSession(this.repositoryHolder,workflow,currentOperator,createdOperator,submitOperator,formData,flowAdvice);
         // 验证会话
         currentNode.verifySession(session);
         // 执行动作

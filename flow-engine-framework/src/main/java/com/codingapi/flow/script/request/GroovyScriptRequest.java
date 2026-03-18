@@ -65,7 +65,7 @@ public class GroovyScriptRequest {
      * 流程提交Id
      */
     @Getter
-    private long submitOperatorId;
+    private IFlowOperator submitOperator;
 
     /**
      * 流程提交人姓名
@@ -87,26 +87,27 @@ public class GroovyScriptRequest {
             this.currentOperator = session.getCurrentOperator();
         }
 
+        // 提取创建人信息
+        if (session.getCreatedOperator() != null) {
+            this.createdOperator = session.getCreatedOperator();
+        }
+
+        // 提取提交人信息
+        if (session.getSubmitOperator() != null) {
+            this.submitOperator = session.getSubmitOperator();
+        }
+
         // 提取流程信息
         if (session.getWorkflow() != null) {
             this.workflowTitle = session.getWorkflow().getTitle();
             this.workflowCode = session.getWorkflow().getCode();
-            // 提取创建人信息
-            if (session.getWorkflow().getCreatedOperator() != null) {
-                this.createdOperator = session.getWorkflow().getCreatedOperator();
-            }
+
         }
 
         // 提取节点信息
         if (session.getCurrentNode() != null) {
             this.nodeName = session.getCurrentNode().getName();
             this.nodeType = session.getCurrentNode().getType();
-        }
-
-        // 提取流程编号（从record获取）
-        if (session.getCurrentRecord() != null) {
-            this.submitOperatorId = session.getSubmitOperatorId();
-            this.submitOperatorName = session.getSubmitOperatorName();
         }
 
         // 提取表单数据
@@ -168,6 +169,28 @@ public class GroovyScriptRequest {
     public String getCurrentOperatorName(){
         return this.currentOperator.getName();
     }
+
+    /**
+     * 流程审批者Id
+     */
+    public long getSubmitOperatorId(){
+        if(this.submitOperator!=null) {
+            return this.submitOperator.getUserId();
+        }
+        return 0;
+    }
+
+    /**
+     * 流程审批者名称
+     */
+    public String getSubmitOperatorName(){
+        if(this.submitOperator!=null) {
+            return this.submitOperator.getName();
+        }else {
+            return null;
+        }
+    }
+
 
 
     /**

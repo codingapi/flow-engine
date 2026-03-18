@@ -1,18 +1,21 @@
 package com.codingapi.flow.script.node;
 
+import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.form.DataType;
-import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FlowFormBuilder;
+import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
-import com.codingapi.flow.factory.MyFlowServiceFactory;
+import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class NodeTitleScriptTest {
 
@@ -22,17 +25,20 @@ class NodeTitleScriptTest {
     @Test
     void testExecuteWithSimpleScript() {
         NodeTitleScript script = new NodeTitleScript("def run(request){return '你有一条待办'}");
+        IFlowOperator operator = new User(1, "张三");
         FlowSession session = new FlowSession(
                 factory.repositoryHolder,
-            new User(1, "张三"),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            0,
-            null
+                operator,
+                operator,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                null
         );
         String result = script.execute(session);
         assertEquals("你有一条待办", result);
@@ -64,7 +70,7 @@ class NodeTitleScriptTest {
         FormData data = new FormData(form);
         data.getDataBody().set("days", 5);
 
-        FlowSession session = FlowSession.startSession(factory.repositoryHolder,user, workflow, startNode, startNode.getActions().get(0), data, 0);
+        FlowSession session = FlowSession.startSession(factory.repositoryHolder, user, workflow, startNode, startNode.getActions().get(0), data, 0);
 
         String result = titleScript.execute(session);
         assertNotNull(result);

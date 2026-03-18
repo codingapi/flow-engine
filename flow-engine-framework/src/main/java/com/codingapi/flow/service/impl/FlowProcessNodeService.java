@@ -32,6 +32,8 @@ public class FlowProcessNodeService {
 
     private final FlowProcessNodeRequest request;
     private final IFlowOperator currentOperator;
+    private IFlowOperator createdOperator;
+    private IFlowOperator submitOperator;
     private final FlowRecordService flowRecordService;
     private final WorkflowService workflowService;
 
@@ -63,6 +65,8 @@ public class FlowProcessNodeService {
         if (this.request.isCreateWorkflow()) {
             this.workflow = workflowService.getWorkflow(id);
             this.currentNode = this.workflow.getStartNode();
+            this.createdOperator = this.currentOperator;
+            this.submitOperator = null;
         } else {
             FlowRecord flowRecord = flowRecordService.getFlowRecord(Long.parseLong(id));
             if (flowRecord == null) {
@@ -75,6 +79,8 @@ public class FlowProcessNodeService {
             }
             this.workflow = workflowRuntime.toWorkflow();
             this.currentNode = this.workflow.getFlowNode(flowRecord.getNodeId());
+            this.createdOperator = this.repositoryHolder.getOperatorById(this.flowRecord.getCreateOperatorId());
+            this.submitOperator =  this.repositoryHolder.getOperatorById(this.flowRecord.getSubmitOperatorId());
         }
     }
 
@@ -83,19 +89,19 @@ public class FlowProcessNodeService {
         if (this.flowRecord != null) {
             backupId = this.flowRecord.getWorkRuntimeId();
             // 如果当前记录已结束，则不查询后续流程
-            if(this.flowRecord.isDone()){
-                List<FlowRecord> historyRecords =  flowRecordService.findFlowRecordByProcessId(this.flowRecord.getProcessId());
+            if (this.flowRecord.isDone()) {
+                List<FlowRecord> historyRecords = flowRecordService.findFlowRecordByProcessId(this.flowRecord.getProcessId());
                 for (FlowRecord historyRecord : historyRecords) {
                     ProcessNode processNode = new ProcessNode(historyRecord, this.workflow);
                     nodeList.add(processNode);
                 }
-                if(this.flowRecord.isFinish()){
+                if (this.flowRecord.isFinish()) {
                     nodeList.add(ProcessNode.createEndNode(this.workflow));
-                }else {
+                } else {
                     this.loadNextNode(backupId);
                 }
                 return this.nodeList;
-            }else {
+            } else {
                 // 查询历史记录
                 List<FlowRecord> historyRecords = flowRecordService.findFlowRecordBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
                 for (FlowRecord historyRecord : historyRecords) {
@@ -111,7 +117,7 @@ public class FlowProcessNodeService {
     }
 
 
-    private void loadNextNode(long backupId){
+    private void loadNextNode(long backupId) {
 
         ActionManager actionManager = currentNode.actionManager();
         IFlowAction flowAction = actionManager.getAction(PassAction.class);
@@ -121,6 +127,8 @@ public class FlowProcessNodeService {
         FlowSession flowSession = new FlowSession(
                 this.repositoryHolder,
                 this.currentOperator,
+                this.createdOperator,
+                this.submitOperator,
                 this.workflow,
                 this.currentNode,
                 flowAction,
@@ -132,7 +140,7 @@ public class FlowProcessNodeService {
         );
 
         NextNodeLoader nextNodeLoader = new NextNodeLoader(this.currentNode);
-        List<ProcessNode> nextNodes =  nextNodeLoader.loadNextNode(flowSession);
+        List<ProcessNode> nextNodes = nextNodeLoader.loadNextNode(flowSession);
 
         this.nodeList.addAll(nextNodes);
     }
@@ -170,12 +178,12 @@ public class FlowProcessNodeService {
         }
 
         public List<ProcessNode> loadNextNode(FlowSession flowSession) {
-            this.fetchNextNode(flowSession,List.of(this.currentNode));
+            this.fetchNextNode(flowSession, List.of(this.currentNode));
 
             List<ProcessNode> displayNodes = nodeList.stream().filter(ProcessNode::isDisplay).toList();
             List<ProcessNode> processNodeList = new ArrayList<>();
-            for (ProcessNode node:displayNodes){
-                if(!processNodeList.contains(node)){
+            for (ProcessNode node : displayNodes) {
+                if (!processNodeList.contains(node)) {
                     processNodeList.add(node);
                 }
             }
