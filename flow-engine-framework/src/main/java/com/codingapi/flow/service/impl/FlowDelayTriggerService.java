@@ -55,6 +55,8 @@ public class FlowDelayTriggerService {
         Workflow workflow = workflowRuntime.toWorkflow();
         IFlowNode currentNode = workflow.getFlowNode(flowRecord.getNodeId());
 
+        IFlowOperator createdOperator = flowOperatorGateway.get(flowRecord.getCreateOperatorId());
+        IFlowOperator submitOperator = flowOperatorGateway.get(flowRecord.getSubmitOperatorId());
         IFlowOperator currentOperator = flowOperatorGateway.get(flowRecord.getCurrentOperatorId());
         IFlowAction flowAction = currentNode.actionManager().getActionById(flowRecord.getActionId());
         FormData formData = new FormData(workflow.getForm());
@@ -67,7 +69,7 @@ public class FlowDelayTriggerService {
         IFlowNode delayNode = workflow.getFlowNode(delayTask.getDelayNodeId());
 
         // 执行后续任务
-        FlowSession flowSession = new FlowSession(this.repositoryHolder,currentOperator, workflow, delayNode, flowAction, formData, flowRecord, currentRecords, flowRecord.getWorkRuntimeId(), advice);
+        FlowSession flowSession = new FlowSession(this.repositoryHolder,currentOperator,createdOperator,submitOperator, workflow, delayNode, flowAction, formData, flowRecord, currentRecords, flowRecord.getWorkRuntimeId(), advice);
         flowAction.run(flowSession);
 
     }

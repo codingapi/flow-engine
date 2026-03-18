@@ -33,7 +33,7 @@ class NodeTitleIntegrationTest {
         );
 
         User user = new User(1, "张三");
-        FlowSession session = new FlowSession(factory.repositoryHolder,user, null, null, null, null, null, null, 0, null);
+        FlowSession session = new FlowSession(factory.repositoryHolder,user, user,null,null, null, null, null, null, null, 0, null);
 
         String result = script.execute(session);
         assertEquals("审批人：张三", result);
@@ -68,7 +68,7 @@ class NodeTitleIntegrationTest {
         FormData data = new FormData(form);
         data.getDataBody().set("days", 5);
 
-        FlowSession session = new FlowSession(factory.repositoryHolder,user, workflow, startNode, startNode.getActions().get(0), data, null, null, 0, null);
+        FlowSession session = new FlowSession(factory.repositoryHolder,user,user,null, workflow, startNode, startNode.getActions().get(0), data, null, null, 0, null);
 
         String result = script.execute(session);
         assertEquals("请假5天", result);
@@ -103,7 +103,7 @@ class NodeTitleIntegrationTest {
         FormData data = new FormData(form);
         data.getDataBody().set("days", 3);
 
-        FlowSession session = new FlowSession(factory.repositoryHolder,user, workflow, startNode, startNode.getActions().get(0), data, null, null, 0, null);
+        FlowSession session = new FlowSession(factory.repositoryHolder,user,user,null, workflow, startNode, startNode.getActions().get(0), data, null, null, 0, null);
 
         String result = script.execute(session);
         assertEquals("你好，李四，请假3天", result);
@@ -116,7 +116,7 @@ class NodeTitleIntegrationTest {
         );
 
         User user = new User(1, "张三");
-        FlowSession session = new FlowSession(factory.repositoryHolder,user, null, null, null, null, null, null, 0, null);
+        FlowSession session = new FlowSession(factory.repositoryHolder,user,user,null, null, null, null, null, null, null, 0, null);
 
         String result = script.execute(session);
         assertEquals("你有一条待办", result);
@@ -148,7 +148,7 @@ class NodeTitleIntegrationTest {
                 .addNode(endNode)
                 .build();
 
-        FlowSession session = new FlowSession(factory.repositoryHolder,user, workflow, startNode, startNode.getActions().get(0), null, null, null, 0, null);
+        FlowSession session = new FlowSession(factory.repositoryHolder,user,user,null, workflow, startNode, startNode.getActions().get(0), null, null, null, 0, null);
 
         String result = script.execute(session);
         assertEquals("请假审批 - 王五", result);

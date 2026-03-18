@@ -31,21 +31,37 @@ public class FlowSession {
     private final IRepositoryHolder repositoryHolder;
 
     /**
-     * 当前操作者
+     * 流程创建者
      */
+    @Getter
+    private final IFlowOperator createdOperator;
+
+    /**
+     * 流程提交人
+     */
+    @Getter
+    private final IFlowOperator submitOperator;
+
+    /**
+     * 当前审批者
+     */
+    @Getter
     private final IFlowOperator currentOperator;
     /**
      * 当前流程设计
      */
+    @Getter
     private final Workflow workflow;
     /**
      * 当前流程节点
      */
+    @Getter
     private final IFlowNode currentNode;
 
     /**
      * 当前流程动作
      */
+    @Getter
     private final IFlowAction currentAction;
 
     /**
@@ -57,25 +73,31 @@ public class FlowSession {
     /**
      * 当前节点的流程记录
      */
+    @Getter
     private final List<FlowRecord> currentNodeRecords;
 
     /**
      * 当前流程表单数据
      */
+    @Getter
     private final FormData formData;
     /**
      * 流程备份id
      */
+    @Getter
     private final long workflowRuntimeId;
 
     /**
      * 审批意见
      */
+    @Getter
     private final FlowAdvice advice;
 
 
     public FlowSession(IRepositoryHolder repositoryHolder,
                        IFlowOperator currentOperator,
+                       IFlowOperator createdOperator,
+                       IFlowOperator submitOperator,
                        Workflow workflow,
                        IFlowNode currentNode,
                        IFlowAction currentAction,
@@ -94,6 +116,8 @@ public class FlowSession {
         this.formData = formData;
         this.workflowRuntimeId = workflowRuntimeId;
         this.advice = advice;
+        this.createdOperator = createdOperator;
+        this.submitOperator = submitOperator;
     }
 
 
@@ -137,7 +161,7 @@ public class FlowSession {
             IFlowAction currentAction,
             FormData formData,
             long backupId) {
-        return new FlowSession(repositoryHolder, currentOperator, workflow, currentNode, currentAction, formData, null, new ArrayList<>(), backupId, new FlowAdvice());
+        return new FlowSession(repositoryHolder, currentOperator, currentOperator,null,workflow, currentNode, currentAction, formData, null, new ArrayList<>(), backupId, new FlowAdvice());
     }
 
 
@@ -209,12 +233,6 @@ public class FlowSession {
         return workflow.getStartNode();
     }
 
-    /**
-     * 获取流程的创建者
-     */
-    public IFlowOperator getCreatedOperator() {
-        return workflow.getCreatedOperator();
-    }
 
 
     /**
@@ -287,7 +305,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowNode currentNode) {
-        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
+        return new FlowSession(repositoryHolder,currentOperator,createdOperator,submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
     }
 
 
@@ -298,7 +316,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowAction currentAction) {
-        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
+        return new FlowSession(repositoryHolder,currentOperator,createdOperator,submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
     }
 
     /**
@@ -308,7 +326,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowOperator currentOperator) {
-        return new FlowSession(repositoryHolder,currentOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
+        return new FlowSession(repositoryHolder,currentOperator,createdOperator,submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
     }
 
     /**
