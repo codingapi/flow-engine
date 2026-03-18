@@ -120,7 +120,8 @@ public class WorkflowController {
 
     @PostMapping("/import")
     public SingleResponse<String> importWorkflow(@RequestBody JSONObject body) {
-        String workId = workflowService.importWorkflow(body.getString("file"));
+        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
+        String workId = workflowService.importWorkflow(body.getString("file"),current);
         return SingleResponse.of(workId);
     }
 
