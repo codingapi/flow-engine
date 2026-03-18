@@ -1,6 +1,7 @@
 package com.codingapi.flow.service;
 
 import com.codingapi.flow.exception.FlowExecutionException;
+import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.repository.WorkflowRuntimeRepository;
 import com.codingapi.flow.repository.WorkflowVersionRepository;
@@ -171,10 +172,10 @@ public class WorkflowService {
      * @param body base64
      * @return 流程id
      */
-    public String importWorkflow(String body) {
+    public String importWorkflow(String body, IFlowOperator createOperator) {
         String json = Base64Utils.toJson(body);
         Workflow workflow = Workflow.formJson(json);
-        workflow.resetWorkflow();
+        workflow.resetWorkflow(createOperator);
         this.saveWorkflow(workflow);
         return workflow.getId();
     }
