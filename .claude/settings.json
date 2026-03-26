@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod +x:*)",
+      "Bash(git config:*)",
+      "Bash(rm:*)",
+      "Bash(git submodule:*)",
+      "Bash(./pull-flow-frontend.sh:*)",
+      "Bash(git:*)",
+      "mcp__chrome-devtools__navigate_page",
+      "mcp__chrome-devtools__take_screenshot",
+      "Bash(./mvnw test:*)",
+      "Bash(./mvnw test-compile:*)",
+      "Bash(file:*)",
+      "Bash(python3:*)",
+      "Bash(find:*)"
+    ]
+  }
+}
