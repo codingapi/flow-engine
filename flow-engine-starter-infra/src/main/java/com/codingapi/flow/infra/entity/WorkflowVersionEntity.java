@@ -23,6 +23,7 @@ public class WorkflowVersionEntity {
     /**
      * 当前版本
      */
+    @Column(name = "is_current")
     private Boolean current;
 
     /**
