@@ -5,6 +5,7 @@ import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.form.FormField;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.session.FlowSession;
@@ -62,6 +63,7 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
         Map<String, Object> latestData = session.getFormData().toMapData();
         if(fieldPermissions!=null) {
             for (FormFieldPermission permission : fieldPermissions) {
+                FormField formField =  flowForm.getField(permission.getFormCode(),permission.getFieldCode());
                 // 子表
                 if (flowForm.isSubForm(permission.getFormCode())) {
                     if (permission.getType() == PermissionType.READ) {
@@ -87,10 +89,10 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
                     }
                 } else {
                     // 在只读权限下不允许修改数据
-                    if (permission.getType() == PermissionType.READ) {
+                    if (formField.isRequired() && permission.getType() == PermissionType.READ) {
                         Object currentValue = currentData.get(permission.getFieldCode());
                         Object latestValue = latestData.get(permission.getFieldCode());
-                        if (!currentValue.equals(latestValue)) {
+                        if (latestValue!=null && currentValue!=null && !currentValue.equals(latestValue)) {
                             throw FlowValidationException.fieldReadOnly(permission.getFieldCode());
                         }
                     }
