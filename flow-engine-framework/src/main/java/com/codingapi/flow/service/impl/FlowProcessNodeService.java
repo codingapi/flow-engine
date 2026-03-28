@@ -159,12 +159,16 @@ public class FlowProcessNodeService {
 
         private void fetchNextNode(FlowSession flowSession, List<IFlowNode> nexNodes) {
             for (IFlowNode flowNode : nexNodes) {
+                ActionManager actionManager = flowNode.actionManager();
+                IFlowAction passAction =  actionManager.getAction(PassAction.class);
+                flowSession = flowSession.updateSession(passAction);
+
                 List<IFlowOperator> operators = null;
                 if (flowNode.getType().equals(StartNode.NODE_TYPE)) {
                     operators = List.of(flowSession.getCurrentOperator());
                 } else {
                     NodeStrategyManager nodeStrategyManager = flowNode.strategyManager();
-                    OperatorManager operatorManager = nodeStrategyManager.loadOperators(flowSession);
+                    OperatorManager operatorManager = nodeStrategyManager.loadOperators(flowSession.updateSession(flowNode));
                     operators = operatorManager.getOperators();
                 }
                 ProcessNode processNode = new ProcessNode(flowNode, operators);

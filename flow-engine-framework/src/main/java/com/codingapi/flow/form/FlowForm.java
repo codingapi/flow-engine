@@ -114,11 +114,30 @@ public class FlowForm {
     /**
      * 获取表单字段
      *
-     * @param fieldName 字段名称
+     * @param fieldCode 字段code
      * @return 表单字段
      */
-    public FormField getField(String fieldName) {
-        return fields.stream().filter(field -> field.getName().equals(fieldName)).findFirst().orElse(null);
+    public FormField getField(String fieldCode) {
+        return fields.stream().filter(field -> field.getCode().equals(fieldCode)).findFirst().orElse(null);
+    }
+
+
+    /**
+     * 获取表单字段
+     * @param formCode 表单code
+     * @param fieldCode 字段code
+     */
+    public FormField getField(String formCode,String fieldCode){
+        if(this.code.equals(formCode)){
+            return this.getField(fieldCode);
+        }else {
+            for (FlowForm subForm:subForms){
+                if(subForm.getCode().equals(formCode)){
+                    return subForm.getField(fieldCode);
+                }
+            }
+        }
+        return null;
     }
 
     private void initFormFieldDataTypes(FlowForm form, Map<String, DataType> types) {
