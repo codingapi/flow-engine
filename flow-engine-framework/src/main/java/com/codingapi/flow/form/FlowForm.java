@@ -155,7 +155,12 @@ public class FlowForm {
      */
     public Map<String, DataType> loadAllFieldDataTypeMaps() {
         Map<String, DataType> types = new HashMap<>();
-        List<FlowForm> forms = new ArrayList<>(this.getSubForms());
+        List<FlowForm> forms;
+        if(this.subForms==null || this.subForms.isEmpty()){
+            forms = new ArrayList<>();
+        }else {
+            forms = new ArrayList<>(this.getSubForms());
+        }
         forms.add(this);
         for (FlowForm subForm : forms) {
             this.initFormFieldDataTypes(subForm, types);
