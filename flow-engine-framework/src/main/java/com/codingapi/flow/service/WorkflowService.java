@@ -57,6 +57,11 @@ public class WorkflowService {
 
         workflowVersionRepository.saveAll(updateList);
         Workflow workflow = currentVersion.toWorkflow();
+        try {
+            workflow.enable();
+        }catch (Exception ignore){
+            workflow.disable();
+        }
         workflowRepository.save(workflow);
     }
 
