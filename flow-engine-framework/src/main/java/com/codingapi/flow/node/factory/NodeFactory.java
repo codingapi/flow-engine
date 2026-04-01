@@ -30,6 +30,8 @@ public class NodeFactory {
         nodesClasses.put(HandleNode.NODE_TYPE, HandleNode.class);
         nodesClasses.put(InclusiveNode.NODE_TYPE, InclusiveNode.class);
         nodesClasses.put(InclusiveBranchNode.NODE_TYPE, InclusiveBranchNode.class);
+        nodesClasses.put(ManualNode.NODE_TYPE, ManualNode.class);
+        nodesClasses.put(ManualBranchNode.NODE_TYPE, ManualBranchNode.class);
         nodesClasses.put(NotifyNode.NODE_TYPE, NotifyNode.class);
         nodesClasses.put(RouterNode.NODE_TYPE, RouterNode.class);
         nodesClasses.put(ParallelNode.NODE_TYPE, ParallelNode.class);

@@ -26,10 +26,12 @@ public class FlowNodeState {
         this.blockNodeTypes.add(NodeType.CONDITION.name());
         this.blockNodeTypes.add(NodeType.INCLUSIVE.name());
         this.blockNodeTypes.add(NodeType.PARALLEL.name());
+        this.blockNodeTypes.add(NodeType.MANUAL.name());
 
         this.branchNodeTypes.add(NodeType.CONDITION_BRANCH.name());
         this.branchNodeTypes.add(NodeType.INCLUSIVE_BRANCH.name());
         this.branchNodeTypes.add(NodeType.PARALLEL_BRANCH.name());
+        this.branchNodeTypes.add(NodeType.MANUAL_BRANCH.name());
     }
 
     public boolean isEndNode() {

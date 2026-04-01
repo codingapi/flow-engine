@@ -3,13 +3,16 @@ package com.codingapi.flow.action.actions;
 import com.codingapi.flow.action.ActionDisplay;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.BaseAction;
+import com.codingapi.flow.context.ActionResponseContext;
 import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.nodes.ManualNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.pojo.response.NodeOption;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
@@ -71,10 +74,25 @@ public class PassAction extends BaseAction {
         List<FlowRecord> recordList = new ArrayList<>();
         FlowRecord currentRecord = flowSession.getCurrentRecord();
         IFlowNode currentNode = flowSession.getCurrentNode();
+
+        // 如果下节点为手动节点时，提交流程时需要先选择节点
+        List<IFlowNode> nextNodes = flowSession.matchNextNodes();
+        if (nextNodes != null && nextNodes.size() == 1) {
+            IFlowNode nextNode = nextNodes.get(0);
+            if (nextNode.getType().equalsIgnoreCase(ManualNode.NODE_TYPE)) {
+                IFlowNode manulNode = flowSession.getAdvice().getManualNode();
+                if (manulNode == null && nextNode.blocks() != null) {
+                    List<NodeOption> options = nextNode.blocks().stream().map(NodeOption::new).toList();
+                    ActionResponseContext.getInstance().set(options);
+                    return;
+                }
+            }
+        }
+
         boolean isFinish = currentNode.isFinish(flowSession);
         currentRecord.update(flowSession, true);
         // 添加流程结束事件
-        flowEvents.add(new FlowRecordDoneEvent(currentRecord,flowSession.isMock()));
+        flowEvents.add(new FlowRecordDoneEvent(currentRecord, flowSession.isMock()));
         recordList.add(currentRecord);
 
         // 激活下一个按顺序审批的记录数据
@@ -85,7 +103,7 @@ public class PassAction extends BaseAction {
                 if (record.getNodeOrder() == currentRecord.getNodeOrder() + 1) {
                     record.show();
                     recordList.add(record);
-                    flowEvents.add(new FlowRecordTodoEvent(record,flowSession.isMock()));
+                    flowEvents.add(new FlowRecordTodoEvent(record, flowSession.isMock()));
                 }
             }
         }
@@ -98,7 +116,7 @@ public class PassAction extends BaseAction {
                 notifyRecord.notifyRecord(flowSession.updateSession(forwardOperator));
                 // 如果不存储这个记录，若下一流程是结束流程时，无法更新流程状态为结束状态。
                 repositoryHolder.saveRecord(notifyRecord);
-                flowEvents.add(new FlowRecordDoneEvent(notifyRecord,flowSession.isMock()));
+                flowEvents.add(new FlowRecordDoneEvent(notifyRecord, flowSession.isMock()));
             }
 
             // 是否委托记录
@@ -109,7 +127,7 @@ public class PassAction extends BaseAction {
                 rebackRecord.clearDelegate();
 
                 recordList.add(rebackRecord);
-                flowEvents.add(new FlowRecordTodoEvent(rebackRecord,flowSession.isMock()));
+                flowEvents.add(new FlowRecordTodoEvent(rebackRecord, flowSession.isMock()));
             } else {
                 this.triggerNode(flowSession, (triggerSession) -> {
                     List<FlowRecord> records = this.generateRecords(triggerSession);
@@ -117,9 +135,9 @@ public class PassAction extends BaseAction {
                         for (FlowRecord record : records) {
                             if (record.isShow()) {
                                 if (record.isNotify()) {
-                                    flowEvents.add(new FlowRecordDoneEvent(record,flowSession.isMock()));
+                                    flowEvents.add(new FlowRecordDoneEvent(record, flowSession.isMock()));
                                 } else {
-                                    flowEvents.add(new FlowRecordTodoEvent(record,flowSession.isMock()));
+                                    flowEvents.add(new FlowRecordTodoEvent(record, flowSession.isMock()));
                                 }
                             }
                         }

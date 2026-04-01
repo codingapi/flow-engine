@@ -30,6 +30,11 @@ public class FlowAdvice {
     private String signKey;
 
     /**
+     * 人工选择节点
+     */
+    private IFlowNode manualNode;
+
+    /**
      * 退回节点
      */
     private IFlowNode backNode;
