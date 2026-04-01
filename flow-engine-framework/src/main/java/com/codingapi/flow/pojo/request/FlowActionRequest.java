@@ -50,6 +50,10 @@ public class FlowActionRequest {
             flowAdvice.setBackNode(workflow.getFlowNode(advice.getBackNodeId()));
         }
 
+        if (StringUtils.hasText(advice.getManualNodeId())) {
+            flowAdvice.setManualNode(workflow.getFlowNode(advice.getManualNodeId()));
+        }
+
         return flowAdvice;
     }
 

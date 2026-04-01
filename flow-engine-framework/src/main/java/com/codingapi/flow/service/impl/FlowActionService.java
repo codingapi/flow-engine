@@ -1,6 +1,7 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.context.ActionResponseContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.form.FormData;
@@ -9,6 +10,7 @@ import com.codingapi.flow.manager.WorkflowStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
+import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.WorkflowService;
@@ -38,8 +40,9 @@ public class FlowActionService {
         this.repositoryHolder = repositoryHolder;
     }
 
-    public void action() {
+    public ActionResponse action() {
 
+        ActionResponseContext.getInstance().clear();
         request.verify();
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getAdvice().getOperatorId());
@@ -88,6 +91,7 @@ public class FlowActionService {
         // 执行动作
         flowAction.run(session);
 
+        return ActionResponseContext.getInstance().get();
     }
 }
 

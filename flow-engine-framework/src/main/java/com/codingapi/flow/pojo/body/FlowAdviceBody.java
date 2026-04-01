@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- *  流程审批意见
+ * 流程审批意见
  */
 @Data
 @NoArgsConstructor
@@ -23,6 +23,11 @@ public class FlowAdviceBody {
      * 审批意见
      */
     private String advice;
+
+    /**
+     * 人工选择节点
+     */
+    private String manualNodeId;
 
     /**
      * 签名key
@@ -57,6 +62,7 @@ public class FlowAdviceBody {
         this.operatorId = flowSession.getCurrentOperator().getUserId();
         this.signKey = flowSession.getAdvice().getSignKey();
         this.backNodeId = flowSession.getAdvice().getBackNode() != null ? flowSession.getAdvice().getBackNode().getId() : null;
+        this.manualNodeId = flowSession.getAdvice().getManualNode() != null ? flowSession.getAdvice().getManualNode().getId() : null;
         this.forwardOperatorIds = flowSession.getAdvice().getForwardOperators() != null ? flowSession.getAdvice().getForwardOperators().stream().map(IFlowOperator::getUserId).toList() : null;
     }
 

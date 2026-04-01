@@ -17,6 +17,7 @@ import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.pojo.request.FlowRevokeRequest;
 import com.codingapi.flow.pojo.request.FlowUrgeRequest;
+import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.script.runtime.IBeanFactory;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class FlowSampleServiceTest {
 
@@ -832,6 +834,161 @@ class FlowSampleServiceTest {
         assertEquals(4, records.size());
         assertEquals(0, records.stream().filter(FlowRecord::isTodo).toList().size());
         assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
+
+    }
+
+
+    /**
+     * 人工分支测试
+     */
+    @Test
+    void manual() {
+
+        User user = new User(1, "user");
+        User depart = new User(2, "depart");
+        User boss = new User(3, "boss");
+        factory.userGateway.save(user);
+        factory.userGateway.save(depart);
+        factory.userGateway.save(boss);
+
+        GatewayContext.getInstance().setFlowOperatorGateway(factory.userGateway);
+
+        FlowForm form = FlowFormBuilder.builder()
+                .name("请假流程")
+                .code("leave")
+                .addField("请假人", "name", DataType.STRING)
+                .addField("请假天数", "days", DataType.INTEGER)
+                .addField("请假事由", "reason", DataType.STRING)
+                .build();
+
+        StartNode startNode = StartNode
+                .builder()
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .build())
+                .build();
+
+
+        ApprovalNode departApprovalNode = ApprovalNode.builder()
+                .name("经理审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .build()
+                )
+                .build();
+
+        ApprovalNode bossApprovalNode = ApprovalNode.builder()
+                .name("老板审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .build()
+                )
+                .build();
+
+        ApprovalNode bigBossApprovalNode = ApprovalNode.builder()
+                .name("大老板审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .build()
+                )
+                .build();
+
+
+        ManualBranchNode manualBranchNode1 =ManualBranchNode.builder()
+                .name("人工分支1")
+                .blocks(departApprovalNode)
+                .order(1)
+                .build();
+
+        ManualBranchNode manualBranchNode2 = ManualBranchNode.builder()
+                .name("人工分支2")
+                .blocks(bossApprovalNode, bigBossApprovalNode)
+                .order(2)
+                .build();
+
+        ManualNode manualNode = ManualNode.builder()
+                .name("人工控制节点")
+                .blocks(manualBranchNode1, manualBranchNode2)
+                .build();
+
+        EndNode endNode = EndNode.builder().build();
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("请假流程")
+                .code("leave")
+                .createdOperator(user)
+                .form(form)
+                .addNode(startNode)
+                .addNode(manualNode)
+                .addNode(endNode)
+                .build();
+
+        factory.workflowService.saveWorkflow(workflow);
+
+        Map<String, Object> data = Map.of("name", "lorne", "days", 3, "reason", "leave");
+
+        List<IFlowAction> startActions = startNode.actionManager().getActions();
+
+        FlowCreateRequest userCreateRequest = new FlowCreateRequest();
+        userCreateRequest.setWorkId(workflow.getId());
+        userCreateRequest.setFormData(data);
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
+
+        factory.flowService.create(userCreateRequest);
+
+        List<FlowRecord> userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(1, userRecordList.size());
+
+        FlowActionRequest userRequest = new FlowActionRequest();
+        userRequest.setFormData(data);
+        userRequest.setRecordId(userRecordList.get(0).getId());
+        FlowAdviceBody adviceBody = new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId());
+        userRequest.setAdvice(adviceBody);
+        ActionResponse actionResponse = factory.flowService.action(userRequest);
+        assertEquals(2,actionResponse.getOptions().size());
+
+        userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(1, userRecordList.size());
+
+        adviceBody.setManualNodeId(actionResponse.getOptions().get(0).getId());
+        actionResponse = factory.flowService.action(userRequest);
+        assertNull(actionResponse);
+
+        List<FlowRecord> departRecordList = factory.flowRecordRepository.findTodoByOperator(depart.getUserId());
+        assertEquals(1, departRecordList.size());
+
+        List<IFlowAction> departActions = departApprovalNode.actionManager().getActions();
+
+        FlowActionRequest departRequest = new FlowActionRequest();
+        departRequest.setFormData(data);
+        departRequest.setRecordId(departRecordList.get(0).getId());
+        departRequest.setAdvice(new FlowAdviceBody(departActions.get(0).id(), "同意", depart.getUserId()));
+        actionResponse = factory.flowService.action(departRequest);
+        assertNull(actionResponse);
+
+        List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(departRecordList.get(0).getProcessId());
+        assertEquals(2, records.size());
+        assertEquals(0, records.stream().filter(FlowRecord::isTodo).toList().size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 

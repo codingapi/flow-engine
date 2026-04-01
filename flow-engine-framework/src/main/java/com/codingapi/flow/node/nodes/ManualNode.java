@@ -5,6 +5,7 @@ import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IBlockNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
+import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
@@ -34,13 +35,30 @@ public class ManualNode extends BaseFlowNode implements IBlockNode {
         this(RandomUtils.generateStringId(), DEFAULT_NAME, 0);
     }
 
+    /**
+     * 匹配条件分支
+     *
+     * @param nodeList    当前节点下的所有条件
+     * @param flowSession 当前会话
+     * @return 匹配的节点
+     */
+    public List<IFlowNode> filterBranches(List<IFlowNode> nodeList, FlowSession flowSession) {
+        IFlowNode selectNode = flowSession.getAdvice().getManualNode();
+        if (selectNode == null) {
+            return nodeList;
+        } else {
+            List<IFlowNode> nextNodes = new ArrayList<>();
+            nextNodes.add(selectNode);
+            return nextNodes;
+        }
+    }
 
     @Override
-    public void addDefaultBranch(int count){
+    public void addDefaultBranch(int count) {
         List<IFlowNode> branches = new ArrayList<>();
-        for (int i=0;i<count;i++){
+        for (int i = 0; i < count; i++) {
             ManualBranchNode branchNode = new ManualBranchNode();
-            branchNode.setOrder(i+1);
+            branchNode.setOrder(i + 1);
             branches.add(branchNode);
         }
         this.setBlocks(branches);

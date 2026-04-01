@@ -1,6 +1,7 @@
 package com.codingapi.flow.service;
 
 import com.codingapi.flow.pojo.request.*;
+import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.pojo.response.FlowContent;
 import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.service.impl.*;
@@ -60,9 +61,9 @@ public class FlowService {
      *
      * @param request 审批请求
      */
-    public void action(FlowActionRequest request) {
+    public ActionResponse action(FlowActionRequest request) {
         FlowActionService flowActionService = new FlowActionService(request,this.repositoryHolder);
-        flowActionService.action();
+        return flowActionService.action();
     }
 
     /**
