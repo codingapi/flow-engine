@@ -13,6 +13,7 @@ import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.script.node.OperatorMatchScript;
+import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.workflow.IWorkflowStrategy;
 import com.codingapi.flow.strategy.workflow.InterfereStrategy;
 import com.codingapi.flow.strategy.workflow.UrgeStrategy;
@@ -89,7 +90,7 @@ public class Workflow {
     private boolean enable;
 
 
-    public boolean isDisable(){
+    public boolean isDisable() {
         return !enable;
     }
 
@@ -212,7 +213,7 @@ public class Workflow {
                 IFlowNode flowNode = NodeFactory.getInstance().createNode(node);
                 nodeList.add(flowNode);
             }
-           workflow.setNodes(nodeList);
+            workflow.setNodes(nodeList);
         }
 
         List<Map<String, Object>> strategies = (List<Map<String, Object>>) data.get("strategies");
@@ -255,7 +256,7 @@ public class Workflow {
     /**
      * 启动流程
      */
-    public void enable(){
+    public void enable() {
         this.verify();
         this.enable = true;
         this.updateTime();
@@ -265,7 +266,7 @@ public class Workflow {
     /**
      * 禁用流程
      */
-    public void disable(){
+    public void disable() {
         this.enable = false;
         this.updateTime();
     }
@@ -291,7 +292,7 @@ public class Workflow {
             throw FlowValidationException.workflowRequired("createdOperator");
         }
         if (nodes == null || nodes.isEmpty()) {
-            throw FlowValidationException.workflowRequired( "nodes");
+            throw FlowValidationException.workflowRequired("nodes");
         }
     }
 
@@ -317,9 +318,9 @@ public class Workflow {
             }
         }
         if (start != 1 || end != 1) {
-            if(start!=1) {
+            if (start != 1) {
                 throw FlowValidationException.nodeRequired("startNode");
-            }else {
+            } else {
                 throw FlowValidationException.nodeRequired("endNode");
             }
         }
@@ -380,5 +381,17 @@ public class Workflow {
         this.createdTime = System.currentTimeMillis();
         this.createdOperator = createdOperator;
         this.updateTime();
+    }
+
+    public void filterPermissions() {
+        FlowForm meta = this.form;
+
+        for (IFlowNode node : this.nodes) {
+            FormFieldPermissionStrategy formFieldPermissionStrategy = node.strategyManager().getStrategy(FormFieldPermissionStrategy.class);
+            if (formFieldPermissionStrategy != null) {
+                formFieldPermissionStrategy.filterPermissions(meta);
+            }
+        }
+
     }
 }
