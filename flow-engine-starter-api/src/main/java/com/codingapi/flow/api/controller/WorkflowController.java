@@ -87,7 +87,7 @@ public class WorkflowController {
         } else {
             workflow.disable();
         }
-        workflowService.saveWorkflow(workflow);
+        workflowService.saveWorkflow(workflow,false);
         return Response.buildSuccess();
     }
 
@@ -163,9 +163,9 @@ public class WorkflowController {
         if (StringUtils.hasText(versionName)) {
             WorkflowVersion workflowVersion = new WorkflowVersion(workflow);
             workflowVersion.setVersionName(versionName);
-            workflowService.saveWorkflowVersion(workflowVersion, true);
+            workflowService.saveWorkflowVersion(workflowVersion, true,true);
         } else {
-            workflowService.saveWorkflow(workflow);
+            workflowService.saveWorkflow(workflow,true);
         }
         return Response.buildSuccess();
     }

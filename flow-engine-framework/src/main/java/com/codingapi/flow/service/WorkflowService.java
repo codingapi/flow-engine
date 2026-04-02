@@ -31,7 +31,7 @@ public class WorkflowService {
      * @param currentVersion 当前版本
      * @param creatable      是否创建新的版本
      */
-    public void saveWorkflowVersion(WorkflowVersion currentVersion, boolean creatable) {
+    public void saveWorkflowVersion(WorkflowVersion currentVersion, boolean creatable,boolean enable) {
         List<WorkflowVersion> updateList = new ArrayList<>();
 
         currentVersion.enableVersion();
@@ -57,10 +57,14 @@ public class WorkflowService {
 
         workflowVersionRepository.saveAll(updateList);
         Workflow workflow = currentVersion.toWorkflow();
-        try {
-            workflow.enable();
-        }catch (Exception ignore){
-            workflow.disable();
+        workflow.filterPermissions();
+
+        if(enable) {
+            try {
+                workflow.enable();
+            } catch (Exception ignore) {
+                workflow.disable();
+            }
         }
         workflowRepository.save(workflow);
     }
@@ -118,7 +122,9 @@ public class WorkflowService {
             }
         }
         workflowVersionRepository.saveAll(versionList);
-        workflowRepository.save(currentVersion.toWorkflow());
+        Workflow workflow = currentVersion.toWorkflow();
+        workflow.filterPermissions();
+        workflowRepository.save(workflow);
 
     }
 
@@ -148,9 +154,9 @@ public class WorkflowService {
      * 保存流程
      * @param workflow 流程对象
      */
-    public void saveWorkflow(Workflow workflow) {
+    public void saveWorkflow(Workflow workflow,boolean enable) {
         WorkflowVersion workflowVersion = new WorkflowVersion(workflow);
-        this.saveWorkflowVersion(workflowVersion, false);
+        this.saveWorkflowVersion(workflowVersion, false,enable);
     }
 
     /**
@@ -181,7 +187,7 @@ public class WorkflowService {
         String json = Base64Utils.toJson(body);
         Workflow workflow = Workflow.formJson(json);
         workflow.resetWorkflow(createOperator);
-        this.saveWorkflow(workflow);
+        this.saveWorkflow(workflow,false);
         return workflow.getId();
     }
 }

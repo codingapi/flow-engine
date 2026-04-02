@@ -29,4 +29,8 @@ public class FormFieldPermission {
         permission.setType(PermissionType.valueOf((String) map.get("type")));
         return permission;
     }
+
+    public boolean isField(String formCode, String fieldCode) {
+        return this.getFormCode().equalsIgnoreCase(formCode) && this.getFieldCode().equalsIgnoreCase(fieldCode);
+    }
 }

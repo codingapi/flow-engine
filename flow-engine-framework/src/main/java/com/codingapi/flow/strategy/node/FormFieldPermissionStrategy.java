@@ -46,7 +46,7 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
     @Override
     public void verifyNode(FlowForm form) {
         Map<String, DataType> fieldTypes = form.loadAllFieldDataTypeMaps();
-        if(fieldPermissions!=null) {
+        if (fieldPermissions != null) {
             for (FormFieldPermission permission : fieldPermissions) {
                 String key = permission.getFormCode() + "." + permission.getFieldCode();
                 if (!fieldTypes.containsKey(key)) {
@@ -61,9 +61,9 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
         FlowForm flowForm = session.getFormData().getFlowForm();
         Map<String, Object> currentData = session.getCurrentRecord().getFormData();
         Map<String, Object> latestData = session.getFormData().toMapData();
-        if(fieldPermissions!=null) {
+        if (fieldPermissions != null) {
             for (FormFieldPermission permission : fieldPermissions) {
-                FormField formField =  flowForm.getField(permission.getFormCode(),permission.getFieldCode());
+                FormField formField = flowForm.getField(permission.getFormCode(), permission.getFieldCode());
                 // 子表
                 if (flowForm.isSubForm(permission.getFormCode())) {
                     if (permission.getType() == PermissionType.READ) {
@@ -92,7 +92,7 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
                     if (formField.isRequired() && permission.getType() == PermissionType.READ) {
                         Object currentValue = currentData.get(permission.getFieldCode());
                         Object latestValue = latestData.get(permission.getFieldCode());
-                        if (latestValue!=null && currentValue!=null && !currentValue.equals(latestValue)) {
+                        if (latestValue != null && currentValue != null && !currentValue.equals(latestValue)) {
                             throw FlowValidationException.fieldReadOnly(permission.getFieldCode());
                         }
                     }
@@ -125,4 +125,56 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
     }
 
 
+    private FormFieldPermission getFormFieldPermission(String formCode,String fieldCode){
+        if(this.fieldPermissions!=null) {
+            for (FormFieldPermission fieldPermission:this.fieldPermissions){
+                if(fieldPermission.isField(formCode,fieldCode)){
+                    return fieldPermission;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void filterPermissions(FlowForm meta) {
+        Map<String,DataType> fieldMap =  meta.loadAllFieldDataTypeMaps();
+
+        if (this.fieldPermissions == null || this.getFieldPermissions().isEmpty()) {
+            // init fieldPermissions
+            this.fieldPermissions = new ArrayList<>();
+            for (String formField:fieldMap.keySet()){
+                String formCode = formField.split("\\.")[0];
+                String fieldCode = formField.split("\\.")[1];
+
+                FormFieldPermission fieldPermission = new FormFieldPermission();
+                fieldPermission.setFormCode(formCode);
+                fieldPermission.setFieldCode(fieldCode);
+                fieldPermission.setType(PermissionType.WRITE);
+
+                this.fieldPermissions.add(fieldPermission);
+            }
+
+        } else {
+            // filter fieldPermissions
+            System.out.println("filter fieldPermissions meta:" + meta);
+
+            List<FormFieldPermission> fieldPermissions = new ArrayList<>();
+            for (String formField:fieldMap.keySet()){
+                String formCode = formField.split("\\.")[0];
+                String fieldCode = formField.split("\\.")[1];
+
+                FormFieldPermission fieldPermission = this.getFormFieldPermission(formCode,fieldCode);
+                if(fieldPermission==null) {
+                    fieldPermission = new FormFieldPermission();
+                    fieldPermission.setFormCode(formCode);
+                    fieldPermission.setFieldCode(fieldCode);
+                    fieldPermission.setType(PermissionType.WRITE);
+                }
+                fieldPermissions.add(fieldPermission);
+            }
+
+            this.fieldPermissions = fieldPermissions;
+        }
+
+    }
 }
