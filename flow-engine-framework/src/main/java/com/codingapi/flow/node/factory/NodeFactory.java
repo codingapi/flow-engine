@@ -25,11 +25,13 @@ public class NodeFactory {
         nodesClasses.put(ApprovalNode.NODE_TYPE, ApprovalNode.class);
         nodesClasses.put(ConditionNode.NODE_TYPE, ConditionNode.class);
         nodesClasses.put(ConditionBranchNode.NODE_TYPE, ConditionBranchNode.class);
+        nodesClasses.put(ConditionElseBranchNode.NODE_TYPE, ConditionElseBranchNode.class);
         nodesClasses.put(DelayNode.NODE_TYPE, DelayNode.class);
         nodesClasses.put(EndNode.NODE_TYPE, EndNode.class);
         nodesClasses.put(HandleNode.NODE_TYPE, HandleNode.class);
         nodesClasses.put(InclusiveNode.NODE_TYPE, InclusiveNode.class);
         nodesClasses.put(InclusiveBranchNode.NODE_TYPE, InclusiveBranchNode.class);
+        nodesClasses.put(InclusiveElseBranchNode.NODE_TYPE, InclusiveElseBranchNode.class);
         nodesClasses.put(ManualNode.NODE_TYPE, ManualNode.class);
         nodesClasses.put(ManualBranchNode.NODE_TYPE, ManualBranchNode.class);
         nodesClasses.put(NotifyNode.NODE_TYPE, NotifyNode.class);

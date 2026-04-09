@@ -7,30 +7,22 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.helper.ParallelNodeRelationHelper;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.script.node.ConditionScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
-import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 /**
  * 包容分支节点
  */
-public class InclusiveBranchNode extends BaseFlowNode {
+public class InclusiveElseBranchNode extends BaseFlowNode {
 
-    public static final String NODE_TYPE = NodeType.INCLUSIVE_BRANCH.name();
-    public static final String DEFAULT_NAME = "包容分支节点";
+    public static final String NODE_TYPE = NodeType.INCLUSIVE_ELSE_BRANCH.name();
+    public static final String DEFAULT_NAME = "包容else分支节点";
 
-    /**
-     * 条件脚本
-     */
-    @Setter
-    private ConditionScript conditionScript;
 
     @Override
     public String getType() {
@@ -38,13 +30,12 @@ public class InclusiveBranchNode extends BaseFlowNode {
     }
 
 
-    public InclusiveBranchNode(String id, String name, int order) {
+    public InclusiveElseBranchNode(String id, String name, int order) {
         super(id, name, order);
-        conditionScript = ConditionScript.defaultScript();
     }
 
-    public InclusiveBranchNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, 0);
+    public InclusiveElseBranchNode() {
+        this(RandomUtils.generateStringId(), DEFAULT_NAME, 100);
     }
 
     /**
@@ -52,21 +43,7 @@ public class InclusiveBranchNode extends BaseFlowNode {
      */
     @Override
     public boolean handle(FlowSession request) {
-        return conditionScript.execute(request);
-    }
-
-
-    @Override
-    public Map<String, Object> toMap() {
-        Map<String, Object> map = super.toMap();
-        map.put("script", conditionScript.getScript());
-        return map;
-    }
-
-    public static InclusiveBranchNode formMap(Map<String, Object> map) {
-        InclusiveBranchNode branchNode = BaseFlowNode.fromMap(map, InclusiveBranchNode.class);
-        branchNode.conditionScript = new ConditionScript((String) map.get("script"));
-        return branchNode;
+        return true;
     }
 
 
@@ -116,19 +93,20 @@ public class InclusiveBranchNode extends BaseFlowNode {
         return nodes;
     }
 
+    public static InclusiveElseBranchNode formMap(Map<String, Object> map) {
+        return BaseFlowNode.fromMap(map, InclusiveElseBranchNode.class);
+    }
+
+
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends BaseNodeBuilder<Builder, InclusiveBranchNode> {
+    public static class Builder extends BaseNodeBuilder<Builder, InclusiveElseBranchNode> {
 
         public Builder() {
-            super(new InclusiveBranchNode());
+            super(new InclusiveElseBranchNode());
         }
 
-        public Builder conditionScript(String script) {
-            node.conditionScript = new ConditionScript(script);
-            return this;
-        }
     }
 }

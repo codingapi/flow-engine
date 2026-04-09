@@ -43,6 +43,7 @@ public class InclusiveNode extends BaseFlowNode implements IBlockNode {
             branchNode.setOrder(i+1);
             branches.add(branchNode);
         }
+        branches.add(new InclusiveElseBranchNode());
         this.setBlocks(branches);
     }
 
