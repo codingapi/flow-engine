@@ -29,7 +29,9 @@ public class FlowNodeState {
         this.blockNodeTypes.add(NodeType.MANUAL.name());
 
         this.branchNodeTypes.add(NodeType.CONDITION_BRANCH.name());
+        this.branchNodeTypes.add(NodeType.CONDITION_ELSE_BRANCH.name());
         this.branchNodeTypes.add(NodeType.INCLUSIVE_BRANCH.name());
+        this.branchNodeTypes.add(NodeType.INCLUSIVE_ELSE_BRANCH.name());
         this.branchNodeTypes.add(NodeType.PARALLEL_BRANCH.name());
         this.branchNodeTypes.add(NodeType.MANUAL_BRANCH.name());
     }

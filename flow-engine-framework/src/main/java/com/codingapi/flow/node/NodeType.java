@@ -10,6 +10,8 @@ public enum NodeType {
     CONDITION,
     // 分支节点
     CONDITION_BRANCH,
+    // 分支else节点
+    CONDITION_ELSE_BRANCH,
     // 延迟节点
     DELAY,
     // 结束
@@ -20,6 +22,8 @@ public enum NodeType {
     INCLUSIVE,
     // 包容分支
     INCLUSIVE_BRANCH,
+    // 包容else分支
+    INCLUSIVE_ELSE_BRANCH,
     // 人工控制
     MANUAL,
     // 人工分支

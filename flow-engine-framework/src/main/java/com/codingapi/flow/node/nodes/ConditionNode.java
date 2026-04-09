@@ -40,6 +40,7 @@ public class ConditionNode extends BaseFlowNode implements IBlockNode {
             branchNode.setOrder(i+1);
             branches.add(branchNode);
         }
+        branches.add(new ConditionElseBranchNode());
         this.setBlocks(branches);
     }
 

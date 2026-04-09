@@ -149,7 +149,13 @@ public class WorkflowService {
         workflowVersionRepository.delete(workId);
         workflowRepository.delete(workId);
     }
-
+    /**
+     * 保存流程
+     * @param workflow 流程对象
+     */
+    public void saveWorkflow(Workflow workflow) {
+        this.saveWorkflow(workflow,true);
+    }
     /**
      * 保存流程
      * @param workflow 流程对象
