@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 审批意见
@@ -43,6 +44,12 @@ public class FlowAdvice {
      * 转办人员
      */
     private List<IFlowOperator> forwardOperators;
+
+    /**
+     * 操作人手动选择映射（节点ID -> 操作人ID列表）
+     * 用于 INITIATOR_SELECT / APPROVER_SELECT 模式
+     */
+    private Map<String, List<Long>> operatorSelectMap;
 
 
     public FlowAdvice(String advice) {

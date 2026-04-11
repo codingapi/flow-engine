@@ -11,11 +11,14 @@ import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.ManualNode;
+import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.pojo.response.NodeOption;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
+import com.codingapi.flow.strategy.node.OperatorSelectType;
 import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.springboot.framework.event.EventPusher;
 
@@ -89,6 +92,35 @@ public class PassAction extends BaseAction {
             }
         }
 
+        // 检查操作人选择：若存在需要手动设定操作人的节点且尚未设定，则提示用户
+        Map<String, List<Long>> operatorSelectMap = flowSession.getAdvice().getOperatorSelectMap();
+        List<NodeOption> operatorSelectNodes = new ArrayList<>();
+
+        if (currentNode.getType().equalsIgnoreCase(StartNode.NODE_TYPE)) {
+            // 发起人设定模式：开始节点提交时，扫描整个工作流中所有 INITIATOR_SELECT 节点
+            for (IFlowNode node : flowSession.getWorkflow().getNodes()) {
+                OperatorSelectType selectType = node.strategyManager().getOperatorSelectType();
+                if (selectType == OperatorSelectType.INITIATOR_SELECT) {
+                    if (operatorSelectMap == null || !operatorSelectMap.containsKey(node.getId())
+                            || operatorSelectMap.get(node.getId()).isEmpty()) {
+                        operatorSelectNodes.add(new NodeOption(node));
+                    }
+                }
+            }
+        } else {
+            // 审批人设定模式：审批节点提交时，检查下游节点是否有 APPROVER_SELECT
+            if (nextNodes != null) {
+                for (IFlowNode nextNode : nextNodes) {
+                    collectApproverSelectNodes(nextNode, operatorSelectMap, operatorSelectNodes);
+                }
+            }
+        }
+
+        if (!operatorSelectNodes.isEmpty()) {
+            ActionResponseContext.getInstance().set(ActionResponse.ResponseType.OPERATOR_SELECT, operatorSelectNodes);
+            return;
+        }
+
         boolean isFinish = currentNode.isFinish(flowSession);
         currentRecord.update(flowSession, true);
         // 添加流程结束事件
@@ -149,5 +181,25 @@ public class PassAction extends BaseAction {
         repositoryHolder.saveRecords(recordList);
 
         flowEvents.forEach(EventPusher::push);
+    }
+
+    /**
+     * 收集需要审批人设定的下游节点
+     * 若下游节点本身是控制节点（如条件节点），则递归检查其子节点
+     */
+    private void collectApproverSelectNodes(IFlowNode node, Map<String, List<Long>> operatorSelectMap, List<NodeOption> result) {
+        OperatorSelectType selectType = node.strategyManager().getOperatorSelectType();
+        if (selectType == OperatorSelectType.APPROVER_SELECT) {
+            if (operatorSelectMap == null || !operatorSelectMap.containsKey(node.getId())
+                    || operatorSelectMap.get(node.getId()).isEmpty()) {
+                result.add(new NodeOption(node));
+            }
+        }
+        // 若节点包含子块（如条件分支），递归检查其子节点
+        if (node.blocks() != null) {
+            for (IFlowNode block : node.blocks()) {
+                collectApproverSelectNodes(block, operatorSelectMap, result);
+            }
+        }
     }
 }

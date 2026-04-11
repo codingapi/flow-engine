@@ -185,4 +185,22 @@ public interface IRepositoryHolder {
      * @return 延迟任务列表
      */
     List<DelayTask> findDelayTasks();
+
+    /**
+     * 保存节点操作人手动分配信息
+     *
+     * @param processId   流程实例唯一标识
+     * @param nodeId      节点 ID
+     * @param operatorIds 操作人 ID 列表
+     */
+    void saveOperatorAssignment(String processId, String nodeId, List<Long> operatorIds);
+
+    /**
+     * 查询节点已分配的操作人 ID 列表
+     *
+     * @param processId 流程实例唯一标识
+     * @param nodeId    节点 ID
+     * @return 操作人 ID 列表（未分配时返回空列表）
+     */
+    List<Long> findAssignedOperatorIds(String processId, String nodeId);
 }

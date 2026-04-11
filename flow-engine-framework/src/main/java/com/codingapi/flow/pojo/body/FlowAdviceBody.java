@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流程审批意见
@@ -48,6 +49,11 @@ public class FlowAdviceBody {
      */
     private List<Long> forwardOperatorIds;
 
+    /**
+     * 操作人手动选择映射（节点ID -> 操作人ID列表）
+     */
+    private Map<String, List<Long>> operatorSelectMap;
+
 
     public FlowAdviceBody(String actionId, String advice, long operatorId) {
         this.actionId = actionId;
@@ -64,6 +70,7 @@ public class FlowAdviceBody {
         this.backNodeId = flowSession.getAdvice().getBackNode() != null ? flowSession.getAdvice().getBackNode().getId() : null;
         this.manualNodeId = flowSession.getAdvice().getManualNode() != null ? flowSession.getAdvice().getManualNode().getId() : null;
         this.forwardOperatorIds = flowSession.getAdvice().getForwardOperators() != null ? flowSession.getAdvice().getForwardOperators().stream().map(IFlowOperator::getUserId).toList() : null;
+        this.operatorSelectMap = flowSession.getAdvice().getOperatorSelectMap();
     }
 
 

@@ -85,6 +85,15 @@ public class FlowActionService {
         formData.reset(request.getFormData());
         FlowAdvice flowAdvice = request.toFlowAdvice(workflow, flowAction);
 
+        // 持久化 APPROVER_SELECT 节点的操作人分配
+        if (flowAdvice.getOperatorSelectMap() != null
+                && !flowAdvice.getOperatorSelectMap().isEmpty()) {
+            String processId = flowRecord.getProcessId();
+            flowAdvice.getOperatorSelectMap().forEach((nodeId, operatorIds) ->
+                    repositoryHolder.saveOperatorAssignment(processId, nodeId, operatorIds)
+            );
+        }
+
         FlowSession session = flowRecord.createFlowSession(this.repositoryHolder,workflow,currentOperator,createdOperator,submitOperator,formData,flowAdvice);
         // 验证会话
         currentNode.verifySession(session);

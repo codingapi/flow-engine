@@ -7,6 +7,7 @@ import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.*;
+import java.util.Collections;
 import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.FlowService;
 import com.codingapi.flow.service.WorkflowService;
@@ -41,6 +42,8 @@ public class RepositoryHolderContext implements IRepositoryHolder {
     private DelayTaskRepository delayTaskRepository;
     @Getter
     private UrgeIntervalRepository urgeIntervalRepository;
+    @Getter
+    private FlowOperatorAssignmentRepository flowOperatorAssignmentRepository;
 
     /**
      * 是否已经注册成功
@@ -51,7 +54,8 @@ public class RepositoryHolderContext implements IRepositoryHolder {
                 && workflowService != null
                 && flowRecordService != null
                 && flowOperatorGateway != null
-                && urgeIntervalRepository != null;
+                && urgeIntervalRepository != null
+                && flowOperatorAssignmentRepository != null;
     }
 
 
@@ -66,13 +70,15 @@ public class RepositoryHolderContext implements IRepositoryHolder {
                          FlowOperatorGateway flowOperatorGateway,
                          ParallelBranchRepository parallelBranchRepository,
                          DelayTaskRepository delayTaskRepository,
-                         UrgeIntervalRepository urgeIntervalRepository) {
+                         UrgeIntervalRepository urgeIntervalRepository,
+                         FlowOperatorAssignmentRepository flowOperatorAssignmentRepository) {
         this.workflowService = workflowService;
         this.flowRecordService = flowRecordService;
         this.flowOperatorGateway = flowOperatorGateway;
         this.parallelBranchRepository = parallelBranchRepository;
         this.delayTaskRepository = delayTaskRepository;
         this.urgeIntervalRepository = urgeIntervalRepository;
+        this.flowOperatorAssignmentRepository = flowOperatorAssignmentRepository;
     }
 
 
@@ -177,5 +183,15 @@ public class RepositoryHolderContext implements IRepositoryHolder {
     @Override
     public UrgeInterval getLatestUrgeInterval(String processId, long recordId) {
         return urgeIntervalRepository.getLatest(processId, recordId);
+    }
+
+    @Override
+    public void saveOperatorAssignment(String processId, String nodeId, List<Long> operatorIds) {
+        flowOperatorAssignmentRepository.save(processId, nodeId, operatorIds);
+    }
+
+    @Override
+    public List<Long> findAssignedOperatorIds(String processId, String nodeId) {
+        return flowOperatorAssignmentRepository.findOperatorIds(processId, nodeId);
     }
 }

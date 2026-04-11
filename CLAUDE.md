@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-Flow Engine 是一个企业级工作流引擎，基于 Java 17 和 Spring Boot 3.5.9 构建。提供可视化流程设计、动态表单配置、多节点类型流转以及脚本扩展功能。项目采用前后端分离架构，支持 PC 端和移动端客户端。
+Flow Engine 是一个企业级工作流引擎，基于 Java 17 和 Spring Boot 3.5.9 构建（当前版本 0.0.12）。提供可视化流程设计、动态表单配置、多节点类型流转以及脚本扩展功能。项目采用前后端分离架构，支持 PC 端和移动端客户端。前端代码位于独立 Git 仓库 `flow-frontend`（git submodule）。
 
 ## 常用命令
 
@@ -39,16 +39,25 @@ pnpm run build
 # 构建 PC 端所有组件库
 pnpm run build:flow-pc
 
+# 构建移动端所有组件库
+pnpm run build:flow-mobile
+
 # 构建特定包
-pnpm run build:flow-core          # 核心 API 库
-pnpm run build:flow-types         # 类型定义库
-pnpm run build:flow-pc-ui        # 基础 UI 组件库
-pnpm run build:flow-pc-form      # 表单组件库
-pnpm run build:flow-pc-design    # 设计器组件库
-pnpm run build:flow-pc-approval  # 审批组件库
+pnpm run build:flow-core              # 核心框架库
+pnpm run build:flow-types             # 类型定义库
+pnpm run build:flow-icons             # 图标库
+pnpm run build:flow-approval-presenter # 审批展示器框架
+pnpm run build:flow-design            # 流程设计器组件库
+pnpm run build:flow-pc-ui             # PC 端基础 UI 组件库
+pnpm run build:flow-pc-form           # PC 端表单组件库
+pnpm run build:flow-pc-approval       # PC 端审批组件库
+pnpm run build:flow-mobile-ui         # 移动端基础 UI 组件库
+pnpm run build:flow-mobile-form       # 移动端表单组件库
+pnpm run build:flow-mobile-approval   # 移动端审批组件库
 
 # 构建特定应用
 pnpm run build:app-pc
+pnpm run build:app-mobile
 
 # 开发模式
 pnpm run dev:app-pc     # PC 端应用
@@ -60,7 +69,7 @@ pnpm run dev:app-mobile # 移动端应用
 ### 后端分层架构（8 层架构）
 
 1. **工作流层** - 流程定义
-2. **节点层** - 15 种节点类型（StartNode、EndNode、ApprovalNode、HandleNode、NotifyNode、RouterNode、SubProcessNode、DelayNode、TriggerNode、ConditionNode、ParallelNode、InclusiveNode 及其分支变体）
+2. **节点层** - 19 种节点类型（StartNode、EndNode、ApprovalNode、HandleNode、NotifyNode、ManualNode、RouterNode、SubProcessNode、DelayNode、TriggerNode、ConditionNode、ParallelNode、InclusiveNode 及其分支变体，含 Else 分支节点）
 3. **动作层** - 8 种动作类型（Pass、Reject、Save、AddAudit、Delegate、Return、Transfer、Custom）
 4. **记录层** - 流程实例记录
 5. **会话层** - 会话管理
@@ -83,46 +92,69 @@ pnpm run dev:app-mobile # 移动端应用
 
 | 模块 | 描述 |
 |--------|-------------|
-| `flow-engine-framework` | 核心工作流引擎框架 |
-| `flow-engine-starter` | Spring Boot 启动器 |
-| `flow-engine-starter-api` | API 层 |
-| `flow-engine-starter-infra` | 基础设施层 |
-| `flow-engine-starter-query` | 查询层 |
-| `flow-engine-example` | 示例应用 |
+| `flow-engine-framework` | 核心工作流引擎框架（节点/动作/策略/脚本/服务） |
+| `flow-engine-starter` | Spring Boot 自动配置入口 |
+| `flow-engine-starter-api` | REST API 层（FlowRecordController、WorkflowController） |
+| `flow-engine-starter-infra` | 持久化层（JPA 实体、8 个仓储实现、达梦方言） |
+| `flow-engine-starter-query` | 查询层（FlowRecordQueryController、WorkflowQueryController） |
+| `flow-engine-example` | 示例应用（H2/达梦、JWT 认证、端口 8090） |
 
-#### 前端模块
+#### 前端模块（位于 flow-frontend 仓库）
+
+**核心模块**：
 
 | 模块 | 描述 | 依赖 |
 |--------|-------------|------|
 | `flow-core` | 核心框架库（HTTP、Hooks、Presenter 等），不包含 UI 组件 | 无 |
 | `flow-types` | TypeScript 类型定义（流程实例、表单、审批等业务类型） | flow-core |
+| `flow-icons` | 图标库 | flow-core |
+| `flow-approval-presenter` | 审批展示器框架（基于 Redux 的状态管理） | flow-core, flow-types |
+| `flow-design` | 流程设计器组件库（节点配置、属性面板、脚本配置等） | flow-core, flow-types, flow-icons, flow-pc-ui |
+
+**PC 端模块**：
+
+| 模块 | 描述 | 依赖 |
+|--------|-------------|------|
 | `flow-pc-ui` | PC 端基础 UI 组件库（按钮、输入框等原子组件） | flow-core |
-| `flow-pc-form` | PC 端表单相关组件（表单设计器、表单渲染等） | flow-core, flow-types |
-| `flow-pc-design` | PC 端流程设计器组件（节点配置、属性面板等） | flow-core, flow-types, flow-pc-ui |
-| `flow-pc-approval` | PC 端审批页面（待办/已办/审批处理等） | flow-pc-design, flow-pc-ui |
+| `flow-pc-form` | PC 端表单组件库（表单设计器、表单渲染等） | flow-core, flow-types |
+| `flow-pc-approval` | PC 端审批组件库（待办/已办/审批处理等） | flow-core, flow-types, flow-icons, flow-approval-presenter, flow-pc-ui, flow-pc-form |
+
+**移动端模块**：
+
+| 模块 | 描述 | 依赖 |
+|--------|-------------|------|
+| `flow-mobile-ui` | 移动端基础 UI 组件库 | flow-core |
+| `flow-mobile-form` | 移动端表单组件库 | flow-core, flow-types |
+| `flow-mobile-approval` | 移动端审批组件库 | flow-core, flow-types, flow-icons, flow-approval-presenter, flow-mobile-ui, flow-mobile-form |
 
 **前端模块依赖关系**：
 
 ```
-flow-core (无UI)
+flow-core (无UI，基础框架)
     ↑       ↑
-    │       └── flow-pc-ui (基础UI)
+    │       └── flow-icons (图标库)
+    │       └── flow-approval-presenter (审批展示器框架)
     │
 flow-types (类型定义)
     ↑       ↑
     │       └── flow-pc-form
     │               ↑
-    └───────→ flow-pc-design ──→ flow-pc-approval
+    └───────→ flow-pc-ui ──→ flow-pc-approval
+                        ↑
+                    flow-design ──→ app-pc
+
+flow-mobile-ui ──→ flow-mobile-form ──→ flow-mobile-approval ──→ app-mobile
 ```
 
 **模块划分原则**：
 
 - **flow-core**：全局框架依赖，只包含与 UI 无关的基础能力（HTTP、状态管理、工具函数等）
-- **flow-types**：全局类型定义，包含流程审批相关的业务类型（手机端和 PC 端共用）
-- **flow-pc-ui**：PC 端基础 UI 组件库，提供原子化组件，依赖 flow-core
-- **flow-pc-form**：表单相关功能，依赖 flow-core + flow-types
-- **flow-pc-design**：流程设计器功能，包含节点配置、属性面板、脚本配置等
-- **flow-pc-approval**：审批页面功能，依赖 flow-pc-design
+- **flow-types**：全局类型定义，包含流程审批相关的业务类型（移动端和 PC 端共用）
+- **flow-icons**：图标库，提供统一的图标组件
+- **flow-approval-presenter**：审批展示器框架，基于 Redux 的状态管理
+- **flow-design**：流程设计器功能，包含节点配置、属性面板、脚本配置等
+- **flow-pc-***：PC 端专用组件库，依赖 Ant Design
+- **flow-mobile-***：移动端专用组件库，依赖 Ant Design Mobile
 
 #### 前端应用
 
@@ -133,12 +165,12 @@ flow-types (类型定义)
 
 ### 技术栈
 
-- **后端**：Java 17、Spring Boot 3.5.9、Groovy
-- **前端**：React 18、TypeScript、pnpm、Rsbuild、Rslib、Antd
+- **后端**：Java 17、Spring Boot 3.5.9、Spring Data JPA、Groovy、JJWT、Fastjson 2、Apache Commons、H2/达梦数据库
+- **前端**：React 18、TypeScript、pnpm、Rsbuild/Rslib、Ant Design（PC）、Ant Design Mobile（移动端）、Redux Toolkit、Flowgram、CodeMirror
 
 ## 关键包
 
-- `com.codingapi.flow.node` - 节点实现（15 种类型）
+- `com.codingapi.flow.node` - 节点实现（19 种类型）
 - `com.codingapi.flow.action` - 动作实现（8 种类型）
 - `com.codingapi.flow.strategy` - 策略接口和实现
 - `com.codingapi.flow.repository` - 数据访问层

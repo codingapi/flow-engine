@@ -16,7 +16,7 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import lombok.Getter;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * 模拟仓库持有者对象
@@ -36,6 +36,7 @@ public class MockRepositoryHolder implements IRepositoryHolder {
     private final FlowRecordService flowRecordService;
     private final WorkflowService workflowService;
     private final FlowOperatorGateway flowOperatorGateway;
+    private final Map<String, List<Long>> operatorAssignmentCache = new HashMap<>();
 
     public MockRepositoryHolder(FlowOperatorGateway flowOperatorGateway,
                                 WorkflowRepository workflowRepository) {
@@ -161,5 +162,15 @@ public class MockRepositoryHolder implements IRepositoryHolder {
     @Override
     public List<DelayTask> findDelayTasks() {
         return this.delayTaskRepository.findAll();
+    }
+
+    @Override
+    public void saveOperatorAssignment(String processId, String nodeId, List<Long> operatorIds) {
+        operatorAssignmentCache.put(processId + ":" + nodeId, new ArrayList<>(operatorIds));
+    }
+
+    @Override
+    public List<Long> findAssignedOperatorIds(String processId, String nodeId) {
+        return operatorAssignmentCache.getOrDefault(processId + ":" + nodeId, Collections.emptyList());
     }
 }

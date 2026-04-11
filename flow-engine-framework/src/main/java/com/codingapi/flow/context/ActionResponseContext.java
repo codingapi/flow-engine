@@ -27,6 +27,10 @@ public class ActionResponseContext {
         this.threadLocal.set(new ActionResponse(options));
     }
 
+    public void set(ActionResponse.ResponseType responseType, List<NodeOption> options) {
+        this.threadLocal.set(new ActionResponse(responseType, options));
+    }
+
     public ActionResponse get() {
         return threadLocal.get();
     }

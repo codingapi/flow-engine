@@ -4,6 +4,7 @@ import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,12 +37,20 @@ public class FlowCreateRequest {
      */
     private long parentRecordId;
 
+    /**
+     * 发起人手动设定的操作人映射（节点ID -> 操作人ID列表）
+     * 用于 INITIATOR_SELECT 模式的节点
+     */
+    private Map<String, List<Long>> operatorSelectMap;
+
 
     public FlowActionRequest toActionRequest(long recordId) {
         FlowActionRequest flowActionRequest = new FlowActionRequest();
         flowActionRequest.setFormData(this.getFormData());
         flowActionRequest.setRecordId(recordId);
-        flowActionRequest.setAdvice(new FlowAdviceBody(this.getActionId(), null, this.getOperatorId()));
+        FlowAdviceBody adviceBody = new FlowAdviceBody(this.getActionId(), null, this.getOperatorId());
+        adviceBody.setOperatorSelectMap(this.getOperatorSelectMap());
+        flowActionRequest.setAdvice(adviceBody);
         flowActionRequest.verify();
         return flowActionRequest;
     }
