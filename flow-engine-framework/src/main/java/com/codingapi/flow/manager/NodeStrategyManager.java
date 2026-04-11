@@ -158,6 +158,20 @@ public class NodeStrategyManager {
         return null;
     }
 
+    /**
+     * 获取操作人选择类型
+     *
+     * @return 操作人选择类型，若未配置则返回 null
+     */
+    public OperatorSelectType getOperatorSelectType() {
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof OperatorLoadStrategy) {
+                return ((OperatorLoadStrategy) strategy).getSelectType();
+            }
+        }
+        return null;
+    }
+
     public OperatorManager loadOperators(FlowSession session) {
         List<INodeStrategy> strategies = this.strategies;
         for (INodeStrategy strategy : strategies) {

@@ -21,6 +21,7 @@ public class MyFlowServiceFactory {
     public ParallelBranchRepository parallelBranchRepository;
     public DelayTaskRepository delayTaskRepository;
     public UrgeIntervalRepository urgeIntervalRepository;
+    public FlowOperatorAssignmentRepository flowOperatorAssignmentRepository;
     public WorkflowService workflowService;
     public FlowRecordService flowRecordService;
     public FlowService flowService;
@@ -37,10 +38,11 @@ public class MyFlowServiceFactory {
         parallelBranchRepository = new ParallelBranchRepositoryImpl();
         delayTaskRepository = new DelayTaskRepositoryImpl();
         urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
+        flowOperatorAssignmentRepository = new FlowOperatorAssignmentRepositoryImpl();
         workflowService = new WorkflowService(workflowVersionRepository, workflowRepository, workflowRuntimeRepository);
         flowRecordService = new FlowRecordService(flowTodoRecordRepository, flowTodoMergeRepository, flowRecordRepository);
 
-        RepositoryHolderContext.getInstance().register(workflowService, flowRecordService, userGateway, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository);
+        RepositoryHolderContext.getInstance().register(workflowService, flowRecordService, userGateway, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository, flowOperatorAssignmentRepository);
         repositoryHolder = RepositoryHolderContext.getInstance();
         this.flowService = new FlowService(this.repositoryHolder);
 

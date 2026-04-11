@@ -44,6 +44,7 @@ public class AutoConfiguration {
             ParallelBranchRepository parallelBranchRepository,
             DelayTaskRepository delayTaskRepository,
             UrgeIntervalRepository urgeIntervalRepository,
+            FlowOperatorAssignmentRepository flowOperatorAssignmentRepository,
             GatewayContextRegister gatewayContextRegister
     ) {
         return new RepositoryHolderContextRegister(
@@ -53,6 +54,7 @@ public class AutoConfiguration {
                 parallelBranchRepository,
                 delayTaskRepository,
                 urgeIntervalRepository,
+                flowOperatorAssignmentRepository,
                 gatewayContextRegister
         );
     }

@@ -58,4 +58,9 @@ public class AutoConfiguration {
         return new FlowTodoMergeRepositoryImpl(flowTodoMargeEntityRepository);
     }
 
+    @Bean
+    public FlowOperatorAssignmentRepository flowOperatorAssignmentRepository(FlowOperatorAssignmentEntityRepository flowOperatorAssignmentEntityRepository){
+        return new FlowOperatorAssignmentRepositoryImpl(flowOperatorAssignmentEntityRepository);
+    }
+
 }

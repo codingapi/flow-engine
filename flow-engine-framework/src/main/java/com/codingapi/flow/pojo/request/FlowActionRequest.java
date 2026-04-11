@@ -54,6 +54,9 @@ public class FlowActionRequest {
             flowAdvice.setManualNode(workflow.getFlowNode(advice.getManualNodeId()));
         }
 
+        // 传递操作人手动选择映射
+        flowAdvice.setOperatorSelectMap(advice.getOperatorSelectMap());
+
         return flowAdvice;
     }
 
