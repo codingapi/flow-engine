@@ -39,6 +39,11 @@ public class WorkflowBuilder {
         return this;
     }
 
+    public WorkflowBuilder description(String description) {
+        workflow.setDescription(description);
+        return this;
+    }
+
     public WorkflowBuilder title(String title) {
         workflow.setTitle(title);
         return this;

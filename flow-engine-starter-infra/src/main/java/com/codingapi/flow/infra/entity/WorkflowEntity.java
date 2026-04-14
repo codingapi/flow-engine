@@ -26,6 +26,11 @@ public class WorkflowEntity {
     private String title;
 
     /**
+     * 流程描述
+     */
+    private String description;
+
+    /**
      * 创建者
      */
     private Long createdOperator;
