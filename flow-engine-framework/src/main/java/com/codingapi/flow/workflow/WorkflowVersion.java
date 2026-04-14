@@ -50,6 +50,12 @@ public class WorkflowVersion {
     private String title;
 
     /**
+     * 流程描述
+     */
+    private String description;
+
+
+    /**
      * 创建者
      */
     private IFlowOperator createdOperator;
@@ -108,6 +114,7 @@ public class WorkflowVersion {
         this.workId = workflow.getId();
         this.code = workflow.getCode();
         this.title = workflow.getTitle();
+        this.description = workflow.getDescription();
         this.createdOperator = workflow.getCreatedOperator();
         this.createdTime = workflow.getCreatedTime();
         this.updatedTime = workflow.getUpdatedTime();
@@ -124,6 +131,7 @@ public class WorkflowVersion {
         return new Workflow(this.workId,
                 this.code,
                 this.title,
+                this.description,
                 this.createdOperator,
                 this.createdTime,
                 this.updatedTime,

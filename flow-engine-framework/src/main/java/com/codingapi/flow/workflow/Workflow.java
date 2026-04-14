@@ -49,6 +49,11 @@ public class Workflow {
     private String title;
 
     /**
+     * 流程描述
+     */
+    private String description;
+
+    /**
      * 创建者
      */
     private IFlowOperator createdOperator;
@@ -137,6 +142,10 @@ public class Workflow {
         this.title = title;
     }
 
+    protected void setDescription(String description) {
+        this.description = description;
+    }
+
     protected void setCreatedOperator(IFlowOperator createdOperator) {
         this.createdOperator = createdOperator;
     }
@@ -176,6 +185,7 @@ public class Workflow {
         map.put("id", id);
         map.put("code", code);
         map.put("title", title);
+        map.put("description", description);
         if (createdOperator != null) {
             map.put("createdOperator", String.valueOf(createdOperator.getUserId()));
         }
@@ -199,6 +209,7 @@ public class Workflow {
         Workflow workflow = new Workflow();
         workflow.setId((String) data.get("id"));
         workflow.setCode((String) data.get("code"));
+        workflow.setDescription((String) data.get("description"));
         workflow.setTitle((String) data.get("title"));
         workflow.setCreatedTime(Long.parseLong((String) data.get("createdTime")));
         workflow.setUpdatedTime(Long.parseLong((String) data.get("updatedTime")));

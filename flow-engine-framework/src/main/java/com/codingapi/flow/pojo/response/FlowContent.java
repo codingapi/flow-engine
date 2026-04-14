@@ -43,6 +43,16 @@ public class FlowContent {
     private String workTitle;
 
     /**
+     * 流程设计备注
+     */
+    private String workDescription;
+
+    /**
+     * 流程创建时间
+     */
+    private long createTime;
+
+    /**
      * 流程编码
      */
     private String workCode;
@@ -192,6 +202,8 @@ public class FlowContent {
         this.form = workflow.getForm();
         this.workCode = workflow.getCode();
         this.workId = workflow.getId();
+        this.workTitle = workflow.getTitle();
+        this.workDescription = workflow.getDescription();
         this.nodes = workflow.getNodes().stream().map(NodeOption::new).toList();
     }
 
@@ -203,7 +215,7 @@ public class FlowContent {
         this.flowState = record.getFlowState();
         this.recordState = record.getRecordState();
         this.title = record.getTitle();
-        this.workTitle = record.getWorkTitle();
+        this.createTime = record.getCreateTime();
 
         this.todos = new ArrayList<>();
         for (FlowRecord item : mergeRecords) {

@@ -24,6 +24,7 @@ public class WorkflowVersionConvertor {
         }
         entity.setCode(workflowVersion.getCode());
         entity.setTitle(workflowVersion.getTitle());
+        entity.setDescription(workflowVersion.getDescription());
         entity.setCurrent(workflowVersion.isCurrent());
         entity.setVersionName(workflowVersion.getVersionName());
         entity.setWorkId(workflowVersion.getWorkId());
@@ -50,6 +51,7 @@ public class WorkflowVersionConvertor {
                 entity.getWorkId(),
                 entity.getCode(),
                 entity.getTitle(),
+                entity.getDescription(),
                 flowOperatorConvertor.convertToEntityAttribute(entity.getCreatedOperator()),
                 entity.getCreatedTime(),
                 entity.getUpdatedTime(),
