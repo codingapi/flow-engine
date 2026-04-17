@@ -74,14 +74,14 @@ public class FlowForm {
                 fieldMeta.setPlaceholder((String) field.get("placeholder"));
                 fieldMeta.setTooltip((String) field.get("tooltip"));
                 fieldMeta.setHelp((String) field.get("help"));
-                List<Map<String, Object>> attributes = (List<Map<String, Object>>)field.get("attributes");
-                if(attributes!=null) {
+                List<Map<String, Object>> attributes = (List<Map<String, Object>>) field.get("attributes");
+                if (attributes != null) {
                     List<FieldAttribute> attributeList = new ArrayList<>();
-                    for (Map<String, Object> attribute : attributes){
+                    for (Map<String, Object> attribute : attributes) {
                         FieldAttribute fieldAttribute = new FieldAttribute();
                         fieldAttribute.setKey((String) attribute.get("key"));
                         fieldAttribute.setLabel((String) attribute.get("label"));
-                        fieldAttribute.setValue((String) attribute.get("value"));
+                        fieldAttribute.setValue(attribute.get("value"));
                         attributeList.add(fieldAttribute);
                     }
                     fieldMeta.setAttributes(attributeList);
@@ -124,15 +124,16 @@ public class FlowForm {
 
     /**
      * 获取表单字段
-     * @param formCode 表单code
+     *
+     * @param formCode  表单code
      * @param fieldCode 字段code
      */
-    public FormField getField(String formCode,String fieldCode){
-        if(this.code.equals(formCode)){
+    public FormField getField(String formCode, String fieldCode) {
+        if (this.code.equals(formCode)) {
             return this.getField(fieldCode);
-        }else {
-            for (FlowForm subForm:subForms){
-                if(subForm.getCode().equals(formCode)){
+        } else {
+            for (FlowForm subForm : subForms) {
+                if (subForm.getCode().equals(formCode)) {
                     return subForm.getField(fieldCode);
                 }
             }
@@ -156,9 +157,9 @@ public class FlowForm {
     public Map<String, DataType> loadAllFieldDataTypeMaps() {
         Map<String, DataType> types = new HashMap<>();
         List<FlowForm> forms;
-        if(this.subForms==null || this.subForms.isEmpty()){
+        if (this.subForms == null || this.subForms.isEmpty()) {
             forms = new ArrayList<>();
-        }else {
+        } else {
             forms = new ArrayList<>(this.getSubForms());
         }
         forms.add(this);
