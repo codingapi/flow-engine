@@ -12,5 +12,5 @@ public class FieldAttribute {
     // 属性名称
     private String label;
     // 属性值
-    private String value;
+    private Object value;
 }
