@@ -1,6 +1,7 @@
 package com.codingapi.flow.user;
 
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.session.FlowSession;
 
 public class User implements IFlowOperator {
 
@@ -44,7 +45,7 @@ public class User implements IFlowOperator {
     }
 
     @Override
-    public IFlowOperator forwardOperator() {
+    public IFlowOperator forwardOperator(FlowSession flowSession) {
         return forwardOperator;
     }
 

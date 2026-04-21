@@ -1,6 +1,6 @@
 package com.codingapi.flow.script.action;
 
-import com.codingapi.flow.script.ScriptDefaultConstants;
+import com.codingapi.flow.script.registry.ScriptRegistry;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class CustomScript {
      * 默认节点脚本
      */
     public static CustomScript defaultScript() {
-        return new CustomScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_CUSTOM);
+        return new CustomScript(ScriptRegistry.getInstance().getActionCustomScript());
     }
 
 }

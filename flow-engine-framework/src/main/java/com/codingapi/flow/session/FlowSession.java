@@ -135,8 +135,10 @@ public class FlowSession {
      * @return 转交之后的审批人
      */
     public IFlowOperator loadFinalForwardOperator(IFlowOperator currentOperator) {
-        if (currentOperator.forwardOperator() != null) {
-            return this.loadFinalForwardOperator(currentOperator.forwardOperator());
+        // 传递更新后的 session，确保 forwardOperator(FlowSession) 中的 currentOperator 是当前操作者
+        IFlowOperator forward = currentOperator.forwardOperator(this.updateSession(currentOperator));
+        if (forward != null) {
+            return this.loadFinalForwardOperator(forward);
         }
         return currentOperator;
     }

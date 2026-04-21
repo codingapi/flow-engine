@@ -2,6 +2,7 @@ package com.codingapi.example.entity;
 
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.session.FlowSession;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -64,7 +65,7 @@ public class User implements IFlowOperator {
     }
 
     @Override
-    public IFlowOperator forwardOperator() {
+    public IFlowOperator forwardOperator(FlowSession flowSession) {
         if(flowOperatorId!=null && flowOperatorId > 0){
             return GatewayContext.getInstance().getFlowOperator(flowOperatorId);
         }

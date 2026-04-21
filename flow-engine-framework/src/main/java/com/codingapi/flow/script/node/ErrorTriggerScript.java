@@ -2,8 +2,8 @@ package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.script.ScriptDefaultConstants;
 import com.codingapi.flow.script.request.GroovyScriptRequest;
+import com.codingapi.flow.script.registry.ScriptRegistry;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -55,7 +55,7 @@ public class ErrorTriggerScript {
      * 默认节点脚本
      */
     public static ErrorTriggerScript defaultScript() {
-        return new ErrorTriggerScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ERROR_TRIGGER);
+        return new ErrorTriggerScript(ScriptRegistry.getInstance().getErrorTriggerScript());
     }
 
 }
