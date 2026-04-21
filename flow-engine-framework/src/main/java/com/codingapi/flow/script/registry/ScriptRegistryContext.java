@@ -1,5 +1,7 @@
 package com.codingapi.flow.script.registry;
 
+import lombok.Getter;
+
 /**
  * 脚本注册单例
  * <p>
@@ -15,19 +17,20 @@ package com.codingapi.flow.script.registry;
  * String script = ScriptRegistry.getInstance().getRouterScript();
  * </pre>
  */
-public class ScriptRegistry {
+@Getter
+public class ScriptRegistryContext {
 
-    private static final ScriptRegistry INSTANCE = new ScriptRegistry();
+    private static final ScriptRegistryContext INSTANCE = new ScriptRegistryContext();
 
     private IScriptRegistry registry = new DefaultScriptRegistry();
 
-    private ScriptRegistry() {
+    private ScriptRegistryContext() {
     }
 
     /**
      * 获取单例实例
      */
-    public static ScriptRegistry getInstance() {
+    public static ScriptRegistryContext getInstance() {
         return INSTANCE;
     }
 
@@ -41,13 +44,6 @@ public class ScriptRegistry {
             throw new IllegalArgumentException("registry cannot be null");
         }
         this.registry = registry;
-    }
-
-    /**
-     * 获取当前注册的脚本注册实现
-     */
-    public IScriptRegistry getRegistry() {
-        return registry;
     }
 
     /**

@@ -1,7 +1,7 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.script.registry.ScriptRegistry;
+import com.codingapi.flow.script.registry.ScriptRegistryContext;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +23,6 @@ public class OperatorMatchScript {
      * 任意人
      */
     public static OperatorMatchScript any() {
-        return new OperatorMatchScript(ScriptRegistry.getInstance().getOperatorMatchScript());
+        return new OperatorMatchScript(ScriptRegistryContext.getInstance().getOperatorMatchScript());
     }
 }

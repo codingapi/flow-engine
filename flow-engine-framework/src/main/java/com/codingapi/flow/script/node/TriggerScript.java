@@ -1,7 +1,7 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.script.request.GroovyScriptRequest;
-import com.codingapi.flow.script.registry.ScriptRegistry;
+import com.codingapi.flow.script.registry.ScriptRegistryContext;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -22,6 +22,6 @@ public class TriggerScript {
     }
 
     public static TriggerScript defaultScript() {
-        return new TriggerScript(ScriptRegistry.getInstance().getTriggerScript());
+        return new TriggerScript(ScriptRegistryContext.getInstance().getTriggerScript());
     }
 }

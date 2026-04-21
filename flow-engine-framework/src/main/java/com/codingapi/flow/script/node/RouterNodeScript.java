@@ -1,7 +1,7 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.script.request.GroovyScriptRequest;
-import com.codingapi.flow.script.registry.ScriptRegistry;
+import com.codingapi.flow.script.registry.ScriptRegistryContext;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class RouterNodeScript {
      * 默认节点脚本
      */
     public static RouterNodeScript defaultScript() {
-        return new RouterNodeScript(ScriptRegistry.getInstance().getRouterScript());
+        return new RouterNodeScript(ScriptRegistryContext.getInstance().getRouterScript());
     }
 
 }

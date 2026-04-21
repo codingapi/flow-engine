@@ -2,7 +2,7 @@ package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.script.request.GroovyScriptRequest;
-import com.codingapi.flow.script.registry.ScriptRegistry;
+import com.codingapi.flow.script.registry.ScriptRegistryContext;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -36,7 +36,7 @@ public class OperatorLoadScript {
      * 流程创建者
      */
     public static OperatorLoadScript defaultScript() {
-        return new OperatorLoadScript(ScriptRegistry.getInstance().getOperatorLoadScript());
+        return new OperatorLoadScript(ScriptRegistryContext.getInstance().getOperatorLoadScript());
     }
 
 }
