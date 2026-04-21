@@ -1,7 +1,7 @@
 package com.codingapi.flow.script.node;
 
-import com.codingapi.flow.script.ScriptDefaultConstants;
 import com.codingapi.flow.script.request.GroovyScriptRequest;
+import com.codingapi.flow.script.registry.ScriptRegistry;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -25,6 +25,6 @@ public class NodeTitleScript {
      * 默认脚本
      */
     public static NodeTitleScript defaultScript() {
-        return new NodeTitleScript(ScriptDefaultConstants.SCRIPT_DEFAULT_NODE_TITLE);
+        return new NodeTitleScript(ScriptRegistry.getInstance().getNodeTitleScript());
     }
 }
