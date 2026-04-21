@@ -1,7 +1,7 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.script.request.GroovyScriptRequest;
-import com.codingapi.flow.script.registry.ScriptRegistry;
+import com.codingapi.flow.script.registry.ScriptRegistryContext;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -19,6 +19,6 @@ public class ConditionScript {
     }
 
     public static ConditionScript defaultScript() {
-        return new ConditionScript(ScriptRegistry.getInstance().getConditionScript());
+        return new ConditionScript(ScriptRegistryContext.getInstance().getConditionScript());
     }
 }

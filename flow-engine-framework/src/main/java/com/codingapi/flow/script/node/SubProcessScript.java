@@ -3,7 +3,7 @@ package com.codingapi.flow.script.node;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.request.GroovyScriptRequest;
-import com.codingapi.flow.script.registry.ScriptRegistry;
+import com.codingapi.flow.script.registry.ScriptRegistryContext;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -28,6 +28,6 @@ public class SubProcessScript {
     }
 
     public static SubProcessScript defaultScript() {
-        return new SubProcessScript(ScriptRegistry.getInstance().getSubProcessScript());
+        return new SubProcessScript(ScriptRegistryContext.getInstance().getSubProcessScript());
     }
 }

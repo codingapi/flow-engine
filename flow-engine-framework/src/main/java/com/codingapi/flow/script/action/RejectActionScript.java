@@ -1,6 +1,6 @@
 package com.codingapi.flow.script.action;
 
-import com.codingapi.flow.script.registry.ScriptRegistry;
+import com.codingapi.flow.script.registry.ScriptRegistryContext;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.session.FlowSession;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ public class RejectActionScript {
      * 退回至发起节点
      */
     public static RejectActionScript defaultScript() {
-        return new RejectActionScript(ScriptRegistry.getInstance().getActionRejectScript());
+        return new RejectActionScript(ScriptRegistryContext.getInstance().getActionRejectScript());
     }
 
 

@@ -4,7 +4,7 @@ package com.codingapi.flow.script.registry;
  * 脚本注册接口
  * <p>
  * 定义获取各类默认脚本的方法，实现此接口可以自定义默认脚本行为。
- * 通过 {@link ScriptRegistry} 单例使用。
+ * 通过 {@link ScriptRegistryContext} 单例使用。
  */
 public interface IScriptRegistry {
 
