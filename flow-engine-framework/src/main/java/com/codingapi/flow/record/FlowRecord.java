@@ -6,6 +6,7 @@ import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.EndNode;
+import com.codingapi.flow.node.nodes.NotifyNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
@@ -275,8 +276,21 @@ public class FlowRecord {
         IFlowAction action = flowSession.getCurrentAction();
         // 当前操作者
         IFlowOperator sourceOperator = flowSession.getCurrentOperator();
-        // 获取转交之后的审批人
-        IFlowOperator currentOperator = flowSession.loadFinalForwardOperator(sourceOperator);
+
+        // 判断是否需要处理转接人
+        // 条件1: NotifyNode 抄送记录
+        // 条件2: 首次创建 FlowRecord (session.getCurrentRecord() == null，等价于 fromId == 0)
+        boolean isNotifyNode = flowSession.getCurrentNode() instanceof NotifyNode;
+        boolean isFirstCreate = flowSession.getCurrentRecord() == null;
+
+        IFlowOperator currentOperator;
+        if (isNotifyNode || isFirstCreate) {
+            // NotifyNode 或首次创建，不使用转接人
+            currentOperator = sourceOperator;
+        } else {
+            // 其他审批流转场景，调用 forwardOperator(FlowSession)
+            currentOperator = flowSession.loadFinalForwardOperator(sourceOperator);
+        }
         this.workCode = flowSession.getWorkCode();
         this.workRuntimeId = flowSession.getWorkflowRuntimeId();
         this.workTitle = flowSession.getWorkflow().getTitle();
