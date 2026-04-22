@@ -1,7 +1,6 @@
 package com.codingapi.flow.operator;
 
 import com.codingapi.flow.script.request.GroovyScriptRequest;
-import com.codingapi.flow.session.FlowSession;
 import com.codingapi.springboot.framework.user.IUser;
 
 /**
