@@ -1,7 +1,7 @@
 package com.codingapi.flow.user;
 
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 
 public class User implements IFlowOperator {
 
@@ -45,7 +45,7 @@ public class User implements IFlowOperator {
     }
 
     @Override
-    public IFlowOperator forwardOperator(FlowSession flowSession) {
+    public IFlowOperator forwardOperator(GroovyScriptRequest request) {
         return forwardOperator;
     }
 

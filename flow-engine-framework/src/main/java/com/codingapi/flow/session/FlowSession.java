@@ -11,6 +11,7 @@ import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Getter;
 import lombok.Setter;
@@ -136,7 +137,8 @@ public class FlowSession {
      */
     public IFlowOperator loadFinalForwardOperator(IFlowOperator currentOperator) {
         // 传递更新后的 session，确保 forwardOperator(FlowSession) 中的 currentOperator 是当前操作者
-        IFlowOperator forward = currentOperator.forwardOperator(this.updateSession(currentOperator));
+        GroovyScriptRequest request = new GroovyScriptRequest(this.updateSession(currentOperator));
+        IFlowOperator forward = currentOperator.forwardOperator(request);
         if (forward != null) {
             return this.loadFinalForwardOperator(forward);
         }

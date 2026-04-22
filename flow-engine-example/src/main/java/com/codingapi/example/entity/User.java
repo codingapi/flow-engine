@@ -2,7 +2,7 @@ package com.codingapi.example.entity;
 
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +30,7 @@ public class User implements IFlowOperator {
     private String password;
 
 
-    public static User admin(PasswordEncoder passwordEncoder){
+    public static User admin(PasswordEncoder passwordEncoder) {
         User user = new User();
         user.setName(ADMIN_ACCOUNT);
         user.setAccount(ADMIN_ACCOUNT);
@@ -40,7 +40,7 @@ public class User implements IFlowOperator {
     }
 
 
-    public void encodePassword(PasswordEncoder passwordEncoder){
+    public void encodePassword(PasswordEncoder passwordEncoder) {
         this.password = passwordEncoder.encode(password);
     }
 
@@ -65,8 +65,8 @@ public class User implements IFlowOperator {
     }
 
     @Override
-    public IFlowOperator forwardOperator(FlowSession flowSession) {
-        if(flowOperatorId!=null && flowOperatorId > 0){
+    public IFlowOperator forwardOperator(GroovyScriptRequest request) {
+        if (flowOperatorId != null && flowOperatorId > 0) {
             return GatewayContext.getInstance().getFlowOperator(flowOperatorId);
         }
         return null;

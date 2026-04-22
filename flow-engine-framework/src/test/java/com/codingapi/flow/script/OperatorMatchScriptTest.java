@@ -2,6 +2,7 @@ package com.codingapi.flow.script;
 
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.script.node.OperatorMatchScript;
+import com.codingapi.flow.script.request.GroovyWorkflowRequest;
 import com.codingapi.flow.user.User;
 import org.junit.jupiter.api.Test;
 
@@ -13,6 +14,6 @@ class OperatorMatchScriptTest {
     void execute() {
         IFlowOperator flowOperator = new User(1, "lorne");
         OperatorMatchScript operatorMatchScript = OperatorMatchScript.any();
-        assertTrue(operatorMatchScript.execute(flowOperator));
+        assertTrue(operatorMatchScript.execute(new GroovyWorkflowRequest(flowOperator,null)));
     }
 }

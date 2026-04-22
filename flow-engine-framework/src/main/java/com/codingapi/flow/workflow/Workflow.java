@@ -13,6 +13,7 @@ import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.script.node.OperatorMatchScript;
+import com.codingapi.flow.script.request.GroovyWorkflowRequest;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.workflow.IWorkflowStrategy;
 import com.codingapi.flow.strategy.workflow.InterfereStrategy;
@@ -252,7 +253,8 @@ public class Workflow {
      * @return 是否匹配
      */
     public boolean matchCreatedOperator(IFlowOperator flowOperator) {
-        return operatorCreateScript.execute(flowOperator);
+        GroovyWorkflowRequest request = new GroovyWorkflowRequest(flowOperator,this);
+        return operatorCreateScript.execute(request);
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.codingapi.flow.operator;
 
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.springboot.framework.user.IUser;
 
@@ -35,10 +36,10 @@ public interface IFlowOperator extends IUser {
      * 转交审批人
      * 转交审批人不为空时，当前操作者将由转交审批人操作者执行
      *
-     * @param flowSession 流程会话上下文，可用于根据表单数据、当前节点等条件动态决定转交人
+     * @param request 流程会话上下文，可用于根据表单数据、当前节点等条件动态决定转交人
      * @return 转交后的审批人，如果无需转交返回null
      */
-    IFlowOperator forwardOperator(FlowSession flowSession);
+    IFlowOperator forwardOperator(GroovyScriptRequest request);
 
 
 }
