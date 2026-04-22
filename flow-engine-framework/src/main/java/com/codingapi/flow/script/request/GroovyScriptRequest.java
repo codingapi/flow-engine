@@ -25,6 +25,12 @@ public class GroovyScriptRequest {
     private String workflowTitle;
 
     /**
+     * 流程Id
+     */
+    @Getter
+    private String workflowId;
+
+    /**
      * 流程编码
      */
     @Getter
@@ -93,9 +99,9 @@ public class GroovyScriptRequest {
 
         // 提取流程信息
         if (session.getWorkflow() != null) {
+            this.workflowId = session.getWorkflow().getId();
             this.workflowTitle = session.getWorkflow().getTitle();
             this.workflowCode = session.getWorkflow().getCode();
-
         }
 
         // 提取节点信息
