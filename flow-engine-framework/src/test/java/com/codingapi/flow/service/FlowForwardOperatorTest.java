@@ -15,6 +15,7 @@ import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.user.User;
@@ -164,7 +165,7 @@ class FlowForwardOperatorTest {
         // given - 创建一个 forwardOperator 返回 null 的 boss
         User bossWithNullForward = new User(5L, "boss", false) {
             @Override
-            public IFlowOperator forwardOperator(FlowSession flowSession) {
+            public IFlowOperator forwardOperator(GroovyScriptRequest request) {
                 return null;  // 不转接
             }
         };
@@ -220,8 +221,8 @@ class FlowForwardOperatorTest {
         // given - 创建一个根据表单数据决定是否转接的 boss
         User conditionalBoss = new User(6L, "boss", false, forwardUser) {
             @Override
-            public IFlowOperator forwardOperator(FlowSession flowSession) {
-                Object amount = flowSession.getFormData("amount");
+            public IFlowOperator forwardOperator(GroovyScriptRequest request) {
+                Object amount = request.getFormData("amount");
                 if (amount != null && ((Number) amount).doubleValue() > 10000) {
                     return forwardUser;  // 金额大于 10000 时转接
                 }
@@ -280,8 +281,8 @@ class FlowForwardOperatorTest {
         // given - 创建一个根据表单数据决定是否转接的 boss
         User conditionalBoss = new User(7L, "boss", false, forwardUser) {
             @Override
-            public IFlowOperator forwardOperator(FlowSession flowSession) {
-                Object amount = flowSession.getFormData("amount");
+            public IFlowOperator forwardOperator(GroovyScriptRequest request) {
+                Object amount = request.getFormData("amount");
                 if (amount != null && ((Number) amount).doubleValue() > 10000) {
                     return forwardUser;
                 }

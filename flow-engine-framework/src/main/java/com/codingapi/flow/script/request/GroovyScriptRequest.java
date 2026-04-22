@@ -67,12 +67,6 @@ public class GroovyScriptRequest {
     @Getter
     private IFlowOperator submitOperator;
 
-    /**
-     * 流程提交人姓名
-     */
-    @Getter
-    private String submitOperatorName;
-
 
     private final FlowSession flowSession;
 
