@@ -15,5 +15,9 @@
       "Bash(python3:*)",
       "Bash(find:*)"
     ]
+  },
+  "enabledPlugins": {
+    "commons@coding-marketplace": true,
+    "backend@coding-marketplace": true
   }
 }
