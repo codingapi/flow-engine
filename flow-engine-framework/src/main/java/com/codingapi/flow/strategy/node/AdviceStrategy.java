@@ -1,6 +1,7 @@
 package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.common.IMapConvertor;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.Map;
 @Setter
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class AdviceStrategy extends BaseStrategy {
 
     /**
@@ -23,7 +25,6 @@ public class AdviceStrategy extends BaseStrategy {
      * 签名必填
      */
     private boolean signRequired;
-
 
     public static AdviceStrategy defaultStrategy() {
         AdviceStrategy strategy = new AdviceStrategy();

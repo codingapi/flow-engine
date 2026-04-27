@@ -17,6 +17,9 @@ public class TriggerStrategy extends BaseStrategy {
 
     private TriggerScript triggerScript;
 
+    public TriggerStrategy(String triggerScript) {
+        this.triggerScript = new TriggerScript(triggerScript);
+    }
 
     @Override
     public void copy(INodeStrategy target) {

@@ -37,6 +37,7 @@ public class WorkflowVersionEntity {
     /**
      * 流程名称
      */
+    @Lob
     private String title;
 
     /**

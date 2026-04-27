@@ -27,6 +27,7 @@ public class WorkflowRuntimeEntity {
     /**
      * 流程名称
      */
+    @Lob
     private String workTitle;
     /**
      * 创建时间

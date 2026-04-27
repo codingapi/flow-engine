@@ -165,7 +165,7 @@ public class FlowSession {
             IFlowAction currentAction,
             FormData formData,
             long backupId) {
-        return new FlowSession(repositoryHolder, currentOperator, currentOperator,null,workflow, currentNode, currentAction, formData, null, new ArrayList<>(), backupId, new FlowAdvice());
+        return new FlowSession(repositoryHolder, currentOperator, currentOperator,currentOperator,workflow, currentNode, currentAction, formData, null, new ArrayList<>(), backupId, new FlowAdvice());
     }
 
 
@@ -243,8 +243,8 @@ public class FlowSession {
      * 获取流程的提交者Id
      */
     public long getSubmitOperatorId(){
-        if(this.currentRecord!=null) {
-            return this.currentRecord.getCurrentOperatorId();
+        if(this.submitOperator!=null) {
+            return this.submitOperator.getUserId();
         }
         return 0;
     }
@@ -253,8 +253,8 @@ public class FlowSession {
      * 获取流程的提交者名称
      */
     public String getSubmitOperatorName(){
-        if(this.currentRecord!=null) {
-            return this.currentRecord.getCurrentOperatorName();
+        if(this.submitOperator!=null) {
+            return this.submitOperator.getName();
         }
         return null;
     }

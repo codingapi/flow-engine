@@ -1,7 +1,9 @@
 package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.common.IMapConvertor;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Map;
@@ -9,6 +11,8 @@ import java.util.Map;
 /**
  * 撤回策略
  */
+@NoArgsConstructor
+@AllArgsConstructor
 public class RevokeStrategy extends BaseStrategy {
 
 

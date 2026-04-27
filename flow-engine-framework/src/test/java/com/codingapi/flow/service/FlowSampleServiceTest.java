@@ -19,12 +19,10 @@ import com.codingapi.flow.pojo.request.FlowRevokeRequest;
 import com.codingapi.flow.pojo.request.FlowUrgeRequest;
 import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.script.runtime.IBeanFactory;
-import com.codingapi.flow.strategy.node.ErrorTriggerStrategy;
-import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
-import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
-import com.codingapi.flow.strategy.node.RouterStrategy;
+import com.codingapi.flow.strategy.node.*;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
@@ -719,6 +717,12 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
+                        .addStrategy(new NodeTitleStrategy("""
+                                def run(request){
+                                    println(request.getFlowAction())
+                                    return '你有一条代办消息'
+                                }
+                                """))
                         .build())
                 .build();
 

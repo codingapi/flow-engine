@@ -3,6 +3,7 @@ package com.codingapi.flow.strategy.node;
 import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.session.FlowSession;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.util.Map;
@@ -17,6 +18,10 @@ public class NodeTitleStrategy extends BaseStrategy {
      * 审批人配置脚本
      */
     private NodeTitleScript nodeTitleScript;
+
+    public NodeTitleStrategy(String titleScript) {
+        this.nodeTitleScript = new NodeTitleScript(titleScript);
+    }
 
 
     @Override

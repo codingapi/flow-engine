@@ -27,6 +27,10 @@ public class SubProcessStrategy extends BaseStrategy {
      */
     private SubProcessScript subProcessScript;
 
+    public SubProcessStrategy(String subProcessScript,boolean submit) {
+        this.submit = submit;
+        this.subProcessScript = new SubProcessScript(subProcessScript);
+    }
 
     @Override
     public void copy(INodeStrategy target) {
