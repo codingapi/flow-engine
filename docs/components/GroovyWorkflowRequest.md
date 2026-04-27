@@ -12,7 +12,7 @@
 <dependency>
     <groupId>com.codingapi.flow</groupId>
     <artifactId>flow-engine-framework</artifactId>
-    <version>0.0.27</version>
+    <version>0.0.28</version>
 </dependency>
 ```
 

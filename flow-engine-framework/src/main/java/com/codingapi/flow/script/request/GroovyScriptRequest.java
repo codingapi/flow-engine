@@ -134,10 +134,18 @@ public class GroovyScriptRequest {
         return this.currentOperator.isFlowManager();
     }
 
+
+    /**
+     * 获取当前节点对象
+     */
+    public IFlowNode getCurrentNode(){
+        return this.flowSession.getCurrentNode();
+    }
+
     /**
      * 获取当前操作对象
      */
-    public IFlowAction getFlowAction(){
+    public IFlowAction getCurrentAction(){
         return this.flowSession.getCurrentAction();
     }
 

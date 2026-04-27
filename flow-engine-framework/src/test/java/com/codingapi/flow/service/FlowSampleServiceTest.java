@@ -719,7 +719,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .addStrategy(new NodeTitleStrategy("""
                                 def run(request){
-                                    println(request.getFlowAction())
+                                    println(request.getCurrentAction())
                                     return '你有一条代办消息'
                                 }
                                 """))
@@ -2576,6 +2576,9 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
                         .build())
+                .actions(ActionBuilder.builder()
+                        .addAction(new CustomAction())
+                        .build())
                 .build();
 
         ApprovalNode bossNode = ApprovalNode.builder()
@@ -2587,11 +2590,14 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
                         .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new NodeTitleStrategy("""
+                                def run(request){
+                                    println(request.getCurrentAction())
+                                    return '你有一条代办消息'
+                                }
+                                """))
                         .build()
                 )
-                .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
-                        .build())
                 .build();
 
         EndNode endNode = EndNode.builder().build();
@@ -2613,7 +2619,7 @@ class FlowSampleServiceTest {
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
         userCreateRequest.setWorkId(workflow.getId());
         userCreateRequest.setFormData(data);
-        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setActionId(startActions.get(2).id());
         userCreateRequest.setOperatorId(user.getUserId());
         factory.flowService.create(userCreateRequest);
 
@@ -2623,7 +2629,7 @@ class FlowSampleServiceTest {
         FlowActionRequest userRequest = new FlowActionRequest();
         userRequest.setFormData(data);
         userRequest.setRecordId(userRecordList.get(0).getId());
-        userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        userRequest.setAdvice(new FlowAdviceBody(startActions.get(2).id(), "同意", user.getUserId()));
         factory.flowService.action(userRequest);
 
         List<FlowRecord> bossRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
@@ -2634,7 +2640,7 @@ class FlowSampleServiceTest {
         FlowActionRequest bossRequest = new FlowActionRequest();
         bossRequest.setFormData(data);
         bossRequest.setRecordId(bossRecordList.get(0).getId());
-        bossRequest.setAdvice(new FlowAdviceBody(bossActions.get(7).id(), boss.getUserId()));
+        bossRequest.setAdvice(new FlowAdviceBody(bossActions.get(0).id(), boss.getUserId()));
         factory.flowService.action(bossRequest);
 
         List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
