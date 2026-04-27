@@ -1,5 +1,6 @@
 package com.codingapi.flow.script.request;
 
+import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -134,6 +135,13 @@ public class GroovyScriptRequest {
     }
 
     /**
+     * 获取当前操作对象
+     */
+    public IFlowAction getFlowAction(){
+        return this.flowSession.getCurrentAction();
+    }
+
+    /**
      * 是否模拟测试
      */
     public boolean isMock(){
@@ -174,21 +182,14 @@ public class GroovyScriptRequest {
      * 流程审批者Id
      */
     public long getSubmitOperatorId(){
-        if(this.submitOperator!=null) {
-            return this.submitOperator.getUserId();
-        }
-        return 0;
+        return this.submitOperator.getUserId();
     }
 
     /**
      * 流程审批者名称
      */
     public String getSubmitOperatorName(){
-        if(this.submitOperator!=null) {
-            return this.submitOperator.getName();
-        }else {
-            return null;
-        }
+        return this.submitOperator.getName();
     }
 
 

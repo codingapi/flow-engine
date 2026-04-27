@@ -58,7 +58,6 @@ public class FlowActionService {
         }
 
         IFlowOperator createdOperator = flowOperatorGateway.get(flowRecord.getCreateOperatorId());
-        IFlowOperator submitOperator = flowOperatorGateway.get(flowRecord.getSubmitOperatorId());
 
         WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(flowRecord.getWorkRuntimeId());
         if (workflowRuntime == null) {
@@ -94,7 +93,7 @@ public class FlowActionService {
             );
         }
 
-        FlowSession session = flowRecord.createFlowSession(this.repositoryHolder,workflow,currentOperator,createdOperator,submitOperator,formData,flowAdvice);
+        FlowSession session = flowRecord.createFlowSession(this.repositoryHolder,workflow,currentOperator,createdOperator,currentOperator,formData,flowAdvice);
         // 验证会话
         currentNode.verifySession(session);
         // 执行动作

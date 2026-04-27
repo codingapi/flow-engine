@@ -156,8 +156,6 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
 
         } else {
             // filter fieldPermissions
-            System.out.println("filter fieldPermissions meta:" + meta);
-
             List<FormFieldPermission> fieldPermissions = new ArrayList<>();
             for (String formField:fieldMap.keySet()){
                 String formCode = formField.split("\\.")[0];
