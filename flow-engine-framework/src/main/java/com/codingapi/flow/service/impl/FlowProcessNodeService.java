@@ -23,7 +23,9 @@ import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 流程节点记录服务
@@ -90,11 +92,9 @@ public class FlowProcessNodeService {
             backupId = this.flowRecord.getWorkRuntimeId();
             // 如果当前记录已结束，则不查询后续流程
             if (this.flowRecord.isDone()) {
-                List<FlowRecord> historyRecords = flowRecordService.findFlowRecordByProcessId(this.flowRecord.getProcessId());
-                for (FlowRecord historyRecord : historyRecords) {
-                    ProcessNode processNode = new ProcessNode(historyRecord, this.workflow);
-                    nodeList.add(processNode);
-                }
+                List<FlowRecord> allRecords = flowRecordService.findFlowRecordByProcessId(this.flowRecord.getProcessId());
+                List<FlowRecord> doneRecords = allRecords.stream().filter(FlowRecord::isDone).toList();
+                nodeList.addAll(buildHistoryNodes(doneRecords));
                 if (this.flowRecord.isFinish()) {
                     nodeList.add(ProcessNode.createEndNode(this.workflow));
                 } else {
@@ -104,16 +104,26 @@ public class FlowProcessNodeService {
             } else {
                 // 查询历史记录
                 List<FlowRecord> historyRecords = flowRecordService.findFlowRecordBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
-                for (FlowRecord historyRecord : historyRecords) {
-                    ProcessNode processNode = new ProcessNode(historyRecord, this.workflow);
-                    nodeList.add(processNode);
-                }
+                nodeList.addAll(buildHistoryNodes(historyRecords));
             }
         }
 
         this.loadNextNode(backupId);
 
         return this.nodeList;
+    }
+
+    private List<ProcessNode> buildHistoryNodes(List<FlowRecord> records) {
+        Map<String, ProcessNode> nodeMap = new LinkedHashMap<>();
+        for (FlowRecord record : records) {
+            ProcessNode existing = nodeMap.get(record.getNodeId());
+            if (existing != null) {
+                existing.addOperator(new ProcessNode.FlowOperatorBody(record));
+            } else {
+                nodeMap.put(record.getNodeId(), new ProcessNode(record, this.workflow));
+            }
+        }
+        return new ArrayList<>(nodeMap.values());
     }
 
 

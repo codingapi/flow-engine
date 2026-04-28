@@ -115,7 +115,11 @@ public class ProcessNode {
 
     @Override
     public int hashCode() {
-        return Objects.hash(nodeId, nodeName, nodeType, state, operators);
+        return Objects.hash(nodeId);
+    }
+
+    public void addOperator(FlowOperatorBody operator) {
+        this.operators.add(operator);
     }
 
     /**
