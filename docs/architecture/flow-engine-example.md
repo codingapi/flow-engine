@@ -6,7 +6,7 @@
 
 - groupId: com.codingapi.flow
 - artifactId: flow-engine-example
-- version: 0.0.26
+- version: 0.0.28
 - packaging: jar
 
 ## 关联关系

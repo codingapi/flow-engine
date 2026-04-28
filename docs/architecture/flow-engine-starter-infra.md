@@ -6,7 +6,7 @@
 
 - groupId: com.codingapi.flow
 - artifactId: flow-engine-starter-infra
-- version: 0.0.26
+- version: 0.0.28
 - packaging: jar
 
 ## 关联关系
@@ -32,7 +32,7 @@
 
 | 依赖 | 版本 | 用途 |
 |------|------|------|
-| com.codingapi.springboot:springboot-starter-data-fast | 3.4.40 | 数据层快速开发框架 |
+| com.codingapi.springboot:springboot-starter-data-fast | 3.4.42 | 数据层快速开发框架 |
 | org.springframework.boot:spring-boot-starter-data-jpa | 3.5.9 | JPA 持久化 |
 | org.springframework.boot:spring-boot-starter-web | 3.5.9 | Web 支持 |
 | com.h2database:h2 | 2.3.232 | 嵌入式数据库（runtime） |
