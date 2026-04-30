@@ -12,6 +12,13 @@ public class LongValueConvertor implements IValueConvertor {
 
     @Override
     public Object getValue(Object value) {
-        return Long.parseLong(String.valueOf(value));
+        if(value!=null) {
+            try {
+                return Long.parseLong(String.valueOf(value));
+            }catch (Exception ignore){
+                return null;
+            }
+        }
+        return null;
     }
 }

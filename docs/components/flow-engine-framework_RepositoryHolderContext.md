@@ -22,7 +22,7 @@ RepositoryHolderContext 是流程引擎运行时的基础设施注册中心。�
 <dependency>
     <groupId>com.codingapi.flow</groupId>
     <artifactId>flow-engine-framework</artifactId>
-    <version>0.0.29</version>
+    <version>0.0.30</version>
 </dependency>
 ```
 

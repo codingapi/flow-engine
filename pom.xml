@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.codingapi.flow</groupId>
 	<artifactId>flow-engine-parent</artifactId>
-	<version>0.0.29</version>
+	<version>0.0.30</version>
     <packaging>pom</packaging>
 
     <url>https://github.com/codingapi/flow-engine</url>

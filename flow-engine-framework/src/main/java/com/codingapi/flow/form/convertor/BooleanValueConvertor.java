@@ -12,6 +12,13 @@ public class BooleanValueConvertor implements IValueConvertor {
 
     @Override
     public Object getValue(Object value) {
-        return String.valueOf(value).equals("true");
+        if(value!=null) {
+            try {
+                return String.valueOf(value).equals("true");
+            } catch (Exception ignore) {
+                return null;
+            }
+        }
+        return null;
     }
 }

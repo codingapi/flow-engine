@@ -12,6 +12,13 @@ public class DoubleValueConvertor implements IValueConvertor {
 
     @Override
     public Object getValue(Object value) {
-        return Double.parseDouble(String.valueOf(value));
+        if(value!=null) {
+            try {
+                return Double.parseDouble(String.valueOf(value));
+            }catch (Exception ignore){
+                return null;
+            }
+        }
+        return null;
     }
 }

@@ -12,6 +12,9 @@ public class StringValueConvertor implements IValueConvertor {
 
     @Override
     public Object getValue(Object value) {
-        return String.valueOf(value);
+        if(value!=null) {
+            return String.valueOf(value);
+        }
+        return null;
     }
 }

@@ -22,7 +22,7 @@ IFlowOperator 是流程引擎中对参与流程的用户（审批人、创建者
 <dependency>
     <groupId>com.codingapi.flow</groupId>
     <artifactId>flow-engine-framework</artifactId>
-    <version>0.0.29</version>
+    <version>0.0.30</version>
 </dependency>
 ```
 

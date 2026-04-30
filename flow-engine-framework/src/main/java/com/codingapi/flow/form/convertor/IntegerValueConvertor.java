@@ -12,6 +12,13 @@ public class IntegerValueConvertor implements IValueConvertor {
 
     @Override
     public Object getValue(Object value) {
-        return Integer.parseInt(String.valueOf(value));
+        if(value!=null) {
+            try {
+                return Integer.parseInt(String.valueOf(value));
+            }catch (Exception ignore){
+                return null;
+            }
+        }
+        return null;
     }
 }
