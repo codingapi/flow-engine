@@ -8,6 +8,10 @@ import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.nodes.ConditionBranchNode;
+import com.codingapi.flow.node.nodes.ConditionElseBranchNode;
+import com.codingapi.flow.node.nodes.InclusiveBranchNode;
+import com.codingapi.flow.node.nodes.InclusiveElseBranchNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowProcessNodeRequest;
@@ -23,6 +27,8 @@ import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -187,8 +193,39 @@ public class FlowProcessNodeService {
                 }
                 this.nodeList.add(processNode);
                 List<IFlowNode> nextNodes = workflow.nextNodes(flowNode);
-                this.fetchNextNode(flowSession.updateSession(flowNode), nextNodes);
+                List<IFlowNode> selected = selectBranchNodes(nextNodes, flowSession.updateSession(flowNode));
+                this.fetchNextNode(flowSession.updateSession(flowNode), selected);
             }
+        }
+
+        private List<IFlowNode> selectBranchNodes(List<IFlowNode> nextNodes, FlowSession flowSession) {
+            if (nextNodes == null || nextNodes.isEmpty()) {
+                return nextNodes;
+            }
+            IFlowNode first = nextNodes.get(0);
+            String type = first.getType();
+            boolean isBranchControl =
+                    ConditionBranchNode.NODE_TYPE.equals(type)
+                            || ConditionElseBranchNode.NODE_TYPE.equals(type)
+                            || InclusiveBranchNode.NODE_TYPE.equals(type)
+                            || InclusiveElseBranchNode.NODE_TYPE.equals(type);
+            if (!isBranchControl) {
+                return nextNodes;
+            }
+            try {
+                // 优先按 if 条件脚本匹配；脚本天然 fallback else（else.handle() 恒为 true）
+                List<IFlowNode> matched = first.filterBranches(nextNodes, flowSession);
+                if (matched != null && !matched.isEmpty()) {
+                    return matched;
+                }
+            } catch (Exception ignored) {
+                // 表单数据缺失导致条件脚本异常 —— 降级到 else
+            }
+            List<IFlowNode> elseOnly = nextNodes.stream()
+                    .filter(n -> ConditionElseBranchNode.NODE_TYPE.equals(n.getType())
+                            || InclusiveElseBranchNode.NODE_TYPE.equals(n.getType()))
+                    .toList();
+            return elseOnly.isEmpty() ? nextNodes : elseOnly;
         }
 
         public List<ProcessNode> loadNextNode(FlowSession flowSession) {
@@ -201,7 +238,30 @@ public class FlowProcessNodeService {
                     processNodeList.add(node);
                 }
             }
-            return processNodeList;
+            return sortByWorkflowNodeOrder(processNodeList);
+        }
+
+        private List<ProcessNode> sortByWorkflowNodeOrder(List<ProcessNode> processNodes) {
+            Map<String, Integer> indexMap = new HashMap<>();
+            int[] counter = {0};
+            buildNodeIndexMap(workflow.getNodes(), indexMap, counter);
+            return processNodes.stream()
+                    .sorted(Comparator.comparingInt(
+                            n -> indexMap.getOrDefault(n.getNodeId(), Integer.MAX_VALUE)))
+                    .toList();
+        }
+
+        private void buildNodeIndexMap(List<IFlowNode> nodes, Map<String, Integer> indexMap, int[] counter) {
+            if (nodes == null || nodes.isEmpty()) {
+                return;
+            }
+            for (IFlowNode node : nodes) {
+                indexMap.put(node.getId(), counter[0]++);
+                List<IFlowNode> blocks = node.blocks();
+                if (blocks != null && !blocks.isEmpty()) {
+                    buildNodeIndexMap(blocks, indexMap, counter);
+                }
+            }
         }
     }
 
