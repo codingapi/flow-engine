@@ -29,9 +29,11 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 流程节点记录服务
@@ -96,25 +98,50 @@ public class FlowProcessNodeService {
         long backupId = 0;
         if (this.flowRecord != null) {
             backupId = this.flowRecord.getWorkRuntimeId();
-            // 如果当前记录已结束，则不查询后续流程
+            List<FlowRecord> allRecords = flowRecordService.findFlowRecordByProcessId(this.flowRecord.getProcessId());
+
             if (this.flowRecord.isDone()) {
-                List<FlowRecord> allRecords = flowRecordService.findFlowRecordByProcessId(this.flowRecord.getProcessId());
+                // 已完成记录：构建历史节点（会签/多人审批按 nodeId 合并）
                 List<FlowRecord> doneRecords = allRecords.stream().filter(FlowRecord::isDone).toList();
                 nodeList.addAll(buildHistoryNodes(doneRecords));
                 if (this.flowRecord.isFinish()) {
                     nodeList.add(ProcessNode.createEndNode(this.workflow));
-                } else {
-                    this.loadNextNode(backupId);
+                    return this.nodeList;
                 }
-                return this.nodeList;
             } else {
-                // 查询历史记录
-                List<FlowRecord> historyRecords = flowRecordService.findFlowRecordBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
-                nodeList.addAll(buildHistoryNodes(historyRecords));
+                // 进行中：构建历史节点 + 当前节点
+                List<FlowRecord> doneRecords = allRecords.stream().filter(FlowRecord::isDone).toList();
+                nodeList.addAll(buildHistoryNodes(doneRecords));
+
+                // 当前节点待办记录 → 当前节点（会签/多人审批合并）
+                List<FlowRecord> currentTodoRecords = allRecords.stream()
+                        .filter(r -> r.getNodeId().equals(this.currentNode.getId()) && r.isTodo())
+                        .toList();
+                if (!currentTodoRecords.isEmpty()) {
+                    ProcessNode currentProcessNode = nodeList.stream()
+                            .filter(n -> n.getNodeId().equals(this.currentNode.getId()))
+                            .findFirst()
+                            .orElse(null);
+                    if (currentProcessNode != null) {
+                        // 部分会签已完成：追加待办审批人
+                        for (FlowRecord record : currentTodoRecords) {
+                            currentProcessNode.addOperator(new ProcessNode.FlowOperatorBody(record));
+                        }
+                    } else {
+                        // 从审批记录创建当前节点
+                        currentProcessNode = new ProcessNode(currentTodoRecords.get(0), this.workflow);
+                        for (int i = 1; i < currentTodoRecords.size(); i++) {
+                            currentProcessNode.addOperator(new ProcessNode.FlowOperatorBody(currentTodoRecords.get(i)));
+                        }
+                        nodeList.add(currentProcessNode);
+                    }
+                    currentProcessNode.setState(ProcessNode.STATE_CURRENT);
+                }
             }
         }
 
         this.loadNextNode(backupId);
+        deduplicateNodeList();
 
         return this.nodeList;
     }
@@ -130,6 +157,18 @@ public class FlowProcessNodeService {
             }
         }
         return new ArrayList<>(nodeMap.values());
+    }
+
+    private void deduplicateNodeList() {
+        Set<String> seen = new HashSet<>();
+        List<ProcessNode> result = new ArrayList<>();
+        for (ProcessNode node : nodeList) {
+            if (seen.add(node.getNodeId())) {
+                result.add(node);
+            }
+        }
+        this.nodeList.clear();
+        this.nodeList.addAll(result);
     }
 
 
