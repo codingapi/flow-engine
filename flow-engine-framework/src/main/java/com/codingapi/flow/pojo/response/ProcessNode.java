@@ -1,18 +1,16 @@
 package com.codingapi.flow.pojo.response;
 
-import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.nodes.EndNode;
-import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.strategy.node.MultiOperatorAuditStrategy;
+import com.codingapi.flow.strategy.node.OperatorSelectType;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 流程审批节点
@@ -21,13 +19,11 @@ import java.util.Objects;
 @NoArgsConstructor
 public class ProcessNode {
 
-    public final static int STATE_HISTORY = -1;
-    public final static int STATE_CURRENT = 0;
-    public final static int STATE_NEXT = 1;
     /**
-     * 节点编号：需要自动生成唯一值
+     * 记录id
      */
-    private String seqNo;
+    private String id;
+
     /**
      * 节点名称
      */
@@ -42,135 +38,149 @@ public class ProcessNode {
     private String nodeType;
 
     /**
-     * 节点动作类型：代表着流程节点的动作，非节点类型；
-     * 比如，节点类型为发起节点时，只有两种类型，即待发起、已发起；
-     * 比如，节点类型为审批节点时，只有三种类型，即待审批、已通过、已退回、已拒绝、加签、转办、委派，但这里的状态判定是要根据节点审批人以及审批策略进行判定
-     * 比如，节点类型为结束节点时，只有两种类型，即在整个流程未结束时，类型为未结束，否则，类型为已结束
-     */
-    private String nodeActionType;
-
-    /**
-     * 节点类型
-     */
-    private String nodeActionName;
-
-    /**
      * 是否呈现节点
      */
-    private boolean display;
+    private MultiOperatorAuditStrategy.Type approveStrategy;
 
     /**
-     * 记录状态
-     * -1 为历史状态
-     * 0 为当前状态
-     * 1 为后续状态
+     * 审批状态
      */
-    private int state;
+    private ApproveState approveState;
 
+    /**
+     * 人员模式
+     */
+    private OperatorStrategy operatorStrategy;
 
     /**
      * 节点审批人
      */
     private List<FlowOperatorBody> operators;
 
-
     public boolean isHistory() {
-        return this.state == STATE_HISTORY;
+        return this.approveState == ApproveState.PASS || this.approveState == ApproveState.ERROR;
     }
 
-    private ProcessNode(IFlowNode flowNode) {
-        this.state = STATE_HISTORY;
-        this.operators = new ArrayList<>();
-        this.nodeType = flowNode.getType();
-        this.nodeName = flowNode.getName();
-        this.nodeId = flowNode.getId();
-    }
-
-    public static ProcessNode createEndNode(Workflow workflow) {
-        IFlowNode endNode = workflow.getEndNode();
-        ProcessNode node = new ProcessNode(endNode);
-        node.nodeActionType = "FINISH";
-        node.nodeActionName = "已结束";
-        return node;
-    }
-
-    public ProcessNode(FlowRecord flowRecord, Workflow workflow) {
-        this.nodeId = flowRecord.getNodeId();
-        IFlowNode flowNode = workflow.getFlowNode(this.nodeId);
-        this.nodeName = flowNode.getName();
-        this.nodeType = flowNode.getType();
-        this.operators = new ArrayList<>();
-        this.display = true;
-        this.state = STATE_HISTORY;
-        this.nodeActionType = flowRecord.getActionType();
-        this.nodeActionName = toHistoryActionName(flowRecord.getActionName());
-        this.operators.add(new FlowOperatorBody(flowRecord));
-    }
-
-
-    public ProcessNode(IFlowNode flowNode, List<IFlowOperator> operators) {
-        this.nodeId = flowNode.getId();
-        this.nodeName = flowNode.getName();
-        this.nodeType = flowNode.getType();
-        this.operators = operators.stream().map(FlowOperatorBody::new).toList();
-        this.state = STATE_NEXT;
-        this.display = flowNode instanceof IDisplayNode;
-        this.nodeActionType = "PENDING";
-        this.nodeActionName = toPendingActionName(flowNode.getType());
-    }
-
-
-    public boolean isFlowNode(IFlowNode currentNode) {
-        return this.nodeId.equals(currentNode.getId());
-    }
-
-    public void setCurrentState() {
-        this.state = STATE_CURRENT;
-    }
-
-
-    @Override
-    public boolean equals(Object target) {
-        if (target instanceof ProcessNode) {
-            ProcessNode targetNode = (ProcessNode) target;
-            return targetNode.getNodeId().equals(this.getNodeId());
+    public void addFlowRecordOperator(FlowRecord record) {
+        if (this.operators == null) {
+            this.operators = new ArrayList<>();
         }
-        return super.equals(target);
+        this.operators.add(new FlowOperatorBody(record));
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(nodeId);
+    public enum OperatorStrategy {
+        /**
+         * 指定人员
+         */
+        OPERATOR_LIST,
+        /**
+         * 发起人设定：流程创建时由发起人为该节点指定操作人
+         */
+        INITIATOR_SELECT,
+
+        /**
+         * 审批人设定：当前节点审批时，审批人为下游该节点指定操作人
+         */
+        APPROVER_SELECT
     }
 
-    public void addOperator(FlowOperatorBody operator) {
-        this.operators.add(operator);
+    public enum ApproveState {
+        // 审批通过
+        PASS,
+        // 审批中
+        PROCESSING,
+        // 未审批
+        PENDING,
+        // 审批错误
+        ERROR
     }
 
-    private static String toHistoryActionName(String actionName) {
-        if (actionName == null) {
-            return null;
+    public void resetApproveState(FlowRecord flowRecord) {
+        if (flowRecord.isDone()) {
+            this.approveState = ApproveState.PASS;
         }
-        return switch (actionName) {
-            case "通过" -> "已通过";
-            case "拒绝" -> "已拒绝";
-            case "退回" -> "已退回";
-            case "加签" -> "加签";
-            case "转办" -> "转办";
-            case "委派" -> "委派";
-            case "保存" -> "已发起";
-            default -> "已" + actionName;
-        };
+
+        if (flowRecord.isError()) {
+            this.approveState = ApproveState.ERROR;
+        }
+
+        if (flowRecord.isHidden()) {
+            this.approveState = ApproveState.PROCESSING;
+        }
+
+        if (flowRecord.isTodo()) {
+            this.approveState = ApproveState.PROCESSING;
+        }
     }
 
-    private static String toPendingActionName(String nodeType) {
-        if (StartNode.NODE_TYPE.equals(nodeType)) {
-            return "待发起";
+    private void resetApproveStrategy(IFlowNode flowNode) {
+        MultiOperatorAuditStrategy.Type type = flowNode.strategyManager().getMultiOperatorAuditStrategyType();
+        if (type != null) {
+            this.setApproveStrategy(type);
+        } else {
+            this.setApproveStrategy(MultiOperatorAuditStrategy.Type.SEQUENCE);
         }
-        if (EndNode.NODE_TYPE.equals(nodeType)) {
-            return "未结束";
+    }
+
+
+    public static ProcessNode createByRecord(FlowRecord flowRecord, Workflow workflow) {
+        IFlowNode flowNode = workflow.getFlowNode(flowRecord.getNodeId());
+
+        ProcessNode processNode = new ProcessNode();
+        processNode.setId(String.valueOf(flowRecord.getId()));
+        processNode.setNodeId(flowNode.getId());
+        processNode.setNodeName(flowNode.getName());
+        processNode.setNodeType(flowNode.getType());
+        processNode.resetApproveState(flowRecord);
+        processNode.resetApproveStrategy(flowNode);
+        processNode.setOperatorStrategy(OperatorStrategy.OPERATOR_LIST);
+
+        List<FlowOperatorBody> flowOperatorBodyList = new ArrayList<>();
+        flowOperatorBodyList.add(new FlowOperatorBody(flowRecord));
+        processNode.setOperators(flowOperatorBodyList);
+
+        return processNode;
+    }
+
+
+    public static ProcessNode createByEndNode(IFlowNode flowNode, boolean finish) {
+        ProcessNode processNode = new ProcessNode();
+        processNode.setId(flowNode.getId());
+        processNode.setNodeId(flowNode.getId());
+        processNode.setNodeName(flowNode.getName());
+        processNode.setNodeType(flowNode.getType());
+        processNode.setApproveState(finish ? ApproveState.PASS : ApproveState.PENDING);
+        processNode.setApproveStrategy(MultiOperatorAuditStrategy.Type.SEQUENCE);
+        processNode.setOperatorStrategy(OperatorStrategy.OPERATOR_LIST);
+        return processNode;
+    }
+
+    public static ProcessNode createByNode(IFlowNode flowNode, OperatorSelectType operatorSelectType, List<IFlowOperator> operators) {
+        ProcessNode processNode = new ProcessNode();
+        processNode.setId(flowNode.getId());
+        processNode.setNodeId(flowNode.getId());
+        processNode.setNodeName(flowNode.getName());
+        processNode.setNodeType(flowNode.getType());
+        processNode.setApproveState(ApproveState.PENDING);
+        processNode.resetApproveStrategy(flowNode);
+
+        if (operators != null && !operators.isEmpty()) {
+            List<FlowOperatorBody> flowOperatorBodyList = new ArrayList<>();
+            for (IFlowOperator operator : operators) {
+                flowOperatorBodyList.add(new FlowOperatorBody(operator));
+            }
+            processNode.setOperators(flowOperatorBodyList);
+            processNode.setOperatorStrategy(OperatorStrategy.OPERATOR_LIST);
+        } else {
+            if (operatorSelectType == OperatorSelectType.APPROVER_SELECT) {
+                processNode.setOperatorStrategy(OperatorStrategy.APPROVER_SELECT);
+            }
+            if (operatorSelectType == OperatorSelectType.INITIATOR_SELECT) {
+                processNode.setOperatorStrategy(OperatorStrategy.INITIATOR_SELECT);
+            }
         }
-        return "待审批";
+
+        return processNode;
     }
 
     /**
@@ -189,6 +199,11 @@ public class ProcessNode {
          * 签名key
          */
         private String signKey;
+
+        /**
+         * 审批类型
+         */
+        private String actionType;
 
         /**
          * 审批动作

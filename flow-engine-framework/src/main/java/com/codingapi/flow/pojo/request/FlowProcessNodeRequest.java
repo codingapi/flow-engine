@@ -26,6 +26,7 @@ public class FlowProcessNodeRequest {
      */
     private Map<String, Object> formData;
 
+
     public FlowProcessNodeRequest(long id, long operatorId, Map<String, Object> formData) {
         this.id = String.valueOf(id);
         this.operatorId = operatorId;
@@ -38,7 +39,4 @@ public class FlowProcessNodeRequest {
         this.formData = formData;
     }
 
-    public boolean isCreateWorkflow() {
-        return !id.matches("^[0-9]+$");
-    }
 }

@@ -5,13 +5,10 @@ import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.manager.ActionManager;
-import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
+import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.nodes.ConditionBranchNode;
-import com.codingapi.flow.node.nodes.ConditionElseBranchNode;
-import com.codingapi.flow.node.nodes.InclusiveBranchNode;
-import com.codingapi.flow.node.nodes.InclusiveElseBranchNode;
+import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowProcessNodeRequest;
@@ -22,13 +19,13 @@ import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
+import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
+import com.codingapi.flow.strategy.node.OperatorSelectType;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
-import lombok.Getter;
 
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,20 +35,16 @@ import java.util.Map;
 public class FlowProcessNodeService {
 
     private final FlowProcessNodeRequest request;
-    private final IFlowOperator currentOperator;
-    private IFlowOperator createdOperator;
-    private IFlowOperator submitOperator;
     private final FlowRecordService flowRecordService;
     private final WorkflowService workflowService;
-
     private final IRepositoryHolder repositoryHolder;
 
+    // 当前操作人
+    private final IFlowOperator currentOperator;
     // 当前的流程记录，当id为workId时flowRecord为空
     private FlowRecord flowRecord;
     // 当前的流程设计器
     private Workflow workflow;
-    // 当前的节点
-    private IFlowNode currentNode;
     // 流程节点记录
     private final List<ProcessNode> nodeList;
 
@@ -63,96 +56,108 @@ public class FlowProcessNodeService {
         this.workflowService = repositoryHolder.getWorkflowService();
         this.repositoryHolder = repositoryHolder;
         this.nodeList = new ArrayList<>();
-        this.loadWorkflow();
+        this.initData();
     }
 
 
-    private void loadWorkflow() {
+    private void initData() {
         String id = this.request.getId();
-        if (this.request.isCreateWorkflow()) {
+        if (this.isCreateWorkflow()) {
             this.workflow = workflowService.getWorkflow(id);
-            this.currentNode = this.workflow.getStartNode();
-            this.createdOperator = this.currentOperator;
-            this.submitOperator = null;
         } else {
-            FlowRecord flowRecord = flowRecordService.getFlowRecord(Long.parseLong(id));
+            this.flowRecord = flowRecordService.getFlowRecord(Long.parseLong(id));
             if (flowRecord == null) {
                 throw FlowNotFoundException.record(Long.parseLong(id));
             }
-            this.flowRecord = flowRecord;
             WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(flowRecord.getWorkRuntimeId());
-            if (workflowRuntime == null) {
-                throw FlowNotFoundException.workflow(flowRecord.getWorkRuntimeId() + " not found");
-            }
             this.workflow = workflowRuntime.toWorkflow();
-            this.currentNode = this.workflow.getFlowNode(flowRecord.getNodeId());
-            this.createdOperator = this.repositoryHolder.getOperatorById(this.flowRecord.getCreateOperatorId());
-            this.submitOperator =  this.repositoryHolder.getOperatorById(this.flowRecord.getSubmitOperatorId());
         }
     }
+
+    private boolean isCreateWorkflow() {
+        String id = this.request.getId();
+        return !id.matches("^[0-9]+$");
+    }
+
 
     public List<ProcessNode> processNodes() {
-        long backupId = 0;
+        // load history data
         if (this.flowRecord != null) {
-            backupId = this.flowRecord.getWorkRuntimeId();
-            // 如果当前记录已结束，则不查询后续流程
+            this.loadHistoryData();
             if (this.flowRecord.isDone()) {
-                List<FlowRecord> allRecords = flowRecordService.findFlowRecordByProcessId(this.flowRecord.getProcessId());
-                List<FlowRecord> doneRecords = allRecords.stream().filter(FlowRecord::isDone).toList();
-                nodeList.addAll(buildHistoryNodes(doneRecords));
-                if (this.flowRecord.isFinish()) {
-                    nodeList.add(ProcessNode.createEndNode(this.workflow));
-                } else {
-                    this.loadNextNode(backupId);
+                // load end node
+                this.loadEndNode(this.flowRecord.isFinish());
+                return nodeList;
+            }
+        }
+        // load next node data
+        this.loadNextData();
+        // load end node
+        this.loadEndNode(false);
+        return nodeList;
+    }
+
+
+    private void loadHistoryData() {
+        List<FlowRecord> allRecords = flowRecordService.findFlowRecordByProcessId(this.flowRecord.getProcessId());
+        Map<String, ProcessNode> nodeMap = new LinkedHashMap<>();
+        for (FlowRecord record : allRecords) {
+            ProcessNode existing = nodeMap.get(record.getNodeId());
+            if (existing != null) {
+                existing.addFlowRecordOperator(record);
+                existing.resetApproveState(record);
+            } else {
+                nodeMap.put(record.getNodeId(), ProcessNode.createByRecord(record, this.workflow));
+            }
+        }
+        this.nodeList.addAll(nodeMap.values());
+    }
+
+    private void loadEndNode(boolean finish) {
+        IFlowNode endNode = this.workflow.getEndNode();
+        this.nodeList.add(ProcessNode.createByEndNode(endNode, finish));
+    }
+
+
+    private void loadNextData() {
+        if (this.flowRecord == null) {
+            IFlowNode currentNode = this.workflow.getStartNode();
+            FlowSession flowSession = this.buildFlowSession(currentNode, currentOperator, currentOperator, currentOperator, 0);
+            this.addFlowNode(currentNode, flowSession);
+            this.fetchFlowNode(flowSession);
+        } else {
+            List<FlowRecord> todoRecords = this.flowRecordService.findFlowRecordTodoRecords(flowRecord.getProcessId());
+            if (todoRecords != null && !todoRecords.isEmpty()) {
+                for (FlowRecord todoRecord : todoRecords) {
+                    IFlowNode currentNode = this.workflow.getFlowNode(todoRecord.getNodeId());
+                    IFlowOperator createOperator = this.repositoryHolder.getOperatorById(todoRecord.getCreateOperatorId());
+                    IFlowOperator submitOperator = this.repositoryHolder.getOperatorById(todoRecord.getSubmitOperatorId());
+
+                    FlowSession flowSession = this.buildFlowSession(currentNode, currentOperator, createOperator, submitOperator, todoRecord.getWorkRuntimeId());
+                    this.fetchFlowNode(flowSession);
                 }
-                return this.nodeList;
-            } else {
-                // 查询历史记录
-                List<FlowRecord> historyRecords = flowRecordService.findFlowRecordBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
-                nodeList.addAll(buildHistoryNodes(historyRecords));
             }
         }
-
-        this.loadNextNode(backupId);
-
-        int seqIndex = 1;
-        for (ProcessNode node : this.nodeList) {
-            node.setSeqNo(String.valueOf(seqIndex++));
-        }
-
-        return this.nodeList;
-    }
-
-    private List<ProcessNode> buildHistoryNodes(List<FlowRecord> records) {
-        List<ProcessNode> result = new ArrayList<>();
-        ProcessNode lastNode = null;
-        for (FlowRecord record : records) {
-            if (lastNode != null && lastNode.getNodeId().equals(record.getNodeId())) {
-                lastNode.addOperator(new ProcessNode.FlowOperatorBody(record));
-            } else {
-                ProcessNode newNode = new ProcessNode(record, this.workflow);
-                result.add(newNode);
-                lastNode = newNode;
-            }
-        }
-        return result;
     }
 
 
-    private void loadNextNode(long backupId) {
-
+    private FlowSession buildFlowSession(IFlowNode currentNode,
+                                         IFlowOperator currentOperator,
+                                         IFlowOperator createdOperator,
+                                         IFlowOperator submitOperator,
+                                         long backupId) {
         ActionManager actionManager = currentNode.actionManager();
         IFlowAction flowAction = actionManager.getAction(PassAction.class);
         FormData formData = new FormData(this.workflow.getForm());
         formData.reset(this.request.getFormData());
 
-        FlowSession flowSession = new FlowSession(
+        return new FlowSession(
                 this.repositoryHolder,
-                this.currentOperator,
-                this.createdOperator,
-                this.submitOperator,
+                currentOperator,
+                createdOperator,
+                submitOperator,
                 this.workflow,
-                this.currentNode,
+                currentNode,
                 flowAction,
                 formData,
                 this.flowRecord,
@@ -160,116 +165,42 @@ public class FlowProcessNodeService {
                 backupId,
                 FlowAdvice.nullFlowAdvice()
         );
-
-        NextNodeLoader nextNodeLoader = new NextNodeLoader(this.currentNode);
-        List<ProcessNode> nextNodes = nextNodeLoader.loadNextNode(flowSession);
-
-        this.nodeList.addAll(nextNodes);
     }
 
 
-    private class NextNodeLoader {
+    private void fetchFlowNode(FlowSession flowSession) {
+        List<IFlowNode> nextNodes = flowSession.matchNextNodes();
+        if (nextNodes != null && !nextNodes.isEmpty()) {
+            for (IFlowNode flowNode : nextNodes) {
+                this.addFlowNode(flowNode, flowSession);
 
-        @Getter
-        private final List<ProcessNode> nodeList;
-        private final IFlowNode currentNode;
-
-        public NextNodeLoader(IFlowNode currentNode) {
-            this.currentNode = currentNode;
-            this.nodeList = new ArrayList<>();
+                FlowSession nextSession = flowSession.updateSession(flowNode);
+                this.fetchFlowNode(nextSession);
+            }
         }
 
-        private void fetchNextNode(FlowSession flowSession, List<IFlowNode> nexNodes) {
-            for (IFlowNode flowNode : nexNodes) {
-                ActionManager actionManager = flowNode.actionManager();
-                IFlowAction passAction =  actionManager.getAction(PassAction.class);
-                flowSession = flowSession.updateSession(passAction);
+    }
 
-                List<IFlowOperator> operators = null;
-                if (flowNode.getType().equals(StartNode.NODE_TYPE)) {
-                    operators = List.of(flowSession.getCurrentOperator());
+    private void addFlowNode(IFlowNode flowNode, FlowSession flowSession) {
+        // 仅添加展示节点，且非结束节点
+        if (flowNode instanceof IDisplayNode) {
+            if (!(flowNode instanceof EndNode)) {
+
+                if (flowNode instanceof StartNode) {
+                    List<IFlowOperator> operators = new ArrayList<>();
+                    operators.add(this.currentOperator);
+                    this.nodeList.add(ProcessNode.createByNode(flowNode, OperatorSelectType.SCRIPT, operators));
                 } else {
-                    NodeStrategyManager nodeStrategyManager = flowNode.strategyManager();
-                    OperatorManager operatorManager = nodeStrategyManager.loadOperators(flowSession.updateSession(flowNode));
-                    operators = operatorManager.getOperators();
-                }
-                ProcessNode processNode = new ProcessNode(flowNode, operators);
-                if (processNode.isFlowNode(this.currentNode)) {
-                    processNode.setCurrentState();
-                }
-                this.nodeList.add(processNode);
-                List<IFlowNode> nextNodes = workflow.nextNodes(flowNode);
-                List<IFlowNode> selected = selectBranchNodes(nextNodes, flowSession.updateSession(flowNode));
-                this.fetchNextNode(flowSession.updateSession(flowNode), selected);
-            }
-        }
+                    OperatorLoadStrategy operatorLoadStrategy = flowNode.strategyManager().getStrategy(OperatorLoadStrategy.class);
+                    OperatorSelectType operatorSelectType = operatorLoadStrategy.getSelectType();
 
-        private List<IFlowNode> selectBranchNodes(List<IFlowNode> nextNodes, FlowSession flowSession) {
-            if (nextNodes == null || nextNodes.isEmpty()) {
-                return nextNodes;
-            }
-            IFlowNode first = nextNodes.get(0);
-            String type = first.getType();
-            boolean isBranchControl =
-                    ConditionBranchNode.NODE_TYPE.equals(type)
-                            || ConditionElseBranchNode.NODE_TYPE.equals(type)
-                            || InclusiveBranchNode.NODE_TYPE.equals(type)
-                            || InclusiveElseBranchNode.NODE_TYPE.equals(type);
-            if (!isBranchControl) {
-                return nextNodes;
-            }
-            try {
-                // 优先按 if 条件脚本匹配；脚本天然 fallback else（else.handle() 恒为 true）
-                List<IFlowNode> matched = first.filterBranches(nextNodes, flowSession);
-                if (matched != null && !matched.isEmpty()) {
-                    return matched;
-                }
-            } catch (Exception ignored) {
-                // 表单数据缺失导致条件脚本异常 —— 降级到 else
-            }
-            List<IFlowNode> elseOnly = nextNodes.stream()
-                    .filter(n -> ConditionElseBranchNode.NODE_TYPE.equals(n.getType())
-                            || InclusiveElseBranchNode.NODE_TYPE.equals(n.getType()))
-                    .toList();
-            return elseOnly.isEmpty() ? nextNodes : elseOnly;
-        }
+                    OperatorManager operatorManager = flowNode.strategyManager().loadOperators(flowSession);
+                    List<IFlowOperator> operators = operatorManager.getOperators();
 
-        public List<ProcessNode> loadNextNode(FlowSession flowSession) {
-            this.fetchNextNode(flowSession, List.of(this.currentNode));
-
-            List<ProcessNode> displayNodes = nodeList.stream().filter(ProcessNode::isDisplay).toList();
-            List<ProcessNode> processNodeList = new ArrayList<>();
-            for (ProcessNode node : displayNodes) {
-                if (!processNodeList.contains(node)) {
-                    processNodeList.add(node);
-                }
-            }
-            return sortByWorkflowNodeOrder(processNodeList);
-        }
-
-        private List<ProcessNode> sortByWorkflowNodeOrder(List<ProcessNode> processNodes) {
-            Map<String, Integer> indexMap = new HashMap<>();
-            int[] counter = {0};
-            buildNodeIndexMap(workflow.getNodes(), indexMap, counter);
-            return processNodes.stream()
-                    .sorted(Comparator.comparingInt(
-                            n -> indexMap.getOrDefault(n.getNodeId(), Integer.MAX_VALUE)))
-                    .toList();
-        }
-
-        private void buildNodeIndexMap(List<IFlowNode> nodes, Map<String, Integer> indexMap, int[] counter) {
-            if (nodes == null || nodes.isEmpty()) {
-                return;
-            }
-            for (IFlowNode node : nodes) {
-                indexMap.put(node.getId(), counter[0]++);
-                List<IFlowNode> blocks = node.blocks();
-                if (blocks != null && !blocks.isEmpty()) {
-                    buildNodeIndexMap(blocks, indexMap, counter);
+                    this.nodeList.add(ProcessNode.createByNode(flowNode, operatorSelectType, operators));
                 }
             }
         }
     }
-
 
 }
