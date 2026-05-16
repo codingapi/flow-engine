@@ -400,6 +400,13 @@ public class FlowRecord {
     }
 
     /**
+     * 是否异常
+     */
+    public boolean isError(){
+        return StringUtils.hasText(this.errMessage);
+    }
+
+    /**
      * 判断是否待办
      *
      * @return true/false
