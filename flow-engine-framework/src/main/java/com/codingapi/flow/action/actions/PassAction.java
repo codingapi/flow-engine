@@ -3,6 +3,7 @@ package com.codingapi.flow.action.actions;
 import com.codingapi.flow.action.ActionDisplay;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.BaseAction;
+import com.codingapi.flow.action.actions.service.InitiatorSelectNodeService;
 import com.codingapi.flow.context.ActionResponseContext;
 import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
@@ -70,6 +71,13 @@ public class PassAction extends BaseAction {
     }
 
 
+    private List<NodeOption> loadInitiatorSelectNodes(FlowSession flowSession){
+        InitiatorSelectNodeService initiatorSelectNodeService = new InitiatorSelectNodeService(flowSession);
+        initiatorSelectNodeService.fetchNodes();
+        return initiatorSelectNodeService.getOperatorSelectNodes();
+    }
+
+
     @Override
     public void run(FlowSession flowSession) {
         IRepositoryHolder repositoryHolder = flowSession.getRepositoryHolder();
@@ -93,21 +101,12 @@ public class PassAction extends BaseAction {
         }
 
         // 检查操作人选择：若存在需要手动设定操作人的节点且尚未设定，则提示用户
-        Map<String, List<Long>> operatorSelectMap = flowSession.getAdvice().getOperatorSelectMap();
         List<NodeOption> operatorSelectNodes = new ArrayList<>();
-
         if (currentNode.getType().equalsIgnoreCase(StartNode.NODE_TYPE)) {
             // 发起人设定模式：开始节点提交时，扫描整个工作流中所有 INITIATOR_SELECT 节点
-            for (IFlowNode node : flowSession.getWorkflow().getNodes()) {
-                OperatorSelectType selectType = node.strategyManager().getOperatorSelectType();
-                if (selectType == OperatorSelectType.INITIATOR_SELECT) {
-                    if (operatorSelectMap == null || !operatorSelectMap.containsKey(node.getId())
-                            || operatorSelectMap.get(node.getId()).isEmpty()) {
-                        operatorSelectNodes.add(new NodeOption(node));
-                    }
-                }
-            }
+            operatorSelectNodes.addAll(this.loadInitiatorSelectNodes(flowSession));
         } else {
+            Map<String, List<Long>> operatorSelectMap = flowSession.getAdvice().getOperatorSelectMap();
             // 审批人设定模式：审批节点提交时，检查下游节点是否有 APPROVER_SELECT
             if (nextNodes != null) {
                 for (IFlowNode nextNode : nextNodes) {
