@@ -1,10 +1,7 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
-import com.codingapi.flow.node.BaseFlowNode;
-import com.codingapi.flow.node.IBlockNode;
-import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.node.NodeType;
+import com.codingapi.flow.node.*;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.utils.RandomUtils;
 
@@ -15,7 +12,7 @@ import java.util.Map;
 /**
  * 人工控制节点
  */
-public class ManualNode extends BaseFlowNode implements IBlockNode {
+public class ManualNode extends BaseFlowNode implements IBlockNode , IDisplayNode {
 
     public static final String NODE_TYPE = NodeType.MANUAL.name();
     public static final String DEFAULT_NAME = "人工控制节点";

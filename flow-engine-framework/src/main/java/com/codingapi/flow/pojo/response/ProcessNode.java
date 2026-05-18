@@ -63,12 +63,7 @@ public class ProcessNode {
         return this.approveState == ApproveState.PASS || this.approveState == ApproveState.ERROR;
     }
 
-    public void addFlowRecordOperator(FlowRecord record, IFlowOperator flowOperator) {
-        if (this.operators == null) {
-            this.operators = new ArrayList<>();
-        }
-        this.operators.add(new FlowOperatorBody(record, flowOperator));
-    }
+
 
     public enum OperatorStrategy {
         /**
@@ -83,7 +78,12 @@ public class ProcessNode {
         /**
          * 审批人设定：当前节点审批时，审批人为下游该节点指定操作人
          */
-        APPROVER_SELECT
+        APPROVER_SELECT,
+
+        /**
+         *  无人员设置
+         */
+        NO_OPERATOR
     }
 
     public enum ApproveState {
@@ -188,22 +188,24 @@ public class ProcessNode {
         processNode.setApproveState(ApproveState.PENDING);
         processNode.resetApproveStrategy(flowNode);
 
+        OperatorStrategy operatorStrategy = OperatorStrategy.NO_OPERATOR;
+
         if (operators != null && !operators.isEmpty()) {
             List<FlowOperatorBody> flowOperatorBodyList = new ArrayList<>();
             for (IFlowOperator operator : operators) {
                 flowOperatorBodyList.add(new FlowOperatorBody(operator));
             }
             processNode.setOperators(flowOperatorBodyList);
-            processNode.setOperatorStrategy(OperatorStrategy.OPERATOR_LIST);
+            operatorStrategy = OperatorStrategy.OPERATOR_LIST;
         } else {
             if (operatorSelectType == OperatorSelectType.APPROVER_SELECT) {
-                processNode.setOperatorStrategy(OperatorStrategy.APPROVER_SELECT);
+                operatorStrategy = OperatorStrategy.APPROVER_SELECT;
             }
             if (operatorSelectType == OperatorSelectType.INITIATOR_SELECT) {
-                processNode.setOperatorStrategy(OperatorStrategy.INITIATOR_SELECT);
+                operatorStrategy = OperatorStrategy.INITIATOR_SELECT;
             }
         }
-
+        processNode.setOperatorStrategy(operatorStrategy);
         return processNode;
     }
 

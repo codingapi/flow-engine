@@ -196,11 +196,15 @@ public class FlowProcessNodeService {
                     operators.add(this.currentOperator);
                     this.nodeList.add(ProcessNode.createByNode(flowNode, OperatorSelectType.SCRIPT, operators));
                 } else {
-                    OperatorLoadStrategy operatorLoadStrategy = flowNode.strategyManager().getStrategy(OperatorLoadStrategy.class);
-                    OperatorSelectType operatorSelectType = operatorLoadStrategy.getSelectType();
-
                     OperatorManager operatorManager = flowNode.strategyManager().loadOperators(flowSession);
                     List<IFlowOperator> operators = operatorManager.getOperators();
+
+                    OperatorSelectType operatorSelectType = null;
+                    // 针对延迟节点、触发节点、子流程节点、路由节点、人工节点都没有设置流程审批人
+                    OperatorLoadStrategy operatorLoadStrategy = flowNode.strategyManager().getStrategy(OperatorLoadStrategy.class);
+                    if(operatorLoadStrategy!=null) {
+                        operatorSelectType = operatorLoadStrategy.getSelectType();
+                    }
 
                     this.nodeList.add(ProcessNode.createByNode(flowNode, operatorSelectType, operators));
                 }
