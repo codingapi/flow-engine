@@ -93,6 +93,48 @@ public class FlowProcessNodeService {
         return flowOperator;
     }
 
+    private void preloadRecordOperators(Collection<Long> operatorIds) {
+        if (operatorIds == null || operatorIds.isEmpty()) {
+            return;
+        }
+
+        List<Long> ids = operatorIds.stream()
+                .filter(id -> id != null && id > 0)
+                .filter(id -> !this.recordOperatorMap.containsKey(id))
+                .distinct()
+                .toList();
+        if (ids.isEmpty()) {
+            return;
+        }
+
+        List<IFlowOperator> operators = this.repositoryHolder.findOperatorByIds(ids);
+        if (operators == null || operators.isEmpty()) {
+            return;
+        }
+
+        for (IFlowOperator operator : operators) {
+            if (operator != null) {
+                this.recordOperatorMap.put(operator.getUserId(), operator);
+            }
+        }
+    }
+
+    private List<Long> collectRecordOperatorIds(Collection<FlowRecord> records) {
+        if (records == null || records.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> ids = new ArrayList<>();
+        for (FlowRecord record : records) {
+            ids.add(record.getCurrentOperatorId());
+            ids.add(record.getCreateOperatorId());
+            ids.add(record.getSubmitOperatorId());
+            ids.add(record.getForwardOperatorId());
+            ids.add(record.getInterferedOperatorId());
+        }
+        return ids;
+    }
+
 
     public List<ProcessNode> processNodes() {
         // load history data
@@ -114,6 +156,10 @@ public class FlowProcessNodeService {
 
     private void loadHistoryData() {
         List<FlowRecord> allRecords = flowRecordService.findFlowRecordByProcessId(this.flowRecord.getProcessId());
+        // 预加载操作人
+        List<Long> operatorIds = new ArrayList<>(this.collectRecordOperatorIds(allRecords));
+        operatorIds.add(this.request.getOperatorId());
+        this.preloadRecordOperators(operatorIds);
         FlowRecordOrderService orderService = new FlowRecordOrderService(allRecords, this::loadRecordOperator, flowRecords -> nodeList.add(ProcessNode.createByRecord(flowRecords, workflow)));
         orderService.fetch(0);
     }
@@ -133,6 +179,7 @@ public class FlowProcessNodeService {
         } else {
             List<FlowRecord> todoRecords = this.flowRecordService.findFlowRecordTodoRecords(flowRecord.getProcessId());
             if (todoRecords != null && !todoRecords.isEmpty()) {
+                this.preloadRecordOperators(this.collectRecordOperatorIds(todoRecords));
                 for (FlowRecord todoRecord : todoRecords) {
                     IFlowNode currentNode = this.workflow.getFlowNode(todoRecord.getNodeId());
                     IFlowOperator createOperator = this.loadRecordOperator(todoRecord.getCreateOperatorId());
