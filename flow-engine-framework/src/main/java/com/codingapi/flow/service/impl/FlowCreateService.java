@@ -1,7 +1,6 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.cache.FlowOperatorLocalThreadCache;
 import com.codingapi.flow.event.FlowRecordStartEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -43,7 +42,6 @@ public class FlowCreateService {
     }
 
     public long create() {
-        FlowOperatorLocalThreadCache.getInstance().clear();
         request.verify();
         Workflow workflow = workflowService.getWorkflow(request.getWorkId());
         if (workflow == null) {

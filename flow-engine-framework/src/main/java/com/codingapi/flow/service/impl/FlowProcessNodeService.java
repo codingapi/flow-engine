@@ -2,7 +2,6 @@ package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
-import com.codingapi.flow.cache.FlowOperatorLocalThreadCache;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.manager.ActionManager;
@@ -119,7 +118,6 @@ public class FlowProcessNodeService {
     }
 
     public List<ProcessNode> processNodes() {
-        FlowOperatorLocalThreadCache.getInstance().clear();
         // load history data
         if (this.flowRecord != null) {
             this.loadHistoryData();

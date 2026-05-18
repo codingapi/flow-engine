@@ -1,6 +1,5 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.cache.FlowOperatorLocalThreadCache;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -35,7 +34,6 @@ public class FlowDetailService {
     }
 
     public FlowContent detail() {
-        FlowOperatorLocalThreadCache.getInstance().clear();
         if (this.request.isCreateWorkflow()) {
             Workflow workflow = workflowService.getWorkflow(this.request.getId());
             if (workflow == null) {

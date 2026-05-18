@@ -1,6 +1,5 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.cache.FlowOperatorLocalThreadCache;
 import com.codingapi.flow.domain.UrgeInterval;
 import com.codingapi.flow.event.FlowRecordUrgeEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -46,7 +45,6 @@ public class FlowUrgeService {
      * 催办
      */
     public void urge() {
-        FlowOperatorLocalThreadCache.getInstance().clear();
         request.verify();
         // 验证当前用户
         FlowRecord currentRecord = flowRecordService.getFlowRecord(request.getRecordId());

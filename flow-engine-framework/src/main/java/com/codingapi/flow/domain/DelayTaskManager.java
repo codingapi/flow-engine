@@ -1,5 +1,6 @@
 package com.codingapi.flow.domain;
 
+import com.codingapi.flow.cache.FlowOperatorLocalThreadCache;
 import com.codingapi.flow.service.impl.FlowDelayTriggerService;
 import com.codingapi.flow.session.IRepositoryHolder;
 import lombok.Getter;
@@ -30,7 +31,7 @@ public class DelayTaskManager {
         List<DelayTask> delayTasks = repositoryHolder.findDelayTasks();
         if (delayTasks != null && !delayTasks.isEmpty()) {
             for (DelayTask delayTask : delayTasks) {
-                this.addTask(delayTask,repositoryHolder);
+                this.addTask(delayTask, repositoryHolder);
             }
         }
         System.out.println("flow delay task started");
@@ -52,9 +53,9 @@ public class DelayTaskManager {
     /**
      * 添加任务队列
      */
-    public void addTask(DelayTask task,IRepositoryHolder repositoryHolder) {
+    public void addTask(DelayTask task, IRepositoryHolder repositoryHolder) {
         repositoryHolder.saveDelayTask(task);
-        this.delayJobs.add(new DelayJob(task,repositoryHolder));
+        this.delayJobs.add(new DelayJob(task, repositoryHolder));
     }
 
     /**
@@ -64,7 +65,7 @@ public class DelayTaskManager {
         private final DelayTask task;
         private final Timer timer;
 
-        public DelayJob(DelayTask task,IRepositoryHolder repositoryHolder) {
+        public DelayJob(DelayTask task, IRepositoryHolder repositoryHolder) {
             this.task = task;
             this.timer = new Timer();
             this.start(repositoryHolder);
@@ -78,11 +79,9 @@ public class DelayTaskManager {
             this.timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-
+                    FlowOperatorLocalThreadCache.getInstance().clear();
                     FlowDelayTriggerService flowDelayTriggerService = repositoryHolder.createDelayTriggerService(task);
-
                     flowDelayTriggerService.trigger();
-
                     repositoryHolder.deleteDelayTask(task);
                 }
             }, new Date(task.getTriggerTime()));

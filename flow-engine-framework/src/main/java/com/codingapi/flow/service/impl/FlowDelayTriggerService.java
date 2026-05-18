@@ -43,7 +43,6 @@ public class FlowDelayTriggerService {
      * 延期任务触发执行
      */
     public void trigger() {
-        FlowOperatorLocalThreadCache.getInstance().clear();
         FlowRecord flowRecord = flowRecordService.getFlowRecord(delayTask.getCurrentRecordId());
         if (flowRecord == null) {
             throw FlowNotFoundException.record(delayTask.getCurrentRecordId());

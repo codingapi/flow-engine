@@ -1,6 +1,5 @@
 package com.codingapi.flow.service.impl;
 
-import com.codingapi.flow.cache.FlowOperatorLocalThreadCache;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowNotFoundException;
@@ -39,7 +38,6 @@ public class FlowRevokeService {
     }
 
     public void revoke() {
-        FlowOperatorLocalThreadCache.getInstance().clear();
         request.verify();
         // 验证当前用户
         FlowRecord currentRecord = flowRecordService.getFlowRecord(request.getRecordId());
