@@ -6,8 +6,10 @@ import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.repository.*;
-import java.util.Collections;
+import com.codingapi.flow.repository.DelayTaskRepository;
+import com.codingapi.flow.repository.FlowOperatorAssignmentRepository;
+import com.codingapi.flow.repository.ParallelBranchRepository;
+import com.codingapi.flow.repository.UrgeIntervalRepository;
 import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.FlowService;
 import com.codingapi.flow.service.WorkflowService;
@@ -35,8 +37,6 @@ public class RepositoryHolderContext implements IRepositoryHolder {
     @Getter
     private FlowRecordService flowRecordService;
     @Getter
-    private FlowOperatorGateway flowOperatorGateway;
-    @Getter
     private ParallelBranchRepository parallelBranchRepository;
     @Getter
     private DelayTaskRepository delayTaskRepository;
@@ -53,7 +53,6 @@ public class RepositoryHolderContext implements IRepositoryHolder {
                 && delayTaskRepository != null
                 && workflowService != null
                 && flowRecordService != null
-                && flowOperatorGateway != null
                 && urgeIntervalRepository != null
                 && flowOperatorAssignmentRepository != null;
     }
@@ -67,14 +66,12 @@ public class RepositoryHolderContext implements IRepositoryHolder {
 
     public void register(WorkflowService workflowService,
                          FlowRecordService flowRecordService,
-                         FlowOperatorGateway flowOperatorGateway,
                          ParallelBranchRepository parallelBranchRepository,
                          DelayTaskRepository delayTaskRepository,
                          UrgeIntervalRepository urgeIntervalRepository,
                          FlowOperatorAssignmentRepository flowOperatorAssignmentRepository) {
         this.workflowService = workflowService;
         this.flowRecordService = flowRecordService;
-        this.flowOperatorGateway = flowOperatorGateway;
         this.parallelBranchRepository = parallelBranchRepository;
         this.delayTaskRepository = delayTaskRepository;
         this.urgeIntervalRepository = urgeIntervalRepository;
@@ -121,14 +118,28 @@ public class RepositoryHolderContext implements IRepositoryHolder {
     }
 
     public List<IFlowOperator> findOperatorByIds(List<Long> ids) {
-        return flowOperatorGateway.findByIds(ids);
+        return GatewayContext.getInstance().findByIds(ids);
     }
 
 
     public IFlowOperator getOperatorById(long id) {
-        return flowOperatorGateway.get(id);
+        return GatewayContext.getInstance().getFlowOperator(id);
     }
 
+    @Override
+    public FlowOperatorGateway getFlowOperatorGateway() {
+        return new FlowOperatorGateway() {
+            @Override
+            public IFlowOperator get(long id) {
+                return GatewayContext.getInstance().getFlowOperator(id);
+            }
+
+            @Override
+            public List<IFlowOperator> findByIds(List<Long> ids) {
+                return GatewayContext.getInstance().findByIds(ids);
+            }
+        };
+    }
 
     public void saveDelayTask(DelayTask delayTask) {
         delayTaskRepository.save(delayTask);

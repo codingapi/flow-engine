@@ -13,6 +13,7 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.*;
 import com.codingapi.flow.utils.RandomUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,11 +42,15 @@ public class NotifyNode extends BaseAuditNode implements IDisplayNode {
 
     @Override
     public boolean handle(FlowSession session) {
-        IRepositoryHolder repositoryHolder = session.getRepositoryHolder();
-        if (this.isWaitRecordMargeParallelNode(session)) {
-            return false;
+        FlowRecord flowRecord = session.getCurrentRecord();
+        String parallelId = flowRecord.getParallelId();
+        if(StringUtils.hasText(parallelId)) {
+            if (this.isWaitRecordMargeParallelNode(session)) {
+                return false;
+            }
         }
-        List<FlowRecord> records = this.generateCurrentRecords(session);
+        IRepositoryHolder repositoryHolder = session.getRepositoryHolder();
+        List<FlowRecord> records = this.generateCurrentRecords0(session);
         for (FlowRecord record : records) {
             this.fillNewRecord(session, record);
         }
@@ -63,14 +68,18 @@ public class NotifyNode extends BaseAuditNode implements IDisplayNode {
         return true;
     }
 
+    @Override
+    public List<FlowRecord> generateCurrentRecords(FlowSession session) {
+        return new ArrayList<>();
+    }
+
     /**
      * 生成当前节点的记录
      *
      * @param session 触发会话
      * @return 生成当前节点的记录
      */
-    @Override
-    public List<FlowRecord> generateCurrentRecords(FlowSession session) {
+    public List<FlowRecord> generateCurrentRecords0(FlowSession session) {
         List<FlowRecord> records = new ArrayList<>();
         NodeStrategyManager nodeStrategyManager = this.strategyManager();
         OperatorManager operatorManager = nodeStrategyManager.loadOperators(session);

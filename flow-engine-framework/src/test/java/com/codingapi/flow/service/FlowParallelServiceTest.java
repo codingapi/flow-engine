@@ -1,6 +1,7 @@
 package com.codingapi.flow.service;
 
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
@@ -304,6 +305,74 @@ class FlowParallelServiceTest {
         assertEquals(7, records.size());
         assertEquals(0, records.stream().filter(FlowRecord::isTodo).toList().size());
         assertEquals(7, records.stream().filter(FlowRecord::isFinish).toList().size());
+
+    }
+
+
+    @Test
+    void parallelTest(){
+        User user = new User(1, "user");
+        factory.userGateway.save(user);
+
+        String json = """
+                {"updatedTime":"1779115566400","code":"3MgPSwshbC","nodes":[{"view":"default","strategies":[{"script":"// @SCRIPT_TITLE 你有一条待办\\ndef run(request){\\n    return '你有一条待办'\\n}\\n","strategyType":"NodeTitleStrategy"},{"strategyType":"FormFieldPermissionStrategy","fieldPermissions":[{"formCode":"leave","fieldCode":"desc","type":"READ"}]},{"enable":true,"type":"REVOKE_CURRENT","strategyType":"RevokeStrategy"}],"display":true,"name":"开始节点","id":"U7TBIwMsBqtPMlLM2X","type":"START","actions":[{"enable":true,"display":{"title":"通过"},"id":"A48hmH57atyK2inSb6","type":"PASS","title":"通过"},{"enable":true,"display":{"title":"保存"},"id":"WnkyxEDBEMnLtphCQw","type":"SAVE","title":"保存"}],"order":"0"},{"strategies":[],"blocks":[{"strategies":{"$ref":"$.nodes[1].strategies"},"blocks":[{"view":"default","strategies":[{"timeoutTime":"86400000","type":"REMIND","strategyType":"TimeoutStrategy"},{"type":"SEQUENCE","percent":"0.0","strategyType":"MultiOperatorAuditStrategy"},{"type":"MANUAL_PASS","strategyType":"SameOperatorAuditStrategy"},{"enable":false,"strategyType":"RecordMergeStrategy"},{"type":"RESUME","strategyType":"ResubmitStrategy"},{"signRequired":false,"adviceRequired":false,"strategyType":"AdviceStrategy"},{"script":"// @SCRIPT_TITLE 回退至开始节点\\n// @SCRIPT_META {\\"type\\":\\"node\\",\\"node\\":\\"START\\"}\\ndef run(request){\\n    return request.getStartNode().getId();\\n}\\n","strategyType":"ErrorTriggerStrategy"},{"script":"// @SCRIPT_TITLE 你有一条待办\\ndef run(request){\\n    return '你有一条待办'\\n}\\n","strategyType":"NodeTitleStrategy"},{"strategyType":"FormFieldPermissionStrategy","fieldPermissions":{"$ref":"$.nodes[1].strategies"}},{"selectType":"SCRIPT","script":"// @SCRIPT_TITLE 流程创建者\\n// @SCRIPT_META {\\"type\\":\\"creator\\"}\\ndef run(request){\\n    return [request.getCreatedOperatorId()]\\n}\\n","strategyType":"OperatorLoadStrategy"},{"enable":true,"type":"REVOKE_CURRENT","strategyType":"RevokeStrategy"}],"display":true,"name":"审批节点","id":"rNtslevbNRB2P3qPrO","type":"APPROVAL","actions":[{"enable":true,"display":{"title":"通过"},"id":"4vCA3MdH1W8fLoDufv","type":"PASS","title":"通过"},{"enable":true,"display":{"title":"拒绝"},"id":"R4Oz7Qii91QFyfJHOj","type":"REJECT","title":"拒绝","script":"// @SCRIPT_TITLE 返回开始节点\\n// @SCRIPT_META {\\"type\\":\\"START\\"}\\ndef run(request){\\n    return request.getStartNode().getId();\\n}\\n"},{"enable":true,"display":{"title":"保存"},"id":"W65JLyz9w67chUuWqK","type":"SAVE","title":"保存"},{"enable":true,"display":{"title":"加签"},"id":"5pT9hbBQiJmJRWMcKv","type":"ADD_AUDIT","title":"加签"},{"enable":true,"display":{"title":"转办"},"id":"cRNl4ls1AVm4J2UiCZ","type":"TRANSFER","title":"转办"},{"enable":true,"display":{"title":"退回"},"id":"Vk7NI8uGA7WZBqeMhp","type":"RETURN","title":"退回"},{"enable":true,"display":{"title":"委派"},"id":"0z1BK3A8OHVtOooajh","type":"DELEGATE","title":"委派"}],"order":"0"}],"display":false,"name":"并行分支节点","id":"QRYBK1RdEGNjqHCWo7","type":"PARALLEL_BRANCH","actions":{"$ref":"$.nodes[1].strategies"},"order":"1"},{"strategies":{"$ref":"$.nodes[1].strategies"},"blocks":[{"view":"default","strategies":[{"timeoutTime":"86400000","type":"REMIND","strategyType":"TimeoutStrategy"},{"type":"SEQUENCE","percent":"0.0","strategyType":"MultiOperatorAuditStrategy"},{"type":"MANUAL_PASS","strategyType":"SameOperatorAuditStrategy"},{"enable":false,"strategyType":"RecordMergeStrategy"},{"type":"RESUME","strategyType":"ResubmitStrategy"},{"signRequired":false,"adviceRequired":false,"strategyType":"AdviceStrategy"},{"script":"// @SCRIPT_TITLE 回退至开始节点\\n// @SCRIPT_META {\\"type\\":\\"node\\",\\"node\\":\\"START\\"}\\ndef run(request){\\n    return request.getStartNode().getId();\\n}\\n","strategyType":"ErrorTriggerStrategy"},{"script":"// @SCRIPT_TITLE 你有一条待办\\ndef run(request){\\n    return '你有一条待办'\\n}\\n","strategyType":"NodeTitleStrategy"},{"strategyType":"FormFieldPermissionStrategy","fieldPermissions":{"$ref":"$.nodes[1].strategies"}},{"selectType":"SCRIPT","script":"// @SCRIPT_TITLE 流程创建者\\n// @SCRIPT_META {\\"type\\":\\"creator\\"}\\ndef run(request){\\n    return [request.getCreatedOperatorId()]\\n}\\n","strategyType":"OperatorLoadStrategy"},{"enable":true,"type":"REVOKE_CURRENT","strategyType":"RevokeStrategy"}],"display":true,"name":"审批节点","id":"q6NO5sCyEmGDw0uNpp","type":"APPROVAL","actions":[{"enable":true,"display":{"title":"通过"},"id":"3MCWiENt6glv9xzea5","type":"PASS","title":"通过"},{"enable":true,"display":{"title":"拒绝"},"id":"dJnTZ9LcBum9gXc1Ba","type":"REJECT","title":"拒绝","script":"// @SCRIPT_TITLE 返回开始节点\\n// @SCRIPT_META {\\"type\\":\\"START\\"}\\ndef run(request){\\n    return request.getStartNode().getId();\\n}\\n"},{"enable":true,"display":{"title":"保存"},"id":"UvA6Wl9epOLCpcRERi","type":"SAVE","title":"保存"},{"enable":true,"display":{"title":"加签"},"id":"P8rvYisfKJsQN6xdFt","type":"ADD_AUDIT","title":"加签"},{"enable":true,"display":{"title":"转办"},"id":"MWO88KiwmDGOOd6FJ6","type":"TRANSFER","title":"转办"},{"enable":true,"display":{"title":"退回"},"id":"cLdgknFlunfTV2fiwL","type":"RETURN","title":"退回"},{"enable":true,"display":{"title":"委派"},"id":"kaGmQkZm1lDm1xpLSc","type":"DELEGATE","title":"委派"}],"order":"0"}],"display":false,"name":"并行分支节点","id":"aiDuVhF32mKgmfG17t","type":"PARALLEL_BRANCH","actions":{"$ref":"$.nodes[1].strategies"},"order":"2"}],"display":false,"name":"并行控制节点","id":"xvXK0CmCs8G7vfSNWR","type":"PARALLEL","actions":{"$ref":"$.nodes[1].strategies"},"order":"0"},{"view":"default","strategies":[{"script":"// @SCRIPT_TITLE 回退至开始节点\\n// @SCRIPT_META {\\"type\\":\\"node\\",\\"node\\":\\"START\\"}\\ndef run(request){\\n    return request.getStartNode().getId();\\n}\\n","strategyType":"ErrorTriggerStrategy"},{"script":"// @SCRIPT_TITLE 你有一条待办\\ndef run(request){\\n    return '你有一条待办'\\n}\\n","strategyType":"NodeTitleStrategy"},{"strategyType":"FormFieldPermissionStrategy","fieldPermissions":[{"formCode":"leave","fieldCode":"desc","type":"WRITE"}]},{"selectType":"SCRIPT","script":"// @SCRIPT_TITLE 流程创建者\\n// @SCRIPT_META {\\"type\\":\\"creator\\"}\\ndef run(request){\\n    return [request.getCreatedOperatorId()]\\n}\\n","strategyType":"OperatorLoadStrategy"}],"display":true,"name":"抄送节点","id":"IhWkd6SKzARfMCN2bW","type":"NOTIFY","actions":{"$ref":"$.nodes[1].strategies"},"order":"2"},{"strategies":{"$ref":"$.nodes[1].strategies"},"display":true,"name":"结束节点","id":"IH0QcEwZlODLlq9uq2","type":"END","actions":{"$ref":"$.nodes[1].strategies"},"order":"0"}],"form":{"code":"leave","name":"请假单","fields":[{"code":"desc","hidden":false,"dataType":"INTEGER","name":"天数","attributes":[],"id":"53759b8e-e622-424e-a10b-a92b4fb90ad6","placeholder":"请输入理由","type":"integer","required":true}]},"createdOperator":"1","strategies":[{"enable":true,"strategyType":"InterfereStrategy"},{"enable":true,"interval":"60","strategyType":"UrgeStrategy"}],"description":"这是一个流程的备注信息","createdTime":"1774603227796","id":"JTWgurhWfc998EMqbw","title":"请假","operatorCreateScript":"// @SCRIPT_TITLE 任意用户\\n// @SCRIPT_META {\\"type\\":\\"any\\"}\\ndef run(request){\\n    return true\\n}\\n"}
+                """;
+
+        Workflow workflow = Workflow.formJson(json);
+        workflow.enable();
+        factory.workflowService.saveWorkflow(workflow);
+
+        String processId = null;
+
+        IFlowNode startNode =  workflow.getStartNode();
+        Map<String, Object> data = Map.of( "desc", 3);
+
+        List<IFlowAction> startActions = startNode.actionManager().getActions();
+
+        FlowCreateRequest userCreateRequest = new FlowCreateRequest();
+        userCreateRequest.setWorkId(workflow.getId());
+        userCreateRequest.setFormData(data);
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
+
+        factory.flowService.create(userCreateRequest);
+
+        List<FlowRecord> userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(1, userRecordList.size());
+
+        processId = userRecordList.get(0).getProcessId();
+
+        FlowActionRequest userRequest = new FlowActionRequest();
+        userRequest.setFormData(data);
+        userRequest.setRecordId(userRecordList.get(0).getId());
+        userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        factory.flowService.action(userRequest);
+
+        userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(2, userRecordList.size());
+
+
+        for (int i=0;i<2;i++){
+            FlowRecord currentRecord = userRecordList.get(i);
+            IFlowNode flowNode = workflow.getFlowNode(currentRecord.getNodeId());
+            userRequest = new FlowActionRequest();
+            userRequest.setFormData(data);
+            userRequest.setRecordId(currentRecord.getId());
+            userRequest.setAdvice(new FlowAdviceBody(flowNode.actionManager().getAction(PassAction.class).id(), "同意", user.getUserId()));
+
+            if(i==1){
+                System.out.println(currentRecord);
+            }
+            factory.flowService.action(userRequest);
+        }
+
+        userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(0, userRecordList.size());
+
+        List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(processId);
+        assertEquals(4, records.size());
+        assertEquals(0, records.stream().filter(FlowRecord::isTodo).toList().size());
+        assertEquals(4, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 }

@@ -5,6 +5,7 @@ import com.codingapi.flow.infra.jpa.ParallelControlEntityRepository;
 import com.codingapi.flow.repository.ParallelBranchRepository;
 import lombok.AllArgsConstructor;
 
+
 @AllArgsConstructor
 public class ParallelBranchRepositoryImpl implements ParallelBranchRepository {
 
@@ -25,7 +26,7 @@ public class ParallelBranchRepositoryImpl implements ParallelBranchRepository {
         if(entity != null){
             entity.setCount(entity.getCount() + 1);
             parallelControlEntityRepository.save(entity);
-        }{
+        }else {
             ParallelControlEntity newEntity = new ParallelControlEntity();
             newEntity.setId(parallelId);
             newEntity.setCount(1);

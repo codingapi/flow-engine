@@ -61,7 +61,7 @@ public interface IRepositoryHolder {
     /**
      * 获取流程详情
      *
-     * @param id 流程id
+     * @param recordId 流程id
      * @return 流程详情
      */
     FlowRecord getRecordById(long recordId);

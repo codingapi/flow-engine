@@ -931,6 +931,11 @@ class FlowSampleServiceTest {
         List<FlowRecord> userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
         assertEquals(1, userRecordList.size());
 
+
+        List<ProcessNode> nodeList = factory.flowService.processNodes(new FlowProcessNodeRequest(workflow.getId(), user.getUserId(),data));
+        assertEquals(5,nodeList.size());
+        assertEquals(0,nodeList.stream().filter(ProcessNode::isHistory).toList().size());
+
         FlowActionRequest userRequest = new FlowActionRequest();
         userRequest.setFormData(data);
         userRequest.setRecordId(userRecordList.get(0).getId());

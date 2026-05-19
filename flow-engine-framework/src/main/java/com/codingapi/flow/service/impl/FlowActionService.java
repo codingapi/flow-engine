@@ -41,9 +41,9 @@ public class FlowActionService {
     }
 
     public ActionResponse action() {
-
         ActionResponseContext.getInstance().clear();
         request.verify();
+
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getAdvice().getOperatorId());
         if (currentOperator == null) {

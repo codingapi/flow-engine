@@ -247,7 +247,7 @@ public class ProcessNode {
         public FlowOperatorBody(FlowRecord flowRecord, IFlowOperator flowOperator) {
             this.advice = flowRecord.getAdvice();
             this.signKey = flowRecord.getSignKey();
-            this.approveTime = flowRecord.getCreateTime();
+            this.approveTime = flowRecord.getUpdateTime();
             this.actionName = flowRecord.getActionName();
             this.actionType = flowRecord.getActionType();
             this.flowOperator = flowOperator;

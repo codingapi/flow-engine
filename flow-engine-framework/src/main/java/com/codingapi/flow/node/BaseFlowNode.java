@@ -213,13 +213,14 @@ public abstract class BaseFlowNode implements IFlowNode {
         IRepositoryHolder repositoryHolder = session.getRepositoryHolder();
         FlowRecord currentRecord = session.getCurrentRecord();
         if (currentRecord != null && this.getId().equals(currentRecord.getParallelBranchNodeId())) {
-            repositoryHolder.addParallelTriggerCount(currentRecord.getParallelId());
+            String parallelId = currentRecord.getParallelId();
+            repositoryHolder.addParallelTriggerCount(parallelId);
             int parallelBranchTotal = currentRecord.getParallelBranchTotal();
-            int parallelBranchCount = repositoryHolder.getParallelBranchTriggerCount(currentRecord.getParallelId());
+            int parallelBranchCount = repositoryHolder.getParallelBranchTriggerCount(parallelId);
             if (parallelBranchCount == parallelBranchTotal) {
                 // 清空并行节点，防止数据继续继承到后续节点
                 currentRecord.clearParallel();
-                repositoryHolder.clearParallelTriggerCount(currentRecord.getParallelId());
+                repositoryHolder.clearParallelTriggerCount(parallelId);
             }
             return parallelBranchCount != parallelBranchTotal;
         }

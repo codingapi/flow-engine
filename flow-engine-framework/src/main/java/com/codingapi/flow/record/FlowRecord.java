@@ -333,6 +333,13 @@ public class FlowRecord {
     }
 
 
+    public void cleanAction(){
+        this.actionId = null;
+        this.actionType = null;
+        this.actionName = null;
+    }
+
+
     /**
      * 继承记录
      *

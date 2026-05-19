@@ -1,5 +1,6 @@
 package com.codingapi.flow.service;
 
+import com.codingapi.flow.cache.FlowOperatorLocalThreadCache;
 import com.codingapi.flow.pojo.request.*;
 import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.pojo.response.FlowContent;
@@ -26,22 +27,26 @@ public class FlowService {
 
     /**
      * 流程详情
+     *
      * @param request 流程详情请求
      * @return 流程详情
      */
     public FlowContent detail(FlowDetailRequest request) {
-        FlowDetailService flowDetailService = new FlowDetailService(request,this.repositoryHolder);
+        FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowDetailService flowDetailService = new FlowDetailService(request, this.repositoryHolder);
         return flowDetailService.detail();
     }
 
 
     /**
      * 流程节点记录
+     *
      * @param request 流程节点记录请求
      * @return 流程节点记录列表
      */
     public List<ProcessNode> processNodes(FlowProcessNodeRequest request) {
-        FlowProcessNodeService flowProcessNodeService = new FlowProcessNodeService(request,this.repositoryHolder);
+        FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowProcessNodeService flowProcessNodeService = new FlowProcessNodeService(request, this.repositoryHolder);
         return flowProcessNodeService.processNodes();
     }
 
@@ -52,7 +57,8 @@ public class FlowService {
      * @return 创建的流程id
      */
     public long create(FlowCreateRequest request) {
-        FlowCreateService flowCreateService = new FlowCreateService(request,this.repositoryHolder);
+        FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowCreateService flowCreateService = new FlowCreateService(request, this.repositoryHolder);
         return flowCreateService.create();
     }
 
@@ -62,7 +68,8 @@ public class FlowService {
      * @param request 审批请求
      */
     public ActionResponse action(FlowActionRequest request) {
-        FlowActionService flowActionService = new FlowActionService(request,this.repositoryHolder);
+        FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowActionService flowActionService = new FlowActionService(request, this.repositoryHolder);
         return flowActionService.action();
     }
 
@@ -72,7 +79,8 @@ public class FlowService {
      * @param request 撤销请求
      */
     public void revoke(FlowRevokeRequest request) {
-        FlowRevokeService flowRevokeService = new FlowRevokeService(request,this.repositoryHolder);
+        FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowRevokeService flowRevokeService = new FlowRevokeService(request, this.repositoryHolder);
         flowRevokeService.revoke();
     }
 
@@ -81,7 +89,8 @@ public class FlowService {
      * 催办
      */
     public void urge(FlowUrgeRequest request) {
-        FlowUrgeService flowUrgeService = new FlowUrgeService(request,this.repositoryHolder);
+        FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowUrgeService flowUrgeService = new FlowUrgeService(request, this.repositoryHolder);
         flowUrgeService.urge();
     }
 }

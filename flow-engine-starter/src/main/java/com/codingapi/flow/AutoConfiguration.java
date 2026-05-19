@@ -40,7 +40,6 @@ public class AutoConfiguration {
     public RepositoryHolderContextRegister repositoryHolderContextRegister(
             WorkflowService workflowService,
             FlowRecordService flowRecordService,
-            FlowOperatorGateway flowOperatorGateway,
             ParallelBranchRepository parallelBranchRepository,
             DelayTaskRepository delayTaskRepository,
             UrgeIntervalRepository urgeIntervalRepository,
@@ -50,7 +49,6 @@ public class AutoConfiguration {
         return new RepositoryHolderContextRegister(
                 workflowService,
                 flowRecordService,
-                flowOperatorGateway,
                 parallelBranchRepository,
                 delayTaskRepository,
                 urgeIntervalRepository,

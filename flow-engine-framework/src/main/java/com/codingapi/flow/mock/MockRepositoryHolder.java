@@ -1,5 +1,6 @@
 package com.codingapi.flow.mock;
 
+import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.domain.DelayTask;
 import com.codingapi.flow.domain.UrgeInterval;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
@@ -66,7 +67,17 @@ public class MockRepositoryHolder implements IRepositoryHolder {
 
     @Override
     public FlowOperatorGateway getFlowOperatorGateway() {
-        return flowOperatorGateway;
+        return new FlowOperatorGateway() {
+            @Override
+            public IFlowOperator get(long id) {
+                return GatewayContext.getInstance().getFlowOperator(id);
+            }
+
+            @Override
+            public List<IFlowOperator> findByIds(List<Long> ids) {
+                return GatewayContext.getInstance().findByIds(ids);
+            }
+        };
     }
 
     @Override

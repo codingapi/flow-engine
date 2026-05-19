@@ -1,5 +1,6 @@
 package com.codingapi.flow.context;
 
+import com.codingapi.flow.cache.FlowOperatorLocalThreadCache;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
 import lombok.Getter;
@@ -20,11 +21,11 @@ public class GatewayContext {
     private FlowOperatorGateway flowOperatorGateway;
 
     public IFlowOperator getFlowOperator(long userId) {
-        return flowOperatorGateway.get(userId);
+        return FlowOperatorLocalThreadCache.getInstance().get(userId,()->flowOperatorGateway.get(userId));
     }
 
     public List<IFlowOperator> findByIds(List<Long> ids) {
-        return flowOperatorGateway.findByIds(ids);
+        return FlowOperatorLocalThreadCache.getInstance().find(ids,(idList)-> flowOperatorGateway.findByIds(idList));
     }
 
 }

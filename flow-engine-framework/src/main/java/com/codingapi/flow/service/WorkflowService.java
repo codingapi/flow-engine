@@ -1,5 +1,6 @@
 package com.codingapi.flow.service;
 
+import com.codingapi.flow.cache.WorkflowRuntimeCache;
 import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.repository.WorkflowRepository;
@@ -77,7 +78,7 @@ public class WorkflowService {
      * @return 运行时流程配置
      */
     public WorkflowRuntime getWorkflowRuntime(long runtimeId) {
-        return workflowRuntimeRepository.get(runtimeId);
+        return WorkflowRuntimeCache.getInstance().get(runtimeId,()-> workflowRuntimeRepository.get(runtimeId));
     }
 
     /**
@@ -171,6 +172,7 @@ public class WorkflowService {
      */
     public void saveWorkflowRuntime(WorkflowRuntime workflowRuntime) {
         this.workflowRuntimeRepository.save(workflowRuntime);
+        WorkflowRuntimeCache.getInstance().sync(workflowRuntime);
     }
 
 

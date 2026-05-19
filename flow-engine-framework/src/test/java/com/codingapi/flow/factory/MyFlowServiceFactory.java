@@ -42,7 +42,7 @@ public class MyFlowServiceFactory {
         workflowService = new WorkflowService(workflowVersionRepository, workflowRepository, workflowRuntimeRepository);
         flowRecordService = new FlowRecordService(flowTodoRecordRepository, flowTodoMergeRepository, flowRecordRepository);
 
-        RepositoryHolderContext.getInstance().register(workflowService, flowRecordService, userGateway, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository, flowOperatorAssignmentRepository);
+        RepositoryHolderContext.getInstance().register(workflowService, flowRecordService, parallelBranchRepository, delayTaskRepository, urgeIntervalRepository, flowOperatorAssignmentRepository);
         repositoryHolder = RepositoryHolderContext.getInstance();
         this.flowService = new FlowService(this.repositoryHolder);
 

@@ -13,7 +13,6 @@ public class RepositoryHolderContextRegister implements InitializingBean {
 
     private final WorkflowService workflowService;
     private final FlowRecordService flowRecordService;
-    private final FlowOperatorGateway flowOperatorGateway;
     private final ParallelBranchRepository parallelBranchRepository;
     private final DelayTaskRepository delayTaskRepository;
     private final UrgeIntervalRepository urgeIntervalRepository;
@@ -26,7 +25,6 @@ public class RepositoryHolderContextRegister implements InitializingBean {
         RepositoryHolderContext.getInstance().register(
                 workflowService,
                 flowRecordService,
-                flowOperatorGateway,
                 parallelBranchRepository,
                 delayTaskRepository,
                 urgeIntervalRepository,
