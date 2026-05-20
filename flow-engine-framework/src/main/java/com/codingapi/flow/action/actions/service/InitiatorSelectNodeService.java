@@ -1,6 +1,7 @@
 package com.codingapi.flow.action.actions.service;
 
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.response.NodeOption;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.OperatorSelectType;
@@ -36,7 +37,9 @@ public class InitiatorSelectNodeService {
                 if (selectType == OperatorSelectType.INITIATOR_SELECT) {
                     if (operatorSelectMap == null || !operatorSelectMap.containsKey(node.getId())
                             || operatorSelectMap.get(node.getId()).isEmpty()) {
-                        operatorSelectNodes.add(new NodeOption(node));
+                        List<IFlowOperator> range = node.strategyManager()
+                                .loadOperatorRange(this.flowSession.updateSession(node));
+                        operatorSelectNodes.add(new NodeOption(node, range));
                     }
                 }
 

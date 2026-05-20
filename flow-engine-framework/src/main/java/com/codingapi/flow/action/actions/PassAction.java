@@ -110,7 +110,7 @@ public class PassAction extends BaseAction {
             // 审批人设定模式：审批节点提交时，检查下游节点是否有 APPROVER_SELECT
             if (nextNodes != null) {
                 for (IFlowNode nextNode : nextNodes) {
-                    collectApproverSelectNodes(nextNode, operatorSelectMap, operatorSelectNodes);
+                    collectApproverSelectNodes(flowSession, nextNode, operatorSelectMap, operatorSelectNodes);
                 }
             }
         }
@@ -186,18 +186,20 @@ public class PassAction extends BaseAction {
      * 收集需要审批人设定的下游节点
      * 若下游节点本身是控制节点（如条件节点），则递归检查其子节点
      */
-    private void collectApproverSelectNodes(IFlowNode node, Map<String, List<Long>> operatorSelectMap, List<NodeOption> result) {
+    private void collectApproverSelectNodes(FlowSession flowSession, IFlowNode node, Map<String, List<Long>> operatorSelectMap, List<NodeOption> result) {
         OperatorSelectType selectType = node.strategyManager().getOperatorSelectType();
         if (selectType == OperatorSelectType.APPROVER_SELECT) {
             if (operatorSelectMap == null || !operatorSelectMap.containsKey(node.getId())
                     || operatorSelectMap.get(node.getId()).isEmpty()) {
-                result.add(new NodeOption(node));
+                List<IFlowOperator> range = node.strategyManager()
+                        .loadOperatorRange(flowSession.updateSession(node));
+                result.add(new NodeOption(node, range));
             }
         }
         // 若节点包含子块（如条件分支），递归检查其子节点
         if (node.blocks() != null) {
             for (IFlowNode block : node.blocks()) {
-                collectApproverSelectNodes(block, operatorSelectMap, result);
+                collectApproverSelectNodes(flowSession, block, operatorSelectMap, result);
             }
         }
     }

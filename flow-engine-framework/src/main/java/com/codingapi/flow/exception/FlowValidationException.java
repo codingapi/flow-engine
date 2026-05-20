@@ -87,4 +87,15 @@ public class FlowValidationException extends FlowException {
         return new FlowValidationException("validation.value.mustBePositive",
                 String.format("%s must be positive", fieldName));
     }
+
+    /**
+     * Selected operators exceed the allowed range
+     *
+     * @param nodeId node id
+     * @return exception
+     */
+    public static FlowValidationException operatorOutOfRange(String nodeId) {
+        return new FlowValidationException("validation.operator.outOfRange",
+                String.format("Selected operators for node '%s' exceed the allowed range", nodeId));
+    }
 }

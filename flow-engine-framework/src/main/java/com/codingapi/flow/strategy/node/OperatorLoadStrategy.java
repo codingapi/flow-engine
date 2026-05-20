@@ -65,6 +65,20 @@ public class OperatorLoadStrategy extends BaseStrategy {
         return new OperatorManager(operatorLoadScript.execute(flowSession));
     }
 
+    /**
+     * 计算该节点的可选人员范围（用于发起人/审批人设定模式）。
+     * 复用 operatorLoadScript 执行脚本得到候选人；脚本为空或执行结果为空均视为不限范围（可选任意人）。
+     *
+     * @param flowSession 目标节点会话
+     * @return 可选人员范围，返回空表示不限范围
+     */
+    public List<IFlowOperator> loadOperatorRange(FlowSession flowSession) {
+        if (operatorLoadScript == null) {
+            return List.of();
+        }
+        return operatorLoadScript.execute(flowSession);
+    }
+
     public static OperatorLoadStrategy defaultStrategy() {
         OperatorLoadStrategy strategy = new OperatorLoadStrategy();
         strategy.operatorLoadScript = OperatorLoadScript.defaultScript();
@@ -73,7 +87,7 @@ public class OperatorLoadStrategy extends BaseStrategy {
     }
 
     /**
-     * 创建发起人设定策略
+     * 创建发起人设定策略（不限可选人员范围）
      */
     public static OperatorLoadStrategy initiatorSelectStrategy() {
         OperatorLoadStrategy strategy = new OperatorLoadStrategy();
@@ -82,11 +96,33 @@ public class OperatorLoadStrategy extends BaseStrategy {
     }
 
     /**
-     * 创建审批人设定策略
+     * 创建发起人设定策略（带可选人员范围脚本）
+     *
+     * @param rangeScript 范围脚本，返回该节点的可选人员范围；为空表示不限范围
+     */
+    public static OperatorLoadStrategy initiatorSelectStrategy(String rangeScript) {
+        OperatorLoadStrategy strategy = initiatorSelectStrategy();
+        strategy.operatorLoadScript = new OperatorLoadScript(rangeScript);
+        return strategy;
+    }
+
+    /**
+     * 创建审批人设定策略（不限可选人员范围）
      */
     public static OperatorLoadStrategy approverSelectStrategy() {
         OperatorLoadStrategy strategy = new OperatorLoadStrategy();
         strategy.selectType = OperatorSelectType.APPROVER_SELECT;
+        return strategy;
+    }
+
+    /**
+     * 创建审批人设定策略（带可选人员范围脚本）
+     *
+     * @param rangeScript 范围脚本，返回该节点的可选人员范围；为空表示不限范围
+     */
+    public static OperatorLoadStrategy approverSelectStrategy(String rangeScript) {
+        OperatorLoadStrategy strategy = approverSelectStrategy();
+        strategy.operatorLoadScript = new OperatorLoadScript(rangeScript);
         return strategy;
     }
 
@@ -95,7 +131,8 @@ public class OperatorLoadStrategy extends BaseStrategy {
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
         map.put("selectType", selectType.name());
-        if (selectType == OperatorSelectType.SCRIPT && operatorLoadScript != null) {
+        // SCRIPT 模式存审批人脚本；INITIATOR/APPROVER 模式存可选人员范围脚本
+        if (operatorLoadScript != null) {
             map.put("script", operatorLoadScript.getScript());
         }
         return map;
@@ -113,6 +150,12 @@ public class OperatorLoadStrategy extends BaseStrategy {
         }
         if (strategy.selectType == OperatorSelectType.SCRIPT) {
             strategy.operatorLoadScript = new OperatorLoadScript((String) map.get("script"));
+        } else {
+            // INITIATOR/APPROVER 模式：存在 script 时作为可选人员范围脚本，缺省表示不限范围
+            String script = (String) map.get("script");
+            if (script != null) {
+                strategy.operatorLoadScript = new OperatorLoadScript(script);
+            }
         }
         return strategy;
     }

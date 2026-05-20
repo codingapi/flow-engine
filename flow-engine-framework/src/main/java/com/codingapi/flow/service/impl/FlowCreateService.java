@@ -85,14 +85,12 @@ public class FlowCreateService {
             throw FlowExecutionException.createRecordSizeError();
         }
 
-        // 持久化 INITIATOR_SELECT 节点的操作人分配
+        // 校验并持久化 INITIATOR_SELECT 节点的操作人分配（含可选人员范围校验）
         if (request.getOperatorSelectMap() != null
                 && !request.getOperatorSelectMap().isEmpty()
                 && !flowRecords.isEmpty()) {
             String processId = flowRecords.get(0).getProcessId();
-            request.getOperatorSelectMap().forEach((nodeId, operatorIds) ->
-                    repositoryHolder.saveOperatorAssignment(processId, nodeId, operatorIds)
-            );
+            OperatorAssignmentService.validateAndSave(session, processId, request.getOperatorSelectMap());
         }
 
         repositoryHolder.saveRecords(flowRecords);

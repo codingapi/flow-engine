@@ -3,6 +3,7 @@ package com.codingapi.flow.manager;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.permission.FormFieldPermission;
+import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.*;
 import lombok.Getter;
@@ -180,6 +181,17 @@ public class NodeStrategyManager {
             }
         }
         return new OperatorManager(new ArrayList<>());
+    }
+
+    /**
+     * 计算节点的可选人员范围（发起人/审批人设定模式）
+     *
+     * @param session 目标节点会话
+     * @return 可选人员范围，返回空表示不限范围（可选任意人）
+     */
+    public List<IFlowOperator> loadOperatorRange(FlowSession session) {
+        OperatorLoadStrategy strategy = getStrategy(OperatorLoadStrategy.class);
+        return strategy == null ? new ArrayList<>() : strategy.loadOperatorRange(session);
     }
 
     /**
