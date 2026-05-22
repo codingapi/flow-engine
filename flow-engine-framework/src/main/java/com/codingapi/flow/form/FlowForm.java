@@ -132,9 +132,11 @@ public class FlowForm {
         if (this.code.equals(formCode)) {
             return this.getField(fieldCode);
         } else {
-            for (FlowForm subForm : subForms) {
-                if (subForm.getCode().equals(formCode)) {
-                    return subForm.getField(fieldCode);
+            if(subForms!=null && !subForms.isEmpty()) {
+                for (FlowForm subForm : subForms) {
+                    if (subForm.getCode().equals(formCode)) {
+                        return subForm.getField(fieldCode);
+                    }
                 }
             }
         }
