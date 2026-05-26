@@ -5,7 +5,9 @@ import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.registry.ScriptRegistryContext;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
+import com.codingapi.flow.script.runtime.ScriptRuntimeRequest;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.springboot.framework.script.request.GroovyBindObjectBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -22,7 +24,10 @@ public class SubProcessScript {
     public FlowCreateRequest execute(FlowSession session) {
         FlowRecord flowRecord = session.getCurrentRecord();
         GroovyScriptRequest request = new GroovyScriptRequest(session);
-        FlowCreateRequest flowCreateRequest =  ScriptRuntimeContext.getInstance().run(script, FlowCreateRequest.class, request);
+        ScriptRuntimeRequest runtimeRequest = new ScriptRuntimeRequest(script, FlowCreateRequest.class, GroovyBindObjectBuilder.builder()
+                .add("request",request)
+                .build());
+        FlowCreateRequest flowCreateRequest =  ScriptRuntimeContext.getInstance().execute(runtimeRequest);
         flowCreateRequest.setParentRecordId(flowRecord.getId());
         return flowCreateRequest;
     }

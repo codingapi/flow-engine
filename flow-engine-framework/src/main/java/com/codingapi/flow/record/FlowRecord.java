@@ -477,6 +477,15 @@ public class FlowRecord {
         }
     }
 
+    public void clearNotify(){
+        this.readable = false;
+        this.readTime = 0;
+        this.advice = null;
+        this.signKey = null;
+        this.notify = true;
+        this.forwardOperatorId = 0;
+    }
+
 
     /**
      * 清空已办
@@ -510,8 +519,7 @@ public class FlowRecord {
         this.setTimeoutTime(nodeStrategyManager.getTimeoutTime());
         this.setMergeable(nodeStrategyManager.isEnableMergeable());
         this.update(flowSession, true);
-        this.notify = true;
-        this.forwardOperatorId = 0;
+        this.clearNotify();
     }
 
 

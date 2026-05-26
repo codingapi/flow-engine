@@ -245,6 +245,11 @@ public class ProcessNode {
          */
         private long approveTime;
 
+        /**
+         * 读取时间
+         */
+        private long readTime;
+
         public FlowOperatorBody(FlowRecord flowRecord, IFlowOperator flowOperator) {
             this.advice = flowRecord.getAdvice();
             this.signKey = flowRecord.getSignKey();
@@ -252,6 +257,7 @@ public class ProcessNode {
             this.actionName = flowRecord.getActionName();
             this.actionType = flowRecord.getActionType();
             this.flowOperator = flowOperator;
+            this.readTime = flowRecord.getReadTime();
         }
 
         public FlowOperatorBody(IFlowOperator flowOperator) {

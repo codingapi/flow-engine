@@ -2,20 +2,30 @@ package com.codingapi.flow.script.request;
 
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.workflow.Workflow;
+import com.codingapi.springboot.framework.script.annotation.ScriptFunction;
+import com.codingapi.springboot.framework.script.annotation.ScriptType;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 /**
- *  流程groovy脚本请求对象 request
+ *  流程发起请求对象 request
  *  def run(request){
  *      request.getOperatorName()
  *  }
  */
-@Getter
 @AllArgsConstructor
+@ScriptType(description = "流程发起请求验证对象")
 public class GroovyWorkflowRequest {
 
     private final IFlowOperator currentOperator;
     private final Workflow workflow;
 
+    @ScriptFunction(name = "getCurrentOperator",description = "当前操作人")
+    public IFlowOperator getCurrentOperator() {
+        return currentOperator;
+    }
+
+    @ScriptFunction(name = "getWorkflow",description = "流程对象")
+    public Workflow getWorkflow() {
+        return workflow;
+    }
 }

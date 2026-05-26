@@ -4,7 +4,9 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.registry.ScriptRegistryContext;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
+import com.codingapi.flow.script.runtime.ScriptRuntimeRequest;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.springboot.framework.script.request.GroovyBindObjectBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -21,10 +23,12 @@ public class OperatorLoadScript {
     @Getter
     private final String script;
 
-    @SuppressWarnings("unchecked")
     public List<IFlowOperator> execute(FlowSession session) {
         GroovyScriptRequest request = new GroovyScriptRequest(session);
-        List<Object> userIds = ScriptRuntimeContext.getInstance().run(script, List.class, request);
+        ScriptRuntimeRequest runtimeRequest = new ScriptRuntimeRequest(script, List.class, GroovyBindObjectBuilder.builder()
+                .add("request",request)
+                .build());
+        List<Object> userIds = ScriptRuntimeContext.getInstance().execute(runtimeRequest);
         List<Long> operatorIds = new ArrayList<>();
         for (Object userId : userIds) {
             operatorIds.add(Long.parseLong(String.valueOf(userId)));

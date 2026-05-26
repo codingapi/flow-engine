@@ -13,6 +13,7 @@ import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.EndNode;
+import com.codingapi.flow.node.nodes.NotifyNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
@@ -210,6 +211,15 @@ public class FlowDetailServiceTest {
                 )
                 .build();
 
+
+        NotifyNode notifyNode = NotifyNode.builder()
+                .name("经理审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .build()
+                )
+                .build();
+
         EndNode endNode = EndNode.builder().build();
         Workflow workflow = WorkflowBuilder.builder()
                 .title("请假流程")
@@ -218,6 +228,7 @@ public class FlowDetailServiceTest {
                 .form(form)
                 .addNode(startNode)
                 .addNode(bossNode)
+                .addNode(notifyNode)
                 .addNode(endNode)
                 .build();
 
@@ -226,7 +237,7 @@ public class FlowDetailServiceTest {
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
         List<ProcessNode> nodeList = factory.flowService.processNodes(new FlowProcessNodeRequest(workflow.getId(), user.getUserId(),data));
-        assertEquals(3,nodeList.size());
+        assertEquals(4,nodeList.size());
         assertEquals(0,nodeList.stream().filter(ProcessNode::isHistory).toList().size());
 
         List<IFlowAction> startActions = startNode.actionManager().getActions();
@@ -241,7 +252,7 @@ public class FlowDetailServiceTest {
         assertEquals(1, userRecordList.size());
 
         nodeList = factory.flowService.processNodes(new FlowProcessNodeRequest(userRecordList.get(0).getId(), user.getUserId(),data));
-        assertEquals(3,nodeList.size());
+        assertEquals(4,nodeList.size());
         assertEquals(0,nodeList.stream().filter(ProcessNode::isHistory).toList().size());
 
 
@@ -256,7 +267,7 @@ public class FlowDetailServiceTest {
 
 
         nodeList = factory.flowService.processNodes(new FlowProcessNodeRequest(bossRecordList.get(0).getId(), boss.getUserId(),data));
-        assertEquals(3,nodeList.size());
+        assertEquals(4,nodeList.size());
         assertEquals(1,nodeList.stream().filter(ProcessNode::isHistory).toList().size());
 
         List<IFlowAction> bossActions = bossNode.actionManager().getActions();
@@ -268,8 +279,12 @@ public class FlowDetailServiceTest {
         factory.flowService.action(bossRequest);
 
         List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(2, records.size());
-        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(3, records.size());
+        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+
+
+        nodeList = factory.flowService.processNodes(new FlowProcessNodeRequest(bossRecordList.get(0).getId(), boss.getUserId(),data));
+        assertEquals(4,nodeList.size());
 
     }
 }
