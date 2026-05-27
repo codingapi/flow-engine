@@ -17,6 +17,7 @@ import com.codingapi.flow.pojo.request.*;
 import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.script.factory.GroovyScriptFactory;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.script.runtime.IBeanFactory;
 import com.codingapi.flow.strategy.node.*;
@@ -3032,7 +3033,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(GroovyScriptFactory.getOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();

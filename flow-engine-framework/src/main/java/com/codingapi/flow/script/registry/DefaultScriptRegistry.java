@@ -1,6 +1,7 @@
 package com.codingapi.flow.script.registry;
 
 import com.codingapi.flow.script.ScriptDefaultConstants;
+import com.codingapi.flow.script.factory.GroovyScriptFactory;
 
 /**
  * 默认脚本注册实现
@@ -9,53 +10,54 @@ import com.codingapi.flow.script.ScriptDefaultConstants;
  */
 public class DefaultScriptRegistry implements IScriptRegistry {
 
+
     @Override
     public String getRouterScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_ROUTER;
+        return GroovyScriptFactory.getRouterScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ROUTER).getKey();
     }
 
     @Override
     public String getNodeTitleScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_NODE_TITLE;
+        return GroovyScriptFactory.getNodeTitleScript(ScriptDefaultConstants.SCRIPT_DEFAULT_NODE_TITLE).getKey();
     }
 
     @Override
     public String getConditionScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_CONDITION;
+        return GroovyScriptFactory.getConditionScript(ScriptDefaultConstants.SCRIPT_DEFAULT_CONDITION).getKey();
     }
 
     @Override
     public String getTriggerScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_TRIGGER;
+        return GroovyScriptFactory.getTriggerScript(ScriptDefaultConstants.SCRIPT_DEFAULT_TRIGGER).getKey();
     }
 
     @Override
     public String getSubProcessScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_SUB_PROCESS;
+        return GroovyScriptFactory.getSubProcessScript(ScriptDefaultConstants.SCRIPT_DEFAULT_SUB_PROCESS).getKey();
     }
 
     @Override
     public String getOperatorLoadScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_OPERATOR_LOAD;
+        return GroovyScriptFactory.getOperatorLoadScript(ScriptDefaultConstants.SCRIPT_DEFAULT_OPERATOR_LOAD).getKey();
     }
 
     @Override
     public String getOperatorMatchScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_OPERATOR_MATCH;
+        return GroovyScriptFactory.getOperatorMatchScript(ScriptDefaultConstants.SCRIPT_DEFAULT_OPERATOR_MATCH).getKey();
     }
 
     @Override
     public String getErrorTriggerScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_ERROR_TRIGGER;
+        return GroovyScriptFactory.getErrorTriggerScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ERROR_TRIGGER).getKey();
     }
 
     @Override
     public String getActionCustomScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_CUSTOM;
+        return GroovyScriptFactory.getActionCustomScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_CUSTOM).getKey();
     }
 
     @Override
     public String getActionRejectScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_REJECT;
+        return GroovyScriptFactory.getActionRejectScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_REJECT).getKey();
     }
 }

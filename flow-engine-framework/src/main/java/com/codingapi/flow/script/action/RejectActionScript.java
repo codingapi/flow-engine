@@ -1,13 +1,15 @@
 package com.codingapi.flow.script.action;
 
 import com.codingapi.flow.script.registry.ScriptRegistryContext;
+import com.codingapi.flow.script.request.GroovyScriptBind;
 import com.codingapi.flow.script.request.GroovyScriptRequest;
-import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
-import com.codingapi.flow.script.runtime.ScriptRuntimeRequest;
+import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.springboot.script.request.GroovyBindObjectBuilder;
+import com.codingapi.springboot.script.cache.GroovyScriptCacheContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.util.Map;
 
 /**
  * 拒绝脚本
@@ -18,23 +20,14 @@ public class RejectActionScript {
 
     public static final String TYPE_TERMINATE = "TERMINATE";
 
-    public static final String description = """
-            拒绝操作脚本\\n
-            脚本说明：即当用户点击拒绝时会发生的处理逻辑。\\n
-            传入对象为GroovyScriptRequest对象，返回数据格式为String类型，数据分为两种情况。\\n
-            一种是返回固定的TERMINATE字符串，TERMINATE代表的是终止流程。\\n
-            另一种是节点id，即nodeId的字符串，代表的是跳转到的指定的节点。\\n
-            """;
-
     @Getter
     private final String script;
 
     public RejectResult execute(FlowSession session) {
         GroovyScriptRequest request = new GroovyScriptRequest(session);
-        ScriptRuntimeRequest runtimeRequest = new ScriptRuntimeRequest(script, description, String.class, GroovyBindObjectBuilder.builder()
-                .add("request", request)
-                .build());
-        String result = ScriptRuntimeContext.getInstance().execute(runtimeRequest);
+        String result = GroovyScriptCacheContext.getInstance()
+                .getGroovyScript(script)
+                .invoke(Map.of("$bind", new GroovyScriptBind(FlowScriptContext.getInstance())), request);
         return new RejectResult(result);
     }
 
