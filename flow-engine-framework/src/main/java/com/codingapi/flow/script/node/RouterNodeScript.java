@@ -5,7 +5,7 @@ import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.script.runtime.ScriptRuntimeRequest;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.springboot.framework.script.request.GroovyBindObjectBuilder;
+import com.codingapi.springboot.script.request.GroovyBindObjectBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

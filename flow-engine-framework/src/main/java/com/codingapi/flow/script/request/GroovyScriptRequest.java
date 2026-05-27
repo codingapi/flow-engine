@@ -6,9 +6,9 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.springboot.framework.script.annotation.ScriptField;
-import com.codingapi.springboot.framework.script.annotation.ScriptFunction;
-import com.codingapi.springboot.framework.script.annotation.ScriptType;
+import com.codingapi.springboot.script.annotation.ScriptField;
+import com.codingapi.springboot.script.annotation.ScriptFunction;
+import com.codingapi.springboot.script.annotation.ScriptType;
 
 import java.util.List;
 import java.util.Map;

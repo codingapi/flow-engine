@@ -6,8 +6,8 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
 import com.codingapi.flow.script.runtime.ScriptRuntimeRequest;
 import com.codingapi.flow.user.User;
-import com.codingapi.springboot.framework.script.meta.GroovyMetadata;
-import com.codingapi.springboot.framework.script.request.GroovyBindObjectBuilder;
+import com.codingapi.springboot.script.meta.GroovyMetadata;
+import com.codingapi.springboot.script.request.GroovyBindObjectBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;

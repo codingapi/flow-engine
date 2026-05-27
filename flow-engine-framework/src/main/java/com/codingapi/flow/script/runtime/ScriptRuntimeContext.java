@@ -1,7 +1,7 @@
 package com.codingapi.flow.script.runtime;
 
-import com.codingapi.springboot.framework.script.GroovyScriptRunner;
-import com.codingapi.springboot.framework.script.GroovyScriptRunningContext;
+import com.codingapi.springboot.script.GroovyScriptRunner;
+import com.codingapi.springboot.script.GroovyScriptRunningContext;
 import lombok.Getter;
 
 /**

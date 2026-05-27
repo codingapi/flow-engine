@@ -3,9 +3,9 @@ package com.codingapi.flow.script.request;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
-import com.codingapi.springboot.framework.script.annotation.ScriptField;
-import com.codingapi.springboot.framework.script.annotation.ScriptFunction;
-import com.codingapi.springboot.framework.script.annotation.ScriptType;
+import com.codingapi.springboot.script.annotation.ScriptField;
+import com.codingapi.springboot.script.annotation.ScriptFunction;
+import com.codingapi.springboot.script.annotation.ScriptType;
 import lombok.AllArgsConstructor;
 
 import java.util.List;

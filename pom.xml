@@ -32,7 +32,7 @@
         <commons-io.version>2.17.0</commons-io.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <commons-crypto.version>1.2.0</commons-crypto.version>
-        <codingapi.framework.version>3.4.49</codingapi.framework.version>
+        <codingapi.framework.version>3.4.50</codingapi.framework.version>
 	</properties>
 
 	<dependencies>
@@ -126,6 +126,12 @@
             <dependency>
                 <groupId>com.codingapi.springboot</groupId>
                 <artifactId>springboot-starter</artifactId>
+                <version>${codingapi.framework.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.codingapi.springboot</groupId>
+                <artifactId>springboot-starter-script</artifactId>
                 <version>${codingapi.framework.version}</version>
             </dependency>
 

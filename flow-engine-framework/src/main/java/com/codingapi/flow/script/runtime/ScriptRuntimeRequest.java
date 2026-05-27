@@ -1,9 +1,9 @@
 package com.codingapi.flow.script.runtime;
 
 import com.codingapi.flow.script.request.GroovyScriptBind;
-import com.codingapi.springboot.framework.script.meta.GroovyMetadata;
-import com.codingapi.springboot.framework.script.request.GroovyBindObject;
-import com.codingapi.springboot.framework.script.request.GroovyRunningScript;
+import com.codingapi.springboot.script.meta.GroovyMetadata;
+import com.codingapi.springboot.script.request.GroovyBindObject;
+import com.codingapi.springboot.script.request.GroovyRunningScript;
 import lombok.Getter;
 
 import java.util.ArrayList;
