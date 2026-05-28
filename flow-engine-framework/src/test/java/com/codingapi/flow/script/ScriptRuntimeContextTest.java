@@ -24,7 +24,13 @@ class ScriptRuntimeContextTest {
     void execute1() {
         String script = "def run(abc){return 1}";
         String key = FlowIDGeneratorGatewayContext.getInstance().generateFlowScriptKey();
-        GroovyScript groovyScript = GroovyScript.createInvoke(key,script,"run", Integer.class, Map.of("abc", Integer.class));
+        GroovyScript groovyScript = GroovyScript
+                .builder(key)
+                .script(script)
+                .method("run")
+                .returnType(Integer.class)
+                .requests( Map.of("abc", Integer.class))
+                .build();
 
         GroovyMetadata metadata = groovyScript.toMetadata();
         System.out.println(metadata);
@@ -42,7 +48,13 @@ class ScriptRuntimeContextTest {
         String script = "def run(abc){return $bind.getOperatorById(1)}";
 
         String key = FlowIDGeneratorGatewayContext.getInstance().generateFlowScriptKey();
-        GroovyScript groovyScript = GroovyScript.createInvoke(key,script,"run", IFlowOperator.class, Map.of("abc", Integer.class));
+        GroovyScript groovyScript = GroovyScript
+                .builder(key)
+                .script(script)
+                .method("run")
+                .returnType(Integer.class)
+                .requests( Map.of("abc", Integer.class))
+                .build();
 
         IFlowOperator target = groovyScript.invoke(1);
         assertEquals(target, user);
@@ -59,7 +71,13 @@ class ScriptRuntimeContextTest {
             scripts.add(script);
 
             String key = FlowIDGeneratorGatewayContext.getInstance().generateFlowScriptKey();
-            GroovyScript groovyScript = GroovyScript.createInvoke(key,script,"run", Integer.class, Map.of("abc", Integer.class));
+            GroovyScript groovyScript = GroovyScript
+                    .builder(key)
+                    .script(script)
+                    .method("run")
+                    .returnType(Integer.class)
+                    .requests( Map.of("abc", Integer.class))
+                    .build();
 
             groovyScript.invoke(i);
         }
@@ -75,7 +93,14 @@ class ScriptRuntimeContextTest {
             String script = "def run(abc){return " + i + "}";
 
             String key = FlowIDGeneratorGatewayContext.getInstance().generateFlowScriptKey();
-            GroovyScript groovyScript = GroovyScript.createInvoke(key,script,"run", Integer.class, Map.of("abc", Integer.class));
+            GroovyScript groovyScript = GroovyScript
+                    .builder(key)
+                    .script(script)
+                    .method("run")
+                    .returnType(Integer.class)
+                    .requests( Map.of("abc", Integer.class))
+                    .build();
+
             groovyScript.invoke(i);
         }
 
