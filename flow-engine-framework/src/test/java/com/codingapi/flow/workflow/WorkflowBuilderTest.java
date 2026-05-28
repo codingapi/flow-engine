@@ -13,6 +13,7 @@ import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.*;
+import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.strategy.node.RouterStrategy;
@@ -218,7 +219,7 @@ class WorkflowBuilderTest {
         RouterNode routerNode = RouterNode.builder()
                 .name("路由节点")
                 .strategies(NodeStrategyBuilder.builder()
-                        .addStrategy(new RouterStrategy(String.format("def run(request){return '%s'}", bossNode.getId())))
+                        .addStrategy(new RouterStrategy(FlowGroovyScriptFactory.createRouterScript(String.format("def run(request){return '%s'}", bossNode.getId())).getKey()))
                         .build())
                 .build();
 
@@ -238,14 +239,14 @@ class WorkflowBuilderTest {
 
         ConditionBranchNode departConditionNode = ConditionBranchNode.builder()
                 .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') <= 3}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') <= 3}").getKey())
                 .order(1)
                 .blocks(departNode, routerNode)
                 .build();
 
         ConditionBranchNode bossConditionNode = ConditionBranchNode.builder()
                 .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') > 3}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') > 3}").getKey())
                 .order(2)
                 .blocks(bossNode)
                 .build();

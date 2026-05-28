@@ -15,7 +15,7 @@ import java.util.Map;
  * 自定义脚本
  */
 @AllArgsConstructor
-public class CustomScript {
+public class ActionCustomScript {
 
     @Getter
     private final String script;
@@ -33,8 +33,8 @@ public class CustomScript {
     /**
      * 默认节点脚本
      */
-    public static CustomScript defaultScript() {
-        return new CustomScript(ScriptRegistryContext.getInstance().getActionCustomScript());
+    public static ActionCustomScript defaultScript() {
+        return new ActionCustomScript(ScriptRegistryContext.getInstance().getActionCustomScript());
     }
 
 }

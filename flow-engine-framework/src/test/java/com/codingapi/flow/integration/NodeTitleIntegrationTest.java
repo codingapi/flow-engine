@@ -6,6 +6,7 @@ import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FlowFormBuilder;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
+import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
 import com.codingapi.flow.script.node.NodeTitleScript;
 import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.session.FlowSession;
@@ -29,7 +30,7 @@ class NodeTitleIntegrationTest {
     @Test
     void testTitleGenerationWithOperatorName() {
         NodeTitleScript script = new NodeTitleScript(
-            "def run(request){return \"审批人：\" + request.getCurrentOperatorName()}"
+            FlowGroovyScriptFactory.createNodeTitleScript("def run(request){return \"审批人：\" + request.getCurrentOperatorName()}").getKey()
         );
 
         User user = new User(1, "张三");
@@ -42,7 +43,7 @@ class NodeTitleIntegrationTest {
     @Test
     void testTitleGenerationWithFormData() {
         NodeTitleScript script = new NodeTitleScript(
-            "def run(request){return \"请假\" + request.getFormData(\"days\") + \"天\"}"
+            FlowGroovyScriptFactory.createNodeTitleScript( "def run(request){return \"请假\" + request.getFormData(\"days\") + \"天\"}").getKey()
         );
 
         User user = new User(1, "张三");
@@ -77,7 +78,7 @@ class NodeTitleIntegrationTest {
     @Test
     void testTitleGenerationWithMultipleVariables() {
         NodeTitleScript script = new NodeTitleScript(
-            "def run(request){return \"你好，\" + request.getCurrentOperatorName() + \"，请假\" + request.getFormData(\"days\") + \"天\"}"
+            FlowGroovyScriptFactory.createNodeTitleScript("def run(request){return \"你好，\" + request.getCurrentOperatorName() + \"，请假\" + request.getFormData(\"days\") + \"天\"}").getKey()
         );
 
         User user = new User(1, "李四");
@@ -112,7 +113,7 @@ class NodeTitleIntegrationTest {
     @Test
     void testTitleGenerationWithSimpleText() {
         NodeTitleScript script = new NodeTitleScript(
-            "def run(request){return \"你有一条待办\"}"
+            FlowGroovyScriptFactory.createNodeTitleScript("def run(request){return \"你有一条待办\"}").getKey()
         );
 
         User user = new User(1, "张三");
@@ -125,7 +126,7 @@ class NodeTitleIntegrationTest {
     @Test
     void testTitleGenerationWithWorkflowTitle() {
         NodeTitleScript script = new NodeTitleScript(
-            "def run(request){return request.getWorkflowTitle() + \" - \" + request.getCurrentOperatorName()}"
+            FlowGroovyScriptFactory.createNodeTitleScript("def run(request){return request.getWorkflowTitle() + \" - \" + request.getCurrentOperatorName()}").getKey()
         );
 
         User user = new User(1, "王五");

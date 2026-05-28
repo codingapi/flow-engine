@@ -8,6 +8,7 @@ import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
@@ -24,7 +25,7 @@ class NodeTitleScriptTest {
 
     @Test
     void testExecuteWithSimpleScript() {
-        NodeTitleScript script = new NodeTitleScript("def run(request){return '你有一条待办'}");
+        NodeTitleScript script = new NodeTitleScript(FlowGroovyScriptFactory.createNodeTitleScript("def run(request){return '你有一条待办'}").getKey());
         IFlowOperator operator = new User(1, "张三");
         FlowSession session = new FlowSession(
                 factory.repositoryHolder,
@@ -47,7 +48,7 @@ class NodeTitleScriptTest {
     @Test
     void testExecuteWithVariableScript() {
         String script = "def run(request){return request.getCurrentOperatorName() + '的审批'}";
-        NodeTitleScript titleScript = new NodeTitleScript(script);
+        NodeTitleScript titleScript = new NodeTitleScript(FlowGroovyScriptFactory.createNodeTitleScript(script).getKey());
 
         User user = new User(1, "张三");
         FlowForm form = FlowFormBuilder.builder()

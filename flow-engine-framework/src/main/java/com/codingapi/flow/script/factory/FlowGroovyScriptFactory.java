@@ -10,11 +10,11 @@ import com.codingapi.springboot.script.GroovyScript;
 import java.util.List;
 import java.util.Map;
 
-public class GroovyScriptFactory {
+public class FlowGroovyScriptFactory {
 
     public static final String DEFAULT_SCRIPT_REMARK = "flow";
 
-    public static GroovyScript getRouterScript(String script) {
+    public static GroovyScript createRouterScript(String script) {
         String key = RandomUtils.generateStringId();
         String description = """
                 路由触发脚本\\n
@@ -34,7 +34,7 @@ public class GroovyScriptFactory {
         return groovyScript;
     }
 
-    public static GroovyScript getNodeTitleScript(String script) {
+    public static GroovyScript createNodeTitleScript(String script) {
         String key = RandomUtils.generateStringId();
         String description = """
                 节点待办标题脚本\\n
@@ -54,7 +54,7 @@ public class GroovyScriptFactory {
         return groovyScript;
     }
 
-    public static GroovyScript getConditionScript(String script) {
+    public static GroovyScript createConditionScript(String script) {
         String key = RandomUtils.generateStringId();
         String description = """
                 条件匹配脚本\\n
@@ -74,7 +74,7 @@ public class GroovyScriptFactory {
         return groovyScript;
     }
 
-    public static GroovyScript getTriggerScript(String script) {
+    public static GroovyScript createTriggerScript(String script) {
         String key = RandomUtils.generateStringId();
         String description = """
                 触发节点脚本\\n
@@ -94,7 +94,7 @@ public class GroovyScriptFactory {
         return groovyScript;
     }
 
-    public static GroovyScript getSubProcessScript(String script) {
+    public static GroovyScript createSubProcessScript(String script) {
         String key = RandomUtils.generateStringId();
         String description = """
                 子流程任务脚本\\n
@@ -115,7 +115,7 @@ public class GroovyScriptFactory {
         return groovyScript;
     }
 
-    public static GroovyScript getOperatorLoadScript(String script) {
+    public static GroovyScript createOperatorLoadScript(String script) {
         String key = RandomUtils.generateStringId();
         String description = """
                 匹配人员列表脚本\\n
@@ -136,7 +136,7 @@ public class GroovyScriptFactory {
         return groovyScript;
     }
 
-    public static GroovyScript getOperatorMatchScript(String script) {
+    public static GroovyScript createOperatorMatchScript(String script) {
         String key = RandomUtils.generateStringId();
         String description = """
                 人员匹配脚本\\n
@@ -156,7 +156,7 @@ public class GroovyScriptFactory {
         return groovyScript;
     }
 
-    public static GroovyScript getErrorTriggerScript(String script) {
+    public static GroovyScript createErrorTriggerScript(String script) {
         String key = RandomUtils.generateStringId();
         String description = """
                 异常触发脚本\\n
@@ -181,7 +181,7 @@ public class GroovyScriptFactory {
         return groovyScript;
     }
 
-    public static GroovyScript getActionCustomScript(String script) {
+    public static GroovyScript createActionCustomScript(String script) {
         String key = RandomUtils.generateStringId();
         String description = """
                 自定义脚本\\n
@@ -203,7 +203,7 @@ public class GroovyScriptFactory {
         return groovyScript;
     }
 
-    public static GroovyScript getActionRejectScript(String script) {
+    public static GroovyScript createActionRejectScript(String script) {
         String key = RandomUtils.generateStringId();
         String description = """
             拒绝操作脚本\\n

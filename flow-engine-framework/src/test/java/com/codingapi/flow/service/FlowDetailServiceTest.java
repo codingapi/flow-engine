@@ -23,6 +23,7 @@ import com.codingapi.flow.pojo.request.FlowProcessNodeRequest;
 import com.codingapi.flow.pojo.response.FlowContent;
 import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.user.User;
@@ -84,7 +85,7 @@ public class FlowDetailServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -206,7 +207,7 @@ public class FlowDetailServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -215,7 +216,7 @@ public class FlowDetailServiceTest {
         NotifyNode notifyNode = NotifyNode.builder()
                 .name("经理审批")
                 .strategies(NodeStrategyBuilder.builder()
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();

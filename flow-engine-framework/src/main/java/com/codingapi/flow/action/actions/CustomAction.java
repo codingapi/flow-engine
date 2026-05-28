@@ -7,7 +7,7 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.node.IFlowNode;
-import com.codingapi.flow.script.action.CustomScript;
+import com.codingapi.flow.script.action.ActionCustomScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.utils.RandomUtils;
@@ -21,12 +21,12 @@ import java.util.Map;
 public class CustomAction extends BaseAction {
 
 
-    private CustomScript script;
+    private ActionCustomScript script;
 
 
     public void setCustomScript(String script) {
         if (StringUtils.hasText(script)) {
-            this.script = new CustomScript(script);
+            this.script = new ActionCustomScript(script);
         }
     }
 
@@ -36,7 +36,7 @@ public class CustomAction extends BaseAction {
         this.enable = true;
         this.type = ActionType.CUSTOM.name();
         this.display = new ActionDisplay(this.title);
-        this.script = CustomScript.defaultScript();
+        this.script = ActionCustomScript.defaultScript();
     }
 
     @Override

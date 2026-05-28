@@ -17,7 +17,7 @@ import com.codingapi.flow.pojo.request.*;
 import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.script.factory.GroovyScriptFactory;
+import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.script.runtime.IBeanFactory;
 import com.codingapi.flow.strategy.node.*;
@@ -74,7 +74,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()).getKey()))
                         .build()
                 )
                 .build();
@@ -163,7 +163,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -265,7 +265,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -364,7 +364,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -452,7 +452,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -465,7 +465,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
                         .build()
                 )
                 .build();
@@ -473,14 +473,14 @@ class FlowSampleServiceTest {
 
         ConditionBranchNode departConditionNode = ConditionBranchNode.builder()
                 .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') == 3}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') == 3}").getKey())
                 .order(1)
                 .blocks(departApprovalNode)
                 .build();
 
         ConditionBranchNode bossConditionNode = ConditionBranchNode.builder()
                 .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') == 5}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') == 5}").getKey())
                 .order(2)
                 .blocks(bossApprovalNode)
                 .build();
@@ -590,7 +590,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -603,7 +603,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
                         .build()
                 )
                 .build();
@@ -611,14 +611,14 @@ class FlowSampleServiceTest {
 
         ConditionBranchNode departConditionNode = ConditionBranchNode.builder()
                 .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') <= 3}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') <= 3}").getKey())
                 .order(1)
                 .blocks(departApprovalNode)
                 .build();
 
         ConditionBranchNode bossConditionNode = ConditionBranchNode.builder()
                 .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') > 3}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') > 3}").getKey())
                 .order(2)
                 .blocks(bossApprovalNode)
                 .build();
@@ -715,12 +715,12 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new NodeTitleStrategy("""
+                        .addStrategy(new NodeTitleStrategy(FlowGroovyScriptFactory.createNodeTitleScript("""
                                 def run(request){
                                     println(request.getCurrentAction())
                                     return '你有一条代办消息'
                                 }
-                                """))
+                                """).getKey()))
                         .build())
                 .build();
 
@@ -732,7 +732,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -855,7 +855,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -868,7 +868,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
                         .build()
                 )
                 .build();
@@ -881,7 +881,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1031,7 +1031,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1044,7 +1044,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1057,7 +1057,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1186,7 +1186,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1199,7 +1199,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1212,7 +1212,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1220,14 +1220,14 @@ class FlowSampleServiceTest {
 
         InclusiveBranchNode parallelBranchNode1 = InclusiveBranchNode.builder()
                 .name("包容分支1")
-                .conditionScript("def run(request){return true}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return true}").getKey())
                 .blocks(departApprovalNode)
                 .order(1)
                 .build();
 
         InclusiveBranchNode parallelBranchNode2 = InclusiveBranchNode.builder()
                 .name("包容分支2")
-                .conditionScript("def run(request){return request.getFormData('days') >= 3}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') >= 3}").getKey())
                 .blocks(bossApprovalNode, bigBossApprovalNode)
                 .order(2)
                 .build();
@@ -1361,7 +1361,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1374,7 +1374,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1387,7 +1387,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1395,14 +1395,14 @@ class FlowSampleServiceTest {
 
         InclusiveBranchNode inclusiveBranchNode1 = InclusiveBranchNode.builder()
                 .name("包容分支1")
-                .conditionScript("def run(request){return request.getFormData('days') == 3}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') == 3}").getKey())
                 .blocks(departApprovalNode)
                 .order(1)
                 .build();
 
         InclusiveBranchNode inclusiveBranchNode2 = InclusiveBranchNode.builder()
                 .name("包容分支2")
-                .conditionScript("def run(request){return request.getFormData('days') == 5}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') == 5}").getKey())
                 .blocks(bossApprovalNode, bigBossApprovalNode)
                 .order(2)
                 .build();
@@ -1520,7 +1520,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [3]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1528,7 +1528,7 @@ class FlowSampleServiceTest {
         RouterNode routerNode = RouterNode.builder()
                 .name("路由节点")
                 .strategies(NodeStrategyBuilder.builder()
-                        .addStrategy(new RouterStrategy(String.format("def run(request){return '%s'}", bossNode.getId())))
+                        .addStrategy(new RouterStrategy(FlowGroovyScriptFactory.createRouterScript(String.format("def run(request){return '%s'}", bossNode.getId())).getKey()))
                         .build())
                 .build();
 
@@ -1540,7 +1540,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1548,14 +1548,14 @@ class FlowSampleServiceTest {
 
         ConditionBranchNode departConditionNode = ConditionBranchNode.builder()
                 .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') <= 3}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') <= 3}").getKey())
                 .order(1)
                 .blocks(departNode, routerNode)
                 .build();
 
         ConditionBranchNode bossConditionNode = ConditionBranchNode.builder()
                 .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') > 3}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') > 3}").getKey())
                 .order(2)
                 .blocks(bossNode)
                 .build();
@@ -1680,7 +1680,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1789,7 +1789,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1897,7 +1897,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -1998,7 +1998,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -2113,7 +2113,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -2238,7 +2238,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -2353,7 +2353,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -2476,7 +2476,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -2597,13 +2597,13 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
-                        .addStrategy(new NodeTitleStrategy("""
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
+                        .addStrategy(new NodeTitleStrategy(FlowGroovyScriptFactory.createNodeTitleScript("""
                                 def run(request){
                                     println(request.getCurrentAction())
                                     return '你有一条代办消息'
                                 }
-                                """))
+                                """).getKey()))
                         .build()
                 )
                 .build();
@@ -2701,7 +2701,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -2820,7 +2820,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -2930,7 +2930,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -3033,7 +3033,7 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy(GroovyScriptFactory.getOperatorLoadScript("def run(request){return [2]}").getKey()))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build()
                 )
                 .build();
@@ -3135,8 +3135,8 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [-1]}"))
-                        .addStrategy(new ErrorTriggerStrategy("def run(request){ return 3; }"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [-1]}").getKey()))
+                        .addStrategy(new ErrorTriggerStrategy(FlowGroovyScriptFactory.createErrorTriggerScript("def run(request){ return 3; }").getKey()))
                         .build()
                 )
                 .build();
@@ -3241,8 +3241,8 @@ class FlowSampleServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [-1]}"))
-                        .addStrategy(new ErrorTriggerStrategy("def run(request){ return '" + startNode.getId() + "'; }"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [-1]}").getKey()))
+                        .addStrategy(new ErrorTriggerStrategy(FlowGroovyScriptFactory.createErrorTriggerScript("def run(request){ return '" + startNode.getId() + "'; }").getKey()))
                         .build()
                 )
                 .build();

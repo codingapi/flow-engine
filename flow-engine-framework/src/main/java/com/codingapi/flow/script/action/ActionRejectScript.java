@@ -16,7 +16,7 @@ import java.util.Map;
  * 拒绝，拒绝时需要根据拒绝的配置流程来设置,退回指定节点、终止流程
  */
 @AllArgsConstructor
-public class RejectActionScript {
+public class ActionRejectScript {
 
     public static final String TYPE_TERMINATE = "TERMINATE";
 
@@ -34,8 +34,8 @@ public class RejectActionScript {
     /**
      * 退回至发起节点
      */
-    public static RejectActionScript defaultScript() {
-        return new RejectActionScript(ScriptRegistryContext.getInstance().getActionRejectScript());
+    public static ActionRejectScript defaultScript() {
+        return new ActionRejectScript(ScriptRegistryContext.getInstance().getActionRejectScript());
     }
 
 
