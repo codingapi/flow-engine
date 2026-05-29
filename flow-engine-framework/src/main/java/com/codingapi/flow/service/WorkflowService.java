@@ -10,6 +10,10 @@ import com.codingapi.flow.utils.Base64Utils;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowVersion;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
+import com.codingapi.springboot.script.GroovyScript;
+import com.codingapi.springboot.script.cache.TempGroovyScriptContext;
+import com.codingapi.springboot.script.parser.GroovyScriptParserService;
+import com.codingapi.springboot.script.repository.GroovyScriptRepositoryContext;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
@@ -32,7 +36,7 @@ public class WorkflowService {
      * @param currentVersion 当前版本
      * @param creatable      是否创建新的版本
      */
-    public void saveWorkflowVersion(WorkflowVersion currentVersion, boolean creatable,boolean enable) {
+    public void saveWorkflowVersion(WorkflowVersion currentVersion, boolean creatable, boolean enable) {
         List<WorkflowVersion> updateList = new ArrayList<>();
 
         currentVersion.enableVersion();
@@ -60,7 +64,7 @@ public class WorkflowService {
         Workflow workflow = currentVersion.toWorkflow();
         workflow.filterPermissions();
 
-        if(enable) {
+        if (enable) {
             try {
                 workflow.enable();
             } catch (Exception ignore) {
@@ -68,6 +72,14 @@ public class WorkflowService {
             }
         }
         workflowRepository.save(workflow);
+
+        List<String> keys = new GroovyScriptParserService(workflow).parser();
+        for (String key : keys) {
+            GroovyScript groovyScript = TempGroovyScriptContext.getInstance().getGroovyScript(key);
+            if (groovyScript != null) {
+                groovyScript.save();
+            }
+        }
     }
 
 
@@ -78,7 +90,7 @@ public class WorkflowService {
      * @return 运行时流程配置
      */
     public WorkflowRuntime getWorkflowRuntime(long runtimeId) {
-        return WorkflowRuntimeCache.getInstance().get(runtimeId,()-> workflowRuntimeRepository.get(runtimeId));
+        return WorkflowRuntimeCache.getInstance().get(runtimeId, () -> workflowRuntimeRepository.get(runtimeId));
     }
 
     /**
@@ -100,6 +112,12 @@ public class WorkflowService {
         WorkflowVersion version = workflowVersionRepository.get(versionId);
         if (version != null && version.isCurrent()) {
             throw FlowExecutionException.removeWorkflowError();
+        }
+        if (version != null) {
+            List<String> keys = new GroovyScriptParserService(version).parser();
+            for (String key : keys) {
+                GroovyScriptRepositoryContext.getInstance().delete(key);
+            }
         }
         workflowVersionRepository.delete(versionId);
     }
@@ -131,7 +149,8 @@ public class WorkflowService {
 
     /**
      * 更新流程版本名称
-     * @param versionId 版本id
+     *
+     * @param versionId   版本id
      * @param versionName 版本名称
      */
     public void updateVersionName(long versionId, String versionName) {
@@ -144,30 +163,43 @@ public class WorkflowService {
 
     /**
      * 删除流程
+     *
      * @param workId 流程编码
      */
     public void delete(String workId) {
+        Workflow workflow = workflowRepository.get(workId);
+        if (workflow != null) {
+            List<String> keys = new GroovyScriptParserService(workflow).parser();
+            for (String key : keys) {
+                GroovyScriptRepositoryContext.getInstance().delete(key);
+            }
+        }
         workflowVersionRepository.delete(workId);
         workflowRepository.delete(workId);
     }
+
     /**
      * 保存流程
+     *
      * @param workflow 流程对象
      */
     public void saveWorkflow(Workflow workflow) {
-        this.saveWorkflow(workflow,true);
+        this.saveWorkflow(workflow, true);
     }
+
     /**
      * 保存流程
+     *
      * @param workflow 流程对象
      */
-    public void saveWorkflow(Workflow workflow,boolean enable) {
+    public void saveWorkflow(Workflow workflow, boolean enable) {
         WorkflowVersion workflowVersion = new WorkflowVersion(workflow);
-        this.saveWorkflowVersion(workflowVersion, false,enable);
+        this.saveWorkflowVersion(workflowVersion, false, enable);
     }
 
     /**
      * 保存流程运行时
+     *
      * @param workflowRuntime 流程运行时
      */
     public void saveWorkflowRuntime(WorkflowRuntime workflowRuntime) {
@@ -178,7 +210,8 @@ public class WorkflowService {
 
     /**
      * 根据运行时版本获取运行时配置
-     * @param workId 流程编码
+     *
+     * @param workId      流程编码
      * @param workVersion 流程版本
      * @return 流程运行时
      */
@@ -188,6 +221,7 @@ public class WorkflowService {
 
     /**
      * 导入流程
+     *
      * @param body base64
      * @return 流程id
      */
@@ -195,7 +229,7 @@ public class WorkflowService {
         String json = Base64Utils.toJson(body);
         Workflow workflow = Workflow.formJson(json);
         workflow.resetWorkflow(createOperator);
-        this.saveWorkflow(workflow,false);
+        this.saveWorkflow(workflow, false);
         return workflow.getId();
     }
 }

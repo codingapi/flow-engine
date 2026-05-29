@@ -4,6 +4,7 @@ import com.codingapi.flow.script.registry.ScriptRegistryContext;
 import com.codingapi.flow.script.request.GroovyScriptBind;
 import com.codingapi.flow.script.request.GroovyWorkflowRequest;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
+import com.codingapi.springboot.script.annotation.GroovyScript;
 import com.codingapi.springboot.script.cache.GroovyScriptCacheContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,6 +18,7 @@ import java.util.Map;
 public class OperatorMatchScript {
 
     @Getter
+    @GroovyScript
     private final String script;
 
     public boolean execute(GroovyWorkflowRequest request) {

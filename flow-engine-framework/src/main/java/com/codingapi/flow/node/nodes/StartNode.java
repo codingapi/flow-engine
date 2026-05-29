@@ -48,13 +48,15 @@ public class StartNode extends BaseFlowNode implements IDisplayNode {
     }
 
 
-    public StartNode(String id, String name, String view, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, 0, actions, nodeStrategies);
-        this.view = view;
-    }
-
-    public StartNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME, DEFAULT_VIEW, defaultActions(), defaultStrategies());
+    public static StartNode defaultNode(){
+        StartNode startNode = new StartNode();
+        startNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        startNode.setName(DEFAULT_NAME);
+        startNode.setView(DEFAULT_VIEW);
+        startNode.setActions(defaultActions());
+        startNode.setStrategies(defaultStrategies());
+        startNode.setOrder(0);
+        return startNode;
     }
 
 
@@ -118,7 +120,7 @@ public class StartNode extends BaseFlowNode implements IDisplayNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, StartNode> {
         public Builder() {
-            super(new StartNode());
+            super(StartNode.defaultNode());
         }
     }
 }

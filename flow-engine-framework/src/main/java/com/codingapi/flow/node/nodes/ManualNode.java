@@ -24,12 +24,14 @@ public class ManualNode extends BaseFlowNode implements IBlockNode , IDisplayNod
     }
 
 
-    public ManualNode(String id, String name, int order) {
-        super(id, name, order);
-    }
-
-    public ManualNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME, 0);
+    public static ManualNode defaultNode(){
+        ManualNode manualNode = new ManualNode();
+        manualNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        manualNode.setName(DEFAULT_NAME);
+        manualNode.setOrder(0);
+        manualNode.setActions(new ArrayList<>());
+        manualNode.setStrategies(new ArrayList<>());
+        return manualNode;
     }
 
     /**
@@ -74,7 +76,7 @@ public class ManualNode extends BaseFlowNode implements IBlockNode , IDisplayNod
     public static class Builder extends BaseNodeBuilder<Builder, ManualNode> {
 
         public Builder() {
-            super(new ManualNode());
+            super(ManualNode.defaultNode());
         }
     }
 }

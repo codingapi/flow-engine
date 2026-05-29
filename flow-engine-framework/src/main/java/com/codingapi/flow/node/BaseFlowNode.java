@@ -17,6 +17,7 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.INodeStrategy;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@NoArgsConstructor
 public abstract class BaseFlowNode implements IFlowNode {
 
     /**
@@ -84,9 +86,11 @@ public abstract class BaseFlowNode implements IFlowNode {
                         currentStrategy.copy(nodeStrategy);
                     }
                 }
-            } else {
+            }else {
                 this.strategies = strategies;
             }
+        }else {
+            this.strategies = strategies;
         }
     }
 
@@ -106,9 +110,11 @@ public abstract class BaseFlowNode implements IFlowNode {
                         }
                     }
                 }
-            } else {
+            }else {
                 this.actions = actions;
             }
+        }else {
+            this.actions = actions;
         }
     }
 
@@ -118,27 +124,6 @@ public abstract class BaseFlowNode implements IFlowNode {
      */
     private boolean hasCustomAction() {
         return this.getType().equals(StartNode.NODE_TYPE) || this.getType().equals(ApprovalNode.NODE_TYPE) || this.getType().equals(HandleNode.NODE_TYPE);
-    }
-
-
-    public BaseFlowNode(String name, String id) {
-        this(name, id, 0, new ArrayList<>(), new ArrayList<>());
-    }
-
-    public BaseFlowNode(String id, String name, int order) {
-        this(id, name, order, new ArrayList<>(), new ArrayList<>());
-    }
-
-    public BaseFlowNode(String id, String name, List<IFlowAction> actions) {
-        this(id, name, 0, actions, new ArrayList<>());
-    }
-
-    public BaseFlowNode(String id, String name, int order, List<IFlowAction> actions, List<INodeStrategy> strategies) {
-        this.id = id;
-        this.name = name;
-        this.order = order;
-        this.actions = actions;
-        this.strategies = strategies;
     }
 
     @Override

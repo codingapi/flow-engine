@@ -14,7 +14,6 @@ import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.springboot.framework.event.EventPusher;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,10 +55,10 @@ public class EndNode extends BaseFlowNode implements IDisplayNode {
 
         // 同步当前处理的FlowRecord的数据
         List<FlowRecord> recordList = new ArrayList<>();
-        for (FlowRecord historyRecord:historyRecords){
-            if(historyRecord.getId()== latestRecord.getId()){
+        for (FlowRecord historyRecord : historyRecords) {
+            if (historyRecord.getId() == latestRecord.getId()) {
                 recordList.add(latestRecord);
-            }else {
+            } else {
                 recordList.add(historyRecord);
             }
         }
@@ -70,7 +69,7 @@ public class EndNode extends BaseFlowNode implements IDisplayNode {
         });
         repositoryHolder.saveRecords(recordList);
         // 流程是否正常结束
-        EventPusher.push(new FlowRecordFinishEvent(latestRecord,session.isMock()));
+        EventPusher.push(new FlowRecordFinishEvent(latestRecord, session.isMock()));
     }
 
 
@@ -79,56 +78,19 @@ public class EndNode extends BaseFlowNode implements IDisplayNode {
         return false;
     }
 
-    public EndNode(String id, String name) {
-        super(id, name);
+
+    public static EndNode defaultNode() {
+        EndNode endNode = new EndNode();
+        endNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        endNode.setName(DEFAULT_NAME);
+        endNode.setActions(new ArrayList<>());
+        endNode.setStrategies(new ArrayList<>());
+        return endNode;
     }
 
-    public EndNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME);
-    }
 
     public static EndNode formMap(Map<String, Object> map) {
         return BaseFlowNode.fromMap(map, EndNode.class);
-    }
-
-
-    private static class RecordMergeHelper {
-
-        private final List<FlowRecord> currentRecords;
-        private final List<FlowRecord> historyRecords;
-
-        private final Map<Long,FlowRecord> currentRecordCache;
-
-        private final List<FlowRecord> recordList;
-
-        public RecordMergeHelper(List<FlowRecord> historyRecords, List<FlowRecord> currentRecords) {
-            this.historyRecords = historyRecords;
-            this.currentRecords = currentRecords;
-            this.currentRecordCache = new HashMap<>();
-            this.recordList = new ArrayList<>();
-            this.initCurrentRecordCache();
-        }
-
-        private void initCurrentRecordCache(){
-            for (FlowRecord currentRecord:this.currentRecords){
-                this.currentRecordCache.put(currentRecord.getId(),currentRecord);
-            }
-        }
-
-        public List<FlowRecord> getUpdateRecordList() {
-            for(FlowRecord historyRecord:historyRecords){
-                FlowRecord currentRecord =  this.currentRecordCache.get(historyRecord.getId());
-                if(currentRecord!=null){
-                    this.recordList.add(currentRecord);
-                }else {
-                    this.recordList.add(historyRecord);
-                }
-            }
-            return this.recordList;
-        }
-
-
-
     }
 
     public static Builder builder() {
@@ -137,7 +99,7 @@ public class EndNode extends BaseFlowNode implements IDisplayNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, EndNode> {
         public Builder() {
-            super(new EndNode());
+            super(EndNode.defaultNode());
         }
     }
 }

@@ -5,6 +5,7 @@ import com.codingapi.flow.script.request.GroovyScriptBind;
 import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.springboot.script.annotation.GroovyScript;
 import com.codingapi.springboot.script.cache.GroovyScriptCacheContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public class ActionRejectScript {
     public static final String TYPE_TERMINATE = "TERMINATE";
 
     @Getter
+    @GroovyScript
     private final String script;
 
     public RejectResult execute(FlowSession session) {

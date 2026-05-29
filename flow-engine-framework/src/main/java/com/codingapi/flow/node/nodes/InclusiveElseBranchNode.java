@@ -30,12 +30,14 @@ public class InclusiveElseBranchNode extends BaseFlowNode {
     }
 
 
-    public InclusiveElseBranchNode(String id, String name, int order) {
-        super(id, name, order);
-    }
-
-    public InclusiveElseBranchNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME, 100);
+    public static InclusiveElseBranchNode defaultNode(){
+        InclusiveElseBranchNode inclusiveElseBranchNode = new InclusiveElseBranchNode();
+        inclusiveElseBranchNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        inclusiveElseBranchNode.setName(DEFAULT_NAME);
+        inclusiveElseBranchNode.setOrder(100);
+        inclusiveElseBranchNode.setActions(new ArrayList<>());
+        inclusiveElseBranchNode.setStrategies(new ArrayList<>());
+        return inclusiveElseBranchNode;
     }
 
     /**
@@ -105,7 +107,7 @@ public class InclusiveElseBranchNode extends BaseFlowNode {
     public static class Builder extends BaseNodeBuilder<Builder, InclusiveElseBranchNode> {
 
         public Builder() {
-            super(new InclusiveElseBranchNode());
+            super(InclusiveElseBranchNode.defaultNode());
         }
 
     }

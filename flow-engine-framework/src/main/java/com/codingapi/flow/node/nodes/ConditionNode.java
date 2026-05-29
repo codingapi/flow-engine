@@ -24,23 +24,26 @@ public class ConditionNode extends BaseFlowNode implements IBlockNode {
         return NODE_TYPE;
     }
 
-    public ConditionNode(String id, String name, int order) {
-        super(id, name, order);
+    public static ConditionNode defaultNode() {
+        ConditionNode conditionNode = new ConditionNode();
+        conditionNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        conditionNode.setName(DEFAULT_NAME);
+        conditionNode.setOrder(0);
+        conditionNode.setActions(new ArrayList<>());
+        conditionNode.setStrategies(new ArrayList<>());
+        return conditionNode;
     }
 
-    public ConditionNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME, 0);
-    }
 
     @Override
-    public void addDefaultBranch(int count){
+    public void addDefaultBranch(int count) {
         List<IFlowNode> branches = new ArrayList<>();
-        for (int i=0;i<count;i++){
-            ConditionBranchNode branchNode = new ConditionBranchNode();
-            branchNode.setOrder(i+1);
+        for (int i = 0; i < count; i++) {
+            ConditionBranchNode branchNode = ConditionBranchNode.defaultNode();
+            branchNode.setOrder(i + 1);
             branches.add(branchNode);
         }
-        branches.add(new ConditionElseBranchNode());
+        branches.add(ConditionElseBranchNode.defaultNode());
         this.setBlocks(branches);
     }
 
@@ -55,7 +58,7 @@ public class ConditionNode extends BaseFlowNode implements IBlockNode {
     public static class Builder extends BaseNodeBuilder<Builder, ConditionNode> {
 
         public Builder() {
-            super(new ConditionNode());
+            super(ConditionNode.defaultNode());
         }
 
     }

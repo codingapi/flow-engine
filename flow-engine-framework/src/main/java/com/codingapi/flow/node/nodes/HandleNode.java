@@ -27,12 +27,14 @@ public class HandleNode extends BaseAuditNode implements IDisplayNode {
     }
 
 
-    public HandleNode(String id, String name, String view, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, view, actions, nodeStrategies);
-    }
-
-    public HandleNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME, DEFAULT_VIEW, defaultActions(), defaultStrategies());
+    public static HandleNode defaultNode(){
+        HandleNode handleNode = new HandleNode();
+        handleNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        handleNode.setName(DEFAULT_NAME);
+        handleNode.setView(DEFAULT_VIEW);
+        handleNode.setActions(defaultActions());
+        handleNode.setStrategies(defaultStrategies());
+        return handleNode;
     }
 
 
@@ -67,7 +69,7 @@ public class HandleNode extends BaseAuditNode implements IDisplayNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, HandleNode> {
         public Builder() {
-            super(new HandleNode());
+            super(HandleNode.defaultNode());
         }
     }
 }

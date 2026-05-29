@@ -26,12 +26,15 @@ public class ConditionElseBranchNode extends BaseFlowNode {
         return NODE_TYPE;
     }
 
-    public ConditionElseBranchNode(String id, String name, int order) {
-        super(id, name, order);
-    }
 
-    public ConditionElseBranchNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME, 100);
+    public static ConditionElseBranchNode defaultNode(){
+        ConditionElseBranchNode conditionElseBranchNode = new ConditionElseBranchNode();
+        conditionElseBranchNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        conditionElseBranchNode.setName(DEFAULT_NAME);
+        conditionElseBranchNode.setOrder(100);
+        conditionElseBranchNode.setActions(new ArrayList<>());
+        conditionElseBranchNode.setStrategies(new ArrayList<>());
+        return conditionElseBranchNode;
     }
 
     /**
@@ -69,7 +72,7 @@ public class ConditionElseBranchNode extends BaseFlowNode {
     public static class Builder extends BaseNodeBuilder<Builder, ConditionElseBranchNode> {
 
         public Builder() {
-            super(new ConditionElseBranchNode());
+            super(ConditionElseBranchNode.defaultNode());
         }
 
     }

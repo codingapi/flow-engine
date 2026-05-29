@@ -27,12 +27,14 @@ public class TriggerNode extends BaseFlowNode implements IDisplayNode {
         return NODE_TYPE;
     }
 
-    public TriggerNode(String id, String name) {
-        super(id, name, 0, new ArrayList<>(), defaultStrategies());
-    }
-
-    public TriggerNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME);
+    public static TriggerNode defaultNode(){
+        TriggerNode triggerNode = new TriggerNode();
+        triggerNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        triggerNode.setName(DEFAULT_NAME);
+        triggerNode.setOrder(0);
+        triggerNode.setStrategies(defaultStrategies());
+        triggerNode.setActions(new ArrayList<>());
+        return triggerNode;
     }
 
     private static List<INodeStrategy> defaultStrategies() {
@@ -63,7 +65,7 @@ public class TriggerNode extends BaseFlowNode implements IDisplayNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, TriggerNode> {
         public Builder() {
-            super(new TriggerNode());
+            super(TriggerNode.defaultNode());
         }
     }
 }

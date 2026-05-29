@@ -37,14 +37,17 @@ public class InclusiveBranchNode extends BaseFlowNode {
     }
 
 
-    public InclusiveBranchNode(String id, String name, int order) {
-        super(id, name, order);
-        conditionScript = ConditionScript.defaultScript();
+    public static InclusiveBranchNode defaultNode(){
+        InclusiveBranchNode inclusiveBranchNode = new InclusiveBranchNode();
+        inclusiveBranchNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        inclusiveBranchNode.setName(DEFAULT_NAME);
+        inclusiveBranchNode.setOrder(0);
+        inclusiveBranchNode.conditionScript = ConditionScript.defaultScript();
+        inclusiveBranchNode.setActions(new ArrayList<>());
+        inclusiveBranchNode.setStrategies(new ArrayList<>());
+        return inclusiveBranchNode;
     }
 
-    public InclusiveBranchNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME, 0);
-    }
 
     /**
      * 匹配条件
@@ -122,7 +125,7 @@ public class InclusiveBranchNode extends BaseFlowNode {
     public static class Builder extends BaseNodeBuilder<Builder, InclusiveBranchNode> {
 
         public Builder() {
-            super(new InclusiveBranchNode());
+            super(InclusiveBranchNode.defaultNode());
         }
 
         public Builder conditionScript(String script) {

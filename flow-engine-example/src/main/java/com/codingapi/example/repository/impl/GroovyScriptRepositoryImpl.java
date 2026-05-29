@@ -30,15 +30,13 @@ public class GroovyScriptRepositoryImpl implements GroovyScriptRepository, Initi
     }
 
     @Override
-    public void delete(GroovyScript groovyScript) {
-        if(groovyScript!=null){
-            groovyScriptEntityRepository.deleteById(groovyScript.getKey());
-        }
+    public void delete(String key) {
+        groovyScriptEntityRepository.deleteById(key);
     }
 
     @Override
     public GroovyScript get(String key) {
-        GroovyScriptEntity entity = groovyScriptEntityRepository.getReferenceById(key);
+        GroovyScriptEntity entity = groovyScriptEntityRepository.getGroovyScriptEntityByKey(key);
         return GroovyScriptConvertor.convert(entity);
     }
 }

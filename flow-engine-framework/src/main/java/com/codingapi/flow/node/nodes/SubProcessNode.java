@@ -27,12 +27,15 @@ public class SubProcessNode extends BaseFlowNode implements IDisplayNode {
         return NODE_TYPE;
     }
 
-    public SubProcessNode(String id, String name) {
-        super(id, name, 0, new ArrayList<>(), defaultStrategies());
-    }
 
-    public SubProcessNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME);
+    public static SubProcessNode defaultNode(){
+        SubProcessNode subProcessNode = new SubProcessNode();
+        subProcessNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        subProcessNode.setName(DEFAULT_NAME);
+        subProcessNode.setOrder(0);
+        subProcessNode.setStrategies(defaultStrategies());
+        subProcessNode.setActions(new ArrayList<>());
+        return subProcessNode;
     }
 
     private static List<INodeStrategy> defaultStrategies() {
@@ -63,7 +66,7 @@ public class SubProcessNode extends BaseFlowNode implements IDisplayNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, SubProcessNode> {
         public Builder() {
-            super(new SubProcessNode());
+            super(SubProcessNode.defaultNode());
         }
     }
 }

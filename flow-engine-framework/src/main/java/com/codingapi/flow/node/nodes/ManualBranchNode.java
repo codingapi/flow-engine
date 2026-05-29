@@ -6,6 +6,7 @@ import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.session.FlowSession;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -22,12 +23,15 @@ public class ManualBranchNode extends BaseFlowNode {
         return NODE_TYPE;
     }
 
-    public ManualBranchNode(String id, String name, int order) {
-        super(id, name, order);
-    }
 
-    public ManualBranchNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME, 0);
+    public static ManualBranchNode defaultNode(){
+        ManualBranchNode manualBranchNode = new ManualBranchNode();
+        manualBranchNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        manualBranchNode.setName(DEFAULT_NAME);
+        manualBranchNode.setOrder(0);
+        manualBranchNode.setActions(new ArrayList<>());
+        manualBranchNode.setStrategies(new ArrayList<>());
+        return manualBranchNode;
     }
 
     /**
@@ -51,7 +55,7 @@ public class ManualBranchNode extends BaseFlowNode {
     public static class Builder extends BaseNodeBuilder<Builder, ManualBranchNode> {
 
         public Builder() {
-            super(new ManualBranchNode());
+            super(ManualBranchNode.defaultNode());
         }
     }
 }

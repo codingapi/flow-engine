@@ -26,12 +26,14 @@ public class InclusiveNode extends BaseFlowNode implements IBlockNode {
     }
 
 
-    public InclusiveNode(String id, String name, int order) {
-        super(id, name, order);
-    }
-
-    public InclusiveNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME, 0);
+    public static InclusiveNode defaultNode(){
+        InclusiveNode inclusiveNode = new InclusiveNode();
+        inclusiveNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        inclusiveNode.setName(DEFAULT_NAME);
+        inclusiveNode.setOrder(0);
+        inclusiveNode.setActions(new ArrayList<>());
+        inclusiveNode.setStrategies(new ArrayList<>());
+        return inclusiveNode;
     }
 
 
@@ -60,7 +62,7 @@ public class InclusiveNode extends BaseFlowNode implements IBlockNode {
     public static class Builder extends BaseNodeBuilder<Builder, InclusiveNode> {
 
         public Builder() {
-            super(new InclusiveNode());
+            super(InclusiveNode.defaultNode());
         }
     }
 }

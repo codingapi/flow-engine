@@ -117,8 +117,8 @@ public class Workflow {
 
     private List<IFlowNode> defaultNodes() {
         List<IFlowNode> nodeList = new ArrayList<>();
-        nodeList.add(new StartNode());
-        nodeList.add(new EndNode());
+        nodeList.add(StartNode.defaultNode());
+        nodeList.add(EndNode.defaultNode());
         return nodeList;
     }
 

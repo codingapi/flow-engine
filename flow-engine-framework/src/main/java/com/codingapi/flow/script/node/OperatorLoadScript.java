@@ -6,6 +6,7 @@ import com.codingapi.flow.script.request.GroovyScriptBind;
 import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.springboot.script.annotation.GroovyScript;
 import com.codingapi.springboot.script.cache.GroovyScriptCacheContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class OperatorLoadScript {
 
 
     @Getter
+    @GroovyScript
     private final String script;
 
     public List<IFlowOperator> execute(FlowSession session) {

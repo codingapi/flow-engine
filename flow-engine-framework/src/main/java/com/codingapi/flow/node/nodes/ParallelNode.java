@@ -24,14 +24,15 @@ public class ParallelNode extends BaseFlowNode implements IBlockNode {
         return NODE_TYPE;
     }
 
-    public ParallelNode(String id, String name) {
-        super(id, name);
-    }
 
-    public ParallelNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME);
+    public static ParallelNode defaultNode(){
+        ParallelNode parallelNode = new ParallelNode();
+        parallelNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        parallelNode.setName(DEFAULT_NAME);
+        parallelNode.setActions(new ArrayList<>());
+        parallelNode.setStrategies(new ArrayList<>());
+        return parallelNode;
     }
-
 
     @Override
     public void addDefaultBranch(int count){
@@ -55,7 +56,7 @@ public class ParallelNode extends BaseFlowNode implements IBlockNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, ParallelNode> {
         public Builder() {
-            super(new ParallelNode());
+            super(ParallelNode.defaultNode());
         }
     }
 }

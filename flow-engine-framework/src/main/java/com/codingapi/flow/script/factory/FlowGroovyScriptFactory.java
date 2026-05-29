@@ -33,7 +33,7 @@ public class FlowGroovyScriptFactory {
                 .requests(Map.of("request", GroovyScriptRequest.class))
                 .build();
 
-        groovyScript.save();
+        groovyScript.temp();
         return groovyScript;
     }
 
@@ -57,7 +57,7 @@ public class FlowGroovyScriptFactory {
                 .build();
 
 
-        groovyScript.save();
+        groovyScript.temp();
         return groovyScript;
     }
 
@@ -80,7 +80,7 @@ public class FlowGroovyScriptFactory {
                 .requests(Map.of("request", GroovyScriptRequest.class))
                 .build();
 
-        groovyScript.save();
+        groovyScript.temp();
         return groovyScript;
     }
 
@@ -104,7 +104,7 @@ public class FlowGroovyScriptFactory {
                 .build();
 
 
-        groovyScript.save();
+        groovyScript.temp();
         return groovyScript;
     }
 
@@ -128,7 +128,7 @@ public class FlowGroovyScriptFactory {
                 .requests(Map.of("request", GroovyScriptRequest.class))
                 .build();
 
-        groovyScript.save();
+        groovyScript.temp();
         return groovyScript;
     }
 
@@ -151,7 +151,7 @@ public class FlowGroovyScriptFactory {
                 .requests(Map.of("request", GroovyScriptRequest.class))
                 .build();
 
-        groovyScript.save();
+        groovyScript.temp();
         return groovyScript;
     }
 
@@ -173,7 +173,7 @@ public class FlowGroovyScriptFactory {
                 .requests(Map.of("request", GroovyWorkflowRequest.class))
                 .build();
 
-        groovyScript.save();
+        groovyScript.temp();
         return groovyScript;
     }
 
@@ -201,7 +201,7 @@ public class FlowGroovyScriptFactory {
                 .requests(Map.of("request", GroovyScriptRequest.class))
                 .build();
 
-        groovyScript.save();
+        groovyScript.temp();
         return groovyScript;
     }
 
@@ -225,7 +225,7 @@ public class FlowGroovyScriptFactory {
                 .requests(Map.of("request", GroovyScriptRequest.class))
                 .build();
 
-        groovyScript.save();
+        groovyScript.temp();
         return groovyScript;
     }
 
@@ -250,7 +250,7 @@ public class FlowGroovyScriptFactory {
                 .requests(Map.of("request", GroovyScriptRequest.class))
                 .build();
 
-        groovyScript.save();
+        groovyScript.temp();
         return groovyScript;
     }
 

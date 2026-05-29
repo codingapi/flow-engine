@@ -31,13 +31,17 @@ public class RouterNode extends BaseFlowNode implements IDisplayNode {
         return NODE_TYPE;
     }
 
-    public RouterNode(String id, String name) {
-        super(id, name,0, new ArrayList<>(),defaultStrategies());
+
+    public static RouterNode defaultNode(){
+        RouterNode routerNode = new RouterNode();
+        routerNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        routerNode.setName(DEFAULT_NAME);
+        routerNode.setOrder(0);
+        routerNode.setStrategies(defaultStrategies());
+        routerNode.setActions(new ArrayList<>());
+        return routerNode;
     }
 
-    public RouterNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME);
-    }
 
     private static List<INodeStrategy> defaultStrategies() {
         List<INodeStrategy> strategies = new ArrayList<>();
@@ -75,7 +79,7 @@ public class RouterNode extends BaseFlowNode implements IDisplayNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, RouterNode> {
         public Builder() {
-            super(new RouterNode());
+            super(RouterNode.defaultNode());
         }
     }
 }

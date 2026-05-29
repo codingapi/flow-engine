@@ -26,13 +26,17 @@ public class ApprovalNode extends BaseAuditNode implements IDisplayNode {
         return NODE_TYPE;
     }
 
-    public ApprovalNode(String id, String name, String view, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, view, actions, nodeStrategies);
+
+    public static ApprovalNode defaultNode(){
+        ApprovalNode approvalNode = new ApprovalNode();
+        approvalNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        approvalNode.setName(DEFAULT_NAME);
+        approvalNode.setView(DEFAULT_VIEW);
+        approvalNode.setActions(defaultActions());
+        approvalNode.setStrategies(defaultStrategies());
+        return approvalNode;
     }
 
-    public ApprovalNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME, DEFAULT_VIEW, defaultActions(), defaultStrategies());
-    }
 
     private static List<INodeStrategy> defaultStrategies() {
         List<INodeStrategy> strategies = new ArrayList<>();
@@ -75,7 +79,7 @@ public class ApprovalNode extends BaseAuditNode implements IDisplayNode {
     public static class Builder extends BaseNodeBuilder<Builder, ApprovalNode> {
 
         public Builder() {
-            super(new ApprovalNode());
+            super(ApprovalNode.defaultNode());
         }
     }
 }

@@ -11,6 +11,7 @@ import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,12 +28,13 @@ public class ParallelBranchNode extends BaseFlowNode {
         return NODE_TYPE;
     }
 
-    public ParallelBranchNode(String id, String name) {
-        super(id, name);
-    }
-
-    public ParallelBranchNode() {
-        this(FlowIDGeneratorGatewayContext.getInstance().generateNodeId(), DEFAULT_NAME);
+    public static ParallelBranchNode defaultNode(){
+        ParallelBranchNode parallelBranchNode = new ParallelBranchNode();
+        parallelBranchNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        parallelBranchNode.setName(DEFAULT_NAME);
+        parallelBranchNode.setActions(new ArrayList<>());
+        parallelBranchNode.setStrategies(new ArrayList<>());
+        return parallelBranchNode;
     }
 
     @Override
@@ -75,7 +77,7 @@ public class ParallelBranchNode extends BaseFlowNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, ParallelBranchNode> {
         public Builder() {
-            super(new ParallelBranchNode());
+            super(ParallelBranchNode.defaultNode());
         }
     }
 }
