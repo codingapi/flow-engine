@@ -24,7 +24,7 @@ import com.codingapi.flow.strategy.node.*;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
-import com.codingapi.springboot.script.parser.GroovyScriptAnnotationUtils;
+import com.codingapi.springboot.script.scanner.GroovyScriptAnnotationScannerUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -91,7 +91,7 @@ class FlowSampleServiceTest {
                 .addNode(endNode)
                 .build();
 
-        List<String> keys = GroovyScriptAnnotationUtils.findGroovyScriptFields(workflow).getKeys();
+        List<String> keys = GroovyScriptAnnotationScannerUtils.findGroovyScriptFields(workflow).getKeys();
         System.out.println(keys);
         assertEquals(6,keys.size());
 

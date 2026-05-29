@@ -8,6 +8,7 @@ import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.springboot.script.annotation.ScriptField;
 import com.codingapi.springboot.script.annotation.ScriptFunction;
+import com.codingapi.springboot.script.annotation.ScriptParameter;
 import com.codingapi.springboot.script.annotation.ScriptType;
 
 import java.util.List;
@@ -112,47 +113,47 @@ public class GroovyScriptRequest {
 
     }
 
-    @ScriptFunction(name = "getWorkflowTitle",description = "获取流程名称")
+    @ScriptFunction(name = "getWorkflowTitle", description = "获取流程名称")
     public String getWorkflowTitle() {
         return workflowTitle;
     }
 
-    @ScriptFunction(name = "getWorkflowId",description = "获取流程workId")
+    @ScriptFunction(name = "getWorkflowId", description = "获取流程workId")
     public String getWorkflowId() {
         return workflowId;
     }
 
-    @ScriptFunction(name = "getWorkflowCode",description = "获取流程workCode")
+    @ScriptFunction(name = "getWorkflowCode", description = "获取流程workCode")
     public String getWorkflowCode() {
         return workflowCode;
     }
 
-    @ScriptFunction(name = "getNodeName",description = "获取节点名称")
+    @ScriptFunction(name = "getNodeName", description = "获取节点名称")
     public String getNodeName() {
         return nodeName;
     }
 
-    @ScriptFunction(name = "getNodeType",description = "获取节点类型")
+    @ScriptFunction(name = "getNodeType", description = "获取节点类型")
     public String getNodeType() {
         return nodeType;
     }
 
-    @ScriptFunction(name = "getFormData",description = "获取当前流程数据")
+    @ScriptFunction(name = "getFormData", description = "获取当前流程数据")
     public Map<String, Object> getFormData() {
         return formData;
     }
 
-    @ScriptFunction(name = "getCreatedOperator",description = "获取流程创建人信息")
+    @ScriptFunction(name = "getCreatedOperator", description = "获取流程创建人信息")
     public IFlowOperator getCreatedOperator() {
         return createdOperator;
     }
 
-    @ScriptFunction(name = "getCurrentOperator",description = "获取当前审批人信息")
+    @ScriptFunction(name = "getCurrentOperator", description = "获取当前审批人信息")
     public IFlowOperator getCurrentOperator() {
         return currentOperator;
     }
 
-    @ScriptFunction(name = "getSubmitOperator",description = "获取流程审批者信息")
+    @ScriptFunction(name = "getSubmitOperator", description = "获取流程审批者信息")
     public IFlowOperator getSubmitOperator() {
         return submitOperator;
     }
@@ -164,10 +165,8 @@ public class GroovyScriptRequest {
      * @param nodeId 节点id
      * @return 节点
      */
-    @ScriptFunction(name = "getNode", description = "获取流程节点信息", parameters = {
-            @ScriptField(name = "nodeId", description = "流程节点Id")
-    })
-    public IFlowNode getNode(String nodeId) {
+    @ScriptFunction(name = "getNode", description = "获取流程节点信息")
+    public IFlowNode getNode(@ScriptParameter(description = "流程节点Id") String nodeId) {
         return flowSession.getNode(nodeId);
     }
 
@@ -283,18 +282,13 @@ public class GroovyScriptRequest {
      */
     @ScriptFunction(
             name = "toCreateRequest",
-            description = "创建流程请求，用于自流程的创建",
-            parameters = {
-                    @ScriptField(name = "workId",description = "流程workId"),
-                    @ScriptField(name = "operatorId",description = "流程发起人id"),
-                    @ScriptField(name = "actionId",description = "流程动作actionId"),
-                    @ScriptField(name = "formData",description = "流程数据formData（JSON格式）"),
-            }
+            description = "创建流程请求，用于自流程的创建"
     )
-    public FlowCreateRequest toCreateRequest(String workId,
-                                             long operatorId,
-                                             String actionId,
-                                             String formData) {
+    public FlowCreateRequest toCreateRequest(
+            @ScriptParameter(description = "流程workId") String workId,
+            @ScriptParameter(description = "流程发起人id") long operatorId,
+            @ScriptParameter(description = "流程动作actionId") String actionId,
+            @ScriptParameter(description = "流程数据formData（JSON格式）") String formData) {
         return flowSession.toCreateRequest(workId, operatorId, actionId, formData);
     }
 
@@ -307,18 +301,12 @@ public class GroovyScriptRequest {
      */
     @ScriptFunction(
             name = "toCreateRequest",
-            description = "创建流程请求，用于自流程的创建",
-            parameters = {
-                    @ScriptField(name = "workId",description = "流程workId"),
-                    @ScriptField(name = "operatorId",description = "流程发起人id"),
-                    @ScriptField(name = "actionId",description = "流程动作actionId"),
-                    @ScriptField(name = "formData",description = "流程数据formData（Map<String,Object>格式）"),
-            }
+            description = "创建流程请求，用于自流程的创建"
     )
-    public FlowCreateRequest toCreateRequest(String workId,
-                                             long operatorId,
-                                             String actionId,
-                                             Map<String, Object> formData) {
+    public FlowCreateRequest toCreateRequest(@ScriptParameter(description = "流程workId") String workId,
+                                             @ScriptParameter(description = "流程发起人id") long operatorId,
+                                             @ScriptParameter(description = "流程动作actionId") String actionId,
+                                             @ScriptParameter(description = "流程数据formData（Map<String,Object>格式）") Map<String, Object> formData) {
         return flowSession.toCreateRequest(workId, operatorId, actionId, formData);
     }
 
@@ -331,12 +319,9 @@ public class GroovyScriptRequest {
      */
     @ScriptFunction(
             name = "getFormData",
-            description = "获取表单字段值",
-            parameters = {
-                    @ScriptField(name = "fieldCode",description = "表单字段编码"),
-            }
+            description = "获取表单字段值"
     )
-    public Object getFormData(String fieldCode) {
+    public Object getFormData(@ScriptParameter(description = "表单字段编码") String fieldCode) {
         return flowSession.getFormData(fieldCode);
     }
 
@@ -348,12 +333,9 @@ public class GroovyScriptRequest {
      */
     @ScriptFunction(
             name = "getSubFormData",
-            description = "获取子表单的数据，返回list格式数据",
-            parameters = {
-                    @ScriptField(name = "subFormCode",description = "字表编码"),
-            }
+            description = "获取子表单的数据，返回list格式数据"
     )
-    public List<Map<String, Object>> getSubFormData(String subFormCode) {
+    public List<Map<String, Object>> getSubFormData(@ScriptParameter(description = "字表编码") String subFormCode) {
         return flowSession.getFormData().getSubDataBody(subFormCode)
                 .stream()
                 .map(FormData.DataBody::toMapData)
