@@ -1,12 +1,12 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.script.node.ConditionScript;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.utils.RandomUtils;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -33,13 +33,15 @@ public class ConditionBranchNode extends BaseFlowNode {
         return NODE_TYPE;
     }
 
-    public ConditionBranchNode(String id, String name, int order) {
-        super(id, name, order);
-        this.conditionScript = ConditionScript.defaultScript();
-    }
 
-    public ConditionBranchNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, 0);
+    public static ConditionBranchNode defaultNode(){
+        ConditionBranchNode conditionBranchNode = new ConditionBranchNode();
+        conditionBranchNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        conditionBranchNode.setName(DEFAULT_NAME);
+        conditionBranchNode.setOrder(0);
+        conditionBranchNode.setActions(new ArrayList<>());
+        conditionBranchNode.setStrategies(new ArrayList<>());
+        return conditionBranchNode;
     }
 
     /**
@@ -86,7 +88,7 @@ public class ConditionBranchNode extends BaseFlowNode {
     public static class Builder extends BaseNodeBuilder<Builder, ConditionBranchNode> {
 
         public Builder() {
-            super(new ConditionBranchNode());
+            super(ConditionBranchNode.defaultNode());
         }
 
         public Builder conditionScript(String script) {

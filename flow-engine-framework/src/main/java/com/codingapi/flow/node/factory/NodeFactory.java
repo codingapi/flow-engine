@@ -48,7 +48,8 @@ public class NodeFactory {
     public IFlowNode createNode(NodeType type) {
         Class<? extends IFlowNode> clazz = nodesClasses.get(type.name());
         if (clazz != null) {
-            return clazz.getDeclaredConstructor().newInstance();
+            Method defaultNode = clazz.getMethod("defaultNode");
+            return (IFlowNode) defaultNode.invoke(null);
         }
         return null;
     }

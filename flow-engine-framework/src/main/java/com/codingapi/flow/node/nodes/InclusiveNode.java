@@ -1,11 +1,11 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IBlockNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
-import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +26,14 @@ public class InclusiveNode extends BaseFlowNode implements IBlockNode {
     }
 
 
-    public InclusiveNode(String id, String name, int order) {
-        super(id, name, order);
-    }
-
-    public InclusiveNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, 0);
+    public static InclusiveNode defaultNode(){
+        InclusiveNode inclusiveNode = new InclusiveNode();
+        inclusiveNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        inclusiveNode.setName(DEFAULT_NAME);
+        inclusiveNode.setOrder(0);
+        inclusiveNode.setActions(new ArrayList<>());
+        inclusiveNode.setStrategies(new ArrayList<>());
+        return inclusiveNode;
     }
 
 
@@ -60,7 +62,7 @@ public class InclusiveNode extends BaseFlowNode implements IBlockNode {
     public static class Builder extends BaseNodeBuilder<Builder, InclusiveNode> {
 
         public Builder() {
-            super(new InclusiveNode());
+            super(InclusiveNode.defaultNode());
         }
     }
 }

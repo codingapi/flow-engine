@@ -18,6 +18,7 @@ import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.strategy.node.OperatorSelectType;
@@ -197,7 +198,7 @@ class OperatorSelectTest {
                                 .addPermission("leave", "days", PermissionType.READ)
                                 .addPermission("leave", "reason", PermissionType.READ)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build())
                 .build();
 
@@ -427,7 +428,7 @@ class OperatorSelectTest {
                                 .addPermission("leave", "days", PermissionType.READ)
                                 .addPermission("leave", "reason", PermissionType.READ)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build())
                 .build();
 
@@ -445,7 +446,7 @@ class OperatorSelectTest {
         factory.workflowService.saveWorkflow(workflow);
 
         // 验证 OperatorLoadStrategy 的序列化和反序列化
-        OperatorLoadStrategy scriptStrategy = new OperatorLoadStrategy("def run(request){return [2]}");
+        OperatorLoadStrategy scriptStrategy = new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey());
         Map<String, Object> map = scriptStrategy.toMap();
         assertEquals("SCRIPT", map.get("selectType"));
 
@@ -512,7 +513,7 @@ class OperatorSelectTest {
                 .name("经理审批")
                 .strategies(NodeStrategyBuilder.builder()
                         .addStrategy(readPermission())
-                        .addStrategy(OperatorLoadStrategy.initiatorSelectStrategy("def run(request){return [2,3]}"))
+                        .addStrategy(OperatorLoadStrategy.initiatorSelectStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2,3]}").getKey()))
                         .build())
                 .build();
 
@@ -587,7 +588,7 @@ class OperatorSelectTest {
                 .name("经理审批")
                 .strategies(NodeStrategyBuilder.builder()
                         .addStrategy(readPermission())
-                        .addStrategy(OperatorLoadStrategy.initiatorSelectStrategy("def run(request){return [2]}"))
+                        .addStrategy(OperatorLoadStrategy.initiatorSelectStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build())
                 .build();
 
@@ -646,7 +647,7 @@ class OperatorSelectTest {
                 .name("经理审批")
                 .strategies(NodeStrategyBuilder.builder()
                         .addStrategy(readPermission())
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build())
                 .build();
 
@@ -655,7 +656,7 @@ class OperatorSelectTest {
                 .name("总监审批")
                 .strategies(NodeStrategyBuilder.builder()
                         .addStrategy(readPermission())
-                        .addStrategy(OperatorLoadStrategy.approverSelectStrategy("def run(request){return [3]}"))
+                        .addStrategy(OperatorLoadStrategy.approverSelectStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
                         .build())
                 .build();
 
@@ -721,7 +722,7 @@ class OperatorSelectTest {
                 .name("经理审批")
                 .strategies(NodeStrategyBuilder.builder()
                         .addStrategy(readPermission())
-                        .addStrategy(OperatorLoadStrategy.initiatorSelectStrategy("def run(request){return []}"))
+                        .addStrategy(OperatorLoadStrategy.initiatorSelectStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return []}").getKey()))
                         .build())
                 .build();
 

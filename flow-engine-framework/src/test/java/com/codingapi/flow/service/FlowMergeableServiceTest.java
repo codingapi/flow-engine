@@ -20,6 +20,7 @@ import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.record.FlowTodoMerge;
 import com.codingapi.flow.record.FlowTodoRecord;
+import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.strategy.node.RecordMergeStrategy;
@@ -83,7 +84,7 @@ public class FlowMergeableServiceTest {
                                 .addPermission("leave", "days", PermissionType.WRITE)
                                 .addPermission("leave", "reason", PermissionType.WRITE)
                                 .build()))
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .addStrategy(new RecordMergeStrategy(true))
                         .build()
                 )

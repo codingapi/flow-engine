@@ -15,6 +15,7 @@ import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
 import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
@@ -66,7 +67,7 @@ class FlowForwardOperatorTest {
         approvalNode = ApprovalNode.builder()
                 .name("审批节点")
                 .strategies(NodeStrategyBuilder.builder()
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [2]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
                         .build())
                 .build();
 
@@ -117,7 +118,7 @@ class FlowForwardOperatorTest {
         approvalNode = ApprovalNode.builder()
                 .name("审批节点")
                 .strategies(NodeStrategyBuilder.builder()
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [4]}"))  // 返回 boss
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [4]}").getKey()))  // 返回 boss
                         .build())
                 .build();
 
@@ -175,7 +176,7 @@ class FlowForwardOperatorTest {
         approvalNode = ApprovalNode.builder()
                 .name("审批节点")
                 .strategies(NodeStrategyBuilder.builder()
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [5]}"))  // 返回 bossWithNullForward
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [5]}").getKey()))  // 返回 bossWithNullForward
                         .build())
                 .build();
 
@@ -235,7 +236,7 @@ class FlowForwardOperatorTest {
         approvalNode = ApprovalNode.builder()
                 .name("审批节点")
                 .strategies(NodeStrategyBuilder.builder()
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [6]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [6]}").getKey()))
                         .build())
                 .build();
 
@@ -295,7 +296,7 @@ class FlowForwardOperatorTest {
         approvalNode = ApprovalNode.builder()
                 .name("审批节点")
                 .strategies(NodeStrategyBuilder.builder()
-                        .addStrategy(new OperatorLoadStrategy("def run(request){return [7]}"))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [7]}").getKey()))
                         .build())
                 .build();
 

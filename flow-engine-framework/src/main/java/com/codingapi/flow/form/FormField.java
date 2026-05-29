@@ -1,6 +1,6 @@
 package com.codingapi.flow.form;
 
-import com.codingapi.flow.utils.RandomUtils;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import lombok.Data;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class FormField {
 
 
     public FormField() {
-        this.id = RandomUtils.generateStringId();
+        this.id = FlowIDGeneratorGatewayContext.getInstance().generateFormFieldId();
     }
 
 }

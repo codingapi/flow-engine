@@ -3,10 +3,10 @@ package com.codingapi.flow.action.actions;
 import com.codingapi.flow.action.ActionDisplay;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.BaseAction;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
-import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.Map;
 
@@ -16,7 +16,7 @@ import java.util.Map;
 public class SaveAction extends BaseAction {
 
     public SaveAction() {
-        this.id = RandomUtils.generateStringId();
+        this.id = FlowIDGeneratorGatewayContext.getInstance().generateActionId();
         this.title = "保存";
         this.enable = true;
         this.type = ActionType.SAVE.name();

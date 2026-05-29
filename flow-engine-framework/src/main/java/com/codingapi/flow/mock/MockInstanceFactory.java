@@ -1,10 +1,10 @@
 package com.codingapi.flow.mock;
 
 import com.codingapi.flow.gateway.FlowOperatorGateway;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.mock.service.FlowRecordQueryMockService;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.service.FlowService;
-import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,7 +27,7 @@ public class MockInstanceFactory {
     }
 
     public MockInstance create(FlowOperatorGateway flowOperatorGateway, WorkflowRepository workflowRepository ) {
-        String key = RandomUtils.generateStringId();
+        String key = FlowIDGeneratorGatewayContext.getInstance().generateMockKey();
         MockRepositoryHolder mockRepositoryHolder = new MockRepositoryHolder(flowOperatorGateway,workflowRepository);
         FlowService flowService = new FlowService(mockRepositoryHolder);
         FlowRecordQueryMockService flowRecordQueryMockService = new FlowRecordQueryMockService(mockRepositoryHolder);

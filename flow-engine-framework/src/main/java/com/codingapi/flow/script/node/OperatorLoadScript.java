@@ -1,17 +1,19 @@
 package com.codingapi.flow.script.node;
 
 import com.codingapi.flow.operator.IFlowOperator;
-import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.registry.ScriptRegistryContext;
-import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
-import com.codingapi.flow.script.runtime.ScriptRuntimeRequest;
+import com.codingapi.flow.script.request.GroovyScriptBind;
+import com.codingapi.flow.script.request.GroovyScriptRequest;
+import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.springboot.framework.script.request.GroovyBindObjectBuilder;
+import com.codingapi.springboot.script.annotation.GroovyScript;
+import com.codingapi.springboot.script.cache.GroovyScriptCacheContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 人员加载脚本
@@ -21,14 +23,14 @@ public class OperatorLoadScript {
 
 
     @Getter
+    @GroovyScript
     private final String script;
 
     public List<IFlowOperator> execute(FlowSession session) {
         GroovyScriptRequest request = new GroovyScriptRequest(session);
-        ScriptRuntimeRequest runtimeRequest = new ScriptRuntimeRequest(script, List.class, GroovyBindObjectBuilder.builder()
-                .add("request",request)
-                .build());
-        List<Object> userIds = ScriptRuntimeContext.getInstance().execute(runtimeRequest);
+        List<Object> userIds = GroovyScriptCacheContext.getInstance()
+                .getGroovyScript(script)
+                .invoke(Map.of("$bind", new GroovyScriptBind(FlowScriptContext.getInstance())), request);
         List<Long> operatorIds = new ArrayList<>();
         for (Object userId : userIds) {
             operatorIds.add(Long.parseLong(String.valueOf(userId)));

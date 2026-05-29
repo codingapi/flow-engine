@@ -1,8 +1,8 @@
 package com.codingapi.flow.domain;
 
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.strategy.node.DelayStrategy;
-import com.codingapi.flow.utils.RandomUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -39,7 +39,7 @@ public class DelayTask {
     private final String delayNodeId;
 
     public DelayTask(DelayStrategy delayStrategy, FlowRecord flowRecord, String delayNodeId) {
-        this.id = RandomUtils.generateStringId();
+        this.id = FlowIDGeneratorGatewayContext.getInstance().generateDelayTaskId();
         this.delayNodeId = delayNodeId;
         this.createTime = System.currentTimeMillis();
         this.triggerTime = createTime + delayStrategy.getTriggerTime();

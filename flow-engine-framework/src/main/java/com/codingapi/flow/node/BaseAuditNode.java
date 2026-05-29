@@ -1,6 +1,5 @@
 package com.codingapi.flow.node;
 
-import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FlowForm;
@@ -9,10 +8,9 @@ import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.strategy.node.INodeStrategy;
 import com.codingapi.flow.strategy.node.MultiOperatorAuditStrategy;
-import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;
@@ -20,7 +18,9 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
+@NoArgsConstructor
 public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
 
     public static final String DEFAULT_VIEW = "default";
@@ -32,11 +32,6 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     @Setter
     private String view;
 
-
-    public BaseAuditNode(String id, String name, String view, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, 0, actions, nodeStrategies);
-        this.view = view;
-    }
 
     @Override
     public Map<String, Object> toMap() {
@@ -149,7 +144,8 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
             }
             // 如果是随机审批，则隐藏掉后续的人员的审批记录
             if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.RANDOM_ONE) {
-                int index = RandomUtils.randomInt(operators.size());
+                Random random = new Random();
+                int index = random.nextInt(operators.size());
 
                 List<FlowRecord> newRecords = new ArrayList<>();
                 for (FlowRecord record : records) {

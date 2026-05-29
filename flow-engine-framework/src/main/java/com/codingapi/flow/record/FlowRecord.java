@@ -3,6 +3,7 @@ package com.codingapi.flow.record;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormData;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.EndNode;
@@ -11,7 +12,6 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
-import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -291,6 +291,7 @@ public class FlowRecord {
             // 其他审批流转场景，调用 forwardOperator(FlowSession)
             currentOperator = flowSession.loadFinalForwardOperator(sourceOperator);
         }
+        this.id = FlowIDGeneratorGatewayContext.getInstance().generateRecordId();
         this.workCode = flowSession.getWorkCode();
         this.workRuntimeId = flowSession.getWorkflowRuntimeId();
         this.workTitle = flowSession.getWorkflow().getTitle();
@@ -299,7 +300,7 @@ public class FlowRecord {
         this.nodeName = flowSession.getCurrentNodeName();
         this.formData = flowSession.getFormData().toMapData();
         this.nodeOrder = nodeOrder;
-        this.processId = RandomUtils.generateStringId();
+        this.processId = FlowIDGeneratorGatewayContext.getInstance().generateProcessId();
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
         this.createOperatorName = flowSession.getCreatedOperator().getName();
         // 是否转交之后的人来审批的判断

@@ -1,6 +1,7 @@
 package com.codingapi.flow.script.registry;
 
 import com.codingapi.flow.script.ScriptDefaultConstants;
+import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
 
 /**
  * 默认脚本注册实现
@@ -9,53 +10,54 @@ import com.codingapi.flow.script.ScriptDefaultConstants;
  */
 public class DefaultScriptRegistry implements IScriptRegistry {
 
+
     @Override
     public String getRouterScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_ROUTER;
+        return FlowGroovyScriptFactory.createRouterScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ROUTER).getKey();
     }
 
     @Override
     public String getNodeTitleScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_NODE_TITLE;
+        return FlowGroovyScriptFactory.createNodeTitleScript(ScriptDefaultConstants.SCRIPT_DEFAULT_NODE_TITLE).getKey();
     }
 
     @Override
     public String getConditionScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_CONDITION;
+        return FlowGroovyScriptFactory.createConditionScript(ScriptDefaultConstants.SCRIPT_DEFAULT_CONDITION).getKey();
     }
 
     @Override
     public String getTriggerScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_TRIGGER;
+        return FlowGroovyScriptFactory.createTriggerScript(ScriptDefaultConstants.SCRIPT_DEFAULT_TRIGGER).getKey();
     }
 
     @Override
     public String getSubProcessScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_SUB_PROCESS;
+        return FlowGroovyScriptFactory.createSubProcessScript(ScriptDefaultConstants.SCRIPT_DEFAULT_SUB_PROCESS).getKey();
     }
 
     @Override
     public String getOperatorLoadScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_OPERATOR_LOAD;
+        return FlowGroovyScriptFactory.createOperatorLoadScript(ScriptDefaultConstants.SCRIPT_DEFAULT_OPERATOR_LOAD).getKey();
     }
 
     @Override
     public String getOperatorMatchScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_OPERATOR_MATCH;
+        return FlowGroovyScriptFactory.createOperatorMatchScript(ScriptDefaultConstants.SCRIPT_DEFAULT_OPERATOR_MATCH).getKey();
     }
 
     @Override
     public String getErrorTriggerScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_ERROR_TRIGGER;
+        return FlowGroovyScriptFactory.createErrorTriggerScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ERROR_TRIGGER).getKey();
     }
 
     @Override
     public String getActionCustomScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_CUSTOM;
+        return FlowGroovyScriptFactory.createActionCustomScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_CUSTOM).getKey();
     }
 
     @Override
     public String getActionRejectScript() {
-        return ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_REJECT;
+        return FlowGroovyScriptFactory.createActionRejectScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_REJECT).getKey();
     }
 }

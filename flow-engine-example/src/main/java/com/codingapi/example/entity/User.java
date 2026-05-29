@@ -3,6 +3,9 @@ package com.codingapi.example.entity;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.script.request.GroovyScriptRequest;
+import com.codingapi.springboot.script.annotation.ScriptField;
+import com.codingapi.springboot.script.annotation.ScriptFunction;
+import com.codingapi.springboot.script.annotation.ScriptType;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,6 +15,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "t_user")
+@ScriptType(description = "用户信息")
 public class User implements IFlowOperator {
 
     public static final String ADMIN_ROLE = "ROLE_ADMIN";
@@ -20,9 +24,13 @@ public class User implements IFlowOperator {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ScriptField(name = "id",description = "用户id")
     private Long id;
+    @ScriptField(name = "name",description = "用户姓名")
     private String name;
+    @ScriptField(name = "flowManager",description = "是否流程管理员")
     private Boolean flowManager;
+    @ScriptField(name = "flowOperatorId",description = "转交审批人Id")
     private Long flowOperatorId;
 
     @Column(unique = true)
@@ -50,16 +58,19 @@ public class User implements IFlowOperator {
     }
 
     @Override
+    @ScriptFunction(name = "getUserId",description = "获取用户id")
     public long getUserId() {
         return id;
     }
 
     @Override
+    @ScriptFunction(name = "getName",description = "获取用户名称")
     public String getName() {
         return name;
     }
 
     @Override
+    @ScriptFunction(name = "isFlowManager",description = "是否为流程管理员")
     public boolean isFlowManager() {
         return flowManager;
     }

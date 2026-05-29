@@ -3,6 +3,7 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.domain.DelayTask;
 import com.codingapi.flow.domain.DelayTaskManager;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IDisplayNode;
@@ -12,7 +13,6 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.DelayStrategy;
 import com.codingapi.flow.strategy.node.INodeStrategy;
-import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,12 +48,13 @@ public class DelayNode extends BaseFlowNode implements IDisplayNode {
     }
 
 
-    public DelayNode(String id, String name) {
-        super(id, name, 0, new ArrayList<>(), defaultStrategies());
-    }
-
-    public DelayNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME);
+    public static DelayNode defaultNode(){
+        DelayNode delayNode = new DelayNode();
+        delayNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        delayNode.setName(DEFAULT_NAME);
+        delayNode.setStrategies(defaultStrategies());
+        delayNode.setActions(new ArrayList<>());
+        return delayNode;
     }
 
     private static List<INodeStrategy> defaultStrategies() {
@@ -72,7 +73,7 @@ public class DelayNode extends BaseFlowNode implements IDisplayNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, DelayNode> {
         public Builder() {
-            super(new DelayNode());
+            super(DelayNode.defaultNode());
         }
     }
 }

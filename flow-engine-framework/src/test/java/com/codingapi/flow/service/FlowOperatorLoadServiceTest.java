@@ -15,6 +15,7 @@ import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.user.User;
@@ -95,14 +96,14 @@ public class FlowOperatorLoadServiceTest {
 
         ConditionBranchNode departConditionNode = ConditionBranchNode.builder()
                 .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') <= 3}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') <= 3}").getKey())
                 .order(1)
                 .blocks(departApprovalNode)
                 .build();
 
         ConditionBranchNode bossConditionNode = ConditionBranchNode.builder()
                 .name("条件分支")
-                .conditionScript("def run(request){return request.getFormData('days') > 3}")
+                .conditionScript(FlowGroovyScriptFactory.createConditionScript("def run(request){return request.getFormData('days') > 3}").getKey())
                 .order(2)
                 .blocks(bossApprovalNode)
                 .build();

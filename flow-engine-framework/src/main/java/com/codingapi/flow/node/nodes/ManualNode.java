@@ -1,9 +1,9 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.node.*;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,12 +24,14 @@ public class ManualNode extends BaseFlowNode implements IBlockNode , IDisplayNod
     }
 
 
-    public ManualNode(String id, String name, int order) {
-        super(id, name, order);
-    }
-
-    public ManualNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, 0);
+    public static ManualNode defaultNode(){
+        ManualNode manualNode = new ManualNode();
+        manualNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        manualNode.setName(DEFAULT_NAME);
+        manualNode.setOrder(0);
+        manualNode.setActions(new ArrayList<>());
+        manualNode.setStrategies(new ArrayList<>());
+        return manualNode;
     }
 
     /**
@@ -74,7 +76,7 @@ public class ManualNode extends BaseFlowNode implements IBlockNode , IDisplayNod
     public static class Builder extends BaseNodeBuilder<Builder, ManualNode> {
 
         public Builder() {
-            super(new ManualNode());
+            super(ManualNode.defaultNode());
         }
     }
 }

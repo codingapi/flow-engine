@@ -3,11 +3,11 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.*;
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.strategy.node.*;
-import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,13 +26,17 @@ public class ApprovalNode extends BaseAuditNode implements IDisplayNode {
         return NODE_TYPE;
     }
 
-    public ApprovalNode(String id, String name, String view, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, view, actions, nodeStrategies);
+
+    public static ApprovalNode defaultNode(){
+        ApprovalNode approvalNode = new ApprovalNode();
+        approvalNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        approvalNode.setName(DEFAULT_NAME);
+        approvalNode.setView(DEFAULT_VIEW);
+        approvalNode.setActions(defaultActions());
+        approvalNode.setStrategies(defaultStrategies());
+        return approvalNode;
     }
 
-    public ApprovalNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, defaultActions(), defaultStrategies());
-    }
 
     private static List<INodeStrategy> defaultStrategies() {
         List<INodeStrategy> strategies = new ArrayList<>();
@@ -75,7 +79,7 @@ public class ApprovalNode extends BaseAuditNode implements IDisplayNode {
     public static class Builder extends BaseNodeBuilder<Builder, ApprovalNode> {
 
         public Builder() {
-            super(new ApprovalNode());
+            super(ApprovalNode.defaultNode());
         }
     }
 }

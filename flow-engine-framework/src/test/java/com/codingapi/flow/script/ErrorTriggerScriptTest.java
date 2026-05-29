@@ -11,6 +11,7 @@ import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
+import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
 import com.codingapi.flow.script.node.ErrorTriggerScript;
 import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.session.FlowSession;
@@ -97,7 +98,7 @@ class ErrorTriggerScriptTest {
             }
             """;
 
-        ErrorTriggerScript errorOperatorTriggerScript = new ErrorTriggerScript(script);
+        ErrorTriggerScript errorOperatorTriggerScript = new ErrorTriggerScript(FlowGroovyScriptFactory.createErrorTriggerScript(script).getKey());
         errorThrow = errorOperatorTriggerScript.execute(flowSession);
         assertFalse(errorThrow.isNode());
         assertEquals(user, errorThrow.getOperators().get(0));

@@ -5,6 +5,7 @@ import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.action.actions.SaveAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.context.GatewayContext;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IDisplayNode;
@@ -16,7 +17,6 @@ import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.strategy.node.INodeStrategy;
 import com.codingapi.flow.strategy.node.NodeTitleStrategy;
 import com.codingapi.flow.strategy.node.RevokeStrategy;
-import com.codingapi.flow.utils.RandomUtils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -48,13 +48,15 @@ public class StartNode extends BaseFlowNode implements IDisplayNode {
     }
 
 
-    public StartNode(String id, String name, String view, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, 0, actions, nodeStrategies);
-        this.view = view;
-    }
-
-    public StartNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, defaultActions(), defaultStrategies());
+    public static StartNode defaultNode(){
+        StartNode startNode = new StartNode();
+        startNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        startNode.setName(DEFAULT_NAME);
+        startNode.setView(DEFAULT_VIEW);
+        startNode.setActions(defaultActions());
+        startNode.setStrategies(defaultStrategies());
+        startNode.setOrder(0);
+        return startNode;
     }
 
 
@@ -118,7 +120,7 @@ public class StartNode extends BaseFlowNode implements IDisplayNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, StartNode> {
         public Builder() {
-            super(new StartNode());
+            super(StartNode.defaultNode());
         }
     }
 }

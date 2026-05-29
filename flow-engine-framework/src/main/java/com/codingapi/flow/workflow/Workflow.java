@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.manager.FlowNodeManager;
 import com.codingapi.flow.manager.WorkflowStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
@@ -19,7 +20,6 @@ import com.codingapi.flow.strategy.workflow.IWorkflowStrategy;
 import com.codingapi.flow.strategy.workflow.InterfereStrategy;
 import com.codingapi.flow.strategy.workflow.UrgeStrategy;
 import com.codingapi.flow.strategy.workflow.WorkflowStrategyFactory;
-import com.codingapi.flow.utils.RandomUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
@@ -101,8 +101,8 @@ public class Workflow {
     }
 
     protected Workflow() {
-        this.id = RandomUtils.generateStringId();
-        this.code = RandomUtils.generateWorkflowCode();
+        this.id = FlowIDGeneratorGatewayContext.getInstance().generateWorkId();
+        this.code = FlowIDGeneratorGatewayContext.getInstance().generateWorkCode();
         this.createdTime = System.currentTimeMillis();
         this.operatorCreateScript = OperatorMatchScript.any();
         this.nodes = new ArrayList<>();
@@ -117,8 +117,8 @@ public class Workflow {
 
     private List<IFlowNode> defaultNodes() {
         List<IFlowNode> nodeList = new ArrayList<>();
-        nodeList.add(new StartNode());
-        nodeList.add(new EndNode());
+        nodeList.add(StartNode.defaultNode());
+        nodeList.add(EndNode.defaultNode());
         return nodeList;
     }
 
@@ -253,7 +253,7 @@ public class Workflow {
      * @return 是否匹配
      */
     public boolean matchCreatedOperator(IFlowOperator flowOperator) {
-        GroovyWorkflowRequest request = new GroovyWorkflowRequest(flowOperator,this);
+        GroovyWorkflowRequest request = new GroovyWorkflowRequest(flowOperator, this);
         return operatorCreateScript.execute(request);
     }
 
@@ -389,8 +389,8 @@ public class Workflow {
     }
 
     public void resetWorkflow(IFlowOperator createdOperator) {
-        this.id = RandomUtils.generateStringId();
-        this.code = RandomUtils.generateWorkflowCode();
+        this.id = FlowIDGeneratorGatewayContext.getInstance().generateWorkId();
+        this.code = FlowIDGeneratorGatewayContext.getInstance().generateWorkCode();
         this.createdTime = System.currentTimeMillis();
         this.createdOperator = createdOperator;
         this.updateTime();

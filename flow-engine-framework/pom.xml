@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.codingapi.flow</groupId>
         <artifactId>flow-engine-parent</artifactId>
-        <version>0.0.40</version>
+        <version>0.0.42</version>
     </parent>
 
     <name>flow-engine-framework</name>
@@ -28,18 +28,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.groovy</groupId>
-            <artifactId>groovy</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.groovy</groupId>
-            <artifactId>groovy-json</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.groovy</groupId>
-            <artifactId>groovy-xml</artifactId>
+            <groupId>com.codingapi.springboot</groupId>
+            <artifactId>springboot-starter-script</artifactId>
         </dependency>
 
     </dependencies>

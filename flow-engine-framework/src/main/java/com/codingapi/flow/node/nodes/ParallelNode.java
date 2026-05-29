@@ -1,11 +1,11 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IBlockNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
-import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,14 +24,15 @@ public class ParallelNode extends BaseFlowNode implements IBlockNode {
         return NODE_TYPE;
     }
 
-    public ParallelNode(String id, String name) {
-        super(id, name);
-    }
 
-    public ParallelNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME);
+    public static ParallelNode defaultNode(){
+        ParallelNode parallelNode = new ParallelNode();
+        parallelNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        parallelNode.setName(DEFAULT_NAME);
+        parallelNode.setActions(new ArrayList<>());
+        parallelNode.setStrategies(new ArrayList<>());
+        return parallelNode;
     }
-
 
     @Override
     public void addDefaultBranch(int count){
@@ -55,7 +56,7 @@ public class ParallelNode extends BaseFlowNode implements IBlockNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, ParallelNode> {
         public Builder() {
-            super(new ParallelNode());
+            super(ParallelNode.defaultNode());
         }
     }
 }

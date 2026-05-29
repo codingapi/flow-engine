@@ -1,6 +1,7 @@
 package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IDisplayNode;
@@ -8,7 +9,6 @@ import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.INodeStrategy;
 import com.codingapi.flow.strategy.node.SubProcessStrategy;
-import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +27,15 @@ public class SubProcessNode extends BaseFlowNode implements IDisplayNode {
         return NODE_TYPE;
     }
 
-    public SubProcessNode(String id, String name) {
-        super(id, name, 0, new ArrayList<>(), defaultStrategies());
-    }
 
-    public SubProcessNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME);
+    public static SubProcessNode defaultNode(){
+        SubProcessNode subProcessNode = new SubProcessNode();
+        subProcessNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        subProcessNode.setName(DEFAULT_NAME);
+        subProcessNode.setOrder(0);
+        subProcessNode.setStrategies(defaultStrategies());
+        subProcessNode.setActions(new ArrayList<>());
+        return subProcessNode;
     }
 
     private static List<INodeStrategy> defaultStrategies() {
@@ -63,7 +66,7 @@ public class SubProcessNode extends BaseFlowNode implements IDisplayNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, SubProcessNode> {
         public Builder() {
-            super(new SubProcessNode());
+            super(SubProcessNode.defaultNode());
         }
     }
 }

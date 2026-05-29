@@ -3,11 +3,11 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.strategy.node.*;
-import com.codingapi.flow.utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +27,14 @@ public class HandleNode extends BaseAuditNode implements IDisplayNode {
     }
 
 
-    public HandleNode(String id, String name, String view, List<IFlowAction> actions, List<INodeStrategy> nodeStrategies) {
-        super(id, name, view, actions, nodeStrategies);
-    }
-
-    public HandleNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, DEFAULT_VIEW, defaultActions(), defaultStrategies());
+    public static HandleNode defaultNode(){
+        HandleNode handleNode = new HandleNode();
+        handleNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        handleNode.setName(DEFAULT_NAME);
+        handleNode.setView(DEFAULT_VIEW);
+        handleNode.setActions(defaultActions());
+        handleNode.setStrategies(defaultStrategies());
+        return handleNode;
     }
 
 
@@ -67,7 +69,7 @@ public class HandleNode extends BaseAuditNode implements IDisplayNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, HandleNode> {
         public Builder() {
-            super(new HandleNode());
+            super(HandleNode.defaultNode());
         }
     }
 }

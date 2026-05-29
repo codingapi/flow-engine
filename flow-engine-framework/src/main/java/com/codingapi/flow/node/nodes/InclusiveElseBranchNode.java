@@ -2,13 +2,13 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.exception.FlowNotFoundException;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.helper.ParallelNodeRelationHelper;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
 
 import java.util.ArrayList;
@@ -30,12 +30,14 @@ public class InclusiveElseBranchNode extends BaseFlowNode {
     }
 
 
-    public InclusiveElseBranchNode(String id, String name, int order) {
-        super(id, name, order);
-    }
-
-    public InclusiveElseBranchNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME, 100);
+    public static InclusiveElseBranchNode defaultNode(){
+        InclusiveElseBranchNode inclusiveElseBranchNode = new InclusiveElseBranchNode();
+        inclusiveElseBranchNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        inclusiveElseBranchNode.setName(DEFAULT_NAME);
+        inclusiveElseBranchNode.setOrder(100);
+        inclusiveElseBranchNode.setActions(new ArrayList<>());
+        inclusiveElseBranchNode.setStrategies(new ArrayList<>());
+        return inclusiveElseBranchNode;
     }
 
     /**
@@ -88,7 +90,7 @@ public class InclusiveElseBranchNode extends BaseFlowNode {
 
         // 在流程记录中记录，合并的条件信息。
         FlowRecord flowRecord = flowSession.getCurrentRecord();
-        flowRecord.parallelBranchNode(overNode.getId(), nodes.size(), RandomUtils.generateStringId());
+        flowRecord.parallelBranchNode(overNode.getId(), nodes.size(), FlowIDGeneratorGatewayContext.getInstance().generateParallelId());
 
         return nodes;
     }
@@ -105,7 +107,7 @@ public class InclusiveElseBranchNode extends BaseFlowNode {
     public static class Builder extends BaseNodeBuilder<Builder, InclusiveElseBranchNode> {
 
         public Builder() {
-            super(new InclusiveElseBranchNode());
+            super(InclusiveElseBranchNode.defaultNode());
         }
 
     }

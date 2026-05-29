@@ -7,12 +7,12 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowStateException;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
-import com.codingapi.flow.script.action.RejectActionScript;
+import com.codingapi.flow.script.action.ActionRejectScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
-import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.springboot.framework.event.EventPusher;
 import lombok.Getter;
 
@@ -27,15 +27,15 @@ import java.util.Map;
 public class RejectAction extends BaseAction {
 
     @Getter
-    private RejectActionScript script;
+    private ActionRejectScript script;
 
     public RejectAction() {
-        this.id = RandomUtils.generateStringId();
+        this.id = FlowIDGeneratorGatewayContext.getInstance().generateActionId();
         this.title = "拒绝";
         this.enable = true;
         this.type = ActionType.REJECT.name();
         this.display = new ActionDisplay(this.title);
-        this.script = RejectActionScript.defaultScript();
+        this.script = ActionRejectScript.defaultScript();
     }
 
     @Override
@@ -45,7 +45,7 @@ public class RejectAction extends BaseAction {
     }
 
     public void setScript(String script) {
-        this.script = new RejectActionScript(script);
+        this.script = new ActionRejectScript(script);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class RejectAction extends BaseAction {
 
     @Override
     public List<FlowRecord> generateRecords(FlowSession flowSession) {
-        RejectActionScript.RejectResult rejectResult = script.execute(flowSession);
+        ActionRejectScript.RejectResult rejectResult = script.execute(flowSession);
         IFlowNode currentNode = null;
         // 返回指定节点
         if (rejectResult.isReturnNode()) {

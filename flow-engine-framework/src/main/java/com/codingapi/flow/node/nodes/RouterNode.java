@@ -3,6 +3,7 @@ package com.codingapi.flow.node.nodes;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IDisplayNode;
@@ -11,7 +12,6 @@ import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.INodeStrategy;
 import com.codingapi.flow.strategy.node.RouterStrategy;
-import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.flow.workflow.Workflow;
 
 import java.util.ArrayList;
@@ -31,13 +31,17 @@ public class RouterNode extends BaseFlowNode implements IDisplayNode {
         return NODE_TYPE;
     }
 
-    public RouterNode(String id, String name) {
-        super(id, name,0, new ArrayList<>(),defaultStrategies());
+
+    public static RouterNode defaultNode(){
+        RouterNode routerNode = new RouterNode();
+        routerNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        routerNode.setName(DEFAULT_NAME);
+        routerNode.setOrder(0);
+        routerNode.setStrategies(defaultStrategies());
+        routerNode.setActions(new ArrayList<>());
+        return routerNode;
     }
 
-    public RouterNode() {
-        this(RandomUtils.generateStringId(), DEFAULT_NAME);
-    }
 
     private static List<INodeStrategy> defaultStrategies() {
         List<INodeStrategy> strategies = new ArrayList<>();
@@ -75,7 +79,7 @@ public class RouterNode extends BaseFlowNode implements IDisplayNode {
 
     public static class Builder extends BaseNodeBuilder<Builder, RouterNode> {
         public Builder() {
-            super(new RouterNode());
+            super(RouterNode.defaultNode());
         }
     }
 }

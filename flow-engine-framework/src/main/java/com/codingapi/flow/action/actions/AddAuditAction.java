@@ -7,6 +7,7 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowExecutionException;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.node.IFlowNode;
@@ -15,7 +16,6 @@ import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
-import com.codingapi.flow.utils.RandomUtils;
 import com.codingapi.springboot.framework.event.EventPusher;
 import org.springframework.util.StringUtils;
 
@@ -47,7 +47,7 @@ public class AddAuditAction extends BaseAction {
     }
 
     public AddAuditAction() {
-        this.id = RandomUtils.generateStringId();
+        this.id = FlowIDGeneratorGatewayContext.getInstance().generateActionId();
         this.title = "加签";
         this.enable = true;
         this.type = ActionType.ADD_AUDIT.name();

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.codingapi.flow</groupId>
 	<artifactId>flow-engine-parent</artifactId>
-	<version>0.0.40</version>
+	<version>0.0.42</version>
     <packaging>pom</packaging>
 
     <url>https://github.com/codingapi/flow-engine</url>
@@ -32,7 +32,7 @@
         <commons-io.version>2.17.0</commons-io.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <commons-crypto.version>1.2.0</commons-crypto.version>
-        <codingapi.framework.version>3.4.46</codingapi.framework.version>
+        <codingapi.framework.version>3.4.52</codingapi.framework.version>
 	</properties>
 
 	<dependencies>
@@ -126,6 +126,12 @@
             <dependency>
                 <groupId>com.codingapi.springboot</groupId>
                 <artifactId>springboot-starter</artifactId>
+                <version>${codingapi.framework.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.codingapi.springboot</groupId>
+                <artifactId>springboot-starter-script</artifactId>
                 <version>${codingapi.framework.version}</version>
             </dependency>
 
