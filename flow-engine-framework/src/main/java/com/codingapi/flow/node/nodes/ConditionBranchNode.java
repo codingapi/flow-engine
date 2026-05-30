@@ -41,6 +41,7 @@ public class ConditionBranchNode extends BaseFlowNode {
         conditionBranchNode.setOrder(0);
         conditionBranchNode.setActions(new ArrayList<>());
         conditionBranchNode.setStrategies(new ArrayList<>());
+        conditionBranchNode.conditionScript = ConditionScript.defaultScript();
         return conditionBranchNode;
     }
 

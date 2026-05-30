@@ -38,7 +38,7 @@ public class ParallelNode extends BaseFlowNode implements IBlockNode {
     public void addDefaultBranch(int count){
         List<IFlowNode> branches = new ArrayList<>();
         for (int i=0;i<count;i++){
-            ParallelBranchNode branchNode = new ParallelBranchNode();
+            ParallelBranchNode branchNode = ParallelBranchNode.defaultNode();
             branchNode.setOrder(i+1);
             branches.add(branchNode);
         }

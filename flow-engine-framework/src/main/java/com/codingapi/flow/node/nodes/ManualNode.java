@@ -56,7 +56,7 @@ public class ManualNode extends BaseFlowNode implements IBlockNode , IDisplayNod
     public void addDefaultBranch(int count) {
         List<IFlowNode> branches = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            ManualBranchNode branchNode = new ManualBranchNode();
+            ManualBranchNode branchNode = ManualBranchNode.defaultNode();
             branchNode.setOrder(i + 1);
             branches.add(branchNode);
         }

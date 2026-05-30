@@ -41,11 +41,11 @@ public class InclusiveNode extends BaseFlowNode implements IBlockNode {
     public void addDefaultBranch(int count){
         List<IFlowNode> branches = new ArrayList<>();
         for (int i=0;i<count;i++){
-            InclusiveBranchNode branchNode = new InclusiveBranchNode();
+            InclusiveBranchNode branchNode = InclusiveBranchNode.defaultNode();
             branchNode.setOrder(i+1);
             branches.add(branchNode);
         }
-        branches.add(new InclusiveElseBranchNode());
+        branches.add(InclusiveElseBranchNode.defaultNode());
         this.setBlocks(branches);
     }
 
