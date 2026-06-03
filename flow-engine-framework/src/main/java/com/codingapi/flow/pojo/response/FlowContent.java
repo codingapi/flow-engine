@@ -62,6 +62,11 @@ public class FlowContent {
     private String view;
 
     /**
+     * 视图代码
+     */
+    private String code;
+
+    /**
      * 节点名称
      */
     private String nodeName;
@@ -196,6 +201,7 @@ public class FlowContent {
         this.fieldPermissions = strategyManager.getFieldPermissions();
         Map<String, Object> nodeData = currentNode.toMap();
         this.view = (String) nodeData.get("view");
+        this.code = (String) nodeData.get("code");
     }
 
     public void pushWorkflow(Workflow workflow) {
