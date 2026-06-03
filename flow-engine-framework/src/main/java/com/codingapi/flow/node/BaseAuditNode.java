@@ -3,6 +3,7 @@ package com.codingapi.flow.node;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.javscript.annotation.NodeViewScript;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -37,6 +38,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
      */
     @Getter
     @Setter
+    @NodeViewScript
     private String code;
 
 

@@ -2,7 +2,6 @@ package com.codingapi.flow.service;
 
 import com.codingapi.flow.cache.WorkflowRuntimeCache;
 import com.codingapi.flow.exception.FlowExecutionException;
-import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.repository.WorkflowRuntimeRepository;
@@ -11,12 +10,6 @@ import com.codingapi.flow.utils.Base64Utils;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowVersion;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
-import com.codingapi.springboot.script.GroovyScript;
-import com.codingapi.springboot.script.cache.GroovyScriptCacheContext;
-import com.codingapi.springboot.script.repository.GroovyScriptRepositoryContext;
-import com.codingapi.springboot.script.scanner.GroovyScriptAnnotationScannerUtils;
-import com.codingapi.springboot.script.scanner.GroovyScriptFieldResult;
-import com.codingapi.springboot.script.temp.TempGroovyScriptContext;
 import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
@@ -45,7 +38,7 @@ public class WorkflowService {
         currentVersion.enableVersion();
         if (currentVersion.getId() == 0) {
             // 新创建的版本，替换脚本
-            WorkflowGroovyScriptUtils.resetGroovyScripts(currentVersion);
+            WorkflowGroovyScriptUtils.resetScripts(currentVersion);
         }
         updateList.add(currentVersion);
 
@@ -80,7 +73,7 @@ public class WorkflowService {
         }
         workflowRepository.save(workflow);
 
-        WorkflowGroovyScriptUtils.saveGroovyScripts(workflow);
+        WorkflowGroovyScriptUtils.saveScripts(workflow);
 
     }
 
@@ -127,7 +120,7 @@ public class WorkflowService {
         if (version != null && version.isCurrent()) {
             throw FlowExecutionException.removeWorkflowError();
         }
-        WorkflowGroovyScriptUtils.deleteGroovyScripts(version);
+        WorkflowGroovyScriptUtils.deleteScripts(version);
         workflowVersionRepository.delete(versionId);
     }
 
@@ -177,7 +170,7 @@ public class WorkflowService {
      */
     public void delete(String workId) {
         Workflow workflow = workflowRepository.getById(workId);
-        WorkflowGroovyScriptUtils.deleteGroovyScripts(workflow);
+        WorkflowGroovyScriptUtils.deleteScripts(workflow);
         workflowVersionRepository.delete(workId);
         workflowRepository.delete(workId);
     }
@@ -234,64 +227,11 @@ public class WorkflowService {
         Workflow workflow = Workflow.formJson(json);
         workflow.resetWorkflow(createOperator);
         // 替换脚本
-        WorkflowGroovyScriptUtils.resetGroovyScripts(workflow);
+        WorkflowGroovyScriptUtils.resetScripts(workflow);
         this.saveWorkflow(workflow, false);
         return workflow.getId();
     }
 
-
-    private static class WorkflowGroovyScriptUtils{
-        /**
-         * 同步保存脚本对象
-         *
-         * @param target 目标对象
-         */
-        public static void saveGroovyScripts(Object target) {
-            if (target != null) {
-                List<String> keys = GroovyScriptAnnotationScannerUtils.findGroovyScriptFields(target).getKeys();
-                for (String key : keys) {
-                    GroovyScript groovyScript = TempGroovyScriptContext.getInstance().getGroovyScript(key);
-                    if (groovyScript != null) {
-                        groovyScript.save();
-                    }
-                }
-            }
-        }
-
-        /**
-         * 同步删除脚本数据
-         *
-         * @param target 目标对象
-         */
-        public static void deleteGroovyScripts(Object target) {
-            if (target != null) {
-                List<String> keys = GroovyScriptAnnotationScannerUtils.findGroovyScriptFields(target).getKeys();
-                for (String key : keys) {
-                    GroovyScriptRepositoryContext.getInstance().delete(key);
-                }
-            }
-        }
-
-        /**
-         * 替换脚本数据对象
-         *
-         * @param target 目标对象
-         */
-        public static void resetGroovyScripts(Object target) {
-            if (target != null) {
-                GroovyScriptFieldResult result = GroovyScriptAnnotationScannerUtils.findGroovyScriptFields(target);
-                result.update((key) -> {
-                    GroovyScript groovyScript = GroovyScriptCacheContext.getInstance().getGroovyScript(key);
-                    if (groovyScript != null) {
-                        GroovyScript latestScript = groovyScript.copy(FlowIDGeneratorGatewayContext.getInstance().generateFlowScriptKey());
-                        latestScript.save();
-                        return latestScript.getKey();
-                    }
-                    return key;
-                });
-            }
-        }
-    }
 
 
 }

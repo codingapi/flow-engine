@@ -2,6 +2,7 @@ package com.codingapi.flow;
 
 import com.codingapi.flow.context.RepositoryHolderContext;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
+import com.codingapi.flow.register.NodeViewJavaScriptCacheContextRegister;
 import com.codingapi.flow.register.RepositoryHolderContextRegister;
 import com.codingapi.flow.register.FlowScriptContextRegister;
 import com.codingapi.flow.register.GatewayContextRegister;
@@ -16,6 +17,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AutoConfiguration {
+
+
+    @Bean
+    public NodeViewJavaScriptCacheContextRegister nodeViewJavaScriptCacheContextRegister(NodeViewJavaScriptRepository nodeViewJavaScriptRepository){
+        return new NodeViewJavaScriptCacheContextRegister(nodeViewJavaScriptRepository);
+    }
+
 
     @Bean
     public FlowDelayTaskRunner delayTaskRunner(RepositoryHolderContextRegister repositoryHolderContextRegister) {

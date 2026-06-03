@@ -6,6 +6,7 @@ import com.codingapi.flow.action.actions.SaveAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
 import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
+import com.codingapi.flow.javscript.annotation.NodeViewScript;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IDisplayNode;
@@ -46,6 +47,7 @@ public class StartNode extends BaseFlowNode implements IDisplayNode {
      */
     @Getter
     @Setter
+    @NodeViewScript
     private String code;
 
 
