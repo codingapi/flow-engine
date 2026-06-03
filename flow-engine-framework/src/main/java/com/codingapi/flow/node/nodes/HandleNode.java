@@ -32,6 +32,7 @@ public class HandleNode extends BaseAuditNode implements IDisplayNode {
         handleNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
         handleNode.setName(DEFAULT_NAME);
         handleNode.setView(DEFAULT_VIEW);
+        handleNode.setCode(FlowIDGeneratorGatewayContext.getInstance().generateViewCode());
         handleNode.setActions(defaultActions());
         handleNode.setStrategies(defaultStrategies());
         return handleNode;

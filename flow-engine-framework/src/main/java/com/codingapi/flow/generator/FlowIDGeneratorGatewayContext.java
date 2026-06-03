@@ -71,6 +71,11 @@ public class FlowIDGeneratorGatewayContext {
         }
 
         @Override
+        public String generateViewCode() {
+            return this.generateId(18);
+        }
+
+        @Override
         public String generateNodeId() {
             return this.generateId(10);
         }
@@ -104,6 +109,10 @@ public class FlowIDGeneratorGatewayContext {
 
     public String generateActionId() {
         return flowIDGeneratorGateway.generateActionId();
+    }
+
+    public String generateViewCode() {
+        return flowIDGeneratorGateway.generateViewCode();
     }
 
     public String generateNodeId() {

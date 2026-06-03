@@ -32,11 +32,19 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     @Setter
     private String view;
 
+    /**
+     * 视图代码
+     */
+    @Getter
+    @Setter
+    private String code;
+
 
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
         map.put("view", view);
+        map.put("code", code);
         return map;
     }
 
@@ -45,6 +53,9 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         super.verifyNode(form);
         if (!StringUtils.hasText(view)) {
             throw FlowValidationException.nodeRequired("view");
+        }
+        if (!StringUtils.hasText(code)) {
+            throw FlowValidationException.nodeRequired("code");
         }
     }
 
@@ -166,6 +177,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     public static <T extends BaseAuditNode> T formMap(Map<String, Object> map, Class<T> clazz) {
         T node = BaseFlowNode.fromMap(map, clazz);
         node.setView((String) map.get("view"));
+        node.setCode((String) map.get("code"));
         return node;
     }
 

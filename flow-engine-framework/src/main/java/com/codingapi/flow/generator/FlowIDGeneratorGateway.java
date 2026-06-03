@@ -26,6 +26,11 @@ public interface FlowIDGeneratorGateway {
     String generateActionId();
 
     /**
+     * 构建视图代码
+     */
+    String generateViewCode();
+
+    /**
      * 构建节点id
      */
     String generateNodeId();

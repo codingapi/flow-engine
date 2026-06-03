@@ -39,6 +39,7 @@ public class NotifyNode extends BaseAuditNode implements IDisplayNode {
         notifyNode.setName(DEFAULT_NAME);
         notifyNode.setView(DEFAULT_VIEW);
         notifyNode.setActions(defaultActions());
+        notifyNode.setCode(FlowIDGeneratorGatewayContext.getInstance().generateViewCode());
         notifyNode.setStrategies(defaultStrategies());
         return notifyNode;
     }

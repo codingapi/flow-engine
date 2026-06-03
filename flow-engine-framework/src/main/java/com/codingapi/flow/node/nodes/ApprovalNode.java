@@ -32,6 +32,7 @@ public class ApprovalNode extends BaseAuditNode implements IDisplayNode {
         approvalNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
         approvalNode.setName(DEFAULT_NAME);
         approvalNode.setView(DEFAULT_VIEW);
+        approvalNode.setCode(FlowIDGeneratorGatewayContext.getInstance().generateViewCode());
         approvalNode.setActions(defaultActions());
         approvalNode.setStrategies(defaultStrategies());
         return approvalNode;
