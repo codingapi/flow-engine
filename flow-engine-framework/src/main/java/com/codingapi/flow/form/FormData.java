@@ -113,45 +113,6 @@ public class FormData {
         return flowForm.getSubForm(formCode);
     }
 
-    /**
-     * 校验formData
-     */
-    public void verify() {
-        for (FormField formField : flowForm.getFields()) {
-            Object value = this.dataBody.get(formField.getCode());
-            Object defaultValue = formField.getDefaultValue();
-            if (value == null && defaultValue != null) {
-                this.dataBody.set(formField.getCode(), defaultValue);
-            }
-            if (formField.isRequired()) {
-                if (value == null && defaultValue == null) {
-                    throw FlowValidationException.fieldNotFound(formField.getName());
-                }
-            }
-        }
-
-        if (flowForm.getSubForms() != null) {
-            for (FlowForm subForm : flowForm.getSubForms()) {
-                List<DataBody> subDataList = this.getSubDataBody(subForm.getCode());
-                for (DataBody subData : subDataList) {
-                    for (FormField formField : subForm.getFields()) {
-                        Object value = subData.get(formField.getCode());
-                        Object defaultValue = formField.getDefaultValue();
-                        if (value == null && defaultValue != null) {
-                            subData.set(formField.getCode(), defaultValue);
-                        }
-                        if (formField.isRequired()) {
-                            if (value == null && defaultValue == null) {
-                                throw FlowValidationException.fieldNotFound(formField.getName());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
-    }
 
     /**
      * 表单数据体

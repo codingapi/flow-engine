@@ -65,7 +65,7 @@ public class FlowProcessNodeService {
     private void initData() {
         String id = this.request.getId();
         if (this.isCreateWorkflow()) {
-            this.workflow = workflowService.getWorkflow(id);
+            this.workflow = workflowService.getWorkflowByCode(id);
         } else {
             this.flowRecord = flowRecordService.getFlowRecord(Long.parseLong(id));
             if (flowRecord == null) {

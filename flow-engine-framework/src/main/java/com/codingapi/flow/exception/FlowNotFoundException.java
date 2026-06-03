@@ -33,12 +33,12 @@ public class FlowNotFoundException extends FlowException {
     /**
      * Workflow definition not found
      *
-     * @param workflowId workflow ID
+     * @param workCode workCode
      * @return exception
      */
-    public static FlowNotFoundException workflow(String workflowId) {
+    public static FlowNotFoundException workflow(String workCode) {
         return new FlowNotFoundException("notFound.workflow.definition",
-                String.format("Workflow definition not found: %s", workflowId));
+                String.format("Workflow definition not found: %s", workCode));
     }
 
     /**

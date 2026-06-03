@@ -100,11 +100,21 @@ public class WorkflowService {
     /**
      * 获取流程对象
      *
+     * @param workCode 流程编码
+     * @return 流程对象
+     */
+    public Workflow getWorkflowByCode(String workCode) {
+        return workflowRepository.getByCode(workCode);
+    }
+
+    /**
+     * 获取流程对象
+     *
      * @param workId 流程编码
      * @return 流程对象
      */
-    public Workflow getWorkflow(String workId) {
-        return workflowRepository.get(workId);
+    public Workflow getWorkflowById(String workId) {
+        return workflowRepository.getById(workId);
     }
 
     /**
@@ -166,7 +176,7 @@ public class WorkflowService {
      * @param workId 流程编码
      */
     public void delete(String workId) {
-        Workflow workflow = workflowRepository.get(workId);
+        Workflow workflow = workflowRepository.getById(workId);
         WorkflowGroovyScriptUtils.deleteGroovyScripts(workflow);
         workflowVersionRepository.delete(workId);
         workflowRepository.delete(workId);

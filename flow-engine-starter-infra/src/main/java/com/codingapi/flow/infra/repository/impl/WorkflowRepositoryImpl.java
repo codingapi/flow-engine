@@ -19,8 +19,14 @@ public class WorkflowRepositoryImpl implements WorkflowRepository {
     }
 
     @Override
-    public Workflow get(String id) {
+    public Workflow getById(String id) {
         WorkflowEntity entity = workflowEntityRepository.getWorkflowEntityById(id);
+        return WorkflowConvertor.convert(entity);
+    }
+
+    @Override
+    public Workflow getByCode(String code) {
+        WorkflowEntity entity = workflowEntityRepository.getWorkflowEntityByCode(code);
         return WorkflowConvertor.convert(entity);
     }
 

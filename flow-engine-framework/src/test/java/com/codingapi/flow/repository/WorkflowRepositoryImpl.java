@@ -15,8 +15,18 @@ public class WorkflowRepositoryImpl implements WorkflowRepository {
     }
 
     @Override
-    public Workflow get(String id) {
+    public Workflow getById(String id) {
         return cache.get(id);
+    }
+
+    @Override
+    public Workflow getByCode(String code) {
+        for (Workflow workflow:cache.values()) {
+            if(workflow.getCode().equals(code)) {
+                return workflow;
+            }
+        }
+        return null;
     }
 
     @Override

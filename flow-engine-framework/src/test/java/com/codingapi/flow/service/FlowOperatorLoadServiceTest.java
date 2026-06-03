@@ -130,7 +130,7 @@ public class FlowOperatorLoadServiceTest {
         List<IFlowAction> startActions = startNode.actionManager().getActions();
 
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
-        userCreateRequest.setWorkId(workflow.getId());
+        userCreateRequest.setWorkCode(workflow.getCode());
         userCreateRequest.setFormData(data);
         userCreateRequest.setActionId(startActions.get(0).id());
         userCreateRequest.setOperatorId(user.getUserId());

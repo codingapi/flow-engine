@@ -103,7 +103,7 @@ public class FlowDetailServiceTest {
 
         factory.workflowService.saveWorkflow(workflow);
 
-        FlowContent detail = factory.flowService.detail(new FlowDetailRequest(workflow.getId(), user.getUserId()));
+        FlowContent detail = factory.flowService.detail(new FlowDetailRequest(workflow.getCode(), user.getUserId()));
         assertEquals(detail.getForm().getCode(), form.getCode());
         assertEquals(detail.getActions().size(), startNode.actionManager().getActions().size());
         assertNull(detail.getTodos());
@@ -114,7 +114,7 @@ public class FlowDetailServiceTest {
 
         List<IFlowAction> startActions = startNode.actionManager().getActions();
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
-        userCreateRequest.setWorkId(workflow.getId());
+        userCreateRequest.setWorkCode(workflow.getCode());
         userCreateRequest.setFormData(data);
         userCreateRequest.setActionId(startActions.get(0).id());
         userCreateRequest.setOperatorId(user.getUserId());
@@ -237,13 +237,13 @@ public class FlowDetailServiceTest {
 
         Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
 
-        List<ProcessNode> nodeList = factory.flowService.processNodes(new FlowProcessNodeRequest(workflow.getId(), user.getUserId(),data));
+        List<ProcessNode> nodeList = factory.flowService.processNodes(new FlowProcessNodeRequest(workflow.getCode(), user.getUserId(),data));
         assertEquals(4,nodeList.size());
         assertEquals(0,nodeList.stream().filter(ProcessNode::isHistory).toList().size());
 
         List<IFlowAction> startActions = startNode.actionManager().getActions();
         FlowCreateRequest userCreateRequest = new FlowCreateRequest();
-        userCreateRequest.setWorkId(workflow.getId());
+        userCreateRequest.setWorkCode(workflow.getCode());
         userCreateRequest.setFormData(data);
         userCreateRequest.setActionId(startActions.get(0).id());
         userCreateRequest.setOperatorId(user.getUserId());

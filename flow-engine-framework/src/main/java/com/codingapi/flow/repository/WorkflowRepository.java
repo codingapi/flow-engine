@@ -9,7 +9,9 @@ public interface WorkflowRepository {
 
     void save(Workflow workflow);
 
-    Workflow get(String id);
+    Workflow getById(String id);
+
+    Workflow getByCode(String code);
 
     void delete(String id);
 

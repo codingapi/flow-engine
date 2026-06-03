@@ -29,10 +29,10 @@ class FormDataBodyTest {
 
         JSONObject request = new JSONObject();
         request.put("formData", jsonObject);
-        request.put("workId", "123123");
+        request.put("workCode", "123123");
 
         FlowCreateRequest formDataBody = JSONObject.parseObject(request.toJSONString(), FlowCreateRequest.class);
-        assertEquals("123123", formDataBody.getWorkId());
+        assertEquals("123123", formDataBody.getWorkCode());
         assertEquals("张三", formDataBody.getFormData().get("name"));
 
     }

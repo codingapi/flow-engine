@@ -5,10 +5,8 @@ import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FlowForm;
-import com.codingapi.flow.form.FormField;
 import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.form.permission.PermissionType;
-import com.codingapi.flow.session.FlowSession;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -51,51 +49,6 @@ public class FormFieldPermissionStrategy extends BaseStrategy {
                 String key = permission.getFormCode() + "." + permission.getFieldCode();
                 if (!fieldTypes.containsKey(key)) {
                     throw FlowValidationException.fieldNotFound(key);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void verifySession(FlowSession session) {
-        FlowForm flowForm = session.getFormData().getFlowForm();
-        Map<String, Object> currentData = session.getCurrentRecord().getFormData();
-        Map<String, Object> latestData = session.getFormData().toMapData();
-        if (fieldPermissions != null) {
-            for (FormFieldPermission permission : fieldPermissions) {
-                FormField formField = flowForm.getField(permission.getFormCode(), permission.getFieldCode());
-                // 子表
-                if (flowForm.isSubForm(permission.getFormCode())) {
-                    if (permission.getType() == PermissionType.READ) {
-                        List<Map<String, Object>> currentSubFormData = (List<Map<String, Object>>) currentData.get(permission.getFormCode());
-                        List<Map<String, Object>> latestSubFormData = (List<Map<String, Object>>) latestData.get(permission.getFormCode());
-                        if (currentSubFormData == null || latestSubFormData == null) {
-                            throw FlowValidationException.nodeRequired("form");
-                        }
-
-                        if (currentSubFormData.size() != latestSubFormData.size()) {
-                            throw FlowValidationException.nodeRequired("form");
-                        }
-
-                        for (int i = 0; i < currentSubFormData.size(); i++) {
-                            Map<String, Object> currentSubFormItem = currentSubFormData.get(i);
-                            Map<String, Object> latestSubFormItem = latestSubFormData.get(i);
-                            Object currentValue = currentSubFormItem.get(permission.getFieldCode());
-                            Object latestValue = latestSubFormItem.get(permission.getFieldCode());
-                            if (!currentValue.equals(latestValue)) {
-                                throw FlowValidationException.fieldReadOnly(permission.getFieldCode());
-                            }
-                        }
-                    }
-                } else {
-                    // 在只读权限下不允许修改数据
-                    if (formField.isRequired() && permission.getType() == PermissionType.READ) {
-                        Object currentValue = currentData.get(permission.getFieldCode());
-                        Object latestValue = latestData.get(permission.getFieldCode());
-                        if (latestValue != null && currentValue != null && !currentValue.equals(latestValue)) {
-                            throw FlowValidationException.fieldReadOnly(permission.getFieldCode());
-                        }
-                    }
                 }
             }
         }

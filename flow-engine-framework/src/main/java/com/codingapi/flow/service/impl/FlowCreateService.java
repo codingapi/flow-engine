@@ -34,7 +34,7 @@ public class FlowCreateService {
     private final WorkflowService workflowService;
     private final IRepositoryHolder repositoryHolder;
 
-    public FlowCreateService(FlowCreateRequest request,IRepositoryHolder repositoryHolder) {
+    public FlowCreateService(FlowCreateRequest request, IRepositoryHolder repositoryHolder) {
         this.request = request;
         this.flowOperatorGateway = repositoryHolder.getFlowOperatorGateway();
         this.workflowService = repositoryHolder.getWorkflowService();
@@ -43,12 +43,12 @@ public class FlowCreateService {
 
     public long create() {
         request.verify();
-        Workflow workflow = workflowService.getWorkflow(request.getWorkId());
+        Workflow workflow = workflowService.getWorkflowByCode(request.getWorkCode());
         if (workflow == null) {
-            throw FlowNotFoundException.workflow(request.getWorkId());
+            throw FlowNotFoundException.workflow(request.getWorkCode());
         }
         if (workflow.isDisable()) {
-            throw FlowStateException.workflowAlreadyDisable(request.getWorkId());
+            throw FlowStateException.workflowAlreadyDisable(request.getWorkCode());
         }
         workflow.verify();
         // 获取备份
@@ -68,7 +68,7 @@ public class FlowCreateService {
 
         StartNode currentNode = (StartNode) workflow.getStartNode();
         IFlowAction action = currentNode.actionManager().getActionById(request.getActionId());
-        FlowSession session = FlowSession.startSession(this.repositoryHolder,currentOperator, workflow, currentNode, action, formData, workflowRuntime.getId());
+        FlowSession session = FlowSession.startSession(this.repositoryHolder, currentOperator, workflow, currentNode, action, formData, workflowRuntime.getId());
 
         List<FlowRecord> flowRecords = currentNode.generateCurrentRecords(session);
 
@@ -97,8 +97,8 @@ public class FlowCreateService {
 
         List<IFlowEvent> events = new ArrayList<>();
         for (FlowRecord flowRecord : flowRecords) {
-            events.add(new FlowRecordStartEvent(flowRecord,session.isMock()));
-            events.add(new FlowRecordTodoEvent(flowRecord,session.isMock()));
+            events.add(new FlowRecordStartEvent(flowRecord, session.isMock()));
+            events.add(new FlowRecordTodoEvent(flowRecord, session.isMock()));
         }
 
         // 推送事件

@@ -13,12 +13,14 @@ import java.util.List;
 public class WorkflowMeta {
 
     private String workId;
+    private String workCode;
     private List<ActionOption> actions;
     private FlowForm form;
 
     public WorkflowMeta(Workflow workflow) {
         this.workId = workflow.getId();
         this.form = workflow.getForm();
+        this.workCode = workflow.getCode();
         IFlowNode startNode = workflow.getStartNode();
         ActionManager actionManager = startNode.actionManager();
         this.actions = actionManager.getActions().stream().map(ActionOption::new).toList();

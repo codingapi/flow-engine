@@ -12,7 +12,7 @@ import java.util.Map;
 @NoArgsConstructor
 public class FlowProcessNodeRequest {
     /**
-     * 详情id，可以是workId或者是recordId
+     * 详情id，可以是workCode或者是recordId
      */
     private String id;
 

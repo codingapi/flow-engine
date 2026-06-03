@@ -35,7 +35,7 @@ public class FlowDetailService {
 
     public FlowContent detail() {
         if (this.request.isCreateWorkflow()) {
-            Workflow workflow = workflowService.getWorkflow(this.request.getId());
+            Workflow workflow = workflowService.getWorkflowByCode(this.request.getId());
             if (workflow == null) {
                 throw FlowNotFoundException.workflow(this.request.getId());
             }

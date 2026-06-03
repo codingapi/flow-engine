@@ -57,7 +57,7 @@ public class WorkflowController {
 
     @GetMapping("/meta")
     public SingleResponse<WorkflowMeta> getMeta(IdRequest request){
-        Workflow workflow = workflowService.getWorkflow(request.getStringId());
+        Workflow workflow = workflowService.getWorkflowById(request.getStringId());
         if(workflow!=null){
             return SingleResponse.of(new WorkflowMeta(workflow));
         }
@@ -81,7 +81,7 @@ public class WorkflowController {
 
     @PostMapping("/changeState")
     public Response changeState(@RequestBody IdRequest request) {
-        Workflow workflow = workflowService.getWorkflow(request.getStringId());
+        Workflow workflow = workflowService.getWorkflowById(request.getStringId());
         if (workflow.isDisable()) {
             workflow.enable();
         } else {
@@ -127,7 +127,7 @@ public class WorkflowController {
 
     @GetMapping("/export")
     public void export(IdRequest request, HttpServletResponse response) {
-        Workflow workflow = workflowService.getWorkflow(request.getStringId());
+        Workflow workflow = workflowService.getWorkflowById(request.getStringId());
         JSONObject jsonObject = JSONObject.parseObject(workflow.toJson());
         try {
             response.setContentType("application/json;charset=UTF-8");
@@ -172,7 +172,7 @@ public class WorkflowController {
 
     @GetMapping("/load")
     public SingleResponse<JSONObject> load(String id) {
-        Workflow workflow = workflowService.getWorkflow(id);
+        Workflow workflow = workflowService.getWorkflowById(id);
         JSONObject jsonObject = JSONObject.parseObject(workflow.toJson());
         return SingleResponse.of(jsonObject);
     }

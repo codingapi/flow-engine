@@ -13,10 +13,11 @@ import java.util.Map;
 @Data
 public class FlowCreateRequest {
 
+
     /**
      * 工作id
      */
-    private String workId;
+    private String workCode;
     /**
      * 表单数据
      */
@@ -57,8 +58,8 @@ public class FlowCreateRequest {
 
 
     public void verify() {
-        if (workId == null) {
-            throw FlowValidationException.required("workId");
+        if (workCode == null) {
+            throw FlowValidationException.required("workCode");
         }
         if (formData == null || formData.isEmpty()) {
             throw FlowValidationException.required("formData");

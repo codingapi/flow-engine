@@ -93,7 +93,7 @@ class FlowForwardOperatorTest {
 
         List<IFlowAction> startActions = startNode.actionManager().getActions();
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(creator.getUserId());
@@ -138,7 +138,7 @@ class FlowForwardOperatorTest {
         Map<String, Object> data = Map.of("amount", 100);
         List<IFlowAction> startActions = startNode.actionManager().getActions();
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(creator.getUserId());
@@ -196,7 +196,7 @@ class FlowForwardOperatorTest {
         Map<String, Object> data = Map.of("amount", 100);
         List<IFlowAction> startActions = startNode.actionManager().getActions();
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(creator.getUserId());
@@ -256,7 +256,7 @@ class FlowForwardOperatorTest {
         Map<String, Object> data = Map.of("amount", 15000);
         List<IFlowAction> startActions = startNode.actionManager().getActions();
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(creator.getUserId());
@@ -316,7 +316,7 @@ class FlowForwardOperatorTest {
         Map<String, Object> data = Map.of("amount", 5000);
         List<IFlowAction> startActions = startNode.actionManager().getActions();
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(creator.getUserId());

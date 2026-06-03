@@ -285,11 +285,11 @@ public class GroovyScriptRequest {
             description = "创建流程请求，用于自流程的创建"
     )
     public FlowCreateRequest toCreateRequest(
-            @ScriptParameter(description = "流程workId") String workId,
+            @ScriptParameter(description = "流程workCode") String workCode,
             @ScriptParameter(description = "流程发起人id") long operatorId,
             @ScriptParameter(description = "流程动作actionId") String actionId,
             @ScriptParameter(description = "流程数据formData（JSON格式）") String formData) {
-        return flowSession.toCreateRequest(workId, operatorId, actionId, formData);
+        return flowSession.toCreateRequest(workCode, operatorId, actionId, formData);
     }
 
     /**
@@ -303,11 +303,11 @@ public class GroovyScriptRequest {
             name = "toCreateRequest",
             description = "创建流程请求，用于自流程的创建"
     )
-    public FlowCreateRequest toCreateRequest(@ScriptParameter(description = "流程workId") String workId,
+    public FlowCreateRequest toCreateRequest(@ScriptParameter(description = "流程workCode") String workCode,
                                              @ScriptParameter(description = "流程发起人id") long operatorId,
                                              @ScriptParameter(description = "流程动作actionId") String actionId,
                                              @ScriptParameter(description = "流程数据formData（Map<String,Object>格式）") Map<String, Object> formData) {
-        return flowSession.toCreateRequest(workId, operatorId, actionId, formData);
+        return flowSession.toCreateRequest(workCode, operatorId, actionId, formData);
     }
 
 

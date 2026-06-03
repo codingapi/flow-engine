@@ -1,6 +1,7 @@
 package com.codingapi.flow.form;
 
 import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.util.List;
@@ -25,6 +26,9 @@ public class FormField {
     private boolean hidden;
     // 是否必填
     private boolean required;
+    // 是否只读
+    @JsonIgnore
+    private transient boolean readonly;
     // 默认值
     private String defaultValue;
     // 输入提示

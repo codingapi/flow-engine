@@ -102,7 +102,7 @@ class OperatorSelectTest {
 
         // 发起流程（不提供 operatorSelectMap）
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(user.getUserId());
@@ -234,7 +234,7 @@ class OperatorSelectTest {
 
         // 发起流程
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(user.getUserId());
@@ -360,7 +360,7 @@ class OperatorSelectTest {
 
         // 发起流程时就提供 operatorSelectMap
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(user.getUserId());
@@ -465,7 +465,7 @@ class OperatorSelectTest {
         List<IFlowAction> startActions = startNode.actionManager().getActions();
 
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(user.getUserId());
@@ -527,7 +527,7 @@ class OperatorSelectTest {
         List<IFlowAction> startActions = startNode.actionManager().getActions();
 
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(user.getUserId());
@@ -602,7 +602,7 @@ class OperatorSelectTest {
         List<IFlowAction> startActions = startNode.actionManager().getActions();
 
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(user.getUserId());
@@ -670,7 +670,7 @@ class OperatorSelectTest {
         List<IFlowAction> startActions = startNode.actionManager().getActions();
 
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(user.getUserId());
@@ -736,7 +736,7 @@ class OperatorSelectTest {
         List<IFlowAction> startActions = startNode.actionManager().getActions();
 
         FlowCreateRequest createRequest = new FlowCreateRequest();
-        createRequest.setWorkId(workflow.getId());
+        createRequest.setWorkCode(workflow.getCode());
         createRequest.setFormData(data);
         createRequest.setActionId(startActions.get(0).id());
         createRequest.setOperatorId(user.getUserId());

@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormData;
+import com.codingapi.flow.form.FormDataVerify;
+import com.codingapi.flow.form.permission.FormFieldPermission;
 import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -125,7 +127,7 @@ public class FlowSession {
     /**
      * 是否是mock
      */
-    public boolean isMock(){
+    public boolean isMock() {
         return this.repositoryHolder instanceof MockRepositoryHolder;
     }
 
@@ -165,7 +167,7 @@ public class FlowSession {
             IFlowAction currentAction,
             FormData formData,
             long backupId) {
-        return new FlowSession(repositoryHolder, currentOperator, currentOperator,currentOperator,workflow, currentNode, currentAction, formData, null, new ArrayList<>(), backupId, new FlowAdvice());
+        return new FlowSession(repositoryHolder, currentOperator, currentOperator, currentOperator, workflow, currentNode, currentAction, formData, null, new ArrayList<>(), backupId, new FlowAdvice());
     }
 
 
@@ -175,24 +177,25 @@ public class FlowSession {
     public FlowCreateRequest toCreateRequest() {
         IFlowNode startNode = workflow.getStartNode();
         IFlowAction action = startNode.actionManager().getActionByType(ActionType.SAVE.name());
-        return this.toCreateRequest(workflow.getId(),currentOperator.getUserId(),action.id(),formData.toMapData());
+        return this.toCreateRequest(workflow.getCode(), currentOperator.getUserId(), action.id(), formData.toMapData());
     }
 
 
     /**
      * 创建流程请求，用于自流程的创建
-     * @param workId 流程设计id
+     *
+     * @param workCode 流程Code
      * @param actionId 动作类型
      * @param formData 流程数据
      */
-    public FlowCreateRequest toCreateRequest(String workId,
+    public FlowCreateRequest toCreateRequest(String workCode,
                                              long operatorId,
                                              String actionId,
-                                             String formData){
+                                             String formData) {
 
         FlowCreateRequest request = new FlowCreateRequest();
         request.setActionId(actionId);
-        request.setWorkId(workId);
+        request.setWorkCode(workCode);
         request.setOperatorId(operatorId);
         request.setFormData(JSONObject.parseObject(formData));
         return request;
@@ -200,18 +203,19 @@ public class FlowSession {
 
     /**
      * 创建流程请求，用于自流程的创建
-     * @param workId 流程设计id
+     *
+     * @param workCode   流程Code
      * @param actionId 动作类型
      * @param formData 流程数据
      */
-    public FlowCreateRequest toCreateRequest(String workId,
-                                           long operatorId,
-                                           String actionId,
-                                           Map<String,Object> formData){
+    public FlowCreateRequest toCreateRequest(String workCode,
+                                             long operatorId,
+                                             String actionId,
+                                             Map<String, Object> formData) {
 
         FlowCreateRequest request = new FlowCreateRequest();
         request.setActionId(actionId);
-        request.setWorkId(workId);
+        request.setWorkCode(workCode);
         request.setOperatorId(operatorId);
         request.setFormData(formData);
         return request;
@@ -238,12 +242,11 @@ public class FlowSession {
     }
 
 
-
     /**
      * 获取流程的提交者Id
      */
-    public long getSubmitOperatorId(){
-        if(this.submitOperator!=null) {
+    public long getSubmitOperatorId() {
+        if (this.submitOperator != null) {
             return this.submitOperator.getUserId();
         }
         return 0;
@@ -252,8 +255,8 @@ public class FlowSession {
     /**
      * 获取流程的提交者名称
      */
-    public String getSubmitOperatorName(){
-        if(this.submitOperator!=null) {
+    public String getSubmitOperatorName() {
+        if (this.submitOperator != null) {
             return this.submitOperator.getName();
         }
         return null;
@@ -309,7 +312,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowNode currentNode) {
-        return new FlowSession(repositoryHolder,currentOperator,createdOperator,submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
+        return new FlowSession(repositoryHolder, currentOperator, createdOperator, submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
     }
 
 
@@ -320,7 +323,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowAction currentAction) {
-        return new FlowSession(repositoryHolder,currentOperator,createdOperator,submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
+        return new FlowSession(repositoryHolder, currentOperator, createdOperator, submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
     }
 
     /**
@@ -330,14 +333,25 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowOperator currentOperator) {
-        return new FlowSession(repositoryHolder,currentOperator,createdOperator,submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
+        return new FlowSession(repositoryHolder, currentOperator, createdOperator, submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
     }
 
     /**
      * 获取节点
+     *
      * @param nodeId 节点id
      */
     public IFlowNode getNode(String nodeId) {
         return this.workflow.getFlowNode(nodeId);
+    }
+
+
+    /**
+     * 校验表单字段
+     */
+    public void verifyFormData() {
+        List<FormFieldPermission> permissions = this.currentNode.strategyManager().getFieldPermissions();
+        FormDataVerify verify = new FormDataVerify(formData, permissions);
+        verify.verify();
     }
 }

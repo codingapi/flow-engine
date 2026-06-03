@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class FlowDetailRequest {
     /**
-     *  详情id，可以是workId或者是recordId
+     *  详情id，可以是workCode或者是recordId
      */
     private String id;
     /**

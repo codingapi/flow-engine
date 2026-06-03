@@ -76,7 +76,8 @@ public class ActionManager {
 
         //  通过操作
         if (flowAction instanceof PassAction ) {
-            session.getFormData().verify();
+            // 校验表单字段
+            session.verifyFormData();
 
             // 是否必须填写审批意见
             if (nodeStrategyManager.isAdviceRequired()) {
