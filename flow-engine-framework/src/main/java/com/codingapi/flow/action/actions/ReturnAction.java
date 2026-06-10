@@ -22,12 +22,17 @@ import java.util.Map;
  */
 public class ReturnAction extends BaseAction {
 
-    public ReturnAction() {
-        this.id = FlowIDGeneratorGatewayContext.getInstance().generateActionId();
-        this.title = "退回";
-        this.enable = true;
-        this.type = ActionType.RETURN.name();
-        this.display = new ActionDisplay(this.title);
+    public static final String DEFAULT_TITLE = "退回";
+
+
+    public static ReturnAction defaultAction() {
+        ReturnAction action = new ReturnAction();
+        action.setId(FlowIDGeneratorGatewayContext.getInstance().generateActionId());
+        action.setTitle(DEFAULT_TITLE);
+        action.setEnable(true);
+        action.setType(ActionType.RETURN.name());
+        action.setDisplay(ActionDisplay.defaultDisplay(DEFAULT_TITLE));
+        return action;
     }
 
     public static ReturnAction fromMap(Map<String, Object> data) {

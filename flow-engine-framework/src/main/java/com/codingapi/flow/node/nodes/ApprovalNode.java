@@ -27,7 +27,7 @@ public class ApprovalNode extends BaseAuditNode implements IDisplayNode {
     }
 
 
-    public static ApprovalNode defaultNode(){
+    public static ApprovalNode defaultNode() {
         ApprovalNode approvalNode = new ApprovalNode();
         approvalNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
         approvalNode.setName(DEFAULT_NAME);
@@ -57,13 +57,13 @@ public class ApprovalNode extends BaseAuditNode implements IDisplayNode {
 
     private static List<IFlowAction> defaultActions() {
         List<IFlowAction> actions = new ArrayList<>();
-        actions.add(new PassAction());
-        actions.add(new RejectAction());
-        actions.add(new SaveAction());
-        actions.add(new AddAuditAction());
-        actions.add(new TransferAction());
-        actions.add(new ReturnAction());
-        actions.add(new DelegateAction());
+        actions.add(PassAction.defaultAction());
+        actions.add(RejectAction.defaultAction());
+        actions.add(SaveAction.defaultAction());
+        actions.add(AddAuditAction.defaultAction());
+        actions.add(TransferAction.defaultAction());
+        actions.add(ReturnAction.defaultAction());
+        actions.add(DelegateAction.defaultAction());
         return actions;
     }
 

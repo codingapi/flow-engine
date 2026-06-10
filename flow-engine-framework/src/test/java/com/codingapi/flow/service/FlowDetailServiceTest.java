@@ -73,7 +73,7 @@ public class FlowDetailServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -195,7 +195,7 @@ public class FlowDetailServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 

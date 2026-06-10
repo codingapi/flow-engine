@@ -8,6 +8,7 @@ import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.Data;
 
@@ -160,7 +161,6 @@ public class FlowContent {
      */
     private boolean urge;
 
-
     /**
      * 设置操作动作按钮
      *
@@ -188,20 +188,22 @@ public class FlowContent {
         }
     }
 
-
-    public void pushCurrentNode(IFlowNode currentNode) {
-        ActionManager actionManager = currentNode.actionManager();
-        NodeStrategyManager strategyManager = currentNode.strategyManager();
-        this.actions = actionManager.getActions().stream().map(IFlowAction::toMap).toList();
-        this.adviceRequired = strategyManager.isAdviceRequired();
-        this.signRequired = strategyManager.isSignRequired();
-        this.nodeId = currentNode.getId();
-        this.nodeName = currentNode.getName();
-        this.nodeType = currentNode.getType();
-        this.fieldPermissions = strategyManager.getFieldPermissions();
-        Map<String, Object> nodeData = currentNode.toMap();
-        this.view = (String) nodeData.get("view");
-        this.code = (String) nodeData.get("code");
+    public void pushCurrentNode(FlowSession flowSession) {
+        IFlowNode currentNode = flowSession.getCurrentNode();
+        if (currentNode != null) {
+            ActionManager actionManager = currentNode.actionManager();
+            NodeStrategyManager strategyManager = currentNode.strategyManager();
+            this.actions = actionManager.filterActions(flowSession).stream().map(IFlowAction::toMap).toList();
+            this.adviceRequired = strategyManager.isAdviceRequired();
+            this.signRequired = strategyManager.isSignRequired();
+            this.nodeId = currentNode.getId();
+            this.nodeName = currentNode.getName();
+            this.nodeType = currentNode.getType();
+            this.fieldPermissions = strategyManager.getFieldPermissions();
+            Map<String, Object> nodeData = currentNode.toMap();
+            this.view = (String) nodeData.get("view");
+            this.code = (String) nodeData.get("code");
+        }
     }
 
     public void pushWorkflow(Workflow workflow) {
@@ -232,8 +234,8 @@ public class FlowContent {
             body.setNodeId(item.getNodeId());
             body.setNodeName(item.getNodeName());
             body.setNodeType(item.getNodeType());
-            body.setSubmitOperator(new FlowOperator(item.getSubmitOperatorId(),item.getSubmitOperatorName()));
-            body.setCreatedOperator(new FlowOperator(record.getCreateOperatorId(),record.getCreateOperatorName()));
+            body.setSubmitOperator(new FlowOperator(item.getSubmitOperatorId(), item.getSubmitOperatorName()));
+            body.setCreatedOperator(new FlowOperator(record.getCreateOperatorId(), record.getCreateOperatorName()));
             body.setTitle(item.getTitle());
             body.setData(item.getFormData());
             body.setRecordState(item.getRecordState());
@@ -265,7 +267,6 @@ public class FlowContent {
         this.currentOperator = new FlowOperator(currentOperator);
         this.createOperator = new FlowOperator(currentOperator);
     }
-
 
     @Data
     public static class History {
@@ -354,7 +355,6 @@ public class FlowContent {
          * 流程提交人
          */
         private FlowOperator submitOperator;
-
 
         /**
          * 流程创建者

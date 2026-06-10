@@ -28,10 +28,24 @@ import java.util.Map;
  */
 public class AddAuditAction extends BaseAction {
 
+    public static final String DEFAULT_TITLE = "加签";
+
     /**
      * 可以加签的人员范围
      */
     private OperatorLoadScript script;
+
+
+    public static AddAuditAction defaultAction() {
+        AddAuditAction action = new AddAuditAction();
+        action.setId(FlowIDGeneratorGatewayContext.getInstance().generateActionId());
+        action.setTitle(DEFAULT_TITLE);
+        action.setEnable(true);
+        action.setType(ActionType.ADD_AUDIT.name());
+        action.setDisplay(ActionDisplay.defaultDisplay(DEFAULT_TITLE));
+        action.setScript(null);
+        return action;
+    }
 
     public void setScript(String script) {
         if (StringUtils.hasText(script)) {
@@ -44,16 +58,6 @@ public class AddAuditAction extends BaseAction {
      */
     public List<IFlowOperator> operators(FlowSession flowSession) {
         return script.execute(flowSession);
-    }
-
-    public AddAuditAction() {
-        this.id = FlowIDGeneratorGatewayContext.getInstance().generateActionId();
-        this.title = "加签";
-        this.enable = true;
-        this.type = ActionType.ADD_AUDIT.name();
-        this.display = new ActionDisplay(this.title);
-        // 默认 anyone
-        this.script = null;
     }
 
 

@@ -20,9 +20,9 @@ import java.util.Map;
  */
 public class CustomAction extends BaseAction {
 
+    public static final String DEFAULT_TITLE = "自定义";
 
     private ActionCustomScript script;
-
 
     public void setCustomScript(String script) {
         if (StringUtils.hasText(script)) {
@@ -30,14 +30,19 @@ public class CustomAction extends BaseAction {
         }
     }
 
-    public CustomAction() {
-        this.id = FlowIDGeneratorGatewayContext.getInstance().generateActionId();
-        this.title = "自定义";
-        this.enable = true;
-        this.type = ActionType.CUSTOM.name();
-        this.display = new ActionDisplay(this.title);
-        this.script = ActionCustomScript.defaultScript();
+
+
+    public static CustomAction defaultAction() {
+        CustomAction action = new CustomAction();
+        action.setId(FlowIDGeneratorGatewayContext.getInstance().generateActionId());
+        action.setTitle(DEFAULT_TITLE);
+        action.setEnable(true);
+        action.setType(ActionType.CUSTOM.name());
+        action.setDisplay(ActionDisplay.defaultDisplay(DEFAULT_TITLE));
+        action.script =  ActionCustomScript.defaultScript();
+        return action;
     }
+
 
     @Override
     public void run(FlowSession flowSession) {

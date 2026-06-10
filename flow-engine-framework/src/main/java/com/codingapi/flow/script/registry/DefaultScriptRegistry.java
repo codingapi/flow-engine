@@ -60,4 +60,9 @@ public class DefaultScriptRegistry implements IScriptRegistry {
     public String getActionRejectScript() {
         return FlowGroovyScriptFactory.createActionRejectScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_REJECT).getKey();
     }
+
+    @Override
+    public String getActionDisplayScript() {
+       return FlowGroovyScriptFactory.createActionDisplayScript(ScriptDefaultConstants.SCRIPT_DEFAULT_ACTION_DISPLAY).getKey();
+    }
 }

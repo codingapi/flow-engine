@@ -9,6 +9,7 @@ import lombok.Getter;
  * 用户可通过 {@link #setRegistry(IScriptRegistry)} 替换默认实现。
  * <p>
  * 使用示例：
+ * 
  * <pre>
  * // 替换默认脚本
  * ScriptRegistry.getInstance().setRegistry(new CustomScriptRegistry());
@@ -107,6 +108,13 @@ public class ScriptRegistryContext {
      */
     public String getActionCustomScript() {
         return registry.getActionCustomScript();
+    }
+
+    /**
+     * 获取动作展示脚本
+     */
+    public String getActionDisplayScript() {
+        return registry.getActionDisplayScript();
     }
 
     /**

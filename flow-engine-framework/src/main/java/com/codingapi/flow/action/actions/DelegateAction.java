@@ -27,6 +27,7 @@ import java.util.Map;
  */
 public class DelegateAction extends BaseAction {
 
+    public static final String DEFAULT_TITLE = "委派";
     /**
      * 可以委派的人员范围
      */
@@ -38,14 +39,16 @@ public class DelegateAction extends BaseAction {
         }
     }
 
-    public DelegateAction() {
-        this.id = FlowIDGeneratorGatewayContext.getInstance().generateActionId();
-        this.title = "委派";
-        this.enable = true;
-        this.type = ActionType.DELEGATE.name();
-        this.display = new ActionDisplay(this.title);
-        // 默认 anyone
-        this.script = null;
+
+    public static DelegateAction defaultAction() {
+        DelegateAction action = new DelegateAction();
+        action.setId(FlowIDGeneratorGatewayContext.getInstance().generateActionId());
+        action.setTitle(DEFAULT_TITLE);
+        action.setEnable(true);
+        action.setType(ActionType.DELEGATE.name());
+        action.setDisplay(ActionDisplay.defaultDisplay(DEFAULT_TITLE));
+        action.script = null;
+        return action;
     }
 
 

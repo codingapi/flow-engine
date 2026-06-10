@@ -93,7 +93,7 @@ class FlowSampleServiceTest {
 
         List<String> keys = GroovyScriptAnnotationScannerUtils.findGroovyScriptFields(workflow).getKeys();
         System.out.println(keys);
-        assertEquals(6,keys.size());
+        assertEquals(15,keys.size());
 
         factory.workflowService.saveWorkflow(workflow);
 
@@ -156,7 +156,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -258,7 +258,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -357,7 +357,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -1512,7 +1512,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -1669,7 +1669,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -1781,7 +1781,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -1886,7 +1886,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -1991,7 +1991,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -2106,7 +2106,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -2231,7 +2231,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -2346,7 +2346,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -2469,7 +2469,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -2590,7 +2590,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -2694,7 +2694,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -2813,7 +2813,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -2923,7 +2923,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -3026,7 +3026,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -3128,7 +3128,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 
@@ -3234,7 +3234,7 @@ class FlowSampleServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 

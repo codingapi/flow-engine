@@ -1,6 +1,8 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.exception.FlowNotFoundException;
+import com.codingapi.flow.form.FlowForm;
+import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowDetailRequest;
@@ -8,14 +10,18 @@ import com.codingapi.flow.pojo.response.FlowContent;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.WorkflowService;
+import com.codingapi.flow.session.FlowAdvice;
+import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 
+import groovyjarjarantlr4.v4.parse.ANTLRParser.throwsSpec_return;
+
 import java.util.List;
 
 /**
- *  流程详情服务
+ * 流程详情服务
  */
 public class FlowDetailService {
 
@@ -39,7 +45,14 @@ public class FlowDetailService {
             if (workflow == null) {
                 throw FlowNotFoundException.workflow(this.request.getId());
             }
-            return new FlowContentFactory(workflow, null, currentOperator,repositoryHolder.getFlowRecordService()).create();
+
+            IFlowNode flowNode = workflow.getStartNode();
+
+            FlowSession flowSession = FlowSession.startSession(repositoryHolder, currentOperator, workflow, flowNode,
+                    null, null, 0);
+
+            return new FlowContentFactory(flowSession, workflow, null, currentOperator,
+                    repositoryHolder.getFlowRecordService()).create();
         } else {
             FlowRecord flowRecord = flowRecordService.getFlowRecord(Long.parseLong(this.request.getId()));
             if (flowRecord == null) {
@@ -51,25 +64,41 @@ public class FlowDetailService {
             }
             Workflow workflow = workflowRuntime.toWorkflow();
 
-            if(!flowRecord.isReadable()){
+            if (!flowRecord.isReadable()) {
                 flowRecord.read();
                 repositoryHolder.saveRecord(flowRecord);
             }
 
-            return new FlowContentFactory(workflow, flowRecord,currentOperator,repositoryHolder.getFlowRecordService()).create();
+            IFlowOperator createOperator = repositoryHolder.getOperatorById(flowRecord.getCreateOperatorId());
+
+            IFlowOperator submitOperator = repositoryHolder.getOperatorById(flowRecord.getSubmitOperatorId());
+
+            FlowForm flowForm = workflow.getForm();
+            FormData formData = new FormData(flowForm);
+            formData.reset(flowRecord.getFormData());
+
+            FlowAdvice flowAdvice = new FlowAdvice(flowRecord.getAdvice());
+
+            FlowSession flowSession = flowRecord.createFlowSession(repositoryHolder, workflow, currentOperator,
+                    createOperator, submitOperator, formData, flowAdvice);
+
+            return new FlowContentFactory(flowSession, workflow, flowRecord, currentOperator,
+                    repositoryHolder.getFlowRecordService()).create();
         }
     }
-
 
     private static class FlowContentFactory {
         private final IFlowOperator currentOperator;
         private final Workflow workflow;
         private final FlowRecord flowRecord;
         private final FlowContent flowContent;
+        private final FlowSession flowSession;
 
         private final FlowRecordService flowRecordService;
 
-        public FlowContentFactory(Workflow workflow, FlowRecord flowRecord,IFlowOperator currentOperator,FlowRecordService flowRecordService) {
+        public FlowContentFactory(FlowSession flowSession, Workflow workflow, FlowRecord flowRecord,
+                IFlowOperator currentOperator, FlowRecordService flowRecordService) {
+            this.flowSession = flowSession;
             this.workflow = workflow;
             this.flowRecord = flowRecord;
             this.currentOperator = currentOperator;
@@ -78,45 +107,36 @@ public class FlowDetailService {
 
         }
 
-        private void loadCurrentOperator(){
+        private void loadCurrentOperator() {
             this.flowContent.pushCurrentOperator(currentOperator);
         }
 
-        private void loadWorkflow(){
+        private void loadWorkflow() {
             this.flowContent.pushWorkflow(workflow);
         }
 
-        private void loadTodoFlowRecords(){
-            if(this.flowRecord!=null){
-                if(this.flowRecord.isMergeable() && this.flowRecord.isTodo()){
+        private void loadTodoFlowRecords() {
+            if (this.flowRecord != null) {
+                if (this.flowRecord.isMergeable() && this.flowRecord.isTodo()) {
                     List<FlowRecord> margeRecords = flowRecordService.getMergeRecord(flowRecord.getTodoKey());
                     this.flowContent.pushRecords(this.flowRecord, margeRecords);
-                }else {
-                    this.flowContent.pushRecords(this.flowRecord,List.of(this.flowRecord));
+                } else {
+                    this.flowContent.pushRecords(this.flowRecord, List.of(this.flowRecord));
                 }
             }
         }
 
-
         private void loadHistoryRecords() {
             if (flowRecord != null) {
-                List<FlowRecord> historyRecords = flowRecordService.findFlowRecordBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
-                this.flowContent.pushHistory(workflow,historyRecords);
+                List<FlowRecord> historyRecords = flowRecordService
+                        .findFlowRecordBeforeRecords(flowRecord.getProcessId(), flowRecord.getId());
+                this.flowContent.pushHistory(workflow, historyRecords);
             }
         }
 
-        private void loadCurrentNode(){
-            IFlowNode currentNode = null;
-            if(flowRecord!=null){
-                currentNode = workflow.getFlowNode(flowRecord.getNodeId());
-            }else {
-                currentNode = workflow.getStartNode();
-            }
-            if(currentNode!=null) {
-                this.flowContent.pushCurrentNode(currentNode);
-            }
+        private void loadCurrentNode() {
+            this.flowContent.pushCurrentNode(this.flowSession);
         }
-
 
         public FlowContent create() {
             this.loadCurrentOperator();
@@ -125,7 +145,7 @@ public class FlowDetailService {
             this.loadTodoFlowRecords();
             this.loadHistoryRecords();
 
-            flowContent.setOperationAction(this.workflow,this.flowRecord);
+            flowContent.setOperationAction(this.workflow, this.flowRecord);
             return flowContent;
         }
     }
