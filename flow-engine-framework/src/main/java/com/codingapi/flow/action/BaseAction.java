@@ -55,9 +55,6 @@ public abstract class BaseAction implements IFlowAction {
 
     @Override
     public boolean equals(Object obj) {
-        if(id==null){
-            System.out.println("Xxx");
-        }
         if (obj instanceof BaseAction action) {
             return action.getId().equals(id);
         }

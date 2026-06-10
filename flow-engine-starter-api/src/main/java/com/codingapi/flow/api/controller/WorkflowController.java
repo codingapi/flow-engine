@@ -1,6 +1,7 @@
 package com.codingapi.flow.api.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.api.pojo.NodeCreateRequest;
 import com.codingapi.flow.api.pojo.WorkflowMeta;
 import com.codingapi.flow.api.pojo.WorkflowUpdateVersionNameRequest;
@@ -15,6 +16,7 @@ import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.repository.WorkflowRepository;
+import com.codingapi.flow.script.registry.ScriptRegistryContext;
 import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
@@ -140,6 +142,12 @@ public class WorkflowController {
             throw new LocaleMessageException("export.error", e);
         }
     }
+
+    @PostMapping("/create-custom-action")
+    public SingleResponse<Map<String,Object>> createCustomAction() {
+        return SingleResponse.of(CustomAction.defaultAction().toMap());
+    }
+
 
     @PostMapping("/create-node")
     public SingleResponse<Map<String, Object>> createNode(@RequestBody NodeCreateRequest request) {
