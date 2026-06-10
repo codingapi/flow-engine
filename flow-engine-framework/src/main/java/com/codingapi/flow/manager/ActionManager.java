@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +27,23 @@ public class ActionManager {
 
     @Getter
     private final List<IFlowAction> actions;
+
+    public List<IFlowAction> filterActions(FlowSession flowSession) {
+        List<IFlowAction> actions = new ArrayList<>();
+        if (this.actions != null) {
+            for (IFlowAction action : this.actions) {
+                if (action.show(flowSession)) {
+                    actions.add(action);
+                }
+            }
+        }
+        return actions;
+    }
+
+
+    public void verify(FlowForm flowForm){
+        // no verify 
+    }
 
 
     /**
@@ -55,10 +73,6 @@ public class ActionManager {
         return null;
     }
 
-    public void verify(FlowForm form) {
-
-    }
-
     public void verifySession(FlowSession session) {
         FlowAdvice flowAdvice = session.getAdvice();
         NodeStrategyManager nodeStrategyManager = session.getCurrentNode().strategyManager();
@@ -74,8 +88,8 @@ public class ActionManager {
             return;
         }
 
-        //  通过操作
-        if (flowAction instanceof PassAction ) {
+        // 通过操作
+        if (flowAction instanceof PassAction) {
             // 校验表单字段
             session.verifyFormData();
 
@@ -94,8 +108,8 @@ public class ActionManager {
             }
         }
 
-        //  通过操作
-        if (flowAction instanceof RejectAction ) {
+        // 通过操作
+        if (flowAction instanceof RejectAction) {
             // 是否必须填写审批意见
             if (nodeStrategyManager.isAdviceRequired()) {
                 if (!StringUtils.hasText(flowAdvice.getAdvice())) {
@@ -105,7 +119,8 @@ public class ActionManager {
         }
 
         // 加签操作、转办操作、委托操作
-        if (flowAction instanceof AddAuditAction || flowAction instanceof TransferAction || flowAction instanceof DelegateAction) {
+        if (flowAction instanceof AddAuditAction || flowAction instanceof TransferAction
+                || flowAction instanceof DelegateAction) {
             if (flowAdvice.getForwardOperators() == null || flowAdvice.getForwardOperators().isEmpty()) {
                 throw FlowValidationException.required("forwardOperators");
             }
@@ -135,7 +150,6 @@ public class ActionManager {
                 throw FlowValidationException.required("backNode");
             }
         }
-
 
     }
 

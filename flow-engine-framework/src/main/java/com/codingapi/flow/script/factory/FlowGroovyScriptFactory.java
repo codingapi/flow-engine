@@ -205,6 +205,30 @@ public class FlowGroovyScriptFactory {
         return groovyScript;
     }
 
+
+    public static GroovyScript createActionDisplayScript(String script) {
+        String key = FlowIDGeneratorGatewayContext.getInstance().generateFlowScriptKey();
+        String description = """
+                <strong>动作按钮展示脚本</strong>
+                脚本说明：实现是否展示改动作按钮的控制。
+                传入对象为 <code>GroovyScriptRequest</code> 对象，返回数据格式为 <code>boolean</code> 类型，当为true时则展示按钮：
+                """;
+
+        GroovyScript groovyScript = GroovyScript.builder(key)
+                .script(script)
+                .typeOne(DEFAULT_SCRIPT_TYPE_ONE)
+                .typeTwo("action-display")
+                .description(description)
+                .method("run")
+                .returnType(Boolean.class)
+                .binds(Map.of("$bind", GroovyScriptBind.class))
+                .requests(Map.of("request", GroovyScriptRequest.class))
+                .build();
+
+        groovyScript.temp();
+        return groovyScript;
+    }
+
     public static GroovyScript createActionCustomScript(String script) {
         String key = FlowIDGeneratorGatewayContext.getInstance().generateFlowScriptKey();
         String description = """

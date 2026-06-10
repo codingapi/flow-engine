@@ -26,17 +26,23 @@ import java.util.Map;
  */
 public class RejectAction extends BaseAction {
 
+    public static final String DEFAULT_TITLE = "拒绝";
+
     @Getter
     private ActionRejectScript script;
 
-    public RejectAction() {
-        this.id = FlowIDGeneratorGatewayContext.getInstance().generateActionId();
-        this.title = "拒绝";
-        this.enable = true;
-        this.type = ActionType.REJECT.name();
-        this.display = new ActionDisplay(this.title);
-        this.script = ActionRejectScript.defaultScript();
+
+    public static RejectAction defaultAction() {
+        RejectAction action = new RejectAction();
+        action.setId(FlowIDGeneratorGatewayContext.getInstance().generateActionId());
+        action.setTitle(DEFAULT_TITLE);
+        action.setEnable(true);
+        action.setType(ActionType.REJECT.name());
+        action.setDisplay(ActionDisplay.defaultDisplay(DEFAULT_TITLE));
+        action.script =  ActionRejectScript.defaultScript();;
+        return action;
     }
+
 
     @Override
     public void copy(IFlowAction action) {

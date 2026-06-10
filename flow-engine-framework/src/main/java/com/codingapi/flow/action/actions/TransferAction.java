@@ -27,19 +27,23 @@ import java.util.Map;
  */
 public class TransferAction extends BaseAction {
 
+    public static final String DEFAULT_TITLE = "转办";
+
     /**
      * 可以转办的人员范围
      */
     private OperatorLoadScript script;
 
-    public TransferAction() {
-        this.id = FlowIDGeneratorGatewayContext.getInstance().generateActionId();
-        this.title = "转办";
-        this.enable = true;
-        this.type = ActionType.TRANSFER.name();
-        this.display = new ActionDisplay(this.title);
-        // 默认 anyone
-        this.script = null;
+
+    public static TransferAction defaultAction() {
+        TransferAction action = new TransferAction();
+        action.setId(FlowIDGeneratorGatewayContext.getInstance().generateActionId());
+        action.setTitle(DEFAULT_TITLE);
+        action.setEnable(true);
+        action.setType(ActionType.TRANSFER.name());
+        action.setDisplay(ActionDisplay.defaultDisplay(DEFAULT_TITLE));
+        action.script = null;
+        return action;
     }
 
     public void setScript(String script) {

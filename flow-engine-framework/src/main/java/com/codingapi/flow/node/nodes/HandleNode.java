@@ -56,7 +56,7 @@ public class HandleNode extends BaseAuditNode implements IDisplayNode {
 
     private static List<IFlowAction> defaultActions() {
         List<IFlowAction> actions = new ArrayList<>();
-        actions.add(new PassAction());
+        actions.add(PassAction.defaultAction());
         return actions;
     }
 

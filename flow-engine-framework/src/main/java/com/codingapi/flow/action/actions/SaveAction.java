@@ -15,12 +15,18 @@ import java.util.Map;
  */
 public class SaveAction extends BaseAction {
 
-    public SaveAction() {
-        this.id = FlowIDGeneratorGatewayContext.getInstance().generateActionId();
-        this.title = "保存";
-        this.enable = true;
-        this.type = ActionType.SAVE.name();
-        this.display = new ActionDisplay(this.title);
+
+    public static final String DEFAULT_TITLE = "保存";
+
+
+    public static SaveAction defaultAction() {
+        SaveAction action = new SaveAction();
+        action.setId(FlowIDGeneratorGatewayContext.getInstance().generateActionId());
+        action.setTitle(DEFAULT_TITLE);
+        action.setEnable(true);
+        action.setType(ActionType.SAVE.name());
+        action.setDisplay(ActionDisplay.defaultDisplay(DEFAULT_TITLE));
+        return action;
     }
 
     public static SaveAction fromMap(Map<String, Object> data) {

@@ -45,6 +45,12 @@ public interface IFlowAction extends IMapConvertor, ICopyAbility<IFlowAction> {
 
 
     /**
+     * 是否展示动作
+     */
+    boolean show(FlowSession flowSession);
+
+
+    /**
      * 执行动作
      * 业务流程的处理入口时通过run函数触发开启的流程
      *

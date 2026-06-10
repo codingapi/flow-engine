@@ -44,6 +44,11 @@ public abstract class BaseAction implements IFlowAction {
     }
 
     @Override
+    public boolean show(FlowSession flowSession) {
+        return this.display.show(flowSession);
+    }
+
+    @Override
     public boolean enable() {
         return enable;
     }

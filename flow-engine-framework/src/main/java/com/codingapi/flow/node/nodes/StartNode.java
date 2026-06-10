@@ -99,8 +99,8 @@ public class StartNode extends BaseFlowNode implements IDisplayNode {
 
     private static List<IFlowAction> defaultActions() {
         List<IFlowAction> actions = new ArrayList<>();
-        actions.add(new PassAction());
-        actions.add(new SaveAction());
+        actions.add(PassAction.defaultAction());
+        actions.add(SaveAction.defaultAction());
         return actions;
     }
 

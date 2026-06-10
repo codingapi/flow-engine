@@ -72,7 +72,7 @@ public class FlowMergeableServiceTest {
                                 .build()))
                         .build())
                 .actions(ActionBuilder.builder()
-                        .addAction(new CustomAction())
+                        .addAction(CustomAction.defaultAction())
                         .build())
                 .build();
 

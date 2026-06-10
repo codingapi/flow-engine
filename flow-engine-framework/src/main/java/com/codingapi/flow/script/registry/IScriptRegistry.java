@@ -54,6 +54,11 @@ public interface IScriptRegistry {
     String getActionCustomScript();
 
     /**
+     * 获取动作展示脚本
+     */
+    String getActionDisplayScript();
+
+    /**
      * 获取拒绝动作脚本
      */
     String getActionRejectScript();

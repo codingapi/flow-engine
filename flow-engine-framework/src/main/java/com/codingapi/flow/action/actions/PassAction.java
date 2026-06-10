@@ -33,16 +33,22 @@ import java.util.Map;
  */
 public class PassAction extends BaseAction {
 
-    public PassAction() {
-        this.id = FlowIDGeneratorGatewayContext.getInstance().generateActionId();
-        this.title = "通过";
-        this.enable = true;
-        this.type = ActionType.PASS.name();
-        this.display = new ActionDisplay(this.title);
-    }
+    public static final String DEFAULT_TITLE = "通过";
+
 
     public static PassAction fromMap(Map<String, Object> data) {
         return BaseAction.fromMap(data, PassAction.class);
+    }
+
+
+    public static  PassAction defaultAction(){
+        PassAction action = new PassAction();
+        action.setId(FlowIDGeneratorGatewayContext.getInstance().generateActionId());
+        action.setTitle(DEFAULT_TITLE);
+        action.setEnable(true);
+        action.setType(ActionType.PASS.name());
+        action.setDisplay(ActionDisplay.defaultDisplay(DEFAULT_TITLE));
+        return action;
     }
 
 
