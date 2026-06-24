@@ -117,4 +117,31 @@ public class FlowStateException extends FlowException {
     public static FlowStateException recordLimitUrgeError() {
         return new FlowStateException("record.urge.limit", "record urge limit error");
     }
+
+    /**
+     * Record not support delete (not a todo / finished / revoked)
+     *
+     * @return exception
+     */
+    public static FlowStateException recordNotSupportDelete() {
+        return new FlowStateException("state.record.notSupportDelete", "Flow record is not a todo, delete not allowed");
+    }
+
+    /**
+     * Record is not on the start node, delete not allowed
+     *
+     * @return exception
+     */
+    public static FlowStateException nodeNotStartNode() {
+        return new FlowStateException("state.node.notStart", "Flow record is not on the start node, delete not allowed");
+    }
+
+    /**
+     * Flow already running (has subsequent records), delete not allowed
+     *
+     * @return exception
+     */
+    public static FlowStateException recordAlreadyRunning() {
+        return new FlowStateException("state.record.alreadyRunning", "Flow is already running, delete not allowed");
+    }
 }

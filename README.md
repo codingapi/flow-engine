@@ -62,13 +62,15 @@ flow-engine
 │       │   └── UrgeInterval      # 催办间隔
 │       ├── error                 # 错误处理
 │       │   └── ErrorThrow        # 错误抛出器
-│       ├── event                 # 事件系统（5种）
+│       ├── event                 # 事件系统（7种）
 │       │   ├── IFlowEvent                # 事件接口
 │       │   ├── FlowRecordStartEvent      # 流程开始事件
 │       │   ├── FlowRecordTodoEvent       # 待办事件
 │       │   ├── FlowRecordDoneEvent       # 已办事件
 │       │   ├── FlowRecordFinishEvent     # 流程完成事件
-│       │   └── FlowRecordUrgeEvent       # 催办事件
+│       │   ├── FlowRecordUrgeEvent       # 催办事件
+│       │   ├── FlowRecordRevokeEvent     # 流程撤销事件
+│       │   └── FlowRecordDeleteEvent     # 流程删除事件
 │       ├── exception             # 异常系统（6种）
 │       │   ├── FlowException             # 异常基类
 │       │   ├── FlowValidationException   # 参数验证异常
@@ -132,6 +134,7 @@ flow-engine
 │       │   │   ├── FlowActionRequest  # 动作请求
 │       │   │   ├── FlowCreateRequest  # 创建请求
 │       │   │   ├── FlowRevokeRequest  # 撤回请求
+│       │   │   ├── FlowDeleteRequest  # 删除请求
 │       │   │   └── FlowUrgeRequest    # 催办请求
 │       │   └── response          # 响应对象
 │       │       ├── FlowOperator   # 流程操作者
@@ -172,6 +175,7 @@ flow-engine
 │       │   │   ├── FlowActionService    # 流程动作服务
 │       │   │   ├── FlowDelayTriggerService # 延迟触发服务
 │       │   │   ├── FlowRevokeService    # 流程撤回服务
+│       │   │   ├── FlowDeleteService    # 流程删除服务
 │       │   │   ├── FlowUrgeService      # 流程催办服务
 │       │   │   └── FlowDetailService   # 流程详情服务
 │       │   └── FlowService       # 服务接口
@@ -474,6 +478,8 @@ category.subcategory.errorType
 - `notFound.workflow.definition` - 流程定义未找到
 - `permission.field.readOnly` - 字段只读
 - `state.record.alreadyDone` - 记录已完成
+- `state.record.notSupportDelete` - 记录不允许删除
+- `state.node.notStart` - 记录不在开始节点
 - `validation.field.required` - 必填字段为空
 - `execution.script.error` - 脚本执行错误
 

@@ -94,6 +94,15 @@ public class FlowRecordController {
     }
 
 
+    @PostMapping("/delete")
+    public Response delete(@RequestBody IdRequest request) {
+        FlowService flowService = this.loadFlowService();
+        long operatorId = loadCurrentOperatorId();
+        flowService.delete(new FlowDeleteRequest(request.getLongId(), operatorId));
+        return Response.buildSuccess();
+    }
+
+
     @PostMapping("/action")
     public SingleResponse<ActionResponse> action(@RequestBody FlowActionRequest request) {
         FlowService flowService = this.loadFlowService();

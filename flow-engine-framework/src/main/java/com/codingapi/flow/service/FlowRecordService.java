@@ -120,4 +120,28 @@ public class FlowRecordService {
         return this.flowRecordRepository.findCurrentNodeRecords(fromId,nodeId);
     }
 
+
+    /**
+     * 删除流程记录及其关联的待办数据
+     * <p>
+     * 仅用于作废尚未流转的流程实例,会同时清理该流程记录对应的待办记录与合并关系
+     * @param flowRecord 流程记录
+     */
+    public void deleteFlowRecord(FlowRecord flowRecord) {
+        FlowTodoRecord flowTodoRecord = flowTodoRecordRepository.getByTodoKey(flowRecord.getTodoKey());
+        if (flowTodoRecord != null) {
+            // 清理待办合并关系
+            List<FlowTodoMerge> todoMerges = flowTodoMergeRepository.findByTodoId(flowTodoRecord.getId());
+            if (todoMerges != null) {
+                for (FlowTodoMerge todoMerge : todoMerges) {
+                    flowTodoMergeRepository.delete(todoMerge);
+                }
+            }
+            // 清理待办记录
+            flowTodoRecordRepository.delete(flowTodoRecord);
+        }
+        // 删除流程记录
+        flowRecordRepository.delete(flowRecord);
+    }
+
 }
