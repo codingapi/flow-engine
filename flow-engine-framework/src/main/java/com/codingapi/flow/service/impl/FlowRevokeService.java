@@ -1,5 +1,6 @@
 package com.codingapi.flow.service.impl;
 
+import com.codingapi.flow.event.FlowRecordRevokeEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowNotFoundException;
@@ -94,6 +95,8 @@ public class FlowRevokeService {
         for (FlowRecord afterRecord : afterRecords) {
             afterRecord.revoke();
             recordList.add(afterRecord);
+            // 撤销事件,登记撤销发起的记录数据
+            flowEvents.add(new FlowRecordRevokeEvent(afterRecord, repositoryHolder instanceof MockRepositoryHolder));
         }
 
         repositoryHolder.saveRecords(recordList);

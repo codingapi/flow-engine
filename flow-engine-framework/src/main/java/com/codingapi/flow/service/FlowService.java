@@ -86,6 +86,19 @@ public class FlowService {
 
 
     /**
+     * 删除流程
+     * <p>
+     * 仅用于作废尚未流转(位于开始节点且无后续记录)的流程实例
+     * @param request 删除请求
+     */
+    public void delete(FlowDeleteRequest request) {
+        FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowDeleteService flowDeleteService = new FlowDeleteService(request, this.repositoryHolder);
+        flowDeleteService.delete();
+    }
+
+
+    /**
      * 催办
      */
     public void urge(FlowUrgeRequest request) {

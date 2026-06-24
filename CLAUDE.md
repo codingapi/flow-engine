@@ -30,6 +30,48 @@ Flow Engine 是一个企业级工作流引擎，基于 Java 17 和 Spring Boot 3
 | `com.codingapi.flow.manager` | 业务管理器 |
 | `com.codingapi.flow.service` | 业务服务层 |
 
+## 核心架构
+
+理解以下跨文件的模式后再动手改动，可避免破坏引擎一致性。
+
+### 服务编排模式（FlowService）
+
+`FlowService`（`flow-engine-framework/.../service/FlowService.java`）是 `@Transactional` 业务入口。**每个流程操作对应一个独立的 `FlowXxxService`**（`FlowCreateService` / `FlowActionService` / `FlowRevokeService` / `FlowDeleteService` / `FlowUrgeService` / `FlowDetailService`），通过 `IRepositoryHolder` 注入依赖，且每次操作前调用 `FlowOperatorLocalThreadCache.getInstance().clear()` 清理线程缓存。新增流程操作应沿用此模式：新建 `FlowXxxService(request, repositoryHolder)`，并在 `FlowService` 暴露一个入口方法。
+
+### 仓储持有者（IRepositoryHolder）
+
+服务层不直接注入仓储，而是通过 `IRepositoryHolder` 获取 `FlowRecordService` / `WorkflowService` / `FlowOperatorGateway` 等依赖。两个实现：
+- `RepositoryHolderContext` — 生产，单例，由 `flow-engine-starter` 自动配置注册
+- `MockRepositoryHolder` — 测试 / Mock 场景
+
+REST 层通过请求参数 `mockKey` 分流到 Mock 实例（见 `FlowRecordController.loadFlowService()` / `loadCurrentOperatorId()`）；`operatorId` 也可由该参数覆盖，便于无登录态测试。
+
+### 流程记录生命周期
+
+三类记录紧密绑定，须保持一致：
+- `FlowRecord` — 流程执行记录（TODO / DONE 状态，`isTodo()` / `isDone()` / `isFinish()`）
+- `FlowTodoRecord` — 待办记录
+- `FlowTodoMerge` — 待办合并关系（开启记录合并 `isMergeable()` 时产生）
+
+保存走 `FlowRecordSaveService.saveAll()`，单次调用顺序执行 `saveRecords → saveTodoMargeRecords → removeTodoMergeRecords`，保证三者一致。删除整条流程走 `FlowRecordService.deleteFlowRecord()`，按 合并关系 → 待办 → 流程记录 顺序清理。
+
+### 节点 / 动作 / 策略三元组
+
+19 种节点（`node/nodes/`）× 8 种动作（`action/actions/`），行为由策略（`strategy/node/`、`strategy/workflow/`）驱动而非继承扩展：
+- `NodeStrategyManager` 持有节点策略（如 `RevokeStrategy`、`OperatorLoadStrategy`、`RecordMergeStrategy`）
+- `ActionManager` 持有节点动作
+- 节点类型常量见 `StartNode.NODE_TYPE`（= `NodeType.START.name()`），`FlowRecord.isNodeType(String)` 用于按类型判定
+
+### 事件（IFlowEvent + EventPusher）
+
+7 种事件：开始 / 待办 / 已办 / 完成 / 催办 / 撤销（`FlowRecordRevokeEvent`）/ 删除（`FlowRecordDeleteEvent`）。操作完成后用 `EventPusher.push(event)` 推送；事件通常携带 `FlowRecord` + `mock` 标记。外部可用 Spring `@EventListener` 订阅。
+
+### API 模块划分
+
+- **命令操作**：`flow-engine-starter-api` — `FlowRecordController`（`/api/cmd/record`：create / action / revoke / delete / urge / detail）与 `WorkflowController`（`/api/cmd/workflow`：流程设计 CRUD）
+- **查询**：`flow-engine-starter-query` — `FlowRecordQueryController`（`/api/query/record`：list / todo / done / notify）
+- **持久化**：`flow-engine-starter-infra` — JPA 实体与仓储实现（含达梦方言）
+
 ## 常用命令
 
 ### 构建与测试
@@ -70,24 +112,6 @@ cd flow-engine-example && mvn spring-boot:run
 - **与用户沟通及编写文档时，所有内容必须使用中文表述**
 - **在每次修改代码以后，要执行本地化的编译验证确保代码没有错误**
 - Java 代码遵循 Spring Boot 规范
-- 设计涉及流程或 UML 图形的解决方案时，使用纯文本线框图表示
-- 在设计计划方案或执行方案过程中，对于代码的设计规划与调整修改要遵循本项目的代码风格和架构设计规则
-- 设计的计划要保存到本地的 `docs/` 目录下：
-  - `docs/plan/` - 存放详细可执行开发计划，文件命名格式为 `yyyy-mm-dd-标题.md`
-  - `docs/architecture/` - 存放架构设计文档
-  - `docs/todo/` - 存放阶段任务清单
-
-### Git 工作流
-
-**代码提交路径：**
-
-```
-feature/{task-name}  →  PR  →  dev  →  （用户审核）  →  main
-```
-
-- **禁止直接向 main 分支提交**，main 分支由用户手动合并管理
-- **dev 分支为集成分支**，所有 PR 的目标分支均为 dev
-- **所有代码开发必须在 git worktree 中进行**，不在主工作区直接改代码
 
 ### 测试规范
 
@@ -151,27 +175,6 @@ class ScriptRuntimeContextTest {
     }
 }
 ```
-
-## 架构设计文档
-
-详细架构设计见 `docs/architecture/` 目录：
-
-| 文档 | 说明 |
-|------|------|
-| `01-项目概览.md` | 项目背景、技术栈 |
-| `02-模块总览.md` | Maven 模块划分 |
-| `03-节点模块.md` | 节点接口、节点类型 |
-| `04-动作模块.md` | 动作接口、动作执行 |
-| `05-策略模块.md` | 节点策略、工作流策略 |
-| `06-脚本模块.md` | Groovy 脚本运行时 |
-| `07-仓储模块.md` | 仓储接口、基础设施实现 |
-| `08-构建器模块.md` | 建造者模式实现 |
-| `09-管理器模块.md` | 业务管理器 |
-| `10-服务模块.md` | 业务服务层 |
-| `11-网关与上下文.md` | 网关接口、上下文 |
-| `12-数据库设计.md` | 实体设计、表结构 |
-| `13-API接口设计.md` | REST API 设计 |
-
 
 <!-- PKR-START -->
 ## PKR 知识查阅（编码前必须）
