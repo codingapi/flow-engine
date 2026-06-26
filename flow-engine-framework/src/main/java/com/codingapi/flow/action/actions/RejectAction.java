@@ -4,6 +4,7 @@ import com.codingapi.flow.action.ActionDisplay;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.BaseAction;
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowStateException;
@@ -97,6 +98,9 @@ public class RejectAction extends BaseAction {
         FlowRecord flowRecord = flowSession.getCurrentRecord();
         flowRecord.update(flowSession, true);
         recordList.add(flowRecord);
+
+        // 当前审批为已办状态
+        flowEvents.add(new FlowRecordDoneEvent(flowRecord, flowSession.isMock()));
 
         List<FlowRecord> records = this.generateRecords(flowSession);
         if (!records.isEmpty()) {
