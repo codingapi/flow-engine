@@ -1,6 +1,5 @@
 package com.codingapi.flow.form;
 
-import com.codingapi.flow.exception.FlowValidationException;
 import lombok.Getter;
 
 import java.util.*;
@@ -75,7 +74,9 @@ public class FormData {
 
         for (String key : data.keySet()) {
             Object value = data.get(key);
-            if (value instanceof Collection<?>) {
+            // 仅当 key 是已定义的子表单时，集合数据才按子表单解析；
+            // 其余字段（含表单定义之外的多余字段，如附件列表）一律按原值保留。
+            if (value instanceof Collection<?> && flowForm.isSubForm(key)) {
                 Collection<Map<String, Object>> list = (Collection<Map<String, Object>>) value;
                 for (Map<String, Object> item : list) {
                     DataBody body = this.addSubDataBody(key);
@@ -144,10 +145,7 @@ public class FormData {
          */
         public DataBody set(String key, Object value) {
             String id = flowForm.getCode() + "." + key;
-            DataType type = this.fieldTypes.get(id);
-            if (type == null) {
-                throw FlowValidationException.fieldNotFound(key);
-            }
+            // 表单元数据中未定义的字段不做校验，按原值保留一并存储
             this.data.put(id, value);
             return this;
         }
