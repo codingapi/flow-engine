@@ -95,13 +95,6 @@ cd flow-engine-example && mvn spring-boot:run
 
 ## 开发规范
 
-### 设计先行
-
-- **开发任何新功能前，必须先在 `docs/architecture/` 下完成架构设计文档，经用户确认后再编码**
-- 架构文档包含：系统架构、API 接口、核心组件方案、模块职责划分
-- 任务清单见 `docs/todo/`
-- 各阶段详细可执行的开发计划见 `docs/plan/`
-
 ### 禁止自动提交
 
 - **未经用户明确要求，任何情况下不得执行 `git commit` / `git push` / `git merge` 操作**
