@@ -2310,8 +2310,9 @@ class FlowMockSampleServiceTest {
         factory.flowService.action(bossRequest);
 
         List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        // 撤销的记录不展示在流程记录中，故只包含开始记录与最新经理审批记录共 2 条
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 

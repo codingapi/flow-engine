@@ -1,6 +1,7 @@
 package com.codingapi.flow.service;
 
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.builder.ActionBuilder;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
@@ -33,6 +34,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FlowSampleServiceTest {
 
@@ -224,6 +226,383 @@ class FlowSampleServiceTest {
         assertEquals(2, records.size());
         assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
+    }
+
+
+    /**
+     * 撤销后重新提交流程记录验证测试
+     *
+     * <p>流程设计：开始 -> a -> b -> 结束，a、b 节点各一个审批人，撤销策略为回到当前节点（默认 REVOKE_CURRENT）。
+     * <p>操作步骤：发起人提交 -> a -> b，发起人撤回到发起节点，发起人重新提交 -> a -> b。
+     * <p>期望：撤销的记录不应展示在流程记录中，查询 b 的流程记录时只能看到一次提交的记录。
+     *
+     * <p>该用例用于核实 {@code findProcessRecords} 未过滤 revoked 记录导致流程记录出现重复提交的问题。
+     */
+    @Test
+    void revokeAndResubmit_shouldNotShowRevokedRecords() {
+
+        User user = new User(1, "user");
+        User aUser = new User(2, "aUser");
+        User bUser = new User(3, "bUser");
+        factory.userGateway.save(user);
+        factory.userGateway.save(aUser);
+        factory.userGateway.save(bUser);
+
+        GatewayContext.getInstance().setFlowOperatorGateway(factory.userGateway);
+
+        FlowForm form = FlowFormBuilder.builder()
+                .name("请假流程")
+                .code("leave")
+                .addField("请假人", "name", DataType.STRING)
+                .addField("请假天数", "days", DataType.INTEGER)
+                .addField("请假事由", "reason", DataType.STRING)
+                .build();
+
+        StartNode startNode = StartNode
+                .builder()
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .build())
+                .actions(ActionBuilder.builder()
+                        .addAction(CustomAction.defaultAction())
+                        .build())
+                .build();
+
+        // a 节点：审批人 aUser
+        ApprovalNode aNode = ApprovalNode.builder()
+                .name("a审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
+                        .build()
+                )
+                .build();
+
+        // b 节点：审批人 bUser
+        ApprovalNode bNode = ApprovalNode.builder()
+                .name("b审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
+                        .build()
+                )
+                .build();
+
+        EndNode endNode = EndNode.builder().build();
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("请假流程")
+                .code("leave")
+                .createdOperator(user)
+                .form(form)
+                .addNode(startNode)
+                .addNode(aNode)
+                .addNode(bNode)
+                .addNode(endNode)
+                .build();
+
+        factory.workflowService.saveWorkflow(workflow);
+
+        Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
+
+        List<IFlowAction> startActions = startNode.actionManager().getActions();
+        List<IFlowAction> aActions = aNode.actionManager().getActions();
+
+        // 1. 发起人提交 -> a
+        FlowCreateRequest userCreateRequest = new FlowCreateRequest();
+        userCreateRequest.setWorkCode(workflow.getCode());
+        userCreateRequest.setFormData(data);
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
+        factory.flowService.create(userCreateRequest);
+
+        List<FlowRecord> userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(1, userRecordList.size());
+
+        FlowActionRequest userRequest = new FlowActionRequest();
+        userRequest.setFormData(data);
+        userRequest.setRecordId(userRecordList.get(0).getId());
+        userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        factory.flowService.action(userRequest);
+
+        // 2. a 提交 -> b
+        List<FlowRecord> aRecordList = factory.flowRecordRepository.findTodoByOperator(aUser.getUserId());
+        assertEquals(1, aRecordList.size());
+
+        FlowActionRequest aRequest = new FlowActionRequest();
+        aRequest.setFormData(data);
+        aRequest.setRecordId(aRecordList.get(0).getId());
+        aRequest.setAdvice(new FlowAdviceBody(aActions.get(0).id(), "同意", aUser.getUserId()));
+        factory.flowService.action(aRequest);
+
+        List<FlowRecord> bRecordList = factory.flowRecordRepository.findTodoByOperator(bUser.getUserId());
+        assertEquals(1, bRecordList.size());
+
+        // 3. 发起人撤回到发起节点（撤销发起人已办记录）
+        List<FlowRecord> userDoneList = factory.flowRecordRepository.findDoneByOperator(user.getUserId());
+        assertEquals(1, userDoneList.size());
+
+        factory.flowService.revoke(new FlowRevokeRequest(userDoneList.get(0).getId(), user.getUserId()));
+
+        // 撤销后：发起人回到待办，a、b 的待办应被撤销清空
+        userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(1, userRecordList.size());
+        assertEquals(0, factory.flowRecordRepository.findTodoByOperator(aUser.getUserId()).size());
+        assertEquals(0, factory.flowRecordRepository.findTodoByOperator(bUser.getUserId()).size());
+
+        // 4. 发起人重新提交 -> a
+        userRequest = new FlowActionRequest();
+        userRequest.setFormData(data);
+        userRequest.setRecordId(userRecordList.get(0).getId());
+        userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        factory.flowService.action(userRequest);
+
+        // 5. a 重新提交 -> b
+        aRecordList = factory.flowRecordRepository.findTodoByOperator(aUser.getUserId());
+        assertEquals(1, aRecordList.size());
+
+        aRequest = new FlowActionRequest();
+        aRequest.setFormData(data);
+        aRequest.setRecordId(aRecordList.get(0).getId());
+        aRequest.setAdvice(new FlowAdviceBody(aActions.get(0).id(), "同意", aUser.getUserId()));
+        factory.flowService.action(aRequest);
+
+        bRecordList = factory.flowRecordRepository.findTodoByOperator(bUser.getUserId());
+        assertEquals(1, bRecordList.size());
+
+        // 6. 查询 b 的流程记录数据
+        List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bRecordList.get(0).getProcessId());
+
+        // 期望：撤销的流程数据不应展示在流程记录中，只应看到一次提交的记录（开始、a、b 各一条 = 3 条）
+        long revokedCount = records.stream().filter(FlowRecord::isRevoked).count();
+        // 打印实际情况，便于核实问题
+        System.out.println("流程记录总数 = " + records.size() + "，其中撤销记录数 = " + revokedCount);
+
+        // 期望撤销记录不参与展示；若该断言失败，则说明 findProcessRecords 未过滤 revoked 记录
+        assertEquals(0, revokedCount);
+        assertEquals(3, records.size());
+    }
+
+
+    /**
+     * 退回场景下的流程记录展示与排序验证测试
+     *
+     * <p>流程设计：开始 -> a -> b -> 结束，a、b 节点各一个审批人。
+     * <p>操作步骤：
+     * 1. 发起人提交 -> a -> b
+     * 2. b 退回到 a
+     * 3. 在 a 查看流程记录：历史应包含 b 的退回记录，后续应能看到 b 仍需再次审批（待审批）
+     * 4. a 再次提交 -> b
+     * 5. 在 b 查看流程记录：应能看到所有历史（含退回、a 再次提交），后续为结束节点
+     *
+     * <p>同时验证历史记录按 fromId 链路顺序排列是否准确。
+     */
+    @Test
+    void returnShouldKeepHistoryAndOrder() {
+
+        User user = new User(1, "user");
+        User aUser = new User(2, "aUser");
+        User bUser = new User(3, "bUser");
+        factory.userGateway.save(user);
+        factory.userGateway.save(aUser);
+        factory.userGateway.save(bUser);
+
+        GatewayContext.getInstance().setFlowOperatorGateway(factory.userGateway);
+
+        FlowForm form = FlowFormBuilder.builder()
+                .name("请假流程")
+                .code("leave")
+                .addField("请假人", "name", DataType.STRING)
+                .addField("请假天数", "days", DataType.INTEGER)
+                .addField("请假事由", "reason", DataType.STRING)
+                .build();
+
+        StartNode startNode = StartNode
+                .builder()
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .build())
+                .actions(ActionBuilder.builder()
+                        .addAction(CustomAction.defaultAction())
+                        .build())
+                .build();
+
+        // a 节点：审批人 aUser
+        ApprovalNode aNode = ApprovalNode.builder()
+                .name("a审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
+                        .build()
+                )
+                .build();
+
+        // b 节点：审批人 bUser
+        ApprovalNode bNode = ApprovalNode.builder()
+                .name("b审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new FormFieldPermissionStrategy(FormFieldPermissionsBuilder.builder()
+                                .addPermission("leave", "name", PermissionType.WRITE)
+                                .addPermission("leave", "days", PermissionType.WRITE)
+                                .addPermission("leave", "reason", PermissionType.WRITE)
+                                .build()))
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
+                        .build()
+                )
+                .build();
+
+        EndNode endNode = EndNode.builder().build();
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("请假流程")
+                .code("leave")
+                .createdOperator(user)
+                .form(form)
+                .addNode(startNode)
+                .addNode(aNode)
+                .addNode(bNode)
+                .addNode(endNode)
+                .build();
+
+        factory.workflowService.saveWorkflow(workflow);
+
+        Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
+
+        List<IFlowAction> startActions = startNode.actionManager().getActions();
+        List<IFlowAction> aActions = aNode.actionManager().getActions();
+        List<IFlowAction> bActions = bNode.actionManager().getActions();
+
+        // 1. 发起人提交 -> a
+        FlowCreateRequest userCreateRequest = new FlowCreateRequest();
+        userCreateRequest.setWorkCode(workflow.getCode());
+        userCreateRequest.setFormData(data);
+        userCreateRequest.setActionId(startActions.get(0).id());
+        userCreateRequest.setOperatorId(user.getUserId());
+        factory.flowService.create(userCreateRequest);
+
+        List<FlowRecord> userRecordList = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(1, userRecordList.size());
+
+        FlowActionRequest userRequest = new FlowActionRequest();
+        userRequest.setFormData(data);
+        userRequest.setRecordId(userRecordList.get(0).getId());
+        userRequest.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "同意", user.getUserId()));
+        factory.flowService.action(userRequest);
+
+        // a 提交 -> b
+        List<FlowRecord> aRecordList = factory.flowRecordRepository.findTodoByOperator(aUser.getUserId());
+        assertEquals(1, aRecordList.size());
+
+        FlowActionRequest aRequest = new FlowActionRequest();
+        aRequest.setFormData(data);
+        aRequest.setRecordId(aRecordList.get(0).getId());
+        aRequest.setAdvice(new FlowAdviceBody(aActions.get(0).id(), "同意", aUser.getUserId()));
+        factory.flowService.action(aRequest);
+
+        // 此时 b 待办
+        List<FlowRecord> bRecordList = factory.flowRecordRepository.findTodoByOperator(bUser.getUserId());
+        assertEquals(1, bRecordList.size());
+
+        // 2. b 退回到 a
+        FlowActionRequest bReturnRequest = new FlowActionRequest();
+        bReturnRequest.setFormData(data);
+        bReturnRequest.setRecordId(bRecordList.get(0).getId());
+        FlowAdviceBody bReturnAdvice = new FlowAdviceBody(bActions.get(5).id(), "退回修改", bUser.getUserId());
+        // 退回节点设置为 a 节点
+        bReturnAdvice.setBackNodeId(aNode.getId());
+        bReturnRequest.setAdvice(bReturnAdvice);
+        factory.flowService.action(bReturnRequest);
+
+        // 退回后：b 待办清空，a 重新出现待办
+        assertEquals(0, factory.flowRecordRepository.findTodoByOperator(bUser.getUserId()).size());
+        aRecordList = factory.flowRecordRepository.findTodoByOperator(aUser.getUserId());
+        assertEquals(1, aRecordList.size());
+
+        // 3. 在 a 查看流程记录
+        List<ProcessNode> nodeListAtA = factory.flowService.processNodes(
+                new FlowProcessNodeRequest(aRecordList.get(0).getId(), aUser.getUserId(), data));
+
+        // 期望顺序：开始 -> a(通过) -> b(退回) -> a(审批中) -> b(待审批) -> 结束(待审批)
+        assertEquals(6, nodeListAtA.size());
+        assertEquals(startNode.getName(), nodeListAtA.get(0).getNodeName());
+        assertEquals(aNode.getName(), nodeListAtA.get(1).getNodeName());
+        assertEquals(bNode.getName(), nodeListAtA.get(2).getNodeName());
+        assertEquals(aNode.getName(), nodeListAtA.get(3).getNodeName());
+        assertEquals(bNode.getName(), nodeListAtA.get(4).getNodeName());
+        assertEquals(endNode.getName(), nodeListAtA.get(5).getNodeName());
+
+        // 历史节点（开始、a 通过、b 退回、当前 a 审批中）
+        assertEquals(ProcessNode.ApproveState.PASS, nodeListAtA.get(0).getApproveState());
+        assertEquals(ProcessNode.ApproveState.PASS, nodeListAtA.get(1).getApproveState());
+        assertEquals(ProcessNode.ApproveState.PASS, nodeListAtA.get(2).getApproveState());
+        assertEquals(ProcessNode.ApproveState.PROCESSING, nodeListAtA.get(3).getApproveState());
+        // 后续 b 待审批
+        assertEquals(ProcessNode.ApproveState.PENDING, nodeListAtA.get(4).getApproveState());
+        assertEquals(ProcessNode.ApproveState.PENDING, nodeListAtA.get(5).getApproveState());
+
+        // 历史中应包含 b 的退回记录（动作类型为 RETURN）
+        List<String> historyActionTypes = nodeListAtA.stream()
+                .map(ProcessNode::getOperators)
+                .filter(list -> list != null && !list.isEmpty())
+                .map(list -> list.get(0).getActionType())
+                .toList();
+        assertTrue(historyActionTypes.stream().anyMatch(ActionType.RETURN.name()::equals),
+                "历史记录中应包含 b 的退回记录");
+
+        // 打印 a 视角下的流程节点顺序，便于核实排序
+        System.out.println("a 视角流程节点顺序：" + nodeListAtA.stream()
+                .map(n -> n.getNodeName() + "[" + n.getApproveState() + "]").toList());
+
+        // 4. a 再次提交 -> b
+        aRequest = new FlowActionRequest();
+        aRequest.setFormData(data);
+        aRequest.setRecordId(aRecordList.get(0).getId());
+        aRequest.setAdvice(new FlowAdviceBody(aActions.get(0).id(), "同意", aUser.getUserId()));
+        factory.flowService.action(aRequest);
+
+        bRecordList = factory.flowRecordRepository.findTodoByOperator(bUser.getUserId());
+        assertEquals(1, bRecordList.size());
+
+        // 5. 在 b 查看流程记录
+        List<ProcessNode> nodeListAtB = factory.flowService.processNodes(
+                new FlowProcessNodeRequest(bRecordList.get(0).getId(), bUser.getUserId(), data));
+
+        // 期望顺序：开始 -> a(通过) -> b(退回) -> a(再次通过) -> b(审批中) -> 结束(待审批)
+        assertEquals(6, nodeListAtB.size());
+        assertEquals(startNode.getName(), nodeListAtB.get(0).getNodeName());
+        assertEquals(aNode.getName(), nodeListAtB.get(1).getNodeName());
+        assertEquals(bNode.getName(), nodeListAtB.get(2).getNodeName());
+        assertEquals(aNode.getName(), nodeListAtB.get(3).getNodeName());
+        assertEquals(bNode.getName(), nodeListAtB.get(4).getNodeName());
+        assertEquals(endNode.getName(), nodeListAtB.get(5).getNodeName());
+
+        // 历史含退回记录与 a 再次提交记录；当前 b 审批中；后续为结束节点（待审批）
+        assertEquals(ProcessNode.ApproveState.PASS, nodeListAtB.get(1).getApproveState());
+        assertEquals(ProcessNode.ApproveState.PASS, nodeListAtB.get(2).getApproveState());
+        assertEquals(ProcessNode.ApproveState.PASS, nodeListAtB.get(3).getApproveState());
+        assertEquals(ProcessNode.ApproveState.PROCESSING, nodeListAtB.get(4).getApproveState());
+        assertEquals(ProcessNode.ApproveState.PENDING, nodeListAtB.get(5).getApproveState());
+
+        System.out.println("b 视角流程节点顺序：" + nodeListAtB.stream()
+                .map(n -> n.getNodeName() + "[" + n.getApproveState() + "]").toList());
     }
 
 
@@ -2776,8 +3155,9 @@ class FlowSampleServiceTest {
         factory.flowService.action(bossRequest);
 
         List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
-        assertEquals(3, records.size());
-        assertEquals(3, records.stream().filter(FlowRecord::isFinish).toList().size());
+        // 撤销的记录不展示在流程记录中，故只包含开始记录与最新经理审批记录共 2 条
+        assertEquals(2, records.size());
+        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
 
     }
 
