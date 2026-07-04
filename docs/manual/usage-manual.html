@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flow Engine 使用手册</title>
+<style>
+  :root {
+    --c-bg: #ffffff; --c-fg: #1f2329; --c-muted: #6b7280; --c-border: #e5e7eb;
+    --c-primary: #2563eb; --c-primary-bg: #eff6ff; --c-accent: #7c3aed; --c-accent-bg: #f5f3ff;
+    --c-success: #059669; --c-warn: #d97706; --c-code-bg: #f8fafc; --c-code-border: #e2e8f0;
+    --c-table-stripe: #f9fafb; --c-block-bg: #fffbeb; --c-block-border: #fcd34d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC","Hiragino Sans GB","Microsoft YaHei", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--c-fg); background: var(--c-bg); line-height: 1.75; margin: 0 auto; padding: 0 20px 100px; max-width: 1080px;
+  }
+  h1 { font-size: 2rem; border-bottom: 3px solid var(--c-primary); padding-bottom: 12px; margin-top: 40px; }
+  h2 { font-size: 1.5rem; margin-top: 48px; border-left: 5px solid var(--c-primary); padding-left: 12px; }
+  h3 { font-size: 1.2rem; margin-top: 32px; color: var(--c-accent); }
+  h4 { font-size: 1.05rem; margin-top: 24px; }
+  p, li { font-size: 15px; }
+  a { color: var(--c-primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: "JetBrains Mono","Fira Code",SFMono-Regular,Consolas,monospace; background: var(--c-code-bg); border: 1px solid var(--c-code-border); border-radius: 4px; padding: 1px 6px; font-size: 13px; color: #be185d; }
+  pre { background: var(--c-code-bg); border: 1px solid var(--c-code-border); border-radius: 8px; padding: 16px 18px; overflow-x: auto; font-size: 13px; line-height: 1.6; }
+  pre code { background: none; border: none; padding: 0; color: #0f172a; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--c-border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: var(--c-primary-bg); color: #1e3a8a; font-weight: 600; }
+  tr:nth-child(even) td { background: var(--c-table-stripe); }
+  .tip, .warn, .note { border-radius: 8px; padding: 12px 16px; margin: 16px 0; font-size: 14px; }
+  .tip { background: var(--c-primary-bg); border-left: 4px solid var(--c-primary); }
+  .warn { background: var(--c-block-bg); border-left: 4px solid var(--c-block-border); }
+  .note { background: var(--c-accent-bg); border-left: 4px solid var(--c-accent); }
+  figure { margin: 24px 0; text-align: center; }
+  figure img { max-width: 100%; height: auto; border: 1px solid var(--c-border); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  figure.mobile-shot img { max-width: 360px; }
+  figcaption { margin-top: 8px; font-size: 13px; color: var(--c-muted); }
+  .toc { background: var(--c-code-bg); border: 1px solid var(--c-code-border); border-radius: 10px; padding: 16px 28px; margin: 24px 0; }
+  .toc a { color: var(--c-fg); }
+  .toc > h3 { margin-top: 0; color: var(--c-primary); }
+  .steps { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps > li { counter-increment: step; position: relative; padding: 8px 0 8px 42px; }
+  .steps > li::before { content: counter(step); position: absolute; left: 0; top: 8px; width: 28px; height: 28px; background: var(--c-primary); color: #fff; border-radius: 50%; text-align: center; line-height: 28px; font-size: 13px; font-weight: 700; }
+  .capability-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap: 12px; margin: 16px 0; }
+  .card { border: 1px solid var(--c-border); border-radius: 8px; padding: 12px; background: #fff; }
+  .card h5 { margin: 0 0 6px; font-size: 14px; color: var(--c-primary); }
+  .card p { margin: 0; font-size: 13px; color: var(--c-muted); }
+  .pill { display:inline-block; font-size:12px; padding:1px 8px; border-radius:10px; background:#dcfce7; color:#166534; margin-left:6px;}
+  .img-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .img-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<h1>Flow Engine 使用手册</h1>
+
+<p>本手册从<strong>前端功能操作视角</strong>介绍 Flow Engine 的能力与使用方式，面向业务用户、前端开发与实施人员。内容涵盖 PC 端首页导航、流程设计、待办中心、流程审批，以及移动端的待办与审批操作，所有界面均配以真实截图说明。</p>
+
+<div class="tip">本手册基于官方示例应用 <code>app-pc</code>（PC 端）与 <code>app-mobile</code>（移动端）描述操作。后端需已按 <a href="integration-manual.html">集成手册</a> 完成集成并启动，截图存放于 <code>docs/manual/screenshot/</code> 目录。</div>
+
+<div class="toc">
+  <h3>目录</h3>
+  <ol>
+    <li><a href="#overview">系统能力总览</a></li>
+    <li><a href="#home">PC 端首页与导航</a></li>
+    <li><a href="#design-list">流程设计：流程列表</a></li>
+    <li><a href="#design-base">流程设计：基本信息与更多参数</a></li>
+    <li><a href="#design-canvas">流程设计：流程画布编排</a></li>
+    <li><a href="#design-node">流程设计：节点面板配置</a></li>
+    <li><a href="#design-form">流程设计：表单设计</a></li>
+    <li><a href="#design-version">流程设计：版本管理与发布</a></li>
+    <li><a href="#todo-pc">待办中心（PC）</a></li>
+    <li><a href="#start-flow">发起流程与审批意见填写</a></li>
+    <li><a href="#flow-detail">流程中心：流程详情</a></li>
+    <li><a href="#actions">8 种审批动作操作</a></li>
+    <li><a href="#user-mgr">用户管理</a></li>
+    <li><a href="#mobile">移动端操作</a></li>
+    <li><a href="#faq">常见问题</a></li>
+  </ol>
+</div>
+
+<h2 id="overview">1. 系统能力总览</h2>
+
+<p>Flow Engine 提供端到端的工作流能力，从前端操作视角分为以下功能域：</p>
+
+<div class="capability-grid">
+  <div class="card"><h5>流程设计</h5><p>流程列表、基本信息、流程画布编排、节点配置、表单设计、版本管理</p></div>
+  <div class="card"><h5>待办中心</h5><p>我的待办、我的已办、全部流程、发起流程，各列表点击进入详情/审批</p></div>
+  <div class="card"><h5>流程中心</h5><p>流程详情、流程记录轨迹、审批意见填写、8 种审批动作</p></div>
+  <div class="card"><h5>移动审批</h5><p>移动端首页、待办/已办/全部、流程申请与审批、流程详情</p></div>
+  <div class="card"><h5>用户管理</h5><p>用户与流程管理员维护</p></div>
+  <div class="card"><h5>导入导出</h5><p>流程定义 JSON 导入/导出，跨环境迁移</p></div>
+</div>
+
+<h3>1.1 19 种节点类型</h3>
+<table>
+  <tr><th>分类</th><th>节点</th><th>用途</th></tr>
+  <tr><td>起止</td><td>START / END</td><td>流程开始 / 结束</td></tr>
+  <tr><td>人工</td><td>APPROVAL / HANDLE</td><td>审批节点 / 办理节点</td></tr>
+  <tr><td>分支-条件</td><td>CONDITION / CONDITION_BRANCH / CONDITION_ELSE_BRANCH</td><td>互斥条件分支（满足一个走一个）</td></tr>
+  <tr><td>分支-包容</td><td>INCLUSIVE / INCLUSIVE_BRANCH / INCLUSIVE_ELSE_BRANCH</td><td>可同时满足多分支</td></tr>
+  <tr><td>分支-并行</td><td>PARALLEL / PARALLEL_BRANCH</td><td>所有分支并行执行</td></tr>
+  <tr><td>分支-人工</td><td>MANUAL / MANUAL_BRANCH</td><td>人工选择走哪条分支</td></tr>
+  <tr><td>路由</td><td>ROUTER</td><td>Groovy 脚本决定下一节点</td></tr>
+  <tr><td>其他</td><td>NOTIFY / DELAY / SUB_PROCESS / TRIGGER</td><td>抄送 / 延时 / 子流程 / 触发</td></tr>
+</table>
+
+<h3>1.2 8 种审批动作</h3>
+<table>
+  <tr><th>动作</th><th>类型</th><th>操作效果</th></tr>
+  <tr><td>通过</td><td>PASS</td><td>流程继续向下流转</td></tr>
+  <tr><td>拒绝</td><td>REJECT</td><td>按拒绝配置结束或退回</td></tr>
+  <tr><td>退回</td><td>RETURN</td><td>退回到指定历史节点</td></tr>
+  <tr><td>转办</td><td>TRANSFER</td><td>转给他人审批，自己不再处理</td></tr>
+  <tr><td>委派</td><td>DELEGATE</td><td>委派他人审批，其完成回到自己</td></tr>
+  <tr><td>加签</td><td>ADD_AUDIT</td><td>增加会签人</td></tr>
+  <tr><td>保存</td><td>SAVE</td><td>暂存表单，不触发流转</td></tr>
+  <tr><td>自定义</td><td>CUSTOM</td><td>自定义按钮，脚本驱动</td></tr>
+</table>
+
+<h2 id="home">2. PC 端首页与导航</h2>
+
+<p>PC 端（app-pc）登录后进入首页，首页以导航卡片形式展示各功能入口，点击进入对应模块。</p>
+
+<figure>
+  <img src="screenshot/pc/首页.png" alt="PC 端首页">
+  <figcaption>图 2-1 PC 端首页：流程设计、待办中心、流程演练等功能入口</figcaption>
+</figure>
+
+<table>
+  <tr><th>导航入口</th><th>功能</th></tr>
+  <tr><td>流程设计</td><td>进入流程定义列表，编排/配置/发布流程</td></tr>
+  <tr><td>待办中心</td><td>我的待办 / 我的已办 / 全部流程 / 发起流程</td></tr>
+  <tr><td>流程演练</td><td>Mock 实例管理，无真实库演练流程</td></tr>
+  <tr><td>用户管理</td><td>用户与流程管理员维护</td></tr>
+</table>
+
+<div class="note">审批与流程详情页为隐藏路由，不直接出现在首页导航，而是由待办中心点击具体记录后携带参数进入。</div>
+
+<h2 id="design-list">3. 流程设计：流程列表</h2>
+
+<p>从首页进入 <strong>流程设计</strong>，首先看到流程定义列表，展示已存在的流程定义，可新建、编辑、删除、启停、导入导出。</p>
+
+<figure>
+  <img src="screenshot/pc/流程设计列表.png" alt="流程设计列表">
+  <figcaption>图 3-1 流程设计列表：管理已有流程定义，点击进入设计器</figcaption>
+</figure>
+
+<h3>3.1 操作步骤</h3>
+<ol class="steps">
+  <li>首页点击 <strong>流程设计</strong> 进入流程列表</li>
+  <li>点击 <strong>新建</strong> 创建空流程定义（含默认开始/结束节点），进入设计器</li>
+  <li>或在列表点击已有流程的 <strong>编辑</strong>，加载流程定义进入设计器</li>
+  <li>列表支持启用/停用（<code>/api/cmd/workflow/changeState</code>）、删除（<code>/api/cmd/workflow/remove</code>）</li>
+</ol>
+
+<h2 id="design-base">4. 流程设计：基本信息与更多参数</h2>
+
+<p>进入设计器后，首先配置流程的基本信息（标题、编码、分类等），需要更深入配置时展开"更多参数"。</p>
+
+<div class="img-row">
+  <figure>
+    <img src="screenshot/pc/流程设计-基本信息.png" alt="流程设计-基本信息">
+    <figcaption>图 4-1 基本信息：流程标题、编码等</figcaption>
+  </figure>
+  <figure>
+    <img src="screenshot/pc/流程设计-更多参数.png" alt="流程设计-更多参数">
+    <figcaption>图 4-2 更多参数：流程级策略与扩展配置</figcaption>
+  </figure>
+</div>
+
+<h3>4.1 操作步骤</h3>
+<ol class="steps">
+  <li>在设计器左侧/顶部切换到 <strong>基本信息</strong> 面板，填写流程标题、编码</li>
+  <li>需要配置流程级策略（如记录合并、超时、催办间隔、驳回配置等）时展开 <strong>更多参数</strong></li>
+  <li>填写完成后保存（详见"版本管理与发布"章节）</li>
+</ol>
+
+<h2 id="design-canvas">5. 流程设计：流程画布编排</h2>
+
+<p>流程画布是设计器的核心，基于 @flowgram.ai 固定布局编辑器，支持拖拽节点、连线编排流程。19 种节点从节点库拖入画布。</p>
+
+<figure>
+  <img src="screenshot/pc/流程设计-流程设计-流程画布.png" alt="流程画布编排">
+  <figcaption>图 5-1 流程画布：左侧节点库 + 中间画布拖拽编排 + 连线</figcaption>
+</figure>
+
+<h3>5.1 编排操作步骤</h3>
+<ol class="steps">
+  <li>从节点库 <strong>拖拽</strong> 节点到画布，节点会按固定布局自动排列并连线</li>
+  <li>点击节点 <strong>选中</strong>，右侧/节点面板展示该节点配置（见下一节）</li>
+  <li>分支类节点（条件/包容/并行/人工）会自动带出对应 block 子节点，可调整分支数量</li>
+  <li>使用 <strong>迷你地图</strong> 快速定位，支持缩放/平移画布</li>
+  <li>编排完成进入节点面板逐个配置节点属性，再保存</li>
+</ol>
+
+<div class="note">每个节点的 meta 控制其行为：起始/结束节点禁止删除；分支节点禁止展开/复制等。这些约束由 node-registry 元数据定义，编辑器自动执行。</div>
+
+<h2 id="design-node">6. 流程设计：节点面板配置</h2>
+
+<p>选中画布上的节点后，节点面板展示该节点的配置，包括节点基本信息、按钮配置（启用哪些审批动作）、权限配置（表单字段权限、审批人加载方式等）。</p>
+
+<div class="img-row">
+  <figure>
+    <img src="screenshot/pc/流程设计-流程设计-节点面板.png" alt="节点面板">
+    <figcaption>图 6-1 节点面板：节点基本信息</figcaption>
+  </figure>
+  <figure>
+    <img src="screenshot/pc/流程设计-流程设计-节点面板-按钮配置.png" alt="节点面板-按钮配置">
+    <figcaption>图 6-2 按钮配置：为节点启用通过/拒绝/退回/转办/委派/加签等动作</figcaption>
+  </figure>
+</div>
+
+<figure>
+  <img src="screenshot/pc/流程设计-流程设计-节点面板-权限配置.png" alt="节点面板-权限配置">
+  <figcaption>图 6-3 权限配置：表单字段权限（必填/可编辑/只读/隐藏）、审批人加载方式</figcaption>
+</figure>
+
+<h3>6.1 节点可配置项</h3>
+<table>
+  <tr><th>配置项</th><th>适用节点</th><th>说明</th></tr>
+  <tr><td>节点标题</td><td>全部</td><td>展示名称</td></tr>
+  <tr><td>按钮配置（动作启用）</td><td>APPROVAL/HANDLE</td><td>勾选启用 8 种动作（PASS/REJECT/RETURN/TRANSFER/DELEGATE/ADD_AUDIT/SAVE/CUSTOM）</td></tr>
+  <tr><td>审批人加载方式</td><td>APPROVAL/HANDLE</td><td>三种：SCRIPT（脚本，默认）/ INITIATOR_SELECT（发起人指定）/ APPROVER_SELECT（当前审批人为下游指定）</td></tr>
+  <tr><td>表单字段权限</td><td>APPROVAL/HANDLE</td><td>每字段必填/可编辑/只读/隐藏</td></tr>
+  <tr><td>记录合并</td><td>APPROVAL/HANDLE</td><td>会签/或签时合并多条待办</td></tr>
+  <tr><td>审批意见必填 / 签名必填</td><td>APPROVAL</td><td>通过/拒绝是否必须填写意见或签名</td></tr>
+  <tr><td>超时 / 催办间隔</td><td>APPROVAL</td><td>超时策略与催办间隔</td></tr>
+  <tr><td>路由目标 / 条件表达式</td><td>ROUTER / CONDITION_BRANCH</td><td>Groovy 脚本返回下一节点 / 布尔</td></tr>
+  <tr><td>子流程编码 / 触发配置</td><td>SUB_PROCESS / TRIGGER</td><td>触发哪条子流程 / 触发外部动作</td></tr>
+</table>
+
+<div class="tip">动作按钮在前端由 <strong>ActionFactory</strong> 工厂渲染。节点面板"按钮配置"中勾选的动作，会出现在该节点审批人的审批页底部按钮区。</div>
+
+<h2 id="design-form">7. 流程设计：表单设计</h2>
+
+<p>表单设计用于定义流程的业务表单字段（如请假的天数、事由）。可新增字段、编辑字段属性、调整排序。表单字段在发起流程与审批时由表单引擎渲染。</p>
+
+<div class="img-row">
+  <figure>
+    <img src="screenshot/pc/流程设计-表单设计.png" alt="表单设计">
+    <figcaption>图 7-1 表单设计：字段列表与新增</figcaption>
+  </figure>
+  <figure>
+    <img src="screenshot/pc/流程设计-表单设计-编辑字段.png" alt="表单设计-编辑字段">
+    <figcaption>图 7-2 编辑字段：字段名、类型、必填等属性</figcaption>
+  </figure>
+</div>
+
+<h3>7.1 操作步骤</h3>
+<ol class="steps">
+  <li>在设计器切换到 <strong>表单设计</strong> 面板</li>
+  <li>点击 <strong>新增字段</strong>，选择字段类型（string/integer/long/date/boolean 等，由 form-engine 注册）</li>
+  <li>填写字段标识、标题、是否必填，可拖拽调整字段顺序</li>
+  <li>字段定义后，在节点面板的"权限配置"中按节点控制每个字段的必填/可编辑/只读/隐藏</li>
+</ol>
+
+<div class="note">表单引擎（@coding-form/form-engine）支持通过 <code>registerFormItems()</code> 注册自定义字段类型，业务方可扩展自定义表单项。</div>
+
+<h2 id="design-version">8. 流程设计：版本管理与发布</h2>
+
+<p>流程定义支持多版本，便于不停机迭代。设计完成后保存为新版本并发布启用。</p>
+
+<figure>
+  <img src="screenshot/pc/流程设计-版本列表.png" alt="版本列表">
+  <figcaption>图 8-1 版本列表：管理流程的多个版本，切换启用版本</figcaption>
+</figure>
+
+<table>
+  <tr><th>操作</th><th>说明</th></tr>
+  <tr><td>保存新版本</td><td>设计器保存时输入版本名，创建新版本并设为当前启用</td></tr>
+  <tr><td>切换版本</td><td>版本列表中选择版本切换启用（<code>/api/cmd/workflow/changeVersion</code>），新发起流程走该版本</td></tr>
+  <tr><td>修改版本名</td><td><code>/api/cmd/workflow/updateVersionName</code></td></tr>
+  <tr><td>删除版本</td><td><code>/api/cmd/workflow/deleteVersion</code></td></tr>
+  <tr><td>导入/导出</td><td>设计器导出 JSON 文件，或上传 JSON 导入（<code>/api/cmd/workflow/import</code>）</td></tr>
+</table>
+
+<h2 id="todo-pc">9. 待办中心（PC）</h2>
+
+<p>待办中心聚合 <strong>我的待办 / 我的已办 / 全部流程</strong> 三类记录，并提供 <strong>发起流程</strong> 入口。</p>
+
+<div class="img-row">
+  <figure>
+    <img src="screenshot/pc/待办中心-我的待办.png" alt="我的待办">
+    <figcaption>图 9-1 我的待办：当前待我审批的流程</figcaption>
+  </figure>
+  <figure>
+    <img src="screenshot/pc/待办中心-我的已办.png" alt="我的已办">
+    <figcaption>图 9-2 我的已办：我已处理过的流程</figcaption>
+  </figure>
+</div>
+
+<figure>
+  <img src="screenshot/pc/待办中心-全部流程.png" alt="全部流程">
+  <figcaption>图 9-3 全部流程：所有流程实例总览</figcaption>
+</figure>
+
+<h3>9.1 操作步骤</h3>
+<ol class="steps">
+  <li>首页点击 <strong>待办中心</strong>，默认进入"我的待办"</li>
+  <li>切换 Tab 查看 我的已办 / 全部流程（分别调用 <code>/api/query/record/{done,list}</code>）</li>
+  <li>在"我的待办"点击某条记录 → 进入流程审批页，填写审批意见后执行动作</li>
+  <li>在"我的已办/全部流程"点击记录 → 进入流程详情查看（只读）</li>
+  <li>点击 <strong>发起流程</strong> → 选择流程定义 → 填写表单发起（见下节）</li>
+</ol>
+
+<h2 id="start-flow">10. 发起流程与审批意见填写</h2>
+
+<p>待办中心的"发起流程"入口用于发起新的流程实例：选择流程定义后填写表单并提交。</p>
+
+<figure>
+  <img src="screenshot/pc/待办中心-发起流程.png" alt="发起流程">
+  <figcaption>图 10-1 发起流程：选择流程定义并填写发起表单</figcaption>
+</figure>
+
+<p>审批人在"我的待办"中点击记录进入审批页，填写审批意见后选择动作（通过/拒绝/退回等）。</p>
+
+<table>
+  <tr><th>场景</th><th>操作</th><th>对应接口</th></tr>
+  <tr><td>发起流程</td><td>选流程 → 填表单 → 提交（发起动作通常为开始节点的通过）</td><td><code>POST /api/cmd/record/create</code></td></tr>
+  <tr><td>执行审批动作</td><td>填审批意见/签名 → 选退回节点/转办人等 → 点击动作按钮</td><td><code>POST /api/cmd/record/action</code></td></tr>
+  <tr><td>撤销/催办/删除</td><td>发起人可撤销/催办；仅开始节点可删除</td><td><code>/api/cmd/record/{revoke,urge,delete}</code></td></tr>
+</table>
+
+<h2 id="flow-detail">11. 流程中心：流程详情</h2>
+
+<p>流程详情展示一条流程实例的完整信息：业务表单、流程记录轨迹（已流转节点、当前节点、各节点的审批人与意见）。</p>
+
+<figure>
+  <img src="screenshot/pc/流程中心-流程详情.png" alt="流程详情">
+  <figcaption>图 11-1 流程中心-流程详情：表单内容 + 流程记录轨迹</figcaption>
+</figure>
+
+<h3>11.1 流程记录轨迹</h3>
+<p>流程详情中的"流程记录/流程轨迹"展示每个节点的处理状态、处理人、处理时间、审批意见。审批人在审批页填写意见后，意见会记录在轨迹中。</p>
+
+<table>
+  <tr><th>三类核心记录</th><th>职责</th></tr>
+  <tr><td>FlowRecord</td><td>流程执行记录（TODO/DONE 状态）</td></tr>
+  <tr><td>FlowTodoRecord</td><td>待办记录</td></tr>
+  <tr><td>FlowTodoMerge</td><td>待办合并关系（开启合并时产生）</td></tr>
+</table>
+<div class="note">保存顺序：saveRecords → saveTodoMargeRecords → removeTodoMergeRecords，保证三者一致；删除顺序：合并关系 → 待办 → 流程记录。</div>
+
+<h2 id="actions">12. 8 种审批动作操作</h2>
+
+<p>审批人在审批页底部看到由节点"按钮配置"决定的可执行动作按钮：</p>
+
+<table>
+  <tr><th>动作</th><th>操作步骤</th></tr>
+  <tr><td>通过 PASS</td><td>填写（必填）审批意见/签名 → 点击通过 → 流程向下一节点流转</td></tr>
+  <tr><td>拒绝 REJECT</td><td>填写意见 → 拒绝 → 按配置结束流程或退回</td></tr>
+  <tr><td>退回 RETURN</td><td>选择退回目标节点（只能退回历史 START/APPROVAL/HANDLE，不能退回当前/后续/结束节点）→ 填意见 → 退回</td></tr>
+  <tr><td>转办 TRANSFER</td><td>选择转办人员 → 流程转给他人，自己不再处理</td></tr>
+  <tr><td>委派 DELEGATE</td><td>选择委派人员 → 他人审批通过后流程回到自己</td></tr>
+  <tr><td>加签 ADD_AUDIT</td><td>选择加签人员 → 增加会签人，会签完成后继续</td></tr>
+  <tr><td>保存 SAVE</td><td>暂存当前表单与意见，不触发流转</td></tr>
+  <tr><td>自定义 CUSTOM</td><td>触发节点配置的脚本/前端事件</td></tr>
+</table>
+
+<h3>12.1 人工分支选择</h3>
+<p>当流程流转到 <strong>MANUAL</strong> 节点，点击通过后引擎不立即流转，返回可选分支列表（<code>responseType: MANUAL_NODE_SELECT</code>）。前端弹出让用户选择走哪条分支，把选中的 <code>manualNodeId</code> 放入 advice 再次提交。</p>
+
+<h3>12.2 为下游节点指定审批人</h3>
+<p>对于 <strong>APPROVER_SELECT</strong> 模式的下游节点，审批人在通过时需在 <code>operatorSelectMap</code> 中为其指定审批人；<strong>INITIATOR_SELECT</strong> 模式则由发起人在发起流程时指定。</p>
+
+<h2 id="user-mgr">13. 用户管理</h2>
+
+<p>用户管理用于维护系统用户与流程管理员（<code>isFlowManager</code>），审批人由 <code>FlowOperatorGateway</code> 按用户体系加载。</p>
+
+<figure>
+  <img src="screenshot/pc/用户管理.png" alt="用户管理">
+  <figcaption>图 13-1 用户管理：用户与流程管理员维护</figcaption>
+</figure>
+
+<div class="tip">流程管理员（isFlowManager=true）可进行流程强制干预，并可作为 Mock 模式的创建者（<code>/api/cmd/workflow/mock</code> 需流程管理员权限）。</div>
+
+<h2 id="mobile">14. 移动端操作</h2>
+
+<p>app-mobile 提供精简的移动审批能力（无流程设计器，设计在 PC 完成）。移动端首页与待办列表如下：</p>
+
+<div class="img-row">
+  <figure class="mobile-shot">
+    <img src="screenshot/mobile/首页.png" alt="移动端首页">
+    <figcaption>图 14-1 移动端首页</figcaption>
+  </figure>
+  <figure class="mobile-shot">
+    <img src="screenshot/mobile/待办中心-待办.png" alt="移动端待办">
+    <figcaption>图 14-2 待办中心-待办</figcaption>
+  </figure>
+</div>
+
+<div class="img-row">
+  <figure class="mobile-shot">
+    <img src="screenshot/mobile/待办中心-已办.png" alt="移动端已办">
+    <figcaption>图 14-3 待办中心-已办</figcaption>
+  </figure>
+  <figure class="mobile-shot">
+    <img src="screenshot/mobile/待办中心-全部.png" alt="移动端全部">
+    <figcaption>图 14-4 待办中心-全部</figcaption>
+  </figure>
+</div>
+
+<h3>14.1 流程申请与审批意见填写</h3>
+<p>移动端发起流程申请时填写表单，提交后生成流程记录；审批人在待办点击进入后填写审批意见。</p>
+
+<div class="img-row">
+  <figure class="mobile-shot">
+    <img src="screenshot/mobile/待办中心-流程申请-流程记录.png" alt="流程申请-流程记录">
+    <figcaption>图 14-5 流程申请-流程记录</figcaption>
+  </figure>
+  <figure class="mobile-shot">
+    <img src="screenshot/mobile/待办中心-流程申请-审批意见填写.png" alt="审批意见填写">
+    <figcaption>图 14-6 审批意见填写</figcaption>
+  </figure>
+</div>
+
+<h3>14.2 流程审批与详情</h3>
+<p>点击待办记录进入流程审批，可查看流程详情与流程记录，并执行动作。</p>
+
+<div class="img-row">
+  <figure class="mobile-shot">
+    <img src="screenshot/mobile/待办中心-流程审批-流程详情.png" alt="流程审批-流程详情">
+    <figcaption>图 14-7 流程审批-流程详情</figcaption>
+  </figure>
+  <figure class="mobile-shot">
+    <img src="screenshot/mobile/待办中心-流程详情-流程详情.png" alt="流程详情-流程详情">
+    <figcaption>图 14-8 流程详情-流程详情</figcaption>
+  </figure>
+</div>
+
+<figure class="mobile-shot">
+  <img src="screenshot/mobile/待办中心-流程详情-流程记录.png" alt="流程详情-流程记录">
+  <figcaption>图 14-9 流程详情-流程记录</figcaption>
+</figure>
+
+<h3>14.3 移动端操作步骤</h3>
+<ol class="steps">
+  <li>登录 → 进入首页，导航到待办中心</li>
+  <li>待办列表（待办/已办/全部 切换）点击卡片 → 进入流程审批页（携带 recordId、workflowCode）</li>
+  <li>查看流程详情与流程记录，填写审批意见</li>
+  <li>点击 通过/拒绝/退回 等动作按钮执行</li>
+  <li>审批完成自动返回列表</li>
+</ol>
+
+<h3>14.4 移动端特性</h3>
+<ul>
+  <li>使用 antd-mobile 组件，<code>flow-mobile-ui</code> 提供 TextIcon 等封装</li>
+  <li>ActionFactory 移动版返回适配移动交互的动作按钮</li>
+  <li>列表复用同一组件，按 type（todo/done/notify/list）切换 API</li>
+  <li>通过 <code>EventBus</code> 监听事件联动</li>
+</ul>
+
+<h2 id="faq">15. 常见问题</h2>
+
+<table>
+  <tr><th>问题</th><th>解答</th></tr>
+  <tr><td>审批时按钮只有部分？</td><td>动作按钮由节点"按钮配置"决定，在设计器节点面板勾选所需动作</td></tr>
+  <tr><td>退回节点选不到目标？</td><td>退回目标只能是历史 START/APPROVAL/HANDLE 节点，且不能是当前节点或其后续节点、不能是结束节点</td></tr>
+  <tr><td>表单字段不显示？</td><td>字段权限设为"隐藏"时不显示；字段类型需在 <code>registerFormItems</code> 中注册</td></tr>
+  <tr><td>发起流程选不到流程？</td><td>流程定义可能被停用，或没有已启用版本</td></tr>
+  <tr><td>审批人不对？</td><td>检查节点"审批人加载方式"与脚本；INITIATOR_SELECT 需发起时指定，APPROVER_SELECT 需上游指定</td></tr>
+  <tr><td>PC 与移动端功能差异？</td><td>PC 含流程设计与完整审批；移动端仅审批与查询，设计在 PC 完成</td></tr>
+  <tr><td>如何不登录调试？</td><td>请求加 <code>?operatorId=xxx</code> 指定操作者；用 <code>?mockKey=xxx</code> 走 Mock 实例</td></tr>
+  <tr><td>流程定义如何迁移？</td><td>设计器导出 JSON → 目标环境导入（<code>/api/cmd/workflow/import</code>）</td></tr>
+  <tr><td>自定义按钮怎么做？</td><td>通过 ActionFactory 注册 CUSTOM 类型组件 + 节点按钮配置启用 CUSTOM + 配置触发脚本</td></tr>
+</table>
+
+<hr>
+<p style="color:var(--c-muted);font-size:13px;">配套文档：<a href="integration-manual.html">集成手册（前后端集成+示例分析）</a> · <a href="README.md">文档入口</a> · 能力清单 <a href="../capabilities/index.md">capabilities</a> · 规范 <a href="../conventions/index.md">conventions</a></p>
+
+</body>
+</html>

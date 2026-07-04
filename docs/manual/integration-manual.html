@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flow Engine 集成手册</title>
+<style>
+  :root {
+    --c-bg: #ffffff;
+    --c-fg: #1f2329;
+    --c-muted: #6b7280;
+    --c-border: #e5e7eb;
+    --c-primary: #2563eb;
+    --c-primary-bg: #eff6ff;
+    --c-accent: #7c3aed;
+    --c-accent-bg: #f5f3ff;
+    --c-success: #059669;
+    --c-warn: #d97706;
+    --c-code-bg: #f8fafc;
+    --c-code-border: #e2e8f0;
+    --c-table-stripe: #f9fafb;
+    --c-block-bg: #fffbeb;
+    --c-block-border: #fcd34d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Hiragino Sans GB", "Microsoft YaHei", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--c-fg);
+    background: var(--c-bg);
+    line-height: 1.75;
+    margin: 0;
+    padding: 0 20px 100px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 2rem; border-bottom: 3px solid var(--c-primary); padding-bottom: 12px; margin-top: 40px; }
+  h2 { font-size: 1.5rem; margin-top: 48px; border-left: 5px solid var(--c-primary); padding-left: 12px; }
+  h3 { font-size: 1.2rem; margin-top: 32px; color: var(--c-accent); }
+  h4 { font-size: 1.05rem; margin-top: 24px; }
+  p, li { font-size: 15px; }
+  a { color: var(--c-primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: "JetBrains Mono", "Fira Code", SFMono-Regular, Consolas, monospace;
+    background: var(--c-code-bg);
+    border: 1px solid var(--c-code-border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 13px;
+    color: #be185d;
+  }
+  pre {
+    background: var(--c-code-bg);
+    border: 1px solid var(--c-code-border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  pre code { background: none; border: none; padding: 0; color: #0f172a; }
+  table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--c-border); padding: 8px 12px; text-align: left; vertical-align: top; }
+  th { background: var(--c-primary-bg); color: #1e3a8a; font-weight: 600; }
+  tr:nth-child(even) td { background: var(--c-table-stripe); }
+  .tip, .warn, .note { border-radius: 8px; padding: 12px 16px; margin: 16px 0; font-size: 14px; }
+  .tip { background: var(--c-primary-bg); border-left: 4px solid var(--c-primary); }
+  .warn { background: var(--c-block-bg); border-left: 4px solid var(--c-block-border); }
+  .note { background: var(--c-accent-bg); border-left: 4px solid var(--c-accent); }
+  .tag { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 10px; margin-right: 6px; vertical-align: middle; }
+  .tag-be { background: #dbeafe; color: #1e40af; }
+  .tag-fe { background: #fce7f3; color: #9d174d; }
+  .tag-pkg { background: #dcfce7; color: #166534; }
+  .svg-wrap { text-align: center; margin: 24px 0; }
+  .svg-wrap svg { max-width: 100%; height: auto; }
+  .toc { background: var(--c-code-bg); border: 1px solid var(--c-code-border); border-radius: 10px; padding: 16px 28px; margin: 24px 0; }
+  .toc ol { margin: 6px 0; }
+  .toc a { color: var(--c-fg); }
+  .toc > h3 { margin-top: 0; color: var(--c-primary); }
+  .checklist { list-style: none; padding-left: 4px; }
+  .checklist li { padding: 4px 0; }
+  .checklist li::before { content: "☐ "; color: var(--c-primary); font-weight: bold; }
+  .layer-box { display: inline-block; border-radius: 8px; padding: 4px 10px; font-size: 13px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<h1>Flow Engine 集成手册</h1>
+
+<p>本手册面向后端与前端开发者，完整介绍如何将 Flow Engine（后端）与 flow-frontend（前端框架）集成到一个企业项目中。涵盖后端 Spring Boot 集成、前端 packages 集成能力、插件扩展机制，以及基于官方示例（后端 <code>flow-engine-example</code>、前端 <code>app-pc</code> / <code>app-mobile</code>）的集成分析。</p>
+
+<div class="tip"><strong>适用版本</strong>：后端 <code>0.0.52</code>（Java 17 / Spring Boot 3.5.9）；前端 <code>0.0.52</code>（React 18 / TypeScript 5 / pnpm 10 monorepo）。</div>
+
+<div class="toc">
+  <h3>目录</h3>
+  <ol>
+    <li><a href="#overview">整体架构与前后端关系</a></li>
+    <li><a href="#be-deps">后端：引入依赖</a></li>
+    <li><a href="#be-config">后端：配置与数据库适配</a></li>
+    <li><a href="#be-interfaces">后端：必需实现的接口</a></li>
+    <li><a href="#be-extends">后端：扩展点（事件/策略/动作/脚本）</a></li>
+    <li><a href="#fe-overview">前端：模块分层与 packages 全景</a></li>
+    <li><a href="#fe-core">前端：flow-core 基础能力集成</a></li>
+    <li><a href="#fe-design">前端：流程设计器集成（flow-design）</a></li>
+    <li><a href="#fe-approval">前端：审批组件集成（flow-pc / flow-mobile approval）</a></li>
+    <li><a href="#fe-form">前端：表单引擎集成（form-engine）</a></li>
+    <li><a href="#fe-plugins">前端：插件与扩展机制总览</a></li>
+    <li><a href="#example-be">示例分析一：后端 flow-engine-example</a></li>
+    <li><a href="#example-pc">示例分析二：前端 app-pc</a></li>
+    <li><a href="#example-mobile">示例分析三：前端 app-mobile</a></li>
+    <li><a href="#fullstack">全栈集成最佳实践</a></li>
+    <li><a href="#checklist">集成验证清单</a></li>
+  </ol>
+</div>
+
+<h2 id="overview">1. 整体架构与前后端关系</h2>
+
+<p>Flow Engine 采用前后端分离架构：</p>
+<ul>
+  <li><strong>后端</strong>（本仓库根目录）：Spring Boot 引擎，提供流程定义存储、流转、待办、查询等 REST API。</li>
+  <li><strong>前端</strong>（<code>flow-frontend/</code> 子目录）：基于 React 的前端框架，提供流程设计器、PC/移动端审批组件、动态表单等可复用 packages，以及两个示例应用 <code>app-pc</code> / <code>app-mobile</code>。</li>
+</ul>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 980 480" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'PingFang SC',sans-serif">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eff6ff"/><stop offset="1" stop-color="#dbeafe"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fce7f3"/><stop offset="1" stop-color="#fbcfe8"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dcfce7"/><stop offset="1" stop-color="#bbf7d0"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <!-- 后端层 -->
+  <rect x="40" y="40" width="900" height="160" rx="14" fill="url(#g1)" stroke="#3b82f6" stroke-width="1.5"/>
+  <text x="60" y="66" font-size="15" font-weight="700" fill="#1e3a8a">后端 Spring Boot（flow-engine）</text>
+
+  <rect x="60" y="84" width="170" height="96" rx="8" fill="#fff" stroke="#60a5fa"/>
+  <text x="145" y="106" text-anchor="middle" font-size="13" font-weight="600" fill="#1e40af">flow-engine-starter</text>
+  <text x="145" y="128" text-anchor="middle" font-size="11" fill="#475569">自动装配入口</text>
+  <text x="145" y="146" text-anchor="middle" font-size="11" fill="#475569">FlowService</text>
+  <text x="145" y="162" text-anchor="middle" font-size="11" fill="#475569">RepositoryHolder</text>
+
+  <rect x="250" y="84" width="170" height="96" rx="8" fill="#fff" stroke="#60a5fa"/>
+  <text x="335" y="106" text-anchor="middle" font-size="13" font-weight="600" fill="#1e40af">starter-infra</text>
+  <text x="335" y="128" text-anchor="middle" font-size="11" fill="#475569">JPA 实体/仓储</text>
+  <text x="335" y="146" text-anchor="middle" font-size="11" fill="#475569">达梦方言</text>
+
+  <rect x="440" y="84" width="170" height="96" rx="8" fill="#fff" stroke="#60a5fa"/>
+  <text x="525" y="106" text-anchor="middle" font-size="13" font-weight="600" fill="#1e40af">starter-api</text>
+  <text x="525" y="128" text-anchor="middle" font-size="11" fill="#475569">命令接口</text>
+  <text x="525" y="146" text-anchor="middle" font-size="11" fill="#475569">/api/cmd/**</text>
+
+  <rect x="630" y="84" width="170" height="96" rx="8" fill="#fff" stroke="#60a5fa"/>
+  <text x="715" y="106" text-anchor="middle" font-size="13" font-weight="600" fill="#1e40af">starter-query</text>
+  <text x="715" y="128" text-anchor="middle" font-size="11" fill="#475569">查询接口</text>
+  <text x="715" y="146" text-anchor="middle" font-size="11" fill="#475569">/api/query/**</text>
+
+  <rect x="820" y="84" width="110" height="96" rx="8" fill="#fff" stroke="#60a5fa" stroke-dasharray="4 3"/>
+  <text x="875" y="106" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">业务方实现</text>
+  <text x="875" y="126" text-anchor="middle" font-size="11" fill="#475569">FlowOperator</text>
+  <text x="875" y="142" text-anchor="middle" font-size="11" fill="#475569">Gateway</text>
+  <text x="875" y="158" text-anchor="middle" font-size="11" fill="#475569">UserContext</text>
+
+  <!-- 中间 REST API 连接线 -->
+  <line x1="490" y1="200" x2="490" y2="248" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="510" y1="248" x2="510" y2="200" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="540" y="232" font-size="11" fill="#475569">REST / JSON</text>
+
+  <!-- 前端层 -->
+  <rect x="40" y="250" width="900" height="190" rx="14" fill="url(#g2)" stroke="#ec4899" stroke-width="1.5"/>
+  <text x="60" y="276" font-size="15" font-weight="700" fill="#9d174d">前端 React（flow-frontend）</text>
+
+  <!-- 基础层 -->
+  <rect x="60" y="294" width="200" height="130" rx="8" fill="#fff" stroke="#f472b6"/>
+  <text x="160" y="314" text-anchor="middle" font-size="12" font-weight="600" fill="#9d174d">基础层</text>
+  <text x="70" y="334" font-size="11" fill="#475569">• flow-core（无UI）</text>
+  <text x="70" y="352" font-size="11" fill="#475569">• flow-types</text>
+  <text x="70" y="370" font-size="11" fill="#475569">• flow-icons</text>
+  <text x="70" y="388" font-size="11" fill="#475569">• flow-approval-presenter</text>
+  <text x="70" y="406" font-size="11" fill="#475569">• EventBus / HttpClient / Presenter</text>
+
+  <!-- PC -->
+  <rect x="280" y="294" width="300" height="130" rx="8" fill="#fff" stroke="#f472b6"/>
+  <text x="430" y="314" text-anchor="middle" font-size="12" font-weight="600" fill="#9d174d">PC 端 packages</text>
+  <text x="290" y="334" font-size="11" fill="#475569">• flow-pc-ui（antd 封装）</text>
+  <text x="290" y="352" font-size="11" fill="#475569">• flow-pc-form（表单渲染）</text>
+  <text x="290" y="370" font-size="11" fill="#475569">• flow-pc-approval（审批组件）</text>
+  <text x="290" y="388" font-size="11" fill="#475569">• flow-design（流程设计器）</text>
+  <text x="290" y="406" font-size="11" fill="#475569">  基于 @flowgram.ai</text>
+
+  <!-- Mobile -->
+  <rect x="600" y="294" width="150" height="130" rx="8" fill="#fff" stroke="#f472b6"/>
+  <text x="675" y="314" text-anchor="middle" font-size="12" font-weight="600" fill="#9d174d">移动端 packages</text>
+  <text x="610" y="334" font-size="11" fill="#475569">• flow-mobile-ui</text>
+  <text x="610" y="352" font-size="11" fill="#475569">• flow-mobile-form</text>
+  <text x="610" y="370" font-size="11" fill="#475569">• flow-mobile-approval</text>
+  <text x="770" y="314" text-anchor="middle" font-size="12" font-weight="600" fill="#9d174d">应用</text>
+  <text x="770" y="334" text-anchor="middle" font-size="11" fill="#475569">app-pc</text>
+  <text x="770" y="352" text-anchor="middle" font-size="11" fill="#475569">app-mobile</text>
+  <rect x="760" y="294" width="170" height="130" rx="8" fill="url(#g3)" stroke="#10b981" stroke-dasharray="4 3"/>
+  <text x="770" y="314" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">示例应用</text>
+  <text x="770" y="334" font-size="11" fill="#166534">app-pc（设计+审批）</text>
+  <text x="770" y="352" font-size="11" fill="#166534">app-mobile（移动审批）</text>
+
+  <text x="490" y="462" text-anchor="middle" font-size="12" fill="#6b7280">图 1：Flow Engine 前后端架构总览</text>
+</svg>
+</div>
+
+<h2 id="be-deps">2. 后端：引入依赖</h2>
+
+<h3>2.1 一站式引入（推荐）</h3>
+<p>业务项目通常只需引入 <code>flow-engine-starter</code>，它会传递依赖 framework、infra、api、query 四个子模块：</p>
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;com.codingapi.flow&lt;/groupId&gt;
+    &lt;artifactId&gt;flow-engine-starter&lt;/artifactId&gt;
+    &lt;version&gt;0.0.52&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+
+<p>starter 通过 Spring Boot 自动装配机制注册以下 <code>AutoConfiguration</code>：</p>
+<table>
+  <tr><th>自动配置类</th><th>来源模块</th><th>职责</th></tr>
+  <tr><td><code>com.codingapi.flow.AutoConfiguration</code></td><td>flow-engine-starter</td><td>注册 FlowService / WorkflowService / FlowRecordService / RepositoryHolderContext / 网关上下文 / 脚本上下文 / 延迟任务 Runner</td></tr>
+  <tr><td><code>com.codingapi.flow.infra.AutoConfiguration</code></td><td>flow-engine-starter-infra</td><td>注册 10 个 JPA 仓储实现，并通过 <code>FlowJpaPackageRegistrar</code> 注册 JPA 扫描包 <code>com.codingapi.flow.infra</code></td></tr>
+  <tr><td><code>com.codingapi.flow.api.AutoConfiguration</code></td><td>flow-engine-starter-api</td><td>扫描 <code>com.codingapi.flow.api</code>，注册命令类 Controller（<code>/api/cmd/**</code>）</td></tr>
+  <tr><td><code>com.codingapi.flow.query.AutoConfiguration</code></td><td>flow-engine-starter-query</td><td>扫描 <code>com.codingapi.flow.query</code>，注册查询类 Controller（<code>/api/query/**</code>）</td></tr>
+</table>
+
+<h3>2.2 按需引入</h3>
+<p>若只想使用部分能力（例如只接查询、不暴露命令 API），可分别引入对应子模块：<code>flow-engine-framework</code> / <code>flow-engine-starter-infra</code> / <code>flow-engine-starter-api</code> / <code>flow-engine-starter-query</code>。</p>
+<div class="note"><code>flow-engine-starter-infra</code> 依赖 <code>springboot-starter-data-fast</code>，会自动引入 Spring Data JPA。若项目已自行引入 JPA，注意依赖版本一致性。</div>
+
+<h2 id="be-config">3. 后端：配置与数据库适配</h2>
+
+<p>Flow Engine 无强制配置项，需保证 Spring Data JPA 配置正确：</p>
+<pre><code># 数据源（H2 示例）
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.url=jdbc:h2:file:./flow.db
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true</code></pre>
+
+<h4>达梦 DM 数据库适配</h4>
+<p>项目已内置达梦方言支持，参考 <code>flow-engine-example</code> 的 <code>application-dm.properties</code>：</p>
+<pre><code>spring.datasource.url=jdbc:dm://localhost:5236
+spring.datasource.username=SYSDBA
+spring.datasource.password=SYSDBA001
+spring.datasource.driverClassName=dm.jdbc.driver.DmDriver
+spring.jpa.properties.hibernate.dialect=com.codingapi.example.dialect.HydDmDialect
+# 需引入 DmJdbcDriver11 与 DmDialect-for-hibernate6.6</code></pre>
+<p>自定义方言 <code>HydDmDialect</code> 继承 Hibernate <code>Dialect</code>，针对达梦对 Hibernate 6.6 的部分语法做了修正。</p>
+
+<h2 id="be-interfaces">4. 后端：必需实现的接口</h2>
+
+<p>引擎领域模型与具体用户体系解耦，集成方< strong>必须</strong>实现以下两个接口，否则引擎无法识别"谁在操作流程"以及"如何加载审批人"。</p>
+
+<h3>4.1 IFlowOperator（流程参与用户）</h3>
+<p>业务系统的用户实体应实现该接口：</p>
+<pre><code>public interface IFlowOperator extends IUser {
+    long getUserId();
+    String getName();
+    boolean isFlowManager();                       // 是否流程管理员
+    IFlowOperator forwardOperator(GroovyScriptRequest request); // 动态转交审批人
+}</code></pre>
+
+<h3>4.2 FlowOperatorGateway（操作者防腐层）</h3>
+<p>这是引擎访问用户体系的唯一入口，需注册为 Spring Bean：<code>get(long id)</code> 与 <code>findByIds(List&lt;Long&gt; ids)</code>。此 Bean 由 starter 的 <code>GatewayContextRegister</code> 注入到 <code>GatewayContext</code> 单例，引擎在加载审批人/转办人/加签人时统一通过它查询。<strong>实现该 Bean 是后端集成成功的关键。</strong></p>
+
+<h3>4.3 当前操作者上下文</h3>
+<p>命令类 Controller 通过 <code>UserContext.getInstance().current()</code> 获取当前登录用户作为操作者。集成方需在鉴权过滤器中把认证后的 <code>IFlowOperator</code> 写入 <code>UserContext</code>（示例：<code>flow-engine-example/.../security/MyAuthenticationTokenFilter.java</code>）。调试时可在请求参数中传 <code>operatorId=123</code> 直接指定。</p>
+
+<h3>4.4 可选：脚本持久化 NodeViewJavaScriptRepository</h3>
+<p>节点中的路由/条件/表单权限逻辑由 Groovy 脚本驱动。脚本可内联在流程定义 JSON 中，也可独立持久化为命名脚本。若需后者，实现 <code>NodeViewJavaScriptRepository</code>（<code>save/delete/get</code>）并注册为 Bean，starter 的 <code>NodeViewJavaScriptCacheContextRegister</code> 会自动加载。</p>
+
+<h2 id="be-extends">5. 后端：扩展点</h2>
+
+<table>
+  <tr><th>扩展点</th><th>说明</th></tr>
+  <tr><td>事件订阅</td><td>实现 <code>IHandler&lt;E&gt;</code> 订阅 7 种事件：Start / Todo / Done / Finish / Urge / Revoke / Delete，自动被 Spring 扫描</td></tr>
+  <tr><td>节点策略</td><td>15+ 策略（OperatorLoad / RecordMerge / Revoke / Router / FormFieldPermission 等）由 <code>NodeStrategyManager</code> 持有，可扩展</td></tr>
+  <tr><td>自定义动作</td><td>8 种内置动作（PASS/REJECT/RETURN/TRANSFER/DELEGATE/ADD_AUDIT/SAVE/CUSTOM），扩展 <code>BaseAction</code> 实现新动作</td></tr>
+  <tr><td>自定义脚本注册</td><td><code>ScriptRegistryContext.getInstance().setRegistry(new CustomScriptRegistry())</code> 替换默认 Groovy 脚本</td></tr>
+</table>
+
+<h2 id="fe-overview">6. 前端：模块分层与 packages 全景</h2>
+
+<p>flow-frontend 是 pnpm monorepo，按"基础层 → PC/移动端组件 → 应用层"分层，跨 package 通过 <code>workspace:*</code> + 完整包名引用，<strong>禁止相对路径跨 package 引用</strong>。</p>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 980 400" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'PingFang SC',sans-serif">
+  <defs>
+    <linearGradient id="lb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fef3c7"/><stop offset="1" stop-color="#fde68a"/></linearGradient>
+    <linearGradient id="lp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dbeafe"/><stop offset="1" stop-color="#bfdbfe"/></linearGradient>
+    <linearGradient id="lm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fce7f3"/><stop offset="1" stop-color="#fbcfe8"/></linearGradient>
+    <linearGradient id="la" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dcfce7"/><stop offset="1" stop-color="#bbf7d0"/></linearGradient>
+  </defs>
+
+  <!-- 基础层 -->
+  <rect x="30" y="20" width="920" height="80" rx="10" fill="url(#lb)" stroke="#f59e0b"/>
+  <text x="50" y="44" font-size="14" font-weight="700" fill="#92400e">基础层（无业务 UI，可被任意端复用）</text>
+  <text x="50" y="68" font-size="12" fill="#475569">flow-core（EventBus · HttpClient · Presenter · ViewBindPlugin · GroovyFormatter）  ·  flow-types  ·  flow-icons  ·  flow-approval-presenter（Redux）</text>
+
+  <!-- PC -->
+  <rect x="30" y="120" width="450" height="160" rx="10" fill="url(#lp)" stroke="#3b82f6"/>
+  <text x="50" y="144" font-size="14" font-weight="700" fill="#1e3a8a">PC 端</text>
+  <rect x="50" y="158" width="190" height="50" rx="6" fill="#fff" stroke="#60a5fa"/>
+  <text x="145" y="178" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">flow-pc-ui</text>
+  <text x="145" y="196" text-anchor="middle" font-size="11" fill="#475569">antd 封装：Table/Drawer/Panel</text>
+  <rect x="250" y="158" width="210" height="50" rx="6" fill="#fff" stroke="#60a5fa"/>
+  <text x="355" y="178" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">flow-pc-form</text>
+  <text x="355" y="196" text-anchor="middle" font-size="11" fill="#475569">表单渲染（form-engine）</text>
+  <rect x="50" y="218" width="410" height="50" rx="6" fill="#fff" stroke="#60a5fa"/>
+  <text x="255" y="238" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">flow-pc-approval（审批组件 + ActionFactory）</text>
+  <text x="255" y="256" text-anchor="middle" font-size="11" fill="#475569">ApprovalPanelDrawer · FlowTitle · WorkflowSelectModal · FlowMock</text>
+
+  <rect x="30" y="300" width="450" height="80" rx="10" fill="#fff" stroke="#7c3aed" stroke-dasharray="5 3"/>
+  <text x="50" y="324" font-size="13" font-weight="700" fill="#6d28d9">flow-design（流程设计器）</text>
+  <text x="50" y="346" font-size="11" fill="#475569">依赖 flow-pc-ui + @flowgram.ai，19 种节点注册</text>
+  <text x="50" y="364" font-size="11" fill="#475569">design-panel · design-editor · design-import · plugins/view</text>
+
+  <!-- Mobile -->
+  <rect x="500" y="120" width="450" height="160" rx="10" fill="url(#lm)" stroke="#ec4899"/>
+  <text x="520" y="144" font-size="14" font-weight="700" fill="#9d174d">移动端</text>
+  <rect x="520" y="158" width="200" height="50" rx="6" fill="#fff" stroke="#f472b6"/>
+  <text x="620" y="178" text-anchor="middle" font-size="12" font-weight="600" fill="#9d174d">flow-mobile-ui</text>
+  <text x="620" y="196" text-anchor="middle" font-size="11" fill="#475569">antd-mobile 封装</text>
+  <rect x="730" y="158" width="200" height="50" rx="6" fill="#fff" stroke="#f472b6"/>
+  <text x="830" y="178" text-anchor="middle" font-size="12" font-weight="600" fill="#9d174d">flow-mobile-form</text>
+  <text x="830" y="196" text-anchor="middle" font-size="11" fill="#475569">移动表单渲染</text>
+  <rect x="520" y="218" width="410" height="50" rx="6" fill="#fff" stroke="#f472b6"/>
+  <text x="725" y="238" text-anchor="middle" font-size="12" font-weight="600" fill="#9d174d">flow-mobile-approval</text>
+  <text x="725" y="256" text-anchor="middle" font-size="11" fill="#475569">ApprovalPanel + ActionFactory（移动实现）</text>
+
+  <rect x="500" y="300" width="450" height="80" rx="10" fill="url(#la)" stroke="#10b981" stroke-dasharray="5 3"/>
+  <text x="520" y="324" font-size="13" font-weight="700" fill="#166534">应用层（示例）</text>
+  <text x="520" y="346" font-size="11" fill="#475569">app-pc：react-router + antd，集成 design + pc-approval + pc-form</text>
+  <text x="520" y="364" font-size="11" fill="#475569">app-mobile：react-router + antd-mobile，集成 mobile-approval</text>
+
+  <text x="490" y="394" text-anchor="middle" font-size="12" fill="#6b7280">图 2：flow-frontend 模块分层（箭头方向 = 依赖方向，上层依赖下层）</text>
+</svg>
+</div>
+
+<h3>外部依赖（非 workspace 包）</h3>
+<table>
+  <tr><th>包</th><th>版本</th><th>作用</th></tr>
+  <tr><td><code>@coding-form/form-engine</code></td><td>^0.0.18</td><td>表单引擎：FormView 渲染器、createFormInstance、registerFormItems 注册自定义字段</td></tr>
+  <tr><td><code>@coding-script/script-engine</code></td><td>^0.0.9</td><td>Groovy 脚本转换引擎（GroovyScriptConvertorUtil）</td></tr>
+  <tr><td><code>@flowgram.ai/fixed-layout-editor</code></td><td>1.0.8</td><td>固定布局流程编辑器框架，flow-design 基于其构建</td></tr>
+  <tr><td>antd / antd-mobile</td><td>6 / 5</td><td>PC 与移动端 UI 组件库</td></tr>
+</table>
+
+<h2 id="fe-core">7. 前端：flow-core 基础能力集成</h2>
+
+<p><code>flow-core</code> 是无 UI 的基础层，提供 5 个可被任意前端项目复用的能力：</p>
+
+<table>
+  <tr><th>能力</th><th>核心 API</th><th>集成用途</th></tr>
+  <tr><td><strong>event-bus</strong></td><td><code>EventBus.getInstance().on/emit/off(name, handler)</code></td><td>跨模块松耦合通信（设计器通知审批刷新、节点变更、表单状态同步）</td></tr>
+  <tr><td><strong>http-client</strong></td><td><code>new HttpClient(timeout, MessageBox, baseUrl?)</code>，<code>get/post/put/delete/page/download</code></td><td>统一 API 出口，自动 token 鉴权与刷新、分页参数 Base64 编码、文件下载</td></tr>
+  <tr><td><strong>presenter</strong></td><td><code>BasePresenter&lt;S,M&gt;</code> + <code>PresenterHooks.create()</code></td><td>业务逻辑与视图分离，桥接 React useState 自动同步 state</td></tr>
+  <tr><td><strong>view-bind-plugin</strong></td><td><code>ViewBindPlugin.getInstance().register(name, Comp) / get(name)</code></td><td>视图动态注册中心，设计器插件体系通过它注册节点视图/动作视图（运行时绑定而非硬编码）</td></tr>
+  <tr><td><strong>groovy-formatter</strong></td><td><code>GroovyFormatter</code> + <code>GroovyScriptConvertorUtil</code></td><td>Groovy 脚本格式化/压缩、自定义脚本标记与标题/元数据管理、return 表达式解析</td></tr>
+</table>
+
+<div class="tip"><strong>集成方式</strong>：<code>import { HttpClient, EventBus } from "@coding-flow/flow-core"</code>。HttpClient 是审批组件对接后端的默认出口，业务项目可复用同一实例或自建。</div>
+
+<h2 id="fe-design">8. 前端：流程设计器集成（flow-design）</h2>
+
+<p><code>flow-design</code> 是基于 <code>@flowgram.ai</code> 固定布局编辑器构建的业务流程设计器，提供完整的可视化编排能力。</p>
+
+<h3>8.1 核心能力</h3>
+<table>
+  <tr><th>能力</th><th>说明</th></tr>
+  <tr><td><strong>node-registry</strong></td><td>通过 <code>FlowNodeRegistry</code> 接口标准化定义并注册 19 种节点类型到 Flowgram 编辑器——13 主体节点（Start/End/Approval/Handle/Notify/Manual/Router/Trigger/Delay/SubProcess/Condition/Parallel/Inclusive）+ 6 分支 block 节点。每个节点带 meta（是否起始/结束、禁止删除/复制/添加/展开）</td></tr>
+  <tr><td><strong>manager-group</strong></td><td>设计面板管理器组，把业务逻辑从 Presenter 抽离为独立类：<code>WorkflowFormManager</code>（表单字段 CRUD 与排序）、<code>NodeConvertorManager</code>（API↔渲染数据互转）、<code>NodeManger</code>（节点查询）、<code>NodeRouterManager</code>（路由节点展示/返回节点列表）、<code>WorkflowStrategyManager</code>（流程策略配置）</td></tr>
+</table>
+
+<h3>8.2 主要导出</h3>
+<p><code>flow-design</code> 通过 <code>src/index.ts</code> 导出三大块：<code>design-panel</code>（设计面板，含节点列表、属性表单、版本管理、脚本编辑器、保存/导入/导出）、<code>design-import</code>（流程导入界面）、<code>plugins</code>（视图插件，如 Condition/Router 视图）。</p>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 820 360" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'PingFang SC',sans-serif">
+  <rect x="10" y="10" width="800" height="340" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+  <!-- 画布 -->
+  <rect x="30" y="40" width="380" height="290" rx="8" fill="#fff" stroke="#94a3b8"/>
+  <text x="40" y="62" font-size="13" font-weight="600" fill="#334155">设计画布（Flowgram 编辑器）</text>
+  <!-- start -->
+  <ellipse cx="120" cy="100" rx="36" ry="20" fill="#bbf7d0" stroke="#10b981"/>
+  <text x="120" y="105" text-anchor="middle" font-size="11" fill="#065f46">开始</text>
+  <line x1="120" y1="120" x2="120" y2="150" stroke="#64748b" marker-end="url(#arrow2)"/>
+  <!-- approval -->
+  <rect x="80" y="150" width="80" height="40" rx="6" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="120" y="174" text-anchor="middle" font-size="11" fill="#1e3a8a">审批</text>
+  <line x1="120" y1="190" x2="120" y2="220" stroke="#64748b" marker-end="url(#arrow2)"/>
+  <!-- condition -->
+  <polygon points="120,220 170,260 120,300 70,260" fill="#fef3c7" stroke="#f59e0b"/>
+  <text x="120" y="264" text-anchor="middle" font-size="11" fill="#92400e">条件</text>
+  <line x1="170" y1="260" x2="240" y2="260" stroke="#64748b" marker-end="url(#arrow2)"/>
+  <rect x="240" y="240" width="80" height="40" rx="6" fill="#fce7f3" stroke="#ec4899"/>
+  <text x="280" y="264" text-anchor="middle" font-size="11" fill="#9d174d">抄送</text>
+  <line x1="120" y1="300" x2="120" y2="310" stroke="#64748b"/>
+  <line x1="280" y1="280" x2="280" y2="310" stroke="#64748b"/>
+  <line x1="120" y1="318" x2="200" y2="318" stroke="#64748b"/>
+  <line x1="280" y1="318" x2="200" y2="318" stroke="#64748b"/>
+  <ellipse cx="200" cy="325" rx="30" ry="14" fill="#fecaca" stroke="#ef4444"/>
+  <text x="200" y="329" text-anchor="middle" font-size="11" fill="#7f1d1d">结束</text>
+
+  <!-- 属性面板 -->
+  <rect x="430" y="40" width="360" height="290" rx="8" fill="#fff" stroke="#94a3b8"/>
+  <text x="440" y="62" font-size="13" font-weight="600" fill="#334155">属性 / 策略配置面板（form-materials）</text>
+  <text x="440" y="88" font-size="11" fill="#475569">• 节点基本信息（标题、节点类型）</text>
+  <text x="440" y="108" font-size="11" fill="#475569">• 审批人加载方式（SCRIPT/INITIATOR_SELECT/APPROVER_SELECT）</text>
+  <text x="440" y="128" font-size="11" fill="#475569">• 动作配置（启用 PASS/REJECT/RETURN/...）</text>
+  <text x="440" y="148" font-size="11" fill="#475569">• 路由/条件 Groovy 脚本编辑器（CodeMirror）</text>
+  <text x="440" y="168" font-size="11" fill="#475569">• 表单字段权限（必填/只读/隐藏）</text>
+  <text x="440" y="188" font-size="11" fill="#475569">• 记录合并、超时、催办间隔策略</text>
+  <text x="440" y="208" font-size="11" fill="#475569">• 版本管理（保存版本 / 切换版本）</text>
+  <rect x="440" y="226" width="150" height="34" rx="6" fill="#2563eb"/>
+  <text x="515" y="247" text-anchor="middle" font-size="12" fill="#fff">保存流程定义</text>
+  <rect x="600" y="226" width="80" height="34" rx="6" fill="#fff" stroke="#64748b"/>
+  <text x="640" y="247" text-anchor="middle" font-size="12" fill="#334155">导入</text>
+  <rect x="690" y="226" width="80" height="34" rx="6" fill="#fff" stroke="#64748b"/>
+  <text x="730" y="247" text-anchor="middle" font-size="12" fill="#334155">导出</text>
+  <text x="440" y="286" font-size="11" fill="#6b7280">左：节点画布  右：属性与策略面板</text>
+  <defs><marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="2.5" orient="auto"><path d="M0,0 L6,2.5 L0,5 Z" fill="#64748b"/></marker></defs>
+</svg>
+</div>
+
+<h3>8.3 集成方式</h3>
+<p>应用层引入 <code>@coding-flow/flow-design</code>，在页面中使用设计面板组件，并通过 API client 调用后端 <code>/api/cmd/workflow/**</code> 进行保存/加载/导入/导出。设计器内部通过 <code>NodeConvertorManager</code> 在 API JSON 格式与 Flowgram 渲染格式间互转。</p>
+
+<h2 id="fe-approval">9. 前端：审批组件集成（flow-pc / flow-mobile approval）</h2>
+
+<p>审批组件是业务系统对接流程流转的前端核心。PC 与移动端各有一套，均基于 <code>flow-approval-presenter</code>（Redux 状态管理框架）。</p>
+
+<h3>9.1 flow-pc-approval 导出</h3>
+<table>
+  <tr><th>导出</th><th>用途</th></tr>
+  <tr><td><code>ApprovalPanelDrawer</code></td><td>PC 审批面板（抽屉形式），包含表单视图、流程节点历史、审批意见、动作按钮区</td></tr>
+  <tr><td><code>FlowTitle</code></td><td>流程标题展示组件（带状态色）</td></tr>
+  <tr><td><code>WorkflowSelectModal</code></td><td>流程定义选择弹窗（发起流程时挑选 workCode）</td></tr>
+  <tr><td><code>FlowMock</code></td><td>Mock 实例管理组件（创建/清理 mockKey，对接后端 <code>/api/cmd/workflow/mock</code>）</td></tr>
+  <tr><td><code>ActionFactory</code></td><td>动作工厂单例，按 ActionType 渲染对应动作组件</td></tr>
+</table>
+
+<h3>9.2 ActionFactory 动作工厂</h3>
+<p>三端（PC / 移动 / 设计器表单）各有一份 <code>ActionFactory</code> 单例，按 8 种 ActionType 注册并渲染对应 React 组件：</p>
+<pre><code>// PC 端注册（packages/flow-pc/flow-pc-approval/.../action/factory.ts）
+cache.set("PASS", PassAction);
+cache.set("REJECT", RejectAction);
+cache.set("RETURN", ReturnAction);
+cache.set("TRANSFER", TransferAction);
+cache.set("DELEGATE", DelegateAction);
+cache.set("ADD_AUDIT", AddAuditAction);
+cache.set("SAVE", SaveAction);
+cache.set("CUSTOM", CustomAction);
+
+// 使用：根据动作渲染按钮
+const Comp = ActionFactory.getInstance().getFlowActionComponent(action);</code></pre>
+
+<div class="tip"><strong>扩展机制</strong>：要增加自定义审批按钮，通过 <code>ActionFactory</code> 注册 <code>CUSTOM</code> 类型组件，并在节点动作配置中启用。PC 与移动端 <code>ActionFactory.render(action)</code> / <code>getFlowActionComponent(action)</code> 各自返回对应平台组件。</div>
+
+<h3>9.3 审批面板内部结构</h3>
+<p><code>flow-pc-approval</code> 内置组件：<code>flow-approval-actions</code>（动作按钮区）、<code>flow-approval-content</code>（表单内容）、<code>flow-approval-sider</code>（侧边流程图/节点）、<code>flow-approval-title</code>、<code>flow-node-history</code>（节点历史轨迹）、<code>flow-time-node</code>（时间轴）、<code>form-view-component</code>（表单渲染）。</p>
+<p>移动端 <code>flow-mobile-approval</code> 导出 <code>ApprovalPanel</code>，提供精简的移动端审批界面。</p>
+
+<h3>9.4 API 对接</h3>
+<p>审批组件通过实现 <code>FlowApprovalApi</code> 接口（位于 flow-approval-presenter）对接后端，PC 端实现 <code>FlowApprovalApiImpl</code> 调用 <code>/api/cmd/record/**</code>：<code>create / action / processNodes / revoke / urge</code>。</p>
+
+<h2 id="fe-form">10. 前端：表单引擎集成（form-engine）</h2>
+
+<p>业务流程表单数据渲染由外部 <code>@coding-form/form-engine</code> 提供，与 Flowgram 的 <code>form-materials</code>（节点属性配置）是两套独立表单能力：</p>
+<table>
+  <tr><th>表单能力</th><th>来源</th><th>用途</th></tr>
+  <tr><td><code>FormView</code></td><td>@coding-form/form-engine</td><td>渲染业务流程表单数据（string/integer/long/date/boolean 等）</td></tr>
+  <tr><td><code>createFormInstance</code></td><td>同上</td><td>编程式操作表单实例（取值/校验/赋值）</td></tr>
+  <tr><td><code>registerFormItems</code></td><td>同上</td><td>注册自定义字段类型组件——<strong>业务方扩展自定义表单项的入口</strong>></td></tr>
+</table>
+<div class="note">app-pc/app-mobile 在启动时调用 <code>registerFormItems()</code> 注册自定义字段类型（见入口 <code>register-form-types.tsx</code>），并调用 <code>registerImportFormView()</code> 注册导入表单视图。</div>
+
+<h2 id="fe-plugins">11. 前端：插件与扩展机制总览</h2>
+
+<div class="warn"><strong>核心原则</strong>：flow-frontend 大量采用"单例注册中心 + 运行时绑定"模式，使视图与逻辑解耦。集成方可通过注册而非修改源码来扩展能力。</div>
+
+<table>
+  <tr><th>扩展入口</th><th>所属</th><th>扩展方式</th></tr>
+  <tr><td><code>ViewBindPlugin.register(name, Comp)</code></td><td>flow-core</td><td>注册节点视图/动作视图，设计器按 name 取用</td></tr>
+  <tr><td><code>ActionFactory</code> 注册 CUSTOM</td><td>pc-approval / mobile-approval / design</td><td>三端各自注册自定义审批动作组件</td></tr>
+  <tr><td><code>FlowNodeRegistry</code></td><td>flow-design</td><td>注册自定义节点类型到 Flowgram 编辑器</td></tr>
+  <tr><td><code>registerFormItems()</code></td><td>form-engine</td><td>注册自定义表单字段类型</td></tr>
+  <tr><td><code>registerImportFormView()</code></td><td>flow-pc-approval</td><td>注册流程导入时的表单视图</td></tr>
+  <tr><td><code>FlowApprovalApi</code> 实现</td><td>flow-approval-presenter</td><td>替换审批组件的后端 API 实现（适配不同后端）</td></tr>
+  <tr><td><code>EventBus</code></td><td>flow-core</td><td>跨模块事件订阅，扩展联动行为</td></tr>
+</table>
+
+<h2 id="example-be">12. 示例分析一：后端 flow-engine-example</h2>
+
+<p><code>flow-engine-example</code> 是开箱即用的后端集成示例，演示了引擎要求的所有集成点：</p>
+
+<table>
+  <tr><th>文件</th><th>集成的接口/能力</th><th>说明</th></tr>
+  <tr><td><code>gateway/impl/FlowOperatorGatewayImpl.java</code></td><td><span class="tag tag-be">后端</span> FlowOperatorGateway</td><td>对接 <code>UserRepository</code>，按 id/ids 查询用户</td></tr>
+  <tr><td><code>entity/User.java</code></td><td><span class="tag tag-be">后端</span> IFlowOperator</td><td>用户实体实现接口，含 isFlowManager / forwardOperator</td></tr>
+  <tr><td><code>security/MyAuthenticationTokenFilter.java</code></td><td><span class="tag tag-be">后端</span> UserContext</td><td>JWT 鉴权过滤器，将用户写入 UserContext</td></tr>
+  <tr><td><code>security/UserDetailServiceImpl.java</code></td><td><span class="tag tag-be">后端</span> Spring Security</td><td>用户详情加载</td></tr>
+  <tr><td><code>repository/impl/NodeViewJavaScriptRepositoryImpl.java</code></td><td><span class="tag tag-be">后端</span> 脚本持久化</td><td>基于 JPA 的 NodeViewJavaScript 存储</td></tr>
+  <tr><td><code>handler/MyFlowRecordUrgeEventHandler.java</code></td><td><span class="tag tag-be">后端</span> 事件订阅</td><td>实现 <code>IHandler&lt;FlowRecordUrgeEvent&gt;</code> 接收催办事件</td></tr>
+  <tr><td><code>runner/AdminInitializer.java</code></td><td><span class="tag tag-be">后端</span> ApplicationRunner</td><td>启动时初始化管理员账号</td></tr>
+  <tr><td><code>dialect/HydDmDialect.java</code></td><td><span class="tag tag-be">后端</span> Hibernate 方言</td><td>达梦数据库方言适配</td></tr>
+  <tr><td><code>application.properties</code></td><td><span class="tag tag-be">后端</span> H2</td><td>默认 H2 配置 + JWT 安全配置</td></tr>
+  <tr><td><code>application-dm.properties</code></td><td><span class="tag tag-be">后端</span> 达梦</td><td>达梦数据源 + 方言</td></tr>
+</table>
+
+<h4>启动</h4>
+<pre><code># H2 模式（默认，端口 8090）
+cd flow-engine-example &amp;&amp; mvn spring-boot:run
+# 达梦模式
+mvn spring-boot:run -Dspring-boot.run.profiles=dm</code></pre>
+
+<h2 id="example-pc">13. 示例分析二：前端 app-pc</h2>
+
+<p><code>app-pc</code> 演示如何用 packages 组装一个 PC 端流程应用。技术栈：React 18 + react-router（hash 路由）+ antd 6 + Rsbuild。</p>
+
+<h3>13.1 依赖的 packages</h3>
+<p><code>@coding-flow/flow-design</code>（流程设计）、<code>@coding-flow/flow-pc-approval</code>（审批）、<code>@coding-flow/flow-pc-form</code>（表单）、<code>@coding-flow/flow-pc-ui</code>（组件）、<code>@coding-flow/flow-core</code>（HttpClient/EventBus）。</p>
+
+<h3>13.2 路由与页面</h3>
+<table>
+  <tr><th>路由 path</th><th>页面</th><th>功能</th></tr>
+  <tr><td><code>/login</code></td><td>login.tsx</td><td>登录</td></tr>
+  <tr><td><code>/</code></td><td>home.tsx</td><td>系统主页（按路由表渲染导航按钮）</td></tr>
+  <tr><td><code>/todo</code></td><td>todo.tsx</td><td>待办中心（Tabs：全部/待办/已办/抄送，点击进入审批抽屉）</td></tr>
+  <tr><td><code>/desgin</code></td><td>desgin.tsx</td><td>流程设计（WorkflowList 列表 + 进入设计器）</td></tr>
+  <tr><td><code>/user</code></td><td>user.tsx</td><td>用户管理</td></tr>
+  <tr><td><code>/mock</code></td><td>mock.tsx</td><td>Mock 实例管理（FlowMock 组件）</td></tr>
+</table>
+
+<h3>13.3 关键集成点</h3>
+<table>
+  <tr><th>集成点</th><th>实现</th></tr>
+  <tr><td>入口注册</td><td><code>index.tsx</code> 启动时 <code>registerFormTypes()</code> 注册表单字段、<code>registerImportFormView()</code> 注册导入视图，<code>ConfigProvider</code> 注入 antd 中文</td></tr>
+  <tr><td>API 出口</td><td><code>src/api/index.ts</code> 创建 HttpClient；<code>record.ts</code> 调用 <code>/api/query/record/{list,todo,done,notify}</code> 与 <code>/api/cmd/record/**</code></td></tr>
+  <tr><td>待办页</td><td>使用 <code>Table（flow-pc-ui）</code> + <code>FlowTitle</code> + <code>ApprovalPanelDrawer</code> + <code>WorkflowSelectModal</code>，4 个 Tab 复用同一表格</td></tr>
+  <tr><td>设计页</td><td>渲染 <code>WorkflowList</code> 组件，内部进入 <code>flow-design</code> 设计面板</td></tr>
+  <tr><td>跨模块通信</td><td>通过 <code>EventBus</code> 联动审批刷新等</td></tr>
+</table>
+
+<h2 id="example-mobile">14. 示例分析三：前端 app-mobile</h2>
+
+<p><code>app-mobile</code> 演示移动端审批应用。技术栈：React 18 + react-router + antd-mobile 5 + Rsbuild。</p>
+
+<h3>14.1 依赖的 packages</h3>
+<p><code>@coding-flow/flow-mobile-approval</code>（移动审批）、<code>@coding-flow/flow-mobile-ui</code>、<code>@coding-flow/flow-mobile-form</code>、<code>@coding-flow/flow-core</code>。</p>
+
+<h3>14.2 路由与页面</h3>
+<table>
+  <tr><th>路由 path</th><th>页面</th><th>功能</th></tr>
+  <tr><td><code>/login</code></td><td>login.tsx</td><td>登录</td></tr>
+  <tr><td><code>/</code></td><td>home.tsx</td><td>主页（Tabs：待办/已办/抄送/全部）</td></tr>
+  <tr><td><code>/todo</code></td><td>todo.tsx</td><td>列表（antd-mobile List/Tabs/Empty），点击跳审批页</td></tr>
+  <tr><td><code>/approval</code></td><td>approval.tsx</td><td>移动审批（<code>ApprovalPanel</code>，从路由 state 取 recordId/workflowCode）</td></tr>
+</table>
+
+<h3>14.3 关键集成点</h3>
+<table>
+  <tr><th>集成点</th><th>实现</th></tr>
+  <tr><td>审批页</td><td>渲染 <code>&lt;ApprovalPanel recordId workflowCode review onClose/&gt;</code>，监听 <code>EventBus</code> 的 <code>compile</code> 事件</td></tr>
+  <tr><td>列表页</td><td>复用同一 <code>TodoList</code> 组件，按 <code>type</code>（todo/done/notify/list）切换 API</td></tr>
+  <tr><td>移动端差异</td><td>无流程设计器（设计在 PC 完成），仅审批与查询；UI 用 antd-mobile</td></tr>
+</table>
+
+<h2 id="fullstack">15. 全栈集成最佳实践</h2>
+
+<div class="svg-wrap">
+<svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system,'PingFang SC',sans-serif">
+  <defs><marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#64748b"/></marker></defs>
+  <!-- 后端 -->
+  <rect x="20" y="30" width="260" height="280" rx="12" fill="#eff6ff" stroke="#3b82f6"/>
+  <text x="150" y="56" text-anchor="middle" font-size="14" font-weight="700" fill="#1e3a8a">后端集成</text>
+  <text x="35" y="84" font-size="12" fill="#334155">1. 引入 flow-engine-starter</text>
+  <text x="35" y="108" font-size="12" fill="#334155">2. 配置数据源/JPA（H2/DM）</text>
+  <text x="35" y="132" font-size="12" fill="#334155">3. User 实现 IFlowOperator</text>
+  <text x="35" y="156" font-size="12" fill="#334155">4. 实现 FlowOperatorGateway</text>
+  <text x="35" y="180" font-size="12" fill="#334155">5. 鉴权过滤器写 UserContext</text>
+  <text x="35" y="204" font-size="12" fill="#334155">6.（可选）脚本仓储实现</text>
+  <text x="35" y="228" font-size="12" fill="#334155">7.（可选）事件 IHandler 订阅</text>
+  <text x="35" y="252" font-size="12" fill="#334155">8. 配置 CORS/反向代理到前端</text>
+  <text x="35" y="284" font-size="12" font-weight="600" fill="#059669">→ /api/cmd/**  /api/query/**</text>
+
+  <!-- 前端 -->
+  <rect x="320" y="30" width="260" height="280" rx="12" fill="#fce7f3" stroke="#ec4899"/>
+  <text x="450" y="56" text-anchor="middle" font-size="14" font-weight="700" fill="#9d174d">前端集成</text>
+  <text x="335" y="84" font-size="12" fill="#334155">1. pnpm 引入所需 packages</text>
+  <text x="335" y="108" font-size="12" fill="#334155">2. 创建 HttpClient 指向后端</text>
+  <text x="335" y="132" font-size="12" fill="#334155">3. 实施 FlowApprovalApi</text>
+  <text x="335" y="156" font-size="12" fill="#334155">4. registerFormItems 注册字段</text>
+  <text x="335" y="180" font-size="12" fill="#334155">5. 路由：登录/待办/审批/设计</text>
+  <text x="335" y="204" font-size="12" fill="#334155">6. 待办页接 ApprovalPanelDrawer</text>
+  <text x="335" y="228" font-size="12" fill="#334155">7. 设计页接 flow-design</text>
+  <text x="335" y="252" font-size="12" fill="#334155">8.（可选）注册自定义动作/节点</text>
+  <text x="335" y="284" font-size="12" font-weight="600" fill="#059669">→ 调用 REST API</text>
+
+  <!-- 约束 -->
+  <rect x="620" y="30" width="260" height="280" rx="12" fill="#fffbeb" stroke="#f59e0b"/>
+  <text x="750" y="56" text-anchor="middle" font-size="14" font-weight="700" fill="#92400e">通用约束</text>
+  <text x="635" y="84" font-size="12" fill="#334155">• 前后端版本对齐（0.0.52）</text>
+  <text x="635" y="108" font-size="12" fill="#334155">• 前端跨包用完整包名 import</text>
+  <text x="635" y="132" font-size="12" fill="#334155">• TS strict，禁用 any</text>
+  <text x="635" y="156" font-size="12" fill="#334155">• 样式用 .module.scss</text>
+  <text x="635" y="180" font-size="12" fill="#334155">• Redux Store 遵循 updateState</text>
+  <text x="635" y="204" font-size="12" fill="#334155">  单 reducer 规范</text>
+  <text x="635" y="228" font-size="12" fill="#334155">• 后端操作走 FlowService</text>
+  <text x="635" y="252" font-size="12" fill="#334155">  事务由 @Transactional 保证</text>
+  <text x="635" y="284" font-size="12" fill="#334155">• 优先复用已有能力</text>
+
+  <line x1="280" y1="170" x2="318" y2="170" stroke="#64748b" stroke-width="2" marker-end="url(#ar3)"/>
+  <line x1="580" y1="170" x2="618" y2="170" stroke="#64748b" stroke-width="2" marker-end="url(#ar3)"/>
+  <text x="450" y="326" text-anchor="middle" font-size="12" fill="#6b7280">图 3：全栈集成路径与约束</text>
+</svg>
+</div>
+
+<h2 id="checklist">16. 集成验证清单</h2>
+
+<h3>后端</h3>
+<ul class="checklist">
+  <li>项目正常启动，无 Bean 缺失异常</li>
+  <li>数据库生成 Flow Engine 相关表（flow_record / flow_todo_record / workflow / workflow_version 等）</li>
+  <li>实现 FlowOperatorGateway 并能按 ID 查到用户</li>
+  <li>用户实体实现 IFlowOperator</li>
+  <li>鉴权过滤器将当前用户写入 UserContext</li>
+  <li>调用 POST /api/cmd/workflow/create 能创建空流程定义</li>
+  <li>调用 GET /api/query/record/todo 不报错</li>
+  <li>（可选）实现 NodeViewJavaScriptRepository 支持脚本存储</li>
+</ul>
+
+<h3>前端</h3>
+<ul class="checklist">
+  <li>pnpm install 成功，所有 workspace 包可构建（pnpm run build）</li>
+  <li>HttpClient baseURL 指向后端，跨域/CORS 已配置</li>
+  <li>登录后可访问待办列表，数据来自 /api/query/record/todo</li>
+  <li>待办点击可打开 ApprovalPanelDrawer（PC）/ ApprovalPanel（移动）</li>
+  <li>审批动作（通过/拒绝/退回等）按钮正常显示并可提交</li>
+  <li>流程设计器可创建/保存/加载流程定义</li>
+  <li>registerFormItems 注册的自定义字段在设计器与审批表单中正确渲染</li>
+</ul>
+
+<h3>全栈联调</h3>
+<ul class="checklist">
+  <li>在 PC 设计器编排一条请假流程并保存</li>
+  <li>从 PC/移动端发起该流程</li>
+  <li>下一审批人在待办中看到并审批通过</li>
+  <li>流程结束后事件订阅收到 FlowRecordFinishEvent</li>
+  <li>Mock 模式：通过 mockKey 在无真实库环境下完成全流程演练</li>
+</ul>
+
+<hr>
+<p style="color:var(--c-muted);font-size:13px;">配套文档：<a href="usage-manual.html">使用手册（前端操作视角）</a> · <a href="README.md">文档入口</a> · 能力清单 <a href="../capabilities/index.md">capabilities</a> · 规范 <a href="../conventions/index.md">conventions</a></p>
+
+</body>
+</html>
