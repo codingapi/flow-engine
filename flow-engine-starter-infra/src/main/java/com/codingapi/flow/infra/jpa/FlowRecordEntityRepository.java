@@ -18,7 +18,7 @@ public interface FlowRecordEntityRepository extends FastRepository<FlowRecordEnt
     @Query("from FlowRecordEntity r where r.id in ?1")
     List<FlowRecordEntity> findByIds(List<Long> ids);
 
-    @Query("from FlowRecordEntity r where r.processId = ?1")
+    @Query("from FlowRecordEntity r where r.processId = ?1 and r.hidden=false and r.revoked = false")
     List<FlowRecordEntity> findProcessIdRecords(String processId);
 
     @Query("from FlowRecordEntity r where r.fromId = ?1 and r.nodeId =?2 and r.revoked = false")

@@ -65,8 +65,10 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
     @Override
     public List<FlowRecord> findProcessRecords(String processId) {
         return cache.values().stream().filter(flowRecord ->
-                flowRecord.getProcessId().equals(processId))
-                .toList();
+                flowRecord.getProcessId().equals(processId)
+                        && !flowRecord.isRevoked()
+                        && !flowRecord.isHidden()
+        ).toList();
     }
 
     @Override

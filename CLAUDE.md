@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-Flow Engine 是一个企业级工作流引擎，基于 Java 17 和 Spring Boot 3.5.9 构建（当前版本 0.0.18）。
+Flow Engine 是一个企业级工作流引擎，基于 Java 17 和 Spring Boot 3.5.9 构建（当前版本 0.0.53）。
 
 ### 核心模块
 
@@ -69,7 +69,7 @@ REST 层通过请求参数 `mockKey` 分流到 Mock 实例（见 `FlowRecordCont
 ### API 模块划分
 
 - **命令操作**：`flow-engine-starter-api` — `FlowRecordController`（`/api/cmd/record`：create / action / revoke / delete / urge / detail）与 `WorkflowController`（`/api/cmd/workflow`：流程设计 CRUD）
-- **查询**：`flow-engine-starter-query` — `FlowRecordQueryController`（`/api/query/record`：list / todo / done / notify）
+- **查询**：`flow-engine-starter-query` — `FlowRecordQueryController`（`/api/query/record`：list / todo / done / notify）与 `WorkflowQueryController`（`/api/query/workflow`：list / options / versions）
 - **持久化**：`flow-engine-starter-infra` — JPA 实体与仓储实现（含达梦方言）
 
 ## 常用命令
@@ -94,13 +94,6 @@ cd flow-engine-example && mvn spring-boot:run
 ```
 
 ## 开发规范
-
-### 设计先行
-
-- **开发任何新功能前，必须先在 `docs/architecture/` 下完成架构设计文档，经用户确认后再编码**
-- 架构文档包含：系统架构、API 接口、核心组件方案、模块职责划分
-- 任务清单见 `docs/todo/`
-- 各阶段详细可执行的开发计划见 `docs/plan/`
 
 ### 禁止自动提交
 

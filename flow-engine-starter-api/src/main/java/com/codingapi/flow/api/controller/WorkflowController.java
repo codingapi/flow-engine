@@ -16,7 +16,6 @@ import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.factory.NodeFactory;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.repository.WorkflowRepository;
-import com.codingapi.flow.script.registry.ScriptRegistryContext;
 import com.codingapi.flow.service.WorkflowService;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
@@ -59,7 +58,8 @@ public class WorkflowController {
 
     @GetMapping("/meta")
     public SingleResponse<WorkflowMeta> getMeta(IdRequest request){
-        Workflow workflow = workflowService.getWorkflowById(request.getStringId());
+        // 子流程配置下拉的 value 为流程编码(workCode)，因此 meta 接口按 workCode 查询
+        Workflow workflow = workflowService.getWorkflowByCode(request.getStringId());
         if(workflow!=null){
             return SingleResponse.of(new WorkflowMeta(workflow));
         }
