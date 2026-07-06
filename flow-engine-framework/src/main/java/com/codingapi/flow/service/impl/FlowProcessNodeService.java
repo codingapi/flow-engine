@@ -223,9 +223,8 @@ public class FlowProcessNodeService {
         List<IFlowNode> nextNodes = flowSession.matchNextNodes();
         if (nextNodes != null && !nextNodes.isEmpty()) {
             for (IFlowNode flowNode : nextNodes) {
-                this.addFlowNode(flowNode, flowSession);
-
                 FlowSession nextSession = flowSession.updateSession(flowNode);
+                this.addFlowNode(flowNode, nextSession);
                 this.fetchFlowNode(nextSession);
             }
         }

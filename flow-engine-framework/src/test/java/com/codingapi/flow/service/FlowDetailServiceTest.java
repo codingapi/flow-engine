@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class FlowDetailServiceTest {
@@ -287,5 +288,102 @@ public class FlowDetailServiceTest {
         nodeList = factory.flowService.processNodes(new FlowProcessNodeRequest(bossRecordList.get(0).getId(), boss.getUserId(),data));
         assertEquals(4,nodeList.size());
 
+    }
+
+
+    /**
+     * 流程记录节点审批人展示验证。
+     *
+     * <p>流程设计：A(开始节点) -> B(审批人 b) -> C(审批人 c) -> D(结束节点)。
+     * <p>操作步骤：a 发起流程并提交到 b，在 b 的当前待办记录下查询流程节点记录。
+     * <p>期望：未审批的 C 节点审批人应展示为 c，不能错误展示为当前审批人 b。
+     */
+    @Test
+    void processNodes_shouldShowNextApprovalNodeOperator() {
+
+        User a = new User(1, "a");
+        User b = new User(2, "b");
+        User c = new User(3, "c");
+        factory.userGateway.save(a);
+        factory.userGateway.save(b);
+        factory.userGateway.save(c);
+
+        GatewayContext.getInstance().setFlowOperatorGateway(factory.userGateway);
+
+        FlowForm form = FlowFormBuilder.builder()
+                .name("审批流程")
+                .code("approval")
+                .addField("标题", "title", DataType.STRING)
+                .build();
+
+        StartNode startNode = StartNode
+                .builder()
+                .actions(ActionBuilder.builder()
+                        .addAction(CustomAction.defaultAction())
+                        .build())
+                .build();
+
+        ApprovalNode bNode = ApprovalNode.builder()
+                .name("B审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
+                        .build()
+                )
+                .build();
+
+        ApprovalNode cNode = ApprovalNode.builder()
+                .name("C审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new OperatorLoadStrategy(FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [3]}").getKey()))
+                        .build()
+                )
+                .build();
+
+        EndNode endNode = EndNode.builder().build();
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("审批流程")
+                .code("approval")
+                .createdOperator(a)
+                .form(form)
+                .addNode(startNode)
+                .addNode(bNode)
+                .addNode(cNode)
+                .addNode(endNode)
+                .build();
+
+        factory.workflowService.saveWorkflow(workflow);
+
+        Map<String, Object> data = Map.of("title", "test");
+
+        FlowCreateRequest createRequest = new FlowCreateRequest();
+        createRequest.setWorkCode(workflow.getCode());
+        createRequest.setFormData(data);
+        createRequest.setActionId(startNode.actionManager().getActions().get(0).id());
+        createRequest.setOperatorId(a.getUserId());
+        factory.flowService.create(createRequest);
+
+        List<FlowRecord> aRecordList = factory.flowRecordRepository.findTodoByOperator(a.getUserId());
+        assertEquals(1, aRecordList.size());
+
+        FlowActionRequest aRequest = new FlowActionRequest();
+        aRequest.setFormData(data);
+        aRequest.setRecordId(aRecordList.get(0).getId());
+        aRequest.setAdvice(new FlowAdviceBody(startNode.actionManager().getActions().get(0).id(), "提交", a.getUserId()));
+        factory.flowService.action(aRequest);
+
+        List<FlowRecord> bRecordList = factory.flowRecordRepository.findTodoByOperator(b.getUserId());
+        assertEquals(1, bRecordList.size());
+
+        List<ProcessNode> nodeList = factory.flowService.processNodes(new FlowProcessNodeRequest(bRecordList.get(0).getId(), b.getUserId(), data));
+        ProcessNode nextApprovalNode = nodeList.stream()
+                .filter(node -> cNode.getId().equals(node.getNodeId()))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(nextApprovalNode);
+        assertEquals(ProcessNode.ApproveState.PENDING, nextApprovalNode.getApproveState());
+        assertEquals(1, nextApprovalNode.getOperators().size());
+        assertEquals(c.getUserId(), nextApprovalNode.getOperators().get(0).getFlowOperator().getUserId());
+        assertEquals(c.getName(), nextApprovalNode.getOperators().get(0).getFlowOperator().getName());
     }
 }
