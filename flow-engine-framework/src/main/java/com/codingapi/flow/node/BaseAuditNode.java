@@ -41,12 +41,23 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
     @NodeViewScript
     private String code;
 
+    /**
+     * 视图标题
+     */
+    @Setter
+    private String viewTitle;
+
+    public String getViewTitle() {
+        return StringUtils.hasText(viewTitle) ? viewTitle : getName();
+    }
+
 
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
         map.put("view", view);
         map.put("code", code);
+        map.put("viewTitle", getViewTitle());
         return map;
     }
 
@@ -180,6 +191,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         T node = BaseFlowNode.fromMap(map, clazz);
         node.setView((String) map.get("view"));
         node.setCode((String) map.get("code"));
+        node.setViewTitle((String) map.get("viewTitle"));
         return node;
     }
 
