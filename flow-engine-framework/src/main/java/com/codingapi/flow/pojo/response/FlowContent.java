@@ -68,6 +68,11 @@ public class FlowContent {
     private String code;
 
     /**
+     * 视图标题
+     */
+    private String viewTitle;
+
+    /**
      * 节点名称
      */
     private String nodeName;
@@ -203,6 +208,7 @@ public class FlowContent {
             Map<String, Object> nodeData = currentNode.toMap();
             this.view = (String) nodeData.get("view");
             this.code = (String) nodeData.get("code");
+            this.viewTitle = (String) nodeData.get("viewTitle");
         }
     }
 
