@@ -11,6 +11,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class NodeFactoryTest {
 
@@ -103,20 +104,19 @@ class NodeFactoryTest {
     }
 
     @Test
-    void shouldFallbackViewTitleWhenImportOldNodeData() {
+    void shouldKeepViewTitleNullWhenNotSet() {
         ApprovalNode approvalNode = ApprovalNode.builder()
                 .name("经理审批")
                 .build();
 
         Map<String, Object> data = JSON.parseObject(JSON.toJSONString(approvalNode.toMap()));
-        data.remove("viewTitle");
 
         IFlowNode node = NodeFactory.getInstance().createNode(data);
 
         assertNotNull(node);
         ApprovalNode restoredNode = (ApprovalNode) node;
-        assertEquals("经理审批", restoredNode.getViewTitle());
-        assertEquals("经理审批", restoredNode.toMap().get("viewTitle"));
+        assertNull(restoredNode.getViewTitle());
+        assertNull(restoredNode.toMap().get("viewTitle"));
     }
 
 

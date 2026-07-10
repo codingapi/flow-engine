@@ -20,7 +20,6 @@ import com.codingapi.flow.strategy.node.NodeTitleStrategy;
 import com.codingapi.flow.strategy.node.RevokeStrategy;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,12 +53,9 @@ public class StartNode extends BaseFlowNode implements IDisplayNode {
     /**
      * 视图标题
      */
+    @Getter
     @Setter
     private String viewTitle;
-
-    public String getViewTitle() {
-        return StringUtils.hasText(viewTitle) ? viewTitle : getName();
-    }
 
 
     @Override
@@ -128,7 +124,7 @@ public class StartNode extends BaseFlowNode implements IDisplayNode {
         Map<String, Object> map = super.toMap();
         map.put("view", view);
         map.put("code", code);
-        map.put("viewTitle", getViewTitle());
+        map.put("viewTitle", viewTitle);
         return map;
     }
 
