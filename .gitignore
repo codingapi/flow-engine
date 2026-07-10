@@ -36,6 +36,9 @@ build/
 ### macOS ###
 .DS_Store
 
+### workbuddy ###
+.workbuddy/
+
 ### Worktrees ###
 .worktrees/
 
