@@ -99,7 +99,7 @@ public class RepositoryHolderContext implements IRepositoryHolder {
      */
     public FlowActionService createFlowActionService(FlowSession flowSession) {
         this.verify();
-        return new FlowActionService(flowSession.toActionRequest(),this);
+        return new FlowActionService(flowSession.toActionRequest(), this, true);
     }
 
 
