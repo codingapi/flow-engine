@@ -35,6 +35,9 @@ public class WorkflowService {
     public void saveWorkflowVersion(WorkflowVersion currentVersion, boolean creatable, boolean enable) {
         List<WorkflowVersion> updateList = new ArrayList<>();
 
+        Workflow workflow = currentVersion.toWorkflow();
+        workflow.filterPermissions();
+
         currentVersion.enableVersion();
         if (currentVersion.getId() == 0) {
             // 新创建的版本，替换脚本
@@ -61,9 +64,6 @@ public class WorkflowService {
         }
 
         workflowVersionRepository.saveAll(updateList);
-        Workflow workflow = currentVersion.toWorkflow();
-        workflow.filterPermissions();
-
         if (enable) {
             try {
                 workflow.enable();
