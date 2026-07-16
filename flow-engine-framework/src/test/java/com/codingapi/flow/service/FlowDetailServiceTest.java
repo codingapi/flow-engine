@@ -2,6 +2,7 @@ package com.codingapi.flow.service;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.CustomAction;
+import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.builder.ActionBuilder;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
@@ -37,6 +38,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FlowDetailServiceTest {
 
@@ -385,5 +388,69 @@ public class FlowDetailServiceTest {
         assertEquals(1, nextApprovalNode.getOperators().size());
         assertEquals(c.getUserId(), nextApprovalNode.getOperators().get(0).getFlowOperator().getUserId());
         assertEquals(c.getName(), nextApprovalNode.getOperators().get(0).getFlowOperator().getName());
+    }
+
+    @Test
+    void customPassAction_shouldExecuteWhenDefaultPassActionIsDisabled() {
+        User a = new User(1, "a");
+        User b = new User(2, "b");
+        factory.userGateway.save(a);
+        factory.userGateway.save(b);
+        GatewayContext.getInstance().setFlowOperatorGateway(factory.userGateway);
+
+        FlowForm form = FlowFormBuilder.builder()
+                .name("审批流程")
+                .code("custom-pass")
+                .addField("标题", "title", DataType.STRING)
+                .build();
+
+        StartNode startNode = StartNode.builder().build();
+        ApprovalNode bNode = ApprovalNode.builder()
+                .name("B审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new OperatorLoadStrategy(
+                                FlowGroovyScriptFactory.createOperatorLoadScript("def run(request){return [2]}").getKey()))
+                        .build())
+                .build();
+
+        IFlowAction defaultPassAction = bNode.actionManager().getActionByType("PASS");
+        ((PassAction) defaultPassAction).setEnable(false);
+        CustomAction customPassAction = CustomAction.defaultAction();
+        bNode.actionManager().getActions().add(customPassAction);
+
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("审批流程")
+                .code("custom-pass")
+                .createdOperator(a)
+                .form(form)
+                .addNode(startNode)
+                .addNode(bNode)
+                .addNode(EndNode.builder().build())
+                .build();
+        factory.workflowService.saveWorkflow(workflow);
+
+        Map<String, Object> data = Map.of("title", "test");
+        FlowCreateRequest createRequest = new FlowCreateRequest();
+        createRequest.setWorkCode(workflow.getCode());
+        createRequest.setFormData(data);
+        createRequest.setActionId(startNode.actionManager().getActionByType("PASS").id());
+        createRequest.setOperatorId(a.getUserId());
+        factory.flowService.create(createRequest);
+
+        FlowRecord startRecord = factory.flowRecordRepository.findTodoByOperator(a.getUserId()).get(0);
+        FlowActionRequest startRequest = new FlowActionRequest();
+        startRequest.setFormData(data);
+        startRequest.setRecordId(startRecord.getId());
+        startRequest.setAdvice(new FlowAdviceBody(startNode.actionManager().getActionByType("PASS").id(), "提交", a.getUserId()));
+        factory.flowService.action(startRequest);
+
+        FlowRecord bRecord = factory.flowRecordRepository.findTodoByOperator(b.getUserId()).get(0);
+        FlowActionRequest customPassRequest = new FlowActionRequest();
+        customPassRequest.setFormData(data);
+        customPassRequest.setRecordId(bRecord.getId());
+        customPassRequest.setAdvice(new FlowAdviceBody(customPassAction.id(), "通过", b.getUserId()));
+
+        assertDoesNotThrow(() -> factory.flowService.action(customPassRequest));
+        assertTrue(bRecord.isDone());
     }
 }

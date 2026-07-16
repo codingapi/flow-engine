@@ -32,12 +32,19 @@ public class FlowActionService {
 
     private final IRepositoryHolder repositoryHolder;
 
+    private final boolean allowDisabledAction;
+
     public FlowActionService(FlowActionRequest request,IRepositoryHolder repositoryHolder) {
+        this(request, repositoryHolder, false);
+    }
+
+    public FlowActionService(FlowActionRequest request, IRepositoryHolder repositoryHolder, boolean allowDisabledAction) {
         this.request = request;
         this.flowOperatorGateway = repositoryHolder.getFlowOperatorGateway();
         this.flowRecordService = repositoryHolder.getFlowRecordService();
         this.workflowService = repositoryHolder.getWorkflowService();
         this.repositoryHolder = repositoryHolder;
+        this.allowDisabledAction = allowDisabledAction;
     }
 
     public ActionResponse action() {
@@ -75,7 +82,7 @@ public class FlowActionService {
             throw FlowNotFoundException.node(flowRecord.getNodeId());
         }
         IFlowAction flowAction = currentNode.actionManager().getActionById(request.getAdvice().getActionId());
-        if (flowAction == null || !flowAction.enable()) {
+        if (flowAction == null || (!flowAction.enable() && !allowDisabledAction)) {
             throw FlowNotFoundException.action(request.getAdvice().getActionId());
         }
 
@@ -100,4 +107,3 @@ public class FlowActionService {
         return ActionResponseContext.getInstance().get();
     }
 }
-

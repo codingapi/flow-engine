@@ -32,7 +32,7 @@ public class ActionManager {
         List<IFlowAction> actions = new ArrayList<>();
         if (this.actions != null) {
             for (IFlowAction action : this.actions) {
-                if (action.show(flowSession)) {
+                if (action.enable() && action.show(flowSession)) {
                     actions.add(action);
                 }
             }

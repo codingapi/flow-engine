@@ -87,7 +87,7 @@ public class MockRepositoryHolder implements IRepositoryHolder {
 
     @Override
     public FlowActionService createFlowActionService(FlowSession flowSession) {
-        return new FlowActionService(flowSession.toActionRequest(), this);
+        return new FlowActionService(flowSession.toActionRequest(), this, true);
     }
 
     @Override
