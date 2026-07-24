@@ -31,6 +31,11 @@ public class WorkflowRepositoryImpl implements WorkflowRepository {
     }
 
     @Override
+    public void lockById(String id) {
+        workflowEntityRepository.lockById(id);
+    }
+
+    @Override
     public void delete(String workId) {
         workflowEntityRepository.deleteById(workId);
     }
