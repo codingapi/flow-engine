@@ -51,12 +51,8 @@ public class FlowCreateService {
             throw FlowStateException.workflowAlreadyDisable(request.getWorkCode());
         }
         workflow.verify();
-        // 获取备份
-        WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(workflow.getId(), workflow.getUpdatedTime());
-        if (workflowRuntime == null) {
-            workflowRuntime = new WorkflowRuntime(workflow);
-            workflowService.saveWorkflowRuntime(workflowRuntime);
-        }
+        // 获取或创建运行时快照
+        WorkflowRuntime workflowRuntime = workflowService.getOrCreateWorkflowRuntime(workflow);
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getOperatorId());
         if (!workflow.matchCreatedOperator(currentOperator)) {

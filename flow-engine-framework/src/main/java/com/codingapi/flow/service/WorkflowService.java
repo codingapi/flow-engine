@@ -11,6 +11,8 @@ import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowVersion;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import lombok.AllArgsConstructor;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -202,6 +204,28 @@ public class WorkflowService {
     public void saveWorkflowRuntime(WorkflowRuntime workflowRuntime) {
         this.workflowRuntimeRepository.save(workflowRuntime);
         WorkflowRuntimeCache.getInstance().sync(workflowRuntime);
+    }
+
+    /**
+     * 获取或创建流程运行时。
+     * <p>
+     * 先锁定流程定义，再查询运行时快照，避免并发创建流程时产生重复快照。
+     *
+     * @param workflow 流程对象
+     * @return 流程运行时
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public WorkflowRuntime getOrCreateWorkflowRuntime(Workflow workflow) {
+        this.workflowRepository.lockById(workflow.getId());
+        WorkflowRuntime workflowRuntime = this.getWorkflowRuntime(
+                workflow.getId(),
+                workflow.getUpdatedTime()
+        );
+        if (workflowRuntime == null) {
+            workflowRuntime = new WorkflowRuntime(workflow);
+            this.saveWorkflowRuntime(workflowRuntime);
+        }
+        return workflowRuntime;
     }
 
 

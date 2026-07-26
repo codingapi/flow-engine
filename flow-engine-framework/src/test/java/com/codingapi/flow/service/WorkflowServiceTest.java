@@ -15,13 +15,58 @@ import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
 import com.codingapi.flow.workflow.WorkflowVersion;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 class WorkflowServiceTest {
+
+    @Test
+    void should_lock_workflow_and_reuse_existing_runtime() {
+        List<String> operations = new ArrayList<>();
+        Workflow workflow = createWorkflow();
+        WorkflowRuntime existing = new WorkflowRuntime(workflow);
+        TrackingWorkflowRepository workflowRepository = new TrackingWorkflowRepository(operations);
+        TrackingWorkflowRuntimeRepository runtimeRepository =
+                new TrackingWorkflowRuntimeRepository(operations, existing);
+        WorkflowService service = new WorkflowService(
+                new SnapshotWorkflowVersionRepository(),
+                workflowRepository,
+                runtimeRepository
+        );
+
+        WorkflowRuntime result = service.getOrCreateWorkflowRuntime(workflow);
+
+        assertSame(existing, result);
+        assertEquals(List.of("lock", "find"), operations);
+        assertEquals(0, runtimeRepository.getSaveCount());
+    }
+
+    @Test
+    void should_create_runtime_after_lock_when_runtime_does_not_exist() {
+        List<String> operations = new ArrayList<>();
+        Workflow workflow = createWorkflow();
+        TrackingWorkflowRepository workflowRepository = new TrackingWorkflowRepository(operations);
+        TrackingWorkflowRuntimeRepository runtimeRepository =
+                new TrackingWorkflowRuntimeRepository(operations, null);
+        WorkflowService service = new WorkflowService(
+                new SnapshotWorkflowVersionRepository(),
+                workflowRepository,
+                runtimeRepository
+        );
+
+        WorkflowRuntime result = service.getOrCreateWorkflowRuntime(workflow);
+
+        assertEquals(workflow.getId(), result.getWorkId());
+        assertEquals(workflow.getUpdatedTime(), result.getWorkVersion());
+        assertEquals(List.of("lock", "find", "save"), operations);
+        assertEquals(1, runtimeRepository.getSaveCount());
+    }
 
     @Test
     void should_align_historical_field_permissions_before_saving_version() {
@@ -68,6 +113,87 @@ class WorkflowServiceTest {
         form.setFields(List.of(field));
         form.setSubForms(List.of());
         return form;
+    }
+
+    private Workflow createWorkflow() {
+        return WorkflowBuilder.builder()
+                .id("workflow-runtime-test")
+                .code("workflow-runtime-test")
+                .title("运行时防重测试")
+                .build(false);
+    }
+
+    private static class TrackingWorkflowRepository implements WorkflowRepository {
+
+        private final List<String> operations;
+
+        private TrackingWorkflowRepository(List<String> operations) {
+            this.operations = operations;
+        }
+
+        @Override
+        public void save(Workflow workflow) {
+        }
+
+        @Override
+        public Workflow getById(String id) {
+            return null;
+        }
+
+        @Override
+        public Workflow getByCode(String code) {
+            return null;
+        }
+
+        @Override
+        public void lockById(String id) {
+            operations.add("lock");
+        }
+
+        @Override
+        public void delete(String id) {
+        }
+    }
+
+    private static class TrackingWorkflowRuntimeRepository implements WorkflowRuntimeRepository {
+
+        private final List<String> operations;
+        private WorkflowRuntime workflowRuntime;
+        private int saveCount;
+
+        private TrackingWorkflowRuntimeRepository(
+                List<String> operations,
+                WorkflowRuntime workflowRuntime
+        ) {
+            this.operations = operations;
+            this.workflowRuntime = workflowRuntime;
+        }
+
+        private int getSaveCount() {
+            return saveCount;
+        }
+
+        @Override
+        public void save(WorkflowRuntime workflowRuntime) {
+            operations.add("save");
+            saveCount++;
+            this.workflowRuntime = workflowRuntime;
+        }
+
+        @Override
+        public WorkflowRuntime get(long id) {
+            return null;
+        }
+
+        @Override
+        public WorkflowRuntime getByWorkId(String workId, long workVersion) {
+            operations.add("find");
+            return workflowRuntime;
+        }
+
+        @Override
+        public void delete(WorkflowRuntime backup) {
+        }
     }
 
     private static class SnapshotWorkflowVersionRepository implements WorkflowVersionRepository {

@@ -5,7 +5,13 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "t_flow_workflow_runtime")
+@Table(
+        name = "t_flow_workflow_runtime",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_workflow_runtime_work_version",
+                columnNames = {"workId", "workVersion"}
+        )
+)
 public class WorkflowRuntimeEntity {
 
     @Id

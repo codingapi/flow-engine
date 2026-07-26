@@ -6,7 +6,6 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.session.FlowSession;
-import com.codingapi.springboot.script.annotation.ScriptField;
 import com.codingapi.springboot.script.annotation.ScriptFunction;
 import com.codingapi.springboot.script.annotation.ScriptParameter;
 import com.codingapi.springboot.script.annotation.ScriptType;
@@ -143,6 +142,18 @@ public class GroovyScriptRequest {
         return formData;
     }
 
+    /**
+     * 重置当前流程表单数据
+     *
+     * @param formData 表单数据
+     */
+    @ScriptFunction(name = "resetFormData", description = "重置当前流程表单数据")
+    public void resetFormData(
+            @ScriptParameter(description = "表单数据") Map<String, Object> formData) {
+        flowSession.getFormData().reset(formData);
+        this.formData = flowSession.getFormData().toMapData();
+    }
+
     @ScriptFunction(name = "getCreatedOperator", description = "获取流程创建人信息")
     public IFlowOperator getCreatedOperator() {
         return createdOperator;
@@ -276,9 +287,10 @@ public class GroovyScriptRequest {
     /**
      * 创建流程请求，用于自流程的创建
      *
-     * @param workId   流程设计id
-     * @param actionId 动作类型
-     * @param formData 流程数据
+     * @param workCode   流程设计流程workCode
+     * @param operatorId 流程发起人id
+     * @param actionId   动作类型
+     * @param formData   流程数据
      */
     @ScriptFunction(
             name = "toCreateRequest",
@@ -295,7 +307,8 @@ public class GroovyScriptRequest {
     /**
      * 创建流程请求，用于自流程的创建
      *
-     * @param workId   流程设计id
+     * @param workCode 流程设计流程workCode
+     * @param operatorId 流程发起人id
      * @param actionId 动作类型
      * @param formData 流程数据
      */
