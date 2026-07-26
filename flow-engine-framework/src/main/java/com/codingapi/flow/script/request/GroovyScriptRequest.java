@@ -143,6 +143,18 @@ public class GroovyScriptRequest {
         return formData;
     }
 
+    /**
+     * 重置当前流程表单数据
+     *
+     * @param formData 表单数据
+     */
+    @ScriptFunction(name = "resetFormData", description = "重置当前流程表单数据")
+    public void resetFormData(
+            @ScriptParameter(description = "表单数据") Map<String, Object> formData) {
+        flowSession.getFormData().reset(formData);
+        this.formData = flowSession.getFormData().toMapData();
+    }
+
     @ScriptFunction(name = "getCreatedOperator", description = "获取流程创建人信息")
     public IFlowOperator getCreatedOperator() {
         return createdOperator;
