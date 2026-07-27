@@ -29,19 +29,20 @@ public class ActionManager {
     private final List<IFlowAction> actions;
 
     public List<IFlowAction> filterActions(FlowSession flowSession) {
+        if (this.actions == null || this.actions.isEmpty()) {
+            return new ArrayList<>();
+        }
         List<IFlowAction> actions = new ArrayList<>();
-        if (this.actions != null) {
-            for (IFlowAction action : this.actions) {
-                if (action.enable() && action.show(flowSession)) {
-                    actions.add(action);
-                }
+        for (IFlowAction action : this.actions) {
+            if (action.enable() && action.show(flowSession)) {
+                actions.add(action);
             }
         }
         return actions;
     }
 
 
-    public void verify(FlowForm flowForm){
+    public void verify(FlowForm flowForm) {
         // no verify 
     }
 

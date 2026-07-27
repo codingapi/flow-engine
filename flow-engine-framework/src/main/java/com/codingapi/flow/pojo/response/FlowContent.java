@@ -117,9 +117,14 @@ public class FlowContent {
     private List<Body> todos;
 
     /**
-     * 流程按钮
+     * 展示流程按钮
      */
     private List<Map<String, Object>> actions;
+
+    /**
+     * 全部展示按钮
+     */
+    private List<Map<String, Object>> actionList;
 
     /**
      * 是否可合并
@@ -199,6 +204,7 @@ public class FlowContent {
             ActionManager actionManager = currentNode.actionManager();
             NodeStrategyManager strategyManager = currentNode.strategyManager();
             this.actions = actionManager.filterActions(flowSession).stream().map(IFlowAction::toMap).toList();
+            this.actionList = actionManager.getActions().stream().map(IFlowAction::toMap).toList();
             this.adviceRequired = strategyManager.isAdviceRequired();
             this.signRequired = strategyManager.isSignRequired();
             this.nodeId = currentNode.getId();
