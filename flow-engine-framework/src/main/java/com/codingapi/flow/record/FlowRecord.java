@@ -502,6 +502,18 @@ public class FlowRecord {
 
 
     /**
+     * 多人审批（或签/并签）场景下，节点完成后同节点其他未办理的待办记录自动置为已办（已审核）。
+     * <p>仅更新记录状态与时间，不记录动作信息，也不视为流程干预。
+     */
+    public void autoDone() {
+        this.readable = true;
+        this.readTime = System.currentTimeMillis();
+        this.updateTime = System.currentTimeMillis();
+        this.recordState = SATE_RECORD_DONE;
+    }
+
+
+    /**
      * 流程结束
      */
     public void finish(boolean success) {
