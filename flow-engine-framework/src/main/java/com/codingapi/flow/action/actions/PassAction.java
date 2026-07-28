@@ -20,6 +20,7 @@ import com.codingapi.flow.pojo.response.NodeOption;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
+import com.codingapi.flow.strategy.node.MultiOperatorAuditStrategy;
 import com.codingapi.flow.strategy.node.OperatorSelectType;
 import com.codingapi.springboot.framework.event.EventPusher;
 
@@ -141,6 +142,21 @@ public class PassAction extends BaseAction {
                     record.show();
                     recordList.add(record);
                     flowEvents.add(new FlowRecordTodoEvent(record, flowSession.isMock()));
+                }
+            }
+        }
+
+        // 或签/并签：节点完成后，将同节点其他未办理的待办记录自动置为已办（已审核），
+        // 避免其他审批人的遗留待办再次触发后续节点
+        MultiOperatorAuditStrategy.Type multiOperatorAuditType = nodeStrategyManager.getMultiOperatorAuditStrategyType();
+        if (isFinish
+                && (multiOperatorAuditType == MultiOperatorAuditStrategy.Type.ANY
+                || multiOperatorAuditType == MultiOperatorAuditStrategy.Type.MERGE)) {
+            for (FlowRecord record : flowSession.getCurrentNodeRecords()) {
+                if (record.getId() != currentRecord.getId() && record.isTodo()) {
+                    record.autoDone();
+                    recordList.add(record);
+                    flowEvents.add(new FlowRecordDoneEvent(record, flowSession.isMock()));
                 }
             }
         }
