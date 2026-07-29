@@ -8,7 +8,7 @@ import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.springboot.script.annotation.GroovyScript;
-import com.codingapi.springboot.script.cache.GroovyScriptCacheContext;
+import com.codingapi.flow.script.runtime.FlowScriptRuntimeContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -29,7 +29,7 @@ public class ErrorTriggerScript {
 
     public ErrorThrow execute(FlowSession session) {
         GroovyScriptRequest request = new GroovyScriptRequest(session);
-        Object value = GroovyScriptCacheContext.getInstance()
+        Object value = FlowScriptRuntimeContext.getInstance()
                 .getGroovyScript(script)
                 .invoke(Map.of("$bind", new GroovyScriptBind(FlowScriptContext.getInstance())), request);
         if(value instanceof String){

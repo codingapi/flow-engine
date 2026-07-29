@@ -7,7 +7,7 @@ import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.script.utils.GroovyScriptUtils;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.springboot.script.annotation.GroovyScript;
-import com.codingapi.springboot.script.cache.GroovyScriptCacheContext;
+import com.codingapi.flow.script.runtime.FlowScriptRuntimeContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
@@ -30,7 +30,7 @@ public class ActionCustomScript {
      */
     public String getTriggerType(){
         if(script!=null){
-            String scriptData = GroovyScriptCacheContext.getInstance()
+            String scriptData = FlowScriptRuntimeContext.getInstance()
                     .getGroovyScript(script)
                     .getScript();
 
@@ -47,7 +47,7 @@ public class ActionCustomScript {
      */
     public String execute(FlowSession session) {
         GroovyScriptRequest request = new GroovyScriptRequest(session);
-        return GroovyScriptCacheContext.getInstance()
+        return FlowScriptRuntimeContext.getInstance()
                 .getGroovyScript(script)
                 .invoke(Map.of("$bind", new GroovyScriptBind(FlowScriptContext.getInstance())), request);
     }

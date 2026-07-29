@@ -1,5 +1,7 @@
 package com.codingapi.flow.service.impl;
 
+import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
+
 import com.codingapi.flow.domain.UrgeInterval;
 import com.codingapi.flow.event.FlowRecordUrgeEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -66,6 +68,7 @@ public class FlowUrgeService {
         UrgeInterval urgeInterval = repositoryHolder.getLatestUrgeInterval(currentRecord.getProcessId(), request.getRecordId());
         if (urgeInterval != null) {
             WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(currentRecord.getWorkRuntimeId());
+            FlowRuntimeScriptLocalCache.getInstance().set(workflowRuntime.getScripts());
             Workflow workflow = workflowRuntime.toWorkflow();
             WorkflowStrategyManager strategyManager = workflow.strategyManager();
             if (strategyManager.isEnableUrge()) {

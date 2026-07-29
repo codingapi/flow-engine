@@ -1,5 +1,7 @@
 package com.codingapi.flow.service.impl;
 
+import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
+
 import com.codingapi.flow.event.FlowRecordRevokeEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -59,6 +61,7 @@ public class FlowRevokeService {
         if (workflowRuntime == null) {
             throw FlowNotFoundException.workflow(currentRecord.getWorkRuntimeId() + " not found");
         }
+        FlowRuntimeScriptLocalCache.getInstance().set(workflowRuntime.getScripts());
         Workflow workflow = workflowRuntime.toWorkflow();
         IFlowNode currentNode = workflow.getFlowNode(currentRecord.getNodeId());
         NodeStrategyManager nodeStrategyManager = currentNode.strategyManager();

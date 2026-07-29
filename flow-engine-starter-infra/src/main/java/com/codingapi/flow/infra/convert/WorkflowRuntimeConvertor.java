@@ -1,7 +1,12 @@
 package com.codingapi.flow.infra.convert;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.flow.infra.entity.WorkflowRuntimeEntity;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class WorkflowRuntimeConvertor {
 
@@ -19,6 +24,7 @@ public class WorkflowRuntimeConvertor {
         entity.setWorkVersion(workflowRuntime.getWorkVersion());
         entity.setWorkTitle(workflowRuntime.getWorkTitle());
         entity.setCreateTime(workflowRuntime.getCreateTime());
+        entity.setScripts(workflowRuntime.getScripts() == null ? null : JSON.toJSONString(workflowRuntime.getScripts()));
         return entity;
     }
 
@@ -26,6 +32,14 @@ public class WorkflowRuntimeConvertor {
         if (entity == null) {
             return null;
         }
-        return new WorkflowRuntime(entity.getId(), entity.getWorkId(), entity.getWorkCode(), entity.getWorkVersion(), entity.getWorkTitle(), entity.getCreateTime(), entity.getWorkflow());
+        Map<String, String> scripts = null;
+        if (entity.getScripts() != null) {
+            scripts = JSON.parseObject(entity.getScripts(), new TypeReference<Map<String, String>>() {
+            });
+        }
+        if (scripts == null) {
+            scripts = new HashMap<>();
+        }
+        return new WorkflowRuntime(entity.getId(), entity.getWorkId(), entity.getWorkCode(), entity.getWorkVersion(), entity.getWorkTitle(), entity.getCreateTime(), entity.getWorkflow(), scripts);
     }
 }

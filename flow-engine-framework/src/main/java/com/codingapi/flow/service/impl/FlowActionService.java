@@ -1,5 +1,7 @@
 package com.codingapi.flow.service.impl;
 
+import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
+
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.context.ActionResponseContext;
 import com.codingapi.flow.exception.FlowNotFoundException;
@@ -71,6 +73,7 @@ public class FlowActionService {
             throw FlowNotFoundException.workflow(flowRecord.getWorkRuntimeId() + " not found");
         }
 
+        FlowRuntimeScriptLocalCache.getInstance().set(workflowRuntime.getScripts());
         Workflow workflow = workflowRuntime.toWorkflow();
 
         long recordOperatorId = flowRecord.getCurrentOperatorId();

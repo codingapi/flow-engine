@@ -1,5 +1,7 @@
 package com.codingapi.flow.service.impl;
 
+import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
+
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.event.FlowRecordStartEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
@@ -53,6 +55,7 @@ public class FlowCreateService {
         workflow.verify();
         // 获取或创建运行时快照
         WorkflowRuntime workflowRuntime = workflowService.getOrCreateWorkflowRuntime(workflow);
+        FlowRuntimeScriptLocalCache.getInstance().set(workflowRuntime.getScripts());
         // 验证当前用户
         IFlowOperator currentOperator = flowOperatorGateway.get(request.getOperatorId());
         if (!workflow.matchCreatedOperator(currentOperator)) {

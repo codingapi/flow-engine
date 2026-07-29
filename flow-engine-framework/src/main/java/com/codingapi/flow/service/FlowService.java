@@ -1,6 +1,7 @@
 package com.codingapi.flow.service;
 
 import com.codingapi.flow.cache.FlowOperatorLocalThreadCache;
+import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
 import com.codingapi.flow.pojo.request.*;
 import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.pojo.response.FlowContent;
@@ -33,6 +34,7 @@ public class FlowService {
      */
     public FlowContent detail(FlowDetailRequest request) {
         FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowRuntimeScriptLocalCache.getInstance().clear();
         FlowDetailService flowDetailService = new FlowDetailService(request, this.repositoryHolder);
         return flowDetailService.detail();
     }
@@ -46,6 +48,7 @@ public class FlowService {
      */
     public List<ProcessNode> processNodes(FlowProcessNodeRequest request) {
         FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowRuntimeScriptLocalCache.getInstance().clear();
         FlowProcessNodeService flowProcessNodeService = new FlowProcessNodeService(request, this.repositoryHolder);
         return flowProcessNodeService.processNodes();
     }
@@ -58,6 +61,7 @@ public class FlowService {
      */
     public long create(FlowCreateRequest request) {
         FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowRuntimeScriptLocalCache.getInstance().clear();
         FlowCreateService flowCreateService = new FlowCreateService(request, this.repositoryHolder);
         return flowCreateService.create();
     }
@@ -69,6 +73,7 @@ public class FlowService {
      */
     public ActionResponse action(FlowActionRequest request) {
         FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowRuntimeScriptLocalCache.getInstance().clear();
         FlowActionService flowActionService = new FlowActionService(request, this.repositoryHolder);
         return flowActionService.action();
     }
@@ -80,6 +85,7 @@ public class FlowService {
      */
     public void revoke(FlowRevokeRequest request) {
         FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowRuntimeScriptLocalCache.getInstance().clear();
         FlowRevokeService flowRevokeService = new FlowRevokeService(request, this.repositoryHolder);
         flowRevokeService.revoke();
     }
@@ -93,6 +99,7 @@ public class FlowService {
      */
     public void delete(FlowDeleteRequest request) {
         FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowRuntimeScriptLocalCache.getInstance().clear();
         FlowDeleteService flowDeleteService = new FlowDeleteService(request, this.repositoryHolder);
         flowDeleteService.delete();
     }
@@ -103,6 +110,7 @@ public class FlowService {
      */
     public void urge(FlowUrgeRequest request) {
         FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowRuntimeScriptLocalCache.getInstance().clear();
         FlowUrgeService flowUrgeService = new FlowUrgeService(request, this.repositoryHolder);
         flowUrgeService.urge();
     }

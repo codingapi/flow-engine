@@ -44,5 +44,10 @@ public class WorkflowRuntimeEntity {
      */
     @Lob
     private String workflow;
+    /**
+     * 脚本快照(脚本key -&gt; 脚本内容)的JSON
+     */
+    @Lob
+    private String scripts;
 
 }
