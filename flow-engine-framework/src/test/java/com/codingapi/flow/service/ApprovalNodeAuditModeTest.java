@@ -366,6 +366,73 @@ class ApprovalNodeAuditModeTest {
     }
 
     /**
+     * 连续两个会签（MERGE）节点：A(发起) -> B(b1、b2 会签) -> C(c1、c2 会签) -> D(结束)。
+     *
+     * <p>问题复现：B 节点仅 b1 一人提交（会签比例未达成，流程不应向下流转）后，
+     * 查看流程记录时，出现了两个 C 节点记录、每条记录各有一个审批人（c1、c2）的脏数据。
+     *
+     * <p>期望：B 节点未完成前，流程记录中不应存在任何 C 节点记录；
+     * processNodes 视图中 C 节点应仅出现一次且处于待审批（PENDING）状态。
+     */
+    @Test
+    void mergeAuditNextMergeNodeRecordsShouldNotAppearPrematurely() {
+        User user = new User(1, "user");
+        User b1 = new User(2, "b1");
+        User b2 = new User(3, "b2");
+        User c1 = new User(4, "c1");
+        User c2 = new User(8, "c2");
+        registerUsers(user, b1, b2, c1, c2);
+
+        StartNode startNode = startNode();
+        ApprovalNode bNode = approvalNode("B审批", "[2,3]",
+                new MultiOperatorAuditStrategy(MultiOperatorAuditStrategy.Type.MERGE, 1.0f));
+        ApprovalNode cNode = approvalNode("C审批", "[4,8]",
+                new MultiOperatorAuditStrategy(MultiOperatorAuditStrategy.Type.MERGE, 1.0f));
+        EndNode endNode = EndNode.builder().build();
+
+        Workflow workflow = saveWorkflow(user, startNode, bNode, cNode, endNode);
+        Map<String, Object> data = data(1);
+        startAndSubmit(workflow, startNode, user, data);
+
+        // B 节点：b1、b2 同时收到待办；C 节点审批人不应产生任何待办
+        FlowRecord b1Todo = todoOf(b1);
+        FlowRecord b2Todo = todoOf(b2);
+        assertNoTodo(c1);
+        assertNoTodo(c2);
+
+        // 初始流程记录：开始、b1、b2 共 3 条，C 节点尚无任何记录
+        List<FlowRecord> records = processRecords(b1Todo);
+        assertEquals(3, records.size());
+        assertEquals(0, recordsOfNode(records, cNode).size(), "B 节点未完成前不应产生 C 节点记录");
+
+        // b1 办理 -> 会签比例 1/2 未达成，流程不向下流转
+        pass(b1Todo, bNode, b1, data);
+        assertNoTodo(c1);
+        assertNoTodo(c2);
+
+        // ============ 核心验证：流程记录中不应出现 C 节点脏数据 ============
+        records = processRecords(b2Todo);
+        // 应为：开始、b1(已办)、b2(待办) 共 3 条，绝不允许出现 C 节点记录
+        assertEquals(3, records.size(), "B 节点未完成时，流程记录应仅有 开始、b1、b2 三条");
+        assertEquals(0, recordsOfNode(records, cNode).size(),
+                "B 节点会签未完成前，流程记录中不应出现任何 C 节点记录");
+        assertEquals(2, recordsOfNode(records, bNode).size());
+        assertEquals(1, records.stream().filter(FlowRecord::isTodo).count(), "仅 b2 一条待办");
+
+        // ============ 视图验证：C 节点仅出现一次且为待审批 ============
+        List<ProcessNode> nodeList = processNodes(b2Todo, b2, data);
+        assertEquals(4, nodeList.size());
+        assertEquals(ProcessNode.ApproveState.PASS, nodeList.get(0).getApproveState());
+        assertEquals(ProcessNode.ApproveState.PROCESSING, nodeList.get(1).getApproveState());
+        assertEquals(ProcessNode.ApproveState.PENDING, nodeList.get(2).getApproveState());
+        assertEquals(ProcessNode.ApproveState.PENDING, nodeList.get(3).getApproveState());
+        // C 节点在视图中应仅出现一次，不应出现两个 C 节点记录
+        assertEquals(1, nodeList.stream()
+                        .filter(n -> cNode.getName().equals(n.getNodeName())).count(),
+                "C 节点在流程节点视图中应仅出现一次，不应出现两条 C 节点记录");
+    }
+
+    /**
      * 合并审核（MERGE，比例 0.5）：b1、b2、b3 三人，两人办理即达到比例。
      * <p>达到比例后节点完成，剩余未办理的 b3 记录自动置为已办（待办清空），流程到 C。
      */
@@ -669,6 +736,72 @@ class ApprovalNodeAuditModeTest {
         nodeList = processNodes(c1Todo, c1, data);
         assertEquals(4, nodeList.size());
         assertEquals(4, nodeList.stream().filter(ProcessNode::isHistory).count());
+    }
+
+    /**
+     * 会签节点存在多个待办时，processNodes 视图不应重复展示下游节点（下游 C 为会签）。
+     *
+     * <p>流程设计：A(发起) -> B(b1、b2 会签) -> C(c1、c2 会签) -> D(结束)。
+     * <p>问题复现：B 节点为多人审批（会签/或签），存在 b1、b2 两条待办记录时，
+     * 查看流程节点视图（{@code processNodes}）会出现两个 C 节点记录（每个下游节点被重复展示），
+     * 而非期望的一个 C 节点。
+     * <p>期望：无论当前节点有多少条待办，其下游节点在视图中应仅展示一次。
+     */
+    @Test
+    void processNodesShouldNotDuplicateNextNodeWhenNextIsMerge() {
+        assertNextNodeNotDuplicated(
+                new MultiOperatorAuditStrategy(MultiOperatorAuditStrategy.Type.MERGE, 1.0f));
+    }
+
+    /**
+     * 会签节点存在多个待办时，processNodes 视图不应重复展示下游节点（下游 C 为或签）。
+     * <p>验证下游节点审批模式为任意审核（ANY）时同样不会重复展示。
+     */
+    @Test
+    void processNodesShouldNotDuplicateNextNodeWhenNextIsAny() {
+        assertNextNodeNotDuplicated(
+                new MultiOperatorAuditStrategy(MultiOperatorAuditStrategy.Type.ANY, 0));
+    }
+
+    /**
+     * 断言：B 会签节点存在 b1、b2 两条待办时，从 b1 待办查看流程节点视图，
+     * 下游 C 节点（按 {@code cAuditStrategy} 配置）仅展示一次。
+     */
+    private void assertNextNodeNotDuplicated(MultiOperatorAuditStrategy cAuditStrategy) {
+        User user = new User(1, "user");
+        User b1 = new User(2, "b1");
+        User b2 = new User(3, "b2");
+        User c1 = new User(4, "c1");
+        User c2 = new User(8, "c2");
+        registerUsers(user, b1, b2, c1, c2);
+
+        StartNode startNode = startNode();
+        ApprovalNode bNode = approvalNode("B审批", "[2,3]",
+                new MultiOperatorAuditStrategy(MultiOperatorAuditStrategy.Type.MERGE, 1.0f));
+        ApprovalNode cNode = approvalNode("C审批", "[4,8]", cAuditStrategy);
+        EndNode endNode = EndNode.builder().build();
+
+        Workflow workflow = saveWorkflow(user, startNode, bNode, cNode, endNode);
+        Map<String, Object> data = data(1);
+        startAndSubmit(workflow, startNode, user, data);
+
+        // B 节点：b1、b2 同时收到待办（同一节点存在多条待办）
+        FlowRecord b1Todo = todoOf(b1);
+        todoOf(b2);
+
+        // 从 b1 待办查看流程节点视图：下游 C 节点应仅展示一次
+        List<ProcessNode> nodeList = processNodes(b1Todo, b1, data);
+        assertEquals(4, nodeList.size(), "视图应仅含 开始、B、C、结束 四个节点，下游节点不应重复");
+        assertEquals(1, nodeList.stream()
+                        .filter(n -> cNode.getName().equals(n.getNodeName())).count(),
+                "C 节点在流程节点视图中应仅出现一次，不应因 B 节点有多条待办而重复展示");
+        assertEquals(1, nodeList.stream()
+                        .filter(n -> bNode.getName().equals(n.getNodeName())).count(),
+                "B 节点在视图中应仅出现一次");
+        // 下游 C 节点视图应完整展示 c1、c2 两名审批人
+        ProcessNode cNodeView = nodeList.stream()
+                .filter(n -> cNode.getName().equals(n.getNodeName())).findFirst().orElseThrow();
+        assertEquals(2, cNodeView.getOperators().size(), "C 节点视图应展示 c1、c2 两名审批人");
     }
 
     // ==================== 嵌套场景：并行 / 条件岔路下的复杂审批 ====================
