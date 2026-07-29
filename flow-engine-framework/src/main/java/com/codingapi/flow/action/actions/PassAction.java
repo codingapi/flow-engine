@@ -109,11 +109,26 @@ public class PassAction extends BaseAction {
 
         // 检查操作人选择：若存在需要手动设定操作人的节点且尚未设定，则提示用户
         List<NodeOption> operatorSelectNodes = new ArrayList<>();
+        Map<String, List<Long>> operatorSelectMap = flowSession.getAdvice().getOperatorSelectMap();
         if (currentNode.getType().equalsIgnoreCase(StartNode.NODE_TYPE)) {
             // 发起人设定模式：开始节点提交时，扫描整个工作流中所有 INITIATOR_SELECT 节点
             operatorSelectNodes.addAll(this.loadInitiatorSelectNodes(flowSession));
+            // 开始节点直接下游若为审批人设定（APPROVER_SELECT）节点，由于没有前序审批人可为其指定操作人，
+            // 需由发起人在提交开始节点时指定，否则节点取不到审批人，流程会停滞在开始节点
+            if (nextNodes != null) {
+                for (IFlowNode nextNode : nextNodes) {
+                    if (nextNode.strategyManager().getOperatorSelectType() != OperatorSelectType.APPROVER_SELECT) {
+                        continue;
+                    }
+                    if (operatorSelectMap == null || !operatorSelectMap.containsKey(nextNode.getId())
+                            || operatorSelectMap.get(nextNode.getId()).isEmpty()) {
+                        List<IFlowOperator> range = nextNode.strategyManager()
+                                .loadOperatorRange(flowSession.updateSession(nextNode));
+                        operatorSelectNodes.add(new NodeOption(nextNode, range));
+                    }
+                }
+            }
         } else {
-            Map<String, List<Long>> operatorSelectMap = flowSession.getAdvice().getOperatorSelectMap();
             // 审批人设定模式：审批节点提交时，检查下游节点是否有 APPROVER_SELECT
             if (nextNodes != null) {
                 for (IFlowNode nextNode : nextNodes) {
