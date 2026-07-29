@@ -786,6 +786,132 @@ class OperatorSelectTest {
     }
 
 
+    /**
+     * 审批人设定模式（APPROVER_SELECT）直接位于开始节点之后：发起人提交开始节点应提示设定操作人。
+     *
+     * <p>流程设计：A(发起) -> B(b1 审批人设定) -> C(c1 审批人设定) -> D(结束)。
+     * <p>问题复现：B、C 均为单人审批节点且配置为审批人设定（APPROVER_SELECT），发起人提交开始节点后，
+     * 既不返回 OPERATOR_SELECT 提示，也不流转到 B，而是在开始节点 A 上重复生成待办，流程始终停留在 A 节点。
+     * <p>期望：开始节点直接下游为审批人设定节点时，发起人提交应返回 OPERATOR_SELECT 提示（由发起人指定 B 的审批人），
+     * 指定后流程正常流转到 B；B 审批时再提示指定 C 的审批人，最终流程正常结束。
+     */
+    @Test
+    void testApproverSelectDirectlyAfterStartNode() {
+        User user = new User(1, "user");
+        User b1 = new User(2, "b1");
+        User c1 = new User(4, "c1");
+        factory.userGateway.save(user);
+        factory.userGateway.save(b1);
+        factory.userGateway.save(c1);
+
+        GatewayContext.getInstance().setFlowOperatorGateway(factory.userGateway);
+
+        StartNode startNode = StartNode.builder()
+                .strategies(NodeStrategyBuilder.builder().addStrategy(writePermission()).build())
+                .build();
+        // B、C 均为单人审批节点，配置为审批人设定（APPROVER_SELECT）
+        ApprovalNode bNode = ApprovalNode.builder()
+                .name("B审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(readPermission())
+                        .addStrategy(OperatorLoadStrategy.approverSelectStrategy())
+                        .build())
+                .build();
+        ApprovalNode cNode = ApprovalNode.builder()
+                .name("C审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(readPermission())
+                        .addStrategy(OperatorLoadStrategy.approverSelectStrategy())
+                        .build())
+                .build();
+        EndNode endNode = EndNode.builder().build();
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("请假流程").code("leave").createdOperator(user).form(leaveForm())
+                .addNode(startNode).addNode(bNode).addNode(cNode).addNode(endNode)
+                .build();
+        factory.workflowService.saveWorkflow(workflow);
+
+        Map<String, Object> data = Map.of("name", "lorne", "days", 1, "reason", "leave");
+        List<IFlowAction> startActions = startNode.actionManager().getActions();
+
+        FlowCreateRequest createRequest = new FlowCreateRequest();
+        createRequest.setWorkCode(workflow.getCode());
+        createRequest.setFormData(data);
+        createRequest.setActionId(startActions.get(0).id());
+        createRequest.setOperatorId(user.getUserId());
+        factory.flowService.create(createRequest);
+
+        List<FlowRecord> userRecords = factory.flowRecordRepository.findTodoByOperator(user.getUserId());
+        assertEquals(1, userRecords.size());
+        FlowRecord startTodo = userRecords.get(0);
+
+        // ① 发起人提交开始节点（不带 operatorSelectMap）：应提示为 B 节点设定审批人
+        FlowActionRequest startAction = new FlowActionRequest();
+        startAction.setFormData(data);
+        startAction.setRecordId(startTodo.getId());
+        startAction.setAdvice(new FlowAdviceBody(startActions.get(0).id(), "提交", user.getUserId()));
+        ActionResponse response = factory.flowService.action(startAction);
+
+        assertNotNull(response, "开始节点直接下游为审批人设定节点时，应返回 OPERATOR_SELECT 提示，而非流程停留在 A 节点");
+        assertEquals(ActionResponse.ResponseType.OPERATOR_SELECT, response.getResponseType());
+        assertEquals(1, response.getOptions().size());
+        assertEquals(bNode.getId(), response.getOptions().get(0).getId());
+
+        // 提示前后开始节点待办不应被消费或在 A 节点重复生成；B 节点尚不应产生待办
+        assertEquals(1, factory.flowRecordRepository.findTodoByOperator(user.getUserId()).size(),
+                "返回设定审批人提示时，开始节点待办不应被消费，更不应在 A 节点重复生成待办");
+        assertEquals(0, factory.flowRecordRepository.findTodoByOperator(b1.getUserId()).size());
+
+        // ② 发起人再次提交并为 B 指定审批人 b1：流程流转到 B
+        FlowActionRequest startAction2 = new FlowActionRequest();
+        startAction2.setFormData(data);
+        startAction2.setRecordId(startTodo.getId());
+        FlowAdviceBody startAdvice = new FlowAdviceBody(startActions.get(0).id(), "提交", user.getUserId());
+        startAdvice.setOperatorSelectMap(Map.of(bNode.getId(), List.of(b1.getUserId())));
+        startAction2.setAdvice(startAdvice);
+        assertNull(factory.flowService.action(startAction2));
+
+        List<FlowRecord> b1Records = factory.flowRecordRepository.findTodoByOperator(b1.getUserId());
+        assertEquals(1, b1Records.size(), "为 B 指定审批人 b1 后，流程应流转到 B 节点");
+        assertEquals(0, factory.flowRecordRepository.findTodoByOperator(user.getUserId()).size());
+
+        // ③ b1 审批（不带 operatorSelectMap）：应提示为 C 节点设定审批人
+        List<IFlowAction> bActions = bNode.actionManager().getActions();
+        FlowActionRequest bAction = new FlowActionRequest();
+        bAction.setFormData(data);
+        bAction.setRecordId(b1Records.get(0).getId());
+        bAction.setAdvice(new FlowAdviceBody(bActions.get(0).id(), "同意", b1.getUserId()));
+        ActionResponse bResponse = factory.flowService.action(bAction);
+
+        assertNotNull(bResponse);
+        assertEquals(ActionResponse.ResponseType.OPERATOR_SELECT, bResponse.getResponseType());
+        assertEquals(cNode.getId(), bResponse.getOptions().get(0).getId());
+
+        // ④ b1 再次审批并为 C 指定审批人 c1：流程流转到 C
+        FlowActionRequest bAction2 = new FlowActionRequest();
+        bAction2.setFormData(data);
+        bAction2.setRecordId(b1Records.get(0).getId());
+        FlowAdviceBody bAdvice = new FlowAdviceBody(bActions.get(0).id(), "同意", b1.getUserId());
+        bAdvice.setOperatorSelectMap(Map.of(cNode.getId(), List.of(c1.getUserId())));
+        bAction2.setAdvice(bAdvice);
+        assertNull(factory.flowService.action(bAction2));
+
+        List<FlowRecord> c1Records = factory.flowRecordRepository.findTodoByOperator(c1.getUserId());
+        assertEquals(1, c1Records.size());
+
+        // ⑤ c1 审批通过，流程结束
+        List<IFlowAction> cActions = cNode.actionManager().getActions();
+        FlowActionRequest cAction = new FlowActionRequest();
+        cAction.setFormData(data);
+        cAction.setRecordId(c1Records.get(0).getId());
+        cAction.setAdvice(new FlowAdviceBody(cActions.get(0).id(), "同意", c1.getUserId()));
+        factory.flowService.action(cAction);
+
+        List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(c1Records.get(0).getProcessId());
+        assertEquals(3, records.stream().filter(FlowRecord::isFinish).count(), "流程应正常结束");
+    }
+
+
     private FlowForm leaveForm() {
         return FlowFormBuilder.builder()
                 .name("请假流程")

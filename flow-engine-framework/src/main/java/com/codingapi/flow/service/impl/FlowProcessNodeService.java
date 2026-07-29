@@ -177,7 +177,13 @@ public class FlowProcessNodeService {
             List<FlowRecord> todoLatestRecords = this.loadLatestRecords();
             IFlowOperator currentOperator = this.loadRecordOperator(this.request.getOperatorId());
             if (!todoLatestRecords.isEmpty()) {
+                // 同一节点存在多条待办（如会签/或签）时，向后预览只需按节点遍历一次，
+                // 否则下游节点会随待办条数被重复展示
+                Map<String, FlowRecord> nodeTodoMap = new LinkedHashMap<>();
                 for (FlowRecord todoRecord : todoLatestRecords) {
+                    nodeTodoMap.putIfAbsent(todoRecord.getNodeId(), todoRecord);
+                }
+                for (FlowRecord todoRecord : nodeTodoMap.values()) {
                     IFlowNode currentNode = this.workflow.getFlowNode(todoRecord.getNodeId());
                     IFlowOperator createOperator = this.loadRecordOperator(todoRecord.getCreateOperatorId());
                     IFlowOperator submitOperator = this.loadRecordOperator(todoRecord.getSubmitOperatorId());
