@@ -1,5 +1,7 @@
 package com.codingapi.flow.service.impl;
 
+import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
+
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.cache.FlowOperatorLocalThreadCache;
 import com.codingapi.flow.domain.DelayTask;
@@ -53,6 +55,7 @@ public class FlowDelayTriggerService {
             throw FlowNotFoundException.workflow(flowRecord.getWorkRuntimeId() + " not found");
         }
 
+        FlowRuntimeScriptLocalCache.getInstance().set(workflowRuntime.getScripts());
         Workflow workflow = workflowRuntime.toWorkflow();
         IFlowNode currentNode = workflow.getFlowNode(flowRecord.getNodeId());
 

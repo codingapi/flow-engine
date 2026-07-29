@@ -1,6 +1,7 @@
 package com.codingapi.flow.domain;
 
 import com.codingapi.flow.cache.FlowOperatorLocalThreadCache;
+import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
 import com.codingapi.flow.service.impl.FlowDelayTriggerService;
 import com.codingapi.flow.session.IRepositoryHolder;
 import lombok.Getter;
@@ -80,6 +81,7 @@ public class DelayTaskManager {
                 @Override
                 public void run() {
                     FlowOperatorLocalThreadCache.getInstance().clear();
+                    FlowRuntimeScriptLocalCache.getInstance().clear();
                     FlowDelayTriggerService flowDelayTriggerService = repositoryHolder.createDelayTriggerService(task);
                     flowDelayTriggerService.trigger();
                     repositoryHolder.deleteDelayTask(task);

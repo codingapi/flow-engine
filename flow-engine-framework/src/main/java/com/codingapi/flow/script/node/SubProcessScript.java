@@ -8,7 +8,7 @@ import com.codingapi.flow.script.request.GroovyScriptRequest;
 import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.springboot.script.annotation.GroovyScript;
-import com.codingapi.springboot.script.cache.GroovyScriptCacheContext;
+import com.codingapi.flow.script.runtime.FlowScriptRuntimeContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -28,7 +28,7 @@ public class SubProcessScript {
     public FlowCreateRequest execute(FlowSession session) {
         FlowRecord flowRecord = session.getCurrentRecord();
         GroovyScriptRequest request = new GroovyScriptRequest(session);
-        FlowCreateRequest flowCreateRequest = GroovyScriptCacheContext.getInstance()
+        FlowCreateRequest flowCreateRequest = FlowScriptRuntimeContext.getInstance()
                 .getGroovyScript(script)
                 .invoke(Map.of("$bind", new GroovyScriptBind(FlowScriptContext.getInstance())), request);
         flowCreateRequest.setParentRecordId(flowRecord.getId());

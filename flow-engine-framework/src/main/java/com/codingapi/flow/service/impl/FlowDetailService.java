@@ -1,5 +1,7 @@
 package com.codingapi.flow.service.impl;
 
+import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
+
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FormData;
@@ -62,6 +64,7 @@ public class FlowDetailService {
             if (workflowRuntime == null) {
                 throw FlowNotFoundException.workflow(flowRecord.getWorkRuntimeId() + " not found");
             }
+            FlowRuntimeScriptLocalCache.getInstance().set(workflowRuntime.getScripts());
             Workflow workflow = workflowRuntime.toWorkflow();
 
             if (!flowRecord.isReadable()) {
