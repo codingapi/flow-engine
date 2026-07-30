@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.codingapi.flow</groupId>
         <artifactId>flow-engine-parent</artifactId>
-        <version>0.0.66</version>
+        <version>${revision}</version>
     </parent>
 
     <name>flow-engine-starter-infra</name>
