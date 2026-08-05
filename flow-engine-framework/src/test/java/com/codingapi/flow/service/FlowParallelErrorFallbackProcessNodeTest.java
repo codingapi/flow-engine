@@ -149,8 +149,10 @@ class FlowParallelErrorFallbackProcessNodeTest {
                 () -> assertTrue(fallbackStartRecords.stream()
                                 .allMatch(record -> record.getActionId() == null
                                         && record.getActionType() == null
-                                        && record.getActionName() == null),
-                        "未审批的异常回退 A 记录不应继承上游 PASS 动作"),
+                                        && record.getActionName() == null
+                                        && record.getAdvice() == null
+                                        && record.getSignKey() == null),
+                        "未审批的异常回退 A 记录不应继承上游审批信息"),
                 () -> assertEquals(aRecord.getId(), b1Todo.getFromId()),
                 () -> assertEquals(1, records.subList(1, 4).stream()
                         .map(FlowRecord::getParallelId).distinct().count()),
@@ -180,8 +182,10 @@ class FlowParallelErrorFallbackProcessNodeTest {
                 () -> assertTrue(fallbackStartNode.getOperators().stream()
                                 .allMatch(operator -> operator.getActionType() == null
                                         && operator.getActionName() == null
+                                        && operator.getAdvice() == null
+                                        && operator.getSignKey() == null
                                         && operator.getApproveTime() == 0),
-                        "PROCESSING 节点内的未审批记录不应显示为已通过"));
+                        "PROCESSING 节点内的未审批记录不应显示上游审批信息"));
     }
 
     private HandleNode fallbackHandleNode(String name, StartNode fallbackNode) {
