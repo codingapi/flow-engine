@@ -1,5 +1,6 @@
 package com.codingapi.flow.service.impl;
 
+import com.codingapi.flow.domain.SubProcessRecord;
 import com.codingapi.flow.event.FlowRecordDeleteEvent;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
@@ -36,6 +37,14 @@ public class FlowDeleteService {
         FlowRecord currentRecord = flowRecordService.getFlowRecord(request.getRecordId());
         if (currentRecord == null) {
             throw FlowNotFoundException.record(request.getRecordId());
+        }
+        boolean waitingParent = currentRecord.getParentId() > 0
+                && repositoryHolder.getSubProcessRepository()
+                .findByParentRecordId(currentRecord.getParentId()).stream()
+                .filter(SubProcessRecord::isWaiting)
+                .anyMatch(record -> record.containsChildProcess(currentRecord.getProcessId()));
+        if (waitingParent) {
+            throw FlowStateException.recordNotSupportDelete();
         }
         // 必须是待办状态(未办理、未撤销、未结束)
         if (!currentRecord.isTodo()) {

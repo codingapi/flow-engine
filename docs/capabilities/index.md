@@ -16,6 +16,7 @@
 | [flow-engine-framework/node](./flow-engine-framework/node.md) | flow-engine-framework | 流程节点体系，包含 19 种节点类型、节点接口层次和节点工厂 | 后端 | 项目自有 |
 | [flow-engine-framework/repository](./flow-engine-framework/repository.md) | flow-engine-framework | 仓储抽象层，定义流程引擎的持久化接口和仓储持有者上下文 | 后端 | 项目自有 |
 | [flow-engine-framework/script](./flow-engine-framework/script.md) | flow-engine-framework | Groovy 脚本运行时，包含脚本注册表、脚本类型封装和脚本执行上下文 | 后端 | 项目自有 |
+| [flow-engine-framework/sub-process](./flow-engine-framework/sub-process.md) | flow-engine-framework | 子流程聚合执行能力，支持批量创建、主流程等待、脚本结果判定与异常跳转 | 后端 | 项目自有 |
 | [flow-engine-framework/workflow-strategy](./flow-engine-framework/workflow-strategy.md) | flow-engine-framework | 工作流级别策略体系，包含策略接口、工厂和具体策略实现 | 后端 | 项目自有 |
 | [flow-engine-framework/workflow](./flow-engine-framework/workflow.md) | flow-engine-framework | 工作流引擎核心模型，包含流程定义、构建器、版本管理和运行时快照 | 后端 | 项目自有 |
 | [flow-engine-starter/auto-configuration](./flow-engine-starter/auto-configuration.md) | flow-engine-starter | Spring Boot 自动配置入口，注册流程引擎的核心组件和仓储上下文 | 后端 | 项目自有 |
@@ -27,4 +28,4 @@
 
 ---
 
-**统计**: 共 18 篇 — 已实现 18 / 计划中 0 / 已废弃 0
+**统计**: 共 19 篇 — 已实现 19 / 计划中 0 / 已废弃 0

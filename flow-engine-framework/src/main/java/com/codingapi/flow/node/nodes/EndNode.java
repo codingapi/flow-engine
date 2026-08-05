@@ -11,6 +11,7 @@ import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
+import com.codingapi.flow.service.impl.FlowSubProcessResultService;
 import com.codingapi.springboot.framework.event.EventPusher;
 
 import java.util.ArrayList;
@@ -68,6 +69,8 @@ public class EndNode extends BaseFlowNode implements IDisplayNode {
             item.finish(currentAction instanceof PassAction);
         });
         repositoryHolder.saveRecords(recordList);
+        // 子流程结束后同步执行主流程结果确认，保证 Mock 与生产环境行为一致。
+        new FlowSubProcessResultService(latestRecord, repositoryHolder).complete();
         // 流程是否正常结束
         EventPusher.push(new FlowRecordFinishEvent(latestRecord, session.isMock()));
     }

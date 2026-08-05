@@ -34,6 +34,13 @@ public interface IScriptRegistry {
     String getSubProcessScript();
 
     /**
+     * 获取子流程结果确认脚本。
+     */
+    default String getSubProcessResultScript() {
+        return getConditionScript();
+    }
+
+    /**
      * 获取操作者加载脚本
      */
     String getOperatorLoadScript();

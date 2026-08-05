@@ -2,6 +2,7 @@ package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
 
+import com.codingapi.flow.domain.SubProcessRecord;
 import com.codingapi.flow.event.FlowRecordRevokeEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
@@ -51,6 +52,12 @@ public class FlowRevokeService {
             throw FlowStateException.recordAlreadyTodo();
         }
         if (currentRecord.isFinish()) {
+            throw FlowStateException.recordNotSupportRevoke();
+        }
+        boolean waitingSubProcess = repositoryHolder.getSubProcessRepository()
+                .findByParentRecordId(currentRecord.getId()).stream()
+                .anyMatch(SubProcessRecord::isWaiting);
+        if (waitingSubProcess) {
             throw FlowStateException.recordNotSupportRevoke();
         }
         long currentOperatorId = currentRecord.getCurrentOperatorId();
@@ -107,4 +114,3 @@ public class FlowRevokeService {
 
     }
 }
-

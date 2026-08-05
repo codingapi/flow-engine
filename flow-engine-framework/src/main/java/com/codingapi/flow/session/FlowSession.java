@@ -3,6 +3,8 @@ package com.codingapi.flow.session;
 import com.alibaba.fastjson.JSONObject;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.domain.SubProcessContext;
+import com.codingapi.flow.domain.SubProcessRecord;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.form.FormDataVerify;
 import com.codingapi.flow.form.permission.FormFieldPermission;
@@ -21,6 +23,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 流程会话对象
@@ -95,6 +98,12 @@ public class FlowSession {
      */
     @Getter
     private final FlowAdvice advice;
+
+    /**
+     * 子流程结果判定上下文，仅在子流程完成回调中存在。
+     */
+    @Setter
+    private SubProcessContext subProcessContext;
 
 
     public FlowSession(IRepositoryHolder repositoryHolder,
@@ -312,7 +321,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowNode currentNode) {
-        return new FlowSession(repositoryHolder, currentOperator, createdOperator, submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
+        return this.copySubProcessContext(new FlowSession(repositoryHolder, currentOperator, createdOperator, submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice));
     }
 
 
@@ -323,7 +332,7 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowAction currentAction) {
-        return new FlowSession(repositoryHolder, currentOperator, createdOperator, submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
+        return this.copySubProcessContext(new FlowSession(repositoryHolder, currentOperator, createdOperator, submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice));
     }
 
     /**
@@ -333,7 +342,55 @@ public class FlowSession {
      * @return 新的会话
      */
     public FlowSession updateSession(IFlowOperator currentOperator) {
-        return new FlowSession(repositoryHolder, currentOperator, createdOperator, submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice);
+        return this.copySubProcessContext(new FlowSession(repositoryHolder, currentOperator, createdOperator, submitOperator, workflow, currentNode, currentAction, formData, currentRecord, currentNodeRecords, workflowRuntimeId, advice));
+    }
+
+    private FlowSession copySubProcessContext(FlowSession session) {
+        session.setSubProcessContext(this.subProcessContext);
+        return session;
+    }
+
+    /**
+     * 查询当前主流程中指定子流程节点已经结束的最终记录。
+     *
+     * @param subProcessNodeId 子流程节点 ID
+     * @return 每个已结束子流程实例的最终业务记录
+     */
+    public List<FlowRecord> findSubProcessRecords(String subProcessNodeId) {
+        if (currentRecord == null) {
+            return List.of();
+        }
+        List<SubProcessRecord> records;
+        if (subProcessContext != null
+                && subProcessContext.getSubProcessRecord().getNodeId().equals(subProcessNodeId)) {
+            records = List.of(subProcessContext.getSubProcessRecord());
+        } else {
+            records = repositoryHolder.getSubProcessRepository()
+                    .findByParentProcessIdAndNodeId(currentRecord.getProcessId(), subProcessNodeId);
+        }
+        List<Long> ids = records.stream()
+                .flatMap(record -> record.findFinishedRecordIds().stream())
+                .toList();
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+        return repositoryHolder.getFlowRecordService().findFlowRecordByIds(ids).stream()
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    /**
+     * 获取本次子流程节点创建的实例总数。
+     */
+    public int getSubProcessTotal() {
+        return subProcessContext == null ? 0 : subProcessContext.getSubProcessRecord().getTotalCount();
+    }
+
+    /**
+     * 获取本次刚结束的子流程最终记录。
+     */
+    public FlowRecord getCurrentSubProcessRecord() {
+        return subProcessContext == null ? null : subProcessContext.getCurrentSubProcessRecord();
     }
 
     /**

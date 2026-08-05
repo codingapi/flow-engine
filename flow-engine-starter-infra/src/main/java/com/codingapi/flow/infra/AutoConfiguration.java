@@ -63,4 +63,9 @@ public class AutoConfiguration {
         return new FlowOperatorAssignmentRepositoryImpl(flowOperatorAssignmentEntityRepository);
     }
 
+    @Bean
+    public SubProcessRepository subProcessRepository(SubProcessRecordEntityRepository repository) {
+        return new SubProcessRepositoryImpl(repository);
+    }
+
 }

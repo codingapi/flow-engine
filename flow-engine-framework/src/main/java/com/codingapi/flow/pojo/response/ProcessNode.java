@@ -1,5 +1,6 @@
 package com.codingapi.flow.pojo.response;
 
+import com.codingapi.flow.domain.SubProcessRecord;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -59,6 +60,11 @@ public class ProcessNode {
      * 节点审批人
      */
     private List<FlowOperatorBody> operators;
+
+    /**
+     * 子流程节点执行信息，仅 SUB_PROCESS 节点产生执行记录后返回。
+     */
+    private SubProcessBody subProcess;
 
     public boolean isHistory() {
         return this.approveState == ApproveState.PASS || this.approveState == ApproveState.ERROR;
@@ -167,6 +173,25 @@ public class ProcessNode {
         return processNode;
     }
 
+    public static ProcessNode createBySubProcessRecord(SubProcessRecord record, Workflow workflow) {
+        IFlowNode flowNode = workflow.getFlowNode(record.getNodeId());
+        ProcessNode processNode = new ProcessNode();
+        processNode.setId("sub-process:" + record.getId());
+        processNode.setNodeId(flowNode.getId());
+        processNode.setNodeName(flowNode.getName());
+        processNode.setNodeType(flowNode.getType());
+        processNode.setApproveState(switch (record.getState()) {
+            case WAITING -> ApproveState.PROCESSING;
+            case PASSED -> ApproveState.PASS;
+            case ERROR -> ApproveState.ERROR;
+        });
+        processNode.resetApproveStrategy(flowNode);
+        processNode.setOperatorStrategy(OperatorStrategy.NO_OPERATOR);
+        processNode.setOperators(List.of());
+        processNode.setSubProcess(SubProcessBody.create(record));
+        return processNode;
+    }
+
 
     public static ProcessNode createByEndNode(IFlowNode flowNode, boolean finish) {
         ProcessNode processNode = new ProcessNode();
@@ -264,6 +289,62 @@ public class ProcessNode {
             this.flowOperator = flowOperator;
         }
 
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SubProcessBody {
+        private long recordId;
+        private String groupId;
+        private long parentRecordId;
+        private int totalCount;
+        private int finishedCount;
+        private SubProcessRecord.State state;
+        private long createTime;
+        private long finishTime;
+        private List<SubProcessInstanceBody> instances;
+
+        private static SubProcessBody create(SubProcessRecord record) {
+            List<SubProcessInstanceBody> instances = record.getInstances().stream()
+                    .map(SubProcessInstanceBody::create)
+                    .toList();
+            int finishedCount = (int) record.getInstances().stream()
+                    .filter(SubProcessRecord.Instance::isFinished)
+                    .count();
+            return new SubProcessBody(
+                    record.getId(),
+                    record.getGroupId(),
+                    record.getParentRecordId(),
+                    record.getTotalCount(),
+                    finishedCount,
+                    record.getState(),
+                    record.getCreateTime(),
+                    record.getFinishTime(),
+                    instances
+            );
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SubProcessInstanceBody {
+        private long startRecordId;
+        private String processId;
+        private long finishRecordId;
+        private SubProcessRecord.InstanceState state;
+        private long finishTime;
+
+        private static SubProcessInstanceBody create(SubProcessRecord.Instance instance) {
+            return new SubProcessInstanceBody(
+                    instance.getStartRecordId(),
+                    instance.getProcessId(),
+                    instance.getFinishRecordId(),
+                    instance.getState(),
+                    instance.getFinishTime()
+            );
+        }
     }
 
 }

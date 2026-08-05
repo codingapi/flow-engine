@@ -12,6 +12,8 @@ import com.codingapi.flow.script.runtime.FlowScriptRuntimeContext;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,14 +27,32 @@ public class SubProcessScript {
     @GroovyScript
     private final String script;
 
-    public FlowCreateRequest execute(FlowSession session) {
+    public List<FlowCreateRequest> execute(FlowSession session) {
         FlowRecord flowRecord = session.getCurrentRecord();
         GroovyScriptRequest request = new GroovyScriptRequest(session);
-        FlowCreateRequest flowCreateRequest = FlowScriptRuntimeContext.getInstance()
+        Object value = FlowScriptRuntimeContext.getInstance()
                 .getGroovyScript(script)
                 .invoke(Map.of("$bind", new GroovyScriptBind(FlowScriptContext.getInstance())), request);
-        flowCreateRequest.setParentRecordId(flowRecord.getId());
-        return flowCreateRequest;
+        List<FlowCreateRequest> flowCreateRequests;
+        if (value instanceof FlowCreateRequest flowCreateRequest) {
+            flowCreateRequests = List.of(flowCreateRequest);
+        } else if (value instanceof Collection<?> collection) {
+            flowCreateRequests = collection.stream()
+                    .map(item -> {
+                        if (!(item instanceof FlowCreateRequest flowCreateRequest)) {
+                            throw new IllegalArgumentException("sub process script must return FlowCreateRequest list");
+                        }
+                        return flowCreateRequest;
+                    })
+                    .toList();
+        } else {
+            throw new IllegalArgumentException("sub process script must return FlowCreateRequest or list");
+        }
+        if (flowCreateRequests.isEmpty()) {
+            throw new IllegalArgumentException("sub process script result cannot be empty");
+        }
+        flowCreateRequests.forEach(requestItem -> requestItem.setParentRecordId(flowRecord.getId()));
+        return flowCreateRequests;
     }
 
     public static SubProcessScript defaultScript() {

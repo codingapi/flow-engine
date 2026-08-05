@@ -5,6 +5,9 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.StartNode;
+import com.codingapi.flow.node.nodes.SubProcessNode;
+import com.codingapi.flow.builder.NodeStrategyBuilder;
+import com.codingapi.flow.strategy.node.SubProcessStrategy;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -125,6 +128,25 @@ class NodeFactoryTest {
         IFlowNode node = NodeFactory.getInstance().createNode(NodeType.SUB_PROCESS);
         assertNotNull(node);
         assertEquals(node.getType(), NodeType.SUB_PROCESS.name());
+    }
+
+    @Test
+    void shouldPreserveSubProcessResultScriptAndSubmitFlagWhenConvertingNode() {
+        SubProcessNode source = SubProcessNode.builder()
+                .name("子流程")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new SubProcessStrategy("create-script", false, "result-script"))
+                        .build())
+                .build();
+        Map<String, Object> data = JSON.parseObject(JSON.toJSONString(source.toMap()));
+
+        SubProcessNode restored = (SubProcessNode) NodeFactory.getInstance().createNode(data);
+        SubProcessStrategy strategy = restored.strategyManager().getStrategy(SubProcessStrategy.class);
+
+        assertNotNull(strategy);
+        assertEquals("create-script", strategy.getSubProcessScript().getScript());
+        assertEquals("result-script", strategy.getResultScript().getScript());
+        assertEquals(false, strategy.isSubmit());
     }
 
 

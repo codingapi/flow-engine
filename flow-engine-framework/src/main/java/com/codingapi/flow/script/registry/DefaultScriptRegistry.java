@@ -37,6 +37,12 @@ public class DefaultScriptRegistry implements IScriptRegistry {
     }
 
     @Override
+    public String getSubProcessResultScript() {
+        return FlowGroovyScriptFactory.createSubProcessResultScript(
+                ScriptDefaultConstants.SCRIPT_DEFAULT_SUB_PROCESS_RESULT).getKey();
+    }
+
+    @Override
     public String getOperatorLoadScript() {
         return FlowGroovyScriptFactory.createOperatorLoadScript(ScriptDefaultConstants.SCRIPT_DEFAULT_OPERATOR_LOAD).getKey();
     }

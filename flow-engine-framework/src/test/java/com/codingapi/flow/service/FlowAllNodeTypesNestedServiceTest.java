@@ -199,9 +199,15 @@ class FlowAllNodeTypesNestedServiceTest {
                 () -> assertEquals(10, parentRecordsBeforeFinish.size(),
                         "父流程应记录 A、两轮 B1/B2、Notify、C、D、I2、E"),
                 () -> assertEquals(List.of("A", "B1", "B2", "B1", "B2", "B-Notify",
-                                "C-Handle", "D1", "I2", "E", "F"),
+                                "C-Handle", "D1", "SubProcess", "I2", "E", "F"),
                         finalNodes.stream().map(ProcessNode::getNodeName).toList(),
-                        "历史节点保留重复轮次，未落库控制节点不应伪造历史记录"),
+                        "历史节点保留重复轮次；有执行记录的子流程应展示，未落库控制节点不应伪造历史"),
+                () -> assertTrue(finalNodes.stream()
+                        .filter(node -> node.getNodeId().equals(fixture.subProcess.getId()))
+                        .anyMatch(node -> node.getApproveState() == ProcessNode.ApproveState.PASS
+                                && node.getSubProcess() != null
+                                && node.getSubProcess().getFinishedCount() == 1),
+                        "已完成的子流程节点应展示聚合执行信息"),
                 () -> assertEquals(1, parentRecordsBeforeFinish.stream()
                         .filter(record -> record.getNodeId().equals(fixture.notifyNode.getId())).count(),
                         "路由后的抄送记录只能生成一次"),

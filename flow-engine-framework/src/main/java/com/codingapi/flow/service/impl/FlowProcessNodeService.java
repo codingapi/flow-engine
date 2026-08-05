@@ -4,6 +4,8 @@ import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
+import com.codingapi.flow.domain.SubProcessContext;
+import com.codingapi.flow.domain.SubProcessRecord;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.manager.ActionManager;
@@ -58,6 +60,7 @@ public class FlowProcessNodeService {
     private final Map<Long, IFlowOperator> recordOperatorMap;
 
     private final List<FlowRecord> recordList;
+    private final List<SubProcessRecord> subProcessRecordList;
 
 
     public FlowProcessNodeService(FlowProcessNodeRequest request, IRepositoryHolder repositoryHolder) {
@@ -70,6 +73,7 @@ public class FlowProcessNodeService {
         this.displayNodeOrderMap = new HashMap<>();
         this.recordOperatorMap = new HashMap<>();
         this.recordList = new ArrayList<>();
+        this.subProcessRecordList = new ArrayList<>();
         this.initData();
         this.initDisplayNodeOrder();
     }
@@ -314,13 +318,19 @@ public class FlowProcessNodeService {
     private void loadHistoryData() {
         List<FlowRecord> allRecords = flowRecordService.findFlowRecordByProcessId(this.flowRecord.getProcessId());
         this.recordList.addAll(allRecords);
+        List<SubProcessRecord> subProcessRecords = repositoryHolder.getSubProcessRepository()
+                .findByParentProcessId(this.flowRecord.getProcessId());
+        this.subProcessRecordList.addAll(subProcessRecords);
 
         this.fetchFlowRecordOperatorList();
 
         FlowRecordOrderService orderService = new FlowRecordOrderService(
                 allRecords,
+                subProcessRecords,
                 this::loadRecordOperator,
                 flowRecords -> historyNodeList.add(ProcessNode.createByRecord(flowRecords, workflow)),
+                subProcessRecord -> historyNodeList.add(
+                        ProcessNode.createBySubProcessRecord(subProcessRecord, workflow)),
                 this::displayNodeOrder);
         orderService.fetch(0);
     }
@@ -375,6 +385,52 @@ public class FlowProcessNodeService {
                     this.fetchFlowNodeReadOnly(flowSession);
                 }
             }
+            this.loadWaitingSubProcessNextData(currentOperator);
+        }
+    }
+
+    private void loadWaitingSubProcessNextData(IFlowOperator currentOperator) {
+        List<SubProcessRecord> waitingRecords = this.subProcessRecordList.stream()
+                .filter(SubProcessRecord::isWaiting)
+                .sorted(Comparator
+                        .comparingInt((SubProcessRecord record) -> this.displayNodeOrder(record.getNodeId()))
+                        .thenComparingLong(SubProcessRecord::getId))
+                .toList();
+        if (waitingRecords.isEmpty()) {
+            return;
+        }
+
+        Map<Long, FlowRecord> parentRecordMap = this.recordList.stream()
+                .collect(java.util.stream.Collectors.toMap(FlowRecord::getId, record -> record));
+        for (SubProcessRecord subProcessRecord : waitingRecords) {
+            FlowRecord parentRecord = parentRecordMap.get(subProcessRecord.getParentRecordId());
+            if (parentRecord == null) {
+                continue;
+            }
+            IFlowNode sourceNode = this.workflow.getFlowNode(parentRecord.getNodeId());
+            IFlowAction sourceAction = sourceNode.actionManager().getActionById(parentRecord.getActionId());
+            IFlowNode subProcessNode = this.workflow.getFlowNode(subProcessRecord.getNodeId());
+            IFlowOperator createOperator = this.loadRecordOperator(parentRecord.getCreateOperatorId());
+            IFlowOperator submitOperator = this.loadRecordOperator(parentRecord.getSubmitOperatorId());
+
+            FormData formData = new FormData(this.workflow.getForm());
+            formData.reset(this.request.getFormData());
+            FlowSession flowSession = new FlowSession(
+                    this.repositoryHolder,
+                    currentOperator,
+                    createOperator,
+                    submitOperator,
+                    this.workflow,
+                    subProcessNode,
+                    sourceAction,
+                    formData,
+                    parentRecord,
+                    new ArrayList<>(),
+                    parentRecord.getWorkRuntimeId(),
+                    FlowAdvice.nullFlowAdvice()
+            );
+            flowSession.setSubProcessContext(new SubProcessContext(subProcessRecord, null));
+            this.fetchFlowNodeReadOnly(flowSession);
         }
     }
 
@@ -490,8 +546,10 @@ public class FlowProcessNodeService {
     private static class FlowRecordOrderService {
 
         private final List<FlowRecord> flowRecords;
+        private final List<SubProcessRecord> subProcessRecords;
 
         private final Consumer<List<ProcessNode.FlowRecordOperator>> consumer;
+        private final Consumer<SubProcessRecord> subProcessConsumer;
 
         private final IFlowOperatorGateway flowOperatorGateway;
 
@@ -499,13 +557,19 @@ public class FlowProcessNodeService {
 
 
         public FlowRecordOrderService(List<FlowRecord> flowRecords,
+                                      List<SubProcessRecord> subProcessRecords,
                                       IFlowOperatorGateway flowOperatorGateway,
                                       Consumer<List<ProcessNode.FlowRecordOperator>> consumer,
+                                      Consumer<SubProcessRecord> subProcessConsumer,
                                       ToIntFunction<String> nodeOrder) {
             this.consumer = consumer;
+            this.subProcessConsumer = subProcessConsumer;
             this.flowOperatorGateway = flowOperatorGateway;
             this.nodeOrder = nodeOrder;
             this.flowRecords = flowRecords.stream().sorted(Comparator.comparing(FlowRecord::getId)).toList();
+            this.subProcessRecords = subProcessRecords.stream()
+                    .sorted(Comparator.comparing(SubProcessRecord::getId))
+                    .toList();
         }
 
 
@@ -519,20 +583,36 @@ public class FlowProcessNodeService {
             return recordList;
         }
 
+        private List<SubProcessRecord> getNextSubProcessRecords(long parentRecordId) {
+            return this.subProcessRecords.stream()
+                    .filter(record -> record.getParentRecordId() == parentRecordId)
+                    .toList();
+        }
+
 
         public void fetch(long formId) {
             List<FlowRecord> batchList = this.getNextRecords(formId);
-            if (!batchList.isEmpty()) {
-                // 根据nodeId 进行分组，不同的分组的要分开执行
+            List<SubProcessRecord> subProcessList = this.getNextSubProcessRecords(formId);
+            if (batchList.isEmpty() && subProcessList.isEmpty()) {
+                return;
+            }
 
-                Map<String, List<FlowRecord>> groupList = this.loadGroupList(batchList);
-                for (List<FlowRecord> group : groupList.values()) {
+            // 子流程恢复后的下游记录仍以触发记录作为 fromId，因此二者在记录树上是兄弟节点。
+            // 实际语义上子流程执行先于恢复/异常跳转产生的记录，必须先插入子流程记录。
+            subProcessList.stream()
+                    .sorted(Comparator
+                            .comparingInt((SubProcessRecord record) -> this.nodeOrder.applyAsInt(record.getNodeId()))
+                            .thenComparingLong(SubProcessRecord::getId))
+                    .forEach(this.subProcessConsumer);
 
-                    this.consumer.accept(group.stream().map(record -> new ProcessNode.FlowRecordOperator(record, flowOperatorGateway.getFlowOperator(record.getCurrentOperatorId()))).toList());
-
-                    for (FlowRecord item : group) {
-                        this.fetch(item.getId());
-                    }
+            Map<String, List<FlowRecord>> groupList = this.loadGroupList(batchList);
+            for (List<FlowRecord> group : groupList.values()) {
+                this.consumer.accept(group.stream()
+                        .map(record -> new ProcessNode.FlowRecordOperator(
+                                record, flowOperatorGateway.getFlowOperator(record.getCurrentOperatorId())))
+                        .toList());
+                for (FlowRecord item : group) {
+                    this.fetch(item.getId());
                 }
             }
         }

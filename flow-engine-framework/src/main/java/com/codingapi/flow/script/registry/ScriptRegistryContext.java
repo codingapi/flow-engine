@@ -83,6 +83,13 @@ public class ScriptRegistryContext {
     }
 
     /**
+     * 获取子流程结果确认脚本。
+     */
+    public String getSubProcessResultScript() {
+        return registry.getSubProcessResultScript();
+    }
+
+    /**
      * 获取操作者加载脚本
      */
     public String getOperatorLoadScript() {

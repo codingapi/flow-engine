@@ -1,14 +1,20 @@
 package com.codingapi.flow.strategy.node;
 
 import com.codingapi.flow.common.IMapConvertor;
+import com.codingapi.flow.domain.SubProcessRecord;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
+import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.SubProcessScript;
+import com.codingapi.flow.script.node.SubProcessResultScript;
 import com.codingapi.flow.service.FlowService;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,19 +33,33 @@ public class SubProcessStrategy extends BaseStrategy {
      */
     private SubProcessScript subProcessScript;
 
-    public SubProcessStrategy(String subProcessScript,boolean submit) {
+    /**
+     * 子流程结果确认脚本。
+     */
+    private SubProcessResultScript resultScript;
+
+    public SubProcessStrategy(String subProcessScript, boolean submit) {
+        this(subProcessScript, submit, SubProcessResultScript.defaultScript().getScript());
+    }
+
+    public SubProcessStrategy(String subProcessScript, boolean submit, String resultScript) {
         this.submit = submit;
         this.subProcessScript = new SubProcessScript(subProcessScript);
+        this.resultScript = new SubProcessResultScript(resultScript);
     }
 
     @Override
     public void copy(INodeStrategy target) {
-        this.subProcessScript = ((SubProcessStrategy) target).subProcessScript;
+        SubProcessStrategy strategy = (SubProcessStrategy) target;
+        this.submit = strategy.submit;
+        this.subProcessScript = strategy.subProcessScript;
+        this.resultScript = strategy.resultScript;
     }
 
     public static SubProcessStrategy defaultStrategy() {
         SubProcessStrategy processStrategy = new SubProcessStrategy();
         processStrategy.subProcessScript = SubProcessScript.defaultScript();
+        processStrategy.resultScript = SubProcessResultScript.defaultScript();
         processStrategy.submit = true;
         return processStrategy;
     }
@@ -49,6 +69,7 @@ public class SubProcessStrategy extends BaseStrategy {
         Map<String, Object> map = super.toMap();
         map.put("script", subProcessScript.getScript());
         map.put("submit", submit);
+        map.put("resultScript", resultScript.getScript());
         return map;
     }
 
@@ -56,17 +77,40 @@ public class SubProcessStrategy extends BaseStrategy {
         SubProcessStrategy processStrategy = IMapConvertor.fromMap(map, SubProcessStrategy.class);
         if (processStrategy == null) return null;
         processStrategy.subProcessScript = new SubProcessScript((String) map.get("script"));
-        processStrategy.submit = (boolean) map.get("submit");
+        processStrategy.submit = map.get("submit") == null || Boolean.parseBoolean(map.get("submit").toString());
+        Object resultScript = map.get("resultScript");
+        processStrategy.resultScript = resultScript == null
+                ? SubProcessResultScript.defaultScript()
+                : new SubProcessResultScript(resultScript.toString());
         return processStrategy;
     }
 
     public void execute(FlowSession session) {
         IRepositoryHolder repositoryHolder = session.getRepositoryHolder();
-        FlowCreateRequest flowCreateRequest = subProcessScript.execute(session);
+        List<FlowCreateRequest> flowCreateRequests = subProcessScript.execute(session);
         FlowService flowService = repositoryHolder.createFlowService();
-        long createRecordId = flowService.create(flowCreateRequest);
-        if (submit) {
-            flowService.action(flowCreateRequest.toActionRequest(createRecordId));
+        List<FlowRecord> childRecords = new ArrayList<>();
+        for (FlowCreateRequest flowCreateRequest : flowCreateRequests) {
+            long createRecordId = flowService.create(flowCreateRequest);
+            childRecords.add(repositoryHolder.getRecordById(createRecordId));
         }
+        List<SubProcessRecord.Instance> instances = childRecords.stream()
+                .map(SubProcessRecord.Instance::new)
+                .toList();
+        SubProcessRecord subProcessRecord = new SubProcessRecord(
+                FlowIDGeneratorGatewayContext.getInstance().generateProcessId(),
+                session.getCurrentRecord(),
+                session.getCurrentNodeId(),
+                instances);
+        repositoryHolder.getSubProcessRepository().save(subProcessRecord);
+        if (submit) {
+            for (int i = 0; i < flowCreateRequests.size(); i++) {
+                flowService.action(flowCreateRequests.get(i).toActionRequest(childRecords.get(i).getId()));
+            }
+        }
+    }
+
+    public boolean confirm(FlowSession session) {
+        return resultScript.execute(session);
     }
 }
