@@ -146,6 +146,11 @@ class FlowParallelErrorFallbackProcessNodeTest {
                 () -> assertEquals(2, fallbackStartRecords.size(), "C1、D1 应各回退生成一条 A 待办"),
                 () -> assertTrue(fallbackStartRecords.stream()
                         .allMatch(record -> record.getFromId() == aRecord.getId())),
+                () -> assertTrue(fallbackStartRecords.stream()
+                                .allMatch(record -> record.getActionId() == null
+                                        && record.getActionType() == null
+                                        && record.getActionName() == null),
+                        "未审批的异常回退 A 记录不应继承上游 PASS 动作"),
                 () -> assertEquals(aRecord.getId(), b1Todo.getFromId()),
                 () -> assertEquals(1, records.subList(1, 4).stream()
                         .map(FlowRecord::getParallelId).distinct().count()),
@@ -155,6 +160,11 @@ class FlowParallelErrorFallbackProcessNodeTest {
         List<ProcessNode> processNodes = factory.flowService.processNodes(
                 new FlowProcessNodeRequest(b1Todo.getId(), b1Operator.getUserId(), data));
         List<String> names = processNodes.stream().map(ProcessNode::getNodeName).toList();
+        ProcessNode fallbackStartNode = processNodes.stream()
+                .filter(node -> node.getNodeId().equals(aNode.getId())
+                        && node.getApproveState() == ProcessNode.ApproveState.PROCESSING)
+                .findFirst()
+                .orElseThrow();
 
         assertAll("异常回退场景的 ProcessNodes 展示",
                 () -> assertEquals(List.of("A", "A", "B1", "B2", "C1", "C2", "D1", "D2", "E", "F"),
@@ -165,7 +175,13 @@ class FlowParallelErrorFallbackProcessNodeTest {
                 () -> assertFalse(processNodes.get(processNodes.size() - 1).isHistory()),
                 () -> assertEquals(List.of(ProcessNode.ApproveState.PASS, ProcessNode.ApproveState.PROCESSING),
                         processNodes.stream().filter(node -> node.getNodeId().equals(aNode.getId()))
-                                .map(ProcessNode::getApproveState).toList()));
+                                .map(ProcessNode::getApproveState).toList()),
+                () -> assertEquals(2, fallbackStartNode.getOperators().size()),
+                () -> assertTrue(fallbackStartNode.getOperators().stream()
+                                .allMatch(operator -> operator.getActionType() == null
+                                        && operator.getActionName() == null
+                                        && operator.getApproveTime() == 0),
+                        "PROCESSING 节点内的未审批记录不应显示为已通过"));
     }
 
     private HandleNode fallbackHandleNode(String name, StartNode fallbackNode) {
