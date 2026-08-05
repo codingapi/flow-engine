@@ -3,6 +3,7 @@ package com.codingapi.flow.service;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
+import com.codingapi.flow.domain.SubProcessRecord;
 import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FlowForm;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -236,6 +238,124 @@ class FlowSubProcessEnhancementServiceTest {
                 () -> assertEquals("RUNNING",
                         subProcessView.getSubProcess().getInstances().get(0).getState().name())
         );
+    }
+
+    /**
+     * 测试目标：验证子流程节点开启主流程记录展示后，子流程详情拼接主流程实际历史路径。
+     * 前置条件：主流程为 A -> B -> SubProcess -> C -> D，SubProcess 开启主流程记录展示。
+     * 执行步骤：完成 A、B 并进入子流程审批节点，然后从子流程待办查询全部节点。
+     * 期望断言：返回 A、B、SubProcess 和当前子流程真实记录及子流程结束节点；不展示主流程 C、D；
+     *          主流程审批人和意见完整返回，子流程实例展示流程名称而不是流程编码。
+     */
+    @Test
+    void shouldPrependParentHistoryAndWorkflowTitleWhenEnabled() {
+        StartNode nodeA = writableStart("A");
+        ApprovalNode nodeB = approvalNode("B", finalOperator);
+        String createScript = """
+                def run(request){
+                    return request.toCreateRequest('%s', %d, '%s', [content:'child-history'])
+                }
+                """.formatted(CHILD_CODE, initiator.getUserId(), passAction(childStart).id());
+        SubProcessNode subProcess = SubProcessNode.builder()
+                .name("SubProcess")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new SubProcessStrategy(
+                                FlowGroovyScriptFactory.createSubProcessScript(createScript).getKey(),
+                                true,
+                                FlowGroovyScriptFactory.createSubProcessResultScript(
+                                        "def run(request){ return request.findSubProcessRecords(request.getCurrentNode().getId()).size() == request.getSubProcessTotal() }")
+                                        .getKey(),
+                                true))
+                        .build())
+                .build();
+        ApprovalNode nodeC = approvalNode("C", initiator);
+        Workflow parentWorkflow = WorkflowBuilder.builder()
+                .title("关联主流程历史测试")
+                .code(PARENT_CODE)
+                .createdOperator(initiator)
+                .form(form)
+                .addNode(nodeA)
+                .addNode(nodeB)
+                .addNode(subProcess)
+                .addNode(nodeC)
+                .addNode(EndNode.builder().name("D").build())
+                .build();
+        factory.workflowService.saveWorkflow(parentWorkflow);
+
+        createAndSubmitParent(nodeA);
+        FlowRecord nodeBRecord = todos(finalOperator, nodeB).get(0);
+        approve(nodeBRecord, passAction(nodeB), finalOperator, nodeBRecord.getFormData());
+        FlowRecord childTodo = todos(childOperator, childApproval).get(0);
+        SubProcessRecord subProcessRecord = factory.subProcessRepository
+                .findByParentRecordId(nodeBRecord.getId()).get(0);
+        SubProcessRecord.Instance instance = subProcessRecord.getInstances().get(0);
+        assertEquals("子流程增强测试-子流程", instance.getWorkTitle(),
+                "新建子流程实例应保存流程名称快照");
+        subProcessRecord.getInstances().set(0, new SubProcessRecord.Instance(
+                instance.getStartRecordId(),
+                instance.getProcessId(),
+                null,
+                instance.getFinishRecordId(),
+                instance.getState(),
+                instance.getFinishTime()));
+
+        List<ProcessNode> processNodes = loadProcessNodes(childTodo.getId(), childOperator);
+        ProcessNode parentApprovalNode = findProcessNode(processNodes, nodeB.getId());
+        ProcessNode subProcessNode = findProcessNode(processNodes, subProcess.getId());
+
+        assertAll("子流程详情关联主流程历史",
+                () -> assertEquals(List.of(
+                                "A", "B", "SubProcess", "子流程开始", "子流程审批", "子流程结束"),
+                        processNodes.stream().map(ProcessNode::getNodeName).toList()),
+                () -> assertFalse(processNodes.stream().anyMatch(node -> "C".equals(node.getNodeName()))),
+                () -> assertFalse(processNodes.stream().anyMatch(node -> "D".equals(node.getNodeName()))),
+                () -> assertEquals("同意", parentApprovalNode.getOperators().get(0).getAdvice()),
+                () -> assertEquals(finalOperator.getUserId(),
+                        parentApprovalNode.getOperators().get(0).getFlowOperator().getUserId()),
+                () -> assertEquals("子流程增强测试-子流程",
+                        subProcessNode.getSubProcess().getInstances().get(0).getWorkTitle()),
+                () -> assertTrue(processNodes.subList(0, 3).stream()
+                        .allMatch(ProcessNode::isParentProcessRecord),
+                        "主流程历史和对应子流程聚合节点应标记为主流程记录"),
+                () -> assertTrue(processNodes.subList(3, processNodes.size()).stream()
+                        .noneMatch(ProcessNode::isParentProcessRecord),
+                        "当前子流程记录不应标记为主流程记录"),
+                () -> assertEquals(ProcessNode.ApproveState.PROCESSING,
+                        findProcessNode(processNodes, childApproval.getId()).getApproveState()),
+                () -> assertEquals(ProcessNode.ApproveState.PENDING,
+                        processNodes.get(processNodes.size() - 1).getApproveState()));
+    }
+
+    /**
+     * 测试目标：验证子流程节点默认不向子流程参与人展示主流程记录。
+     * 前置条件：子流程节点使用未设置展示开关的历史兼容配置。
+     * 执行步骤：进入子流程审批节点并查询全部节点。
+     * 期望断言：仅返回子流程自身节点，不包含主流程节点或 SubProcess 聚合节点。
+     */
+    @Test
+    void shouldHideParentHistoryByDefault() {
+        StartNode parentStart = writableStart("默认隐藏主流程开始");
+        String createScript = """
+                def run(request){
+                    return request.toCreateRequest('%s', %d, '%s', [content:'hidden-parent'])
+                }
+                """.formatted(CHILD_CODE, initiator.getUserId(), passAction(childStart).id());
+        SubProcessNode subProcess = SubProcessNode.builder()
+                .name("默认隐藏主流程")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new SubProcessStrategy(
+                                FlowGroovyScriptFactory.createSubProcessScript(createScript).getKey(), true))
+                        .build())
+                .build();
+        saveParentWorkflow(parentStart, subProcess, approvalNode("主流程后续节点", finalOperator));
+
+        createAndSubmitParent(parentStart);
+        FlowRecord childTodo = todos(childOperator, childApproval).get(0);
+
+        List<ProcessNode> processNodes = loadProcessNodes(childTodo.getId(), childOperator);
+
+        assertEquals(List.of("子流程开始", "子流程审批", "子流程结束"),
+                processNodes.stream().map(ProcessNode::getNodeName).toList());
     }
 
     /**

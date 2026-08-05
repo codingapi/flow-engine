@@ -38,14 +38,27 @@ public class SubProcessStrategy extends BaseStrategy {
      */
     private SubProcessResultScript resultScript;
 
+    /**
+     * 是否允许子流程参与人在节点记录中查看主流程历史。
+     */
+    private boolean showParentProcessRecords;
+
     public SubProcessStrategy(String subProcessScript, boolean submit) {
-        this(subProcessScript, submit, SubProcessResultScript.defaultScript().getScript());
+        this(subProcessScript, submit, SubProcessResultScript.defaultScript().getScript(), false);
     }
 
     public SubProcessStrategy(String subProcessScript, boolean submit, String resultScript) {
+        this(subProcessScript, submit, resultScript, false);
+    }
+
+    public SubProcessStrategy(String subProcessScript,
+                              boolean submit,
+                              String resultScript,
+                              boolean showParentProcessRecords) {
         this.submit = submit;
         this.subProcessScript = new SubProcessScript(subProcessScript);
         this.resultScript = new SubProcessResultScript(resultScript);
+        this.showParentProcessRecords = showParentProcessRecords;
     }
 
     @Override
@@ -54,6 +67,7 @@ public class SubProcessStrategy extends BaseStrategy {
         this.submit = strategy.submit;
         this.subProcessScript = strategy.subProcessScript;
         this.resultScript = strategy.resultScript;
+        this.showParentProcessRecords = strategy.showParentProcessRecords;
     }
 
     public static SubProcessStrategy defaultStrategy() {
@@ -61,6 +75,7 @@ public class SubProcessStrategy extends BaseStrategy {
         processStrategy.subProcessScript = SubProcessScript.defaultScript();
         processStrategy.resultScript = SubProcessResultScript.defaultScript();
         processStrategy.submit = true;
+        processStrategy.showParentProcessRecords = false;
         return processStrategy;
     }
 
@@ -70,6 +85,7 @@ public class SubProcessStrategy extends BaseStrategy {
         map.put("script", subProcessScript.getScript());
         map.put("submit", submit);
         map.put("resultScript", resultScript.getScript());
+        map.put("showParentProcessRecords", showParentProcessRecords);
         return map;
     }
 
@@ -82,6 +98,9 @@ public class SubProcessStrategy extends BaseStrategy {
         processStrategy.resultScript = resultScript == null
                 ? SubProcessResultScript.defaultScript()
                 : new SubProcessResultScript(resultScript.toString());
+        Object showParentProcessRecords = map.get("showParentProcessRecords");
+        processStrategy.showParentProcessRecords = showParentProcessRecords != null
+                && Boolean.parseBoolean(showParentProcessRecords.toString());
         return processStrategy;
     }
 

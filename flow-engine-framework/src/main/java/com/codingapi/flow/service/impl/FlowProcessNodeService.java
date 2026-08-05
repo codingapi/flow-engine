@@ -16,6 +16,7 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.RouterNode;
 import com.codingapi.flow.node.nodes.StartNode;
+import com.codingapi.flow.node.nodes.SubProcessNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowProcessNodeRequest;
 import com.codingapi.flow.pojo.response.ProcessNode;
@@ -27,6 +28,7 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.strategy.node.OperatorSelectType;
+import com.codingapi.flow.strategy.node.SubProcessStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 
@@ -61,6 +63,7 @@ public class FlowProcessNodeService {
 
     private final List<FlowRecord> recordList;
     private final List<SubProcessRecord> subProcessRecordList;
+    private final Map<Long, String> subProcessWorkTitleMap;
 
 
     public FlowProcessNodeService(FlowProcessNodeRequest request, IRepositoryHolder repositoryHolder) {
@@ -74,6 +77,7 @@ public class FlowProcessNodeService {
         this.recordOperatorMap = new HashMap<>();
         this.recordList = new ArrayList<>();
         this.subProcessRecordList = new ArrayList<>();
+        this.subProcessWorkTitleMap = new HashMap<>();
         this.initData();
         this.initDisplayNodeOrder();
     }
@@ -136,6 +140,15 @@ public class FlowProcessNodeService {
     }
 
     public List<ProcessNode> processNodes() {
+        ParentSubProcessContext parentContext = this.loadParentSubProcessContext(this.flowRecord);
+        if (parentContext != null && parentContext.showParentProcessRecords()) {
+            this.loadHistoryData();
+            this.loadEndNode(this.flowRecord.isFinish());
+            List<ProcessNode> processNodes = new ArrayList<>(this.loadParentHistory(parentContext));
+            processNodes.addAll(this.buildProcessNodeList());
+            return processNodes;
+        }
+
         // load history data
         if (this.flowRecord != null) {
             this.loadHistoryData();
@@ -321,6 +334,7 @@ public class FlowProcessNodeService {
         List<SubProcessRecord> subProcessRecords = repositoryHolder.getSubProcessRepository()
                 .findByParentProcessId(this.flowRecord.getProcessId());
         this.subProcessRecordList.addAll(subProcessRecords);
+        this.subProcessWorkTitleMap.putAll(this.loadSubProcessWorkTitles(subProcessRecords));
 
         this.fetchFlowRecordOperatorList();
 
@@ -330,9 +344,134 @@ public class FlowProcessNodeService {
                 this::loadRecordOperator,
                 flowRecords -> historyNodeList.add(ProcessNode.createByRecord(flowRecords, workflow)),
                 subProcessRecord -> historyNodeList.add(
-                        ProcessNode.createBySubProcessRecord(subProcessRecord, workflow)),
+                        ProcessNode.createBySubProcessRecord(
+                                subProcessRecord, workflow, subProcessWorkTitleMap::get)),
                 this::displayNodeOrder);
         orderService.fetch(0);
+    }
+
+    private ParentSubProcessContext loadParentSubProcessContext(FlowRecord childRecord) {
+        if (childRecord == null || childRecord.getParentId() <= 0) {
+            return null;
+        }
+        FlowRecord parentRecord = flowRecordService.getFlowRecord(childRecord.getParentId());
+        if (parentRecord == null) {
+            return null;
+        }
+        SubProcessRecord subProcessRecord = repositoryHolder.getSubProcessRepository()
+                .findByParentRecordId(parentRecord.getId()).stream()
+                .filter(record -> record.containsChildProcess(childRecord.getProcessId()))
+                .findFirst()
+                .orElse(null);
+        if (subProcessRecord == null) {
+            return null;
+        }
+        WorkflowRuntime parentRuntime = workflowService.getWorkflowRuntime(
+                subProcessRecord.getParentWorkRuntimeId());
+        if (parentRuntime == null) {
+            return null;
+        }
+        Workflow parentWorkflow = parentRuntime.toWorkflow();
+        IFlowNode parentNode = parentWorkflow.getFlowNode(subProcessRecord.getNodeId());
+        if (!(parentNode instanceof SubProcessNode)) {
+            return null;
+        }
+        SubProcessStrategy strategy = parentNode.strategyManager().getStrategy(SubProcessStrategy.class);
+        boolean showParentProcessRecords = strategy != null && strategy.isShowParentProcessRecords();
+        return new ParentSubProcessContext(
+                parentRecord, subProcessRecord, parentWorkflow, showParentProcessRecords);
+    }
+
+    /**
+     * 只根据持久化记录的 fromId 链构造主流程历史，不执行主流程后续节点推演。
+     */
+    private List<ProcessNode> loadParentHistory(ParentSubProcessContext context) {
+        List<ProcessNode> processNodes = new ArrayList<>();
+        ParentSubProcessContext ancestorContext = this.loadParentSubProcessContext(context.parentRecord());
+        if (ancestorContext != null && ancestorContext.showParentProcessRecords()) {
+            processNodes.addAll(this.loadParentHistory(ancestorContext));
+        }
+
+        List<FlowRecord> parentRecords = flowRecordService.findFlowRecordByProcessId(
+                context.parentRecord().getProcessId());
+        this.fetchFlowRecordOperatorList(parentRecords);
+        for (List<FlowRecord> recordGroup : this.loadRecordPath(context.parentRecord(), parentRecords)) {
+            List<ProcessNode.FlowRecordOperator> operators = recordGroup.stream()
+                    .map(record -> new ProcessNode.FlowRecordOperator(
+                            record, this.loadRecordOperator(record.getCurrentOperatorId())))
+                    .toList();
+            ProcessNode parentProcessNode = ProcessNode.createByRecord(operators, context.parentWorkflow());
+            parentProcessNode.setParentProcessRecord(true);
+            processNodes.add(parentProcessNode);
+        }
+
+        Map<Long, String> workTitles = this.loadSubProcessWorkTitles(List.of(context.subProcessRecord()));
+        ProcessNode parentSubProcessNode = ProcessNode.createBySubProcessRecord(
+                context.subProcessRecord(), context.parentWorkflow(), workTitles::get);
+        parentSubProcessNode.setParentProcessRecord(true);
+        processNodes.add(parentSubProcessNode);
+        return processNodes;
+    }
+
+    private List<List<FlowRecord>> loadRecordPath(FlowRecord targetRecord, List<FlowRecord> allRecords) {
+        Map<Long, FlowRecord> recordMap = allRecords.stream()
+                .collect(java.util.stream.Collectors.toMap(FlowRecord::getId, record -> record));
+        List<List<FlowRecord>> reversePath = new ArrayList<>();
+        FlowRecord currentRecord = targetRecord;
+        while (currentRecord != null) {
+            FlowRecord pathRecord = currentRecord;
+            List<FlowRecord> recordGroup = allRecords.stream()
+                    .filter(record -> record.getFromId() == pathRecord.getFromId())
+                    .filter(record -> record.getNodeId().equals(pathRecord.getNodeId()))
+                    .sorted(Comparator.comparingLong(FlowRecord::getId))
+                    .toList();
+            reversePath.add(recordGroup.isEmpty() ? List.of(currentRecord) : recordGroup);
+            if (currentRecord.getFromId() == 0) {
+                break;
+            }
+            currentRecord = recordMap.get(currentRecord.getFromId());
+        }
+        Collections.reverse(reversePath);
+        return reversePath;
+    }
+
+    private Map<Long, String> loadSubProcessWorkTitles(List<SubProcessRecord> records) {
+        List<Long> startRecordIds = records.stream()
+                .flatMap(record -> record.getInstances().stream())
+                .filter(instance -> instance.getWorkTitle() == null || instance.getWorkTitle().isBlank())
+                .map(SubProcessRecord.Instance::getStartRecordId)
+                .distinct()
+                .toList();
+        if (startRecordIds.isEmpty()) {
+            return Map.of();
+        }
+        return flowRecordService.findFlowRecordByIds(startRecordIds).stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        FlowRecord::getId, FlowRecord::getWorkTitle, (left, right) -> left));
+    }
+
+    private void fetchFlowRecordOperatorList(List<FlowRecord> records) {
+        List<Long> operatorIds = records.stream()
+                .flatMap(record -> java.util.stream.Stream.of(
+                        record.getCreateOperatorId(),
+                        record.getCurrentOperatorId(),
+                        record.getSubmitOperatorId()))
+                .filter(operatorId -> operatorId > 0 && !this.recordOperatorMap.containsKey(operatorId))
+                .distinct()
+                .toList();
+        if (operatorIds.isEmpty()) {
+            return;
+        }
+        List<IFlowOperator> operatorList = this.repositoryHolder.findOperatorByIds(operatorIds);
+        if (operatorList != null) {
+            operatorList.forEach(operator -> this.recordOperatorMap.put(operator.getUserId(), operator));
+        }
+    }
+
+    private record ParentSubProcessContext(FlowRecord parentRecord,
+                                           SubProcessRecord subProcessRecord,
+                                           Workflow parentWorkflow,
+                                           boolean showParentProcessRecords) {
     }
 
     private void loadEndNode(boolean finish) {

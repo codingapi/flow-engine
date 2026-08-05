@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SubProcessRecordConvertorTest {
 
@@ -37,11 +39,21 @@ class SubProcessRecordConvertorTest {
         entity.setVersion(7L);
 
         SubProcessRecord record = SubProcessRecordConvertor.convert(entity);
+        assertNull(record.getInstances().get(0).getWorkTitle(), "历史 JSON 缺少流程名称时应兼容读取");
+        SubProcessRecord.Instance first = record.getInstances().get(0);
+        record.getInstances().set(0, new SubProcessRecord.Instance(
+                first.getStartRecordId(),
+                first.getProcessId(),
+                "采购审批子流程",
+                first.getFinishRecordId(),
+                first.getState(),
+                first.getFinishTime()));
         SubProcessRecordEntity converted = SubProcessRecordConvertor.convert(record, entity);
 
         assertSame(entity, converted);
         assertEquals(7L, converted.getVersion());
         assertEquals(List.of(11L), record.findFinishedRecordIds());
         assertEquals(SubProcessRecord.InstanceState.RUNNING, record.getInstances().get(1).getState());
+        assertTrue(converted.getInstances().contains("采购审批子流程"), "新记录应在实例 JSON 中保存流程名称");
     }
 }

@@ -108,12 +108,14 @@ public class SubProcessRecord {
 
         private long startRecordId;
         private String processId;
+        private String workTitle;
         private long finishRecordId;
         private InstanceState state;
         private long finishTime;
 
         public Instance(FlowRecord startRecord) {
-            this(startRecord.getId(), startRecord.getProcessId(), 0, InstanceState.RUNNING, 0);
+            this(startRecord.getId(), startRecord.getProcessId(), startRecord.getWorkTitle(),
+                    0, InstanceState.RUNNING, 0);
         }
 
         private void complete(FlowRecord finalRecord) {
