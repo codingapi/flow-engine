@@ -5,6 +5,7 @@ import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
+import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.springboot.script.annotation.ScriptFunction;
 import com.codingapi.springboot.script.annotation.ScriptParameter;
@@ -353,5 +354,30 @@ public class GroovyScriptRequest {
                 .stream()
                 .map(FormData.DataBody::toMapData)
                 .toList();
+    }
+
+    /**
+     * 查询指定子流程节点已经结束的最终记录。
+     */
+    @ScriptFunction(name = "findSubProcessRecords", description = "查询指定子流程节点已经结束的最终记录")
+    public List<FlowRecord> findSubProcessRecords(
+            @ScriptParameter(description = "子流程节点Id") String subProcessNodeId) {
+        return flowSession.findSubProcessRecords(subProcessNodeId);
+    }
+
+    /**
+     * 获取本次子流程节点创建的实例总数。
+     */
+    @ScriptFunction(name = "getSubProcessTotal", description = "获取本次子流程节点创建的实例总数")
+    public int getSubProcessTotal() {
+        return flowSession.getSubProcessTotal();
+    }
+
+    /**
+     * 获取本次刚结束的子流程最终记录。
+     */
+    @ScriptFunction(name = "getCurrentSubProcessRecord", description = "获取本次刚结束的子流程最终记录")
+    public FlowRecord getCurrentSubProcessRecord() {
+        return flowSession.getCurrentSubProcessRecord();
     }
 }

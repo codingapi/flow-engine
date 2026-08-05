@@ -9,6 +9,7 @@ import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.DelayTaskRepository;
 import com.codingapi.flow.repository.FlowOperatorAssignmentRepository;
 import com.codingapi.flow.repository.ParallelBranchRepository;
+import com.codingapi.flow.repository.SubProcessRepository;
 import com.codingapi.flow.repository.UrgeIntervalRepository;
 import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.FlowService;
@@ -44,6 +45,8 @@ public class RepositoryHolderContext implements IRepositoryHolder {
     private UrgeIntervalRepository urgeIntervalRepository;
     @Getter
     private FlowOperatorAssignmentRepository flowOperatorAssignmentRepository;
+    @Getter
+    private SubProcessRepository subProcessRepository;
 
     /**
      * 是否已经注册成功
@@ -54,7 +57,8 @@ public class RepositoryHolderContext implements IRepositoryHolder {
                 && workflowService != null
                 && flowRecordService != null
                 && urgeIntervalRepository != null
-                && flowOperatorAssignmentRepository != null;
+                && flowOperatorAssignmentRepository != null
+                && subProcessRepository != null;
     }
 
 
@@ -69,13 +73,15 @@ public class RepositoryHolderContext implements IRepositoryHolder {
                          ParallelBranchRepository parallelBranchRepository,
                          DelayTaskRepository delayTaskRepository,
                          UrgeIntervalRepository urgeIntervalRepository,
-                         FlowOperatorAssignmentRepository flowOperatorAssignmentRepository) {
+                         FlowOperatorAssignmentRepository flowOperatorAssignmentRepository,
+                         SubProcessRepository subProcessRepository) {
         this.workflowService = workflowService;
         this.flowRecordService = flowRecordService;
         this.parallelBranchRepository = parallelBranchRepository;
         this.delayTaskRepository = delayTaskRepository;
         this.urgeIntervalRepository = urgeIntervalRepository;
         this.flowOperatorAssignmentRepository = flowOperatorAssignmentRepository;
+        this.subProcessRepository = subProcessRepository;
     }
 
 

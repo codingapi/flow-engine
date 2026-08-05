@@ -7,6 +7,7 @@ import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.strategy.node.ErrorTriggerStrategy;
 import com.codingapi.flow.strategy.node.INodeStrategy;
 import com.codingapi.flow.strategy.node.SubProcessStrategy;
 
@@ -41,6 +42,7 @@ public class SubProcessNode extends BaseFlowNode implements IDisplayNode {
     private static List<INodeStrategy> defaultStrategies() {
         List<INodeStrategy> strategies = new ArrayList<>();
         strategies.add(SubProcessStrategy.defaultStrategy());
+        strategies.add(ErrorTriggerStrategy.defaultStrategy());
         return strategies;
     }
 
@@ -51,7 +53,7 @@ public class SubProcessNode extends BaseFlowNode implements IDisplayNode {
             NodeStrategyManager nodeStrategyManager = this.strategyManager();
             SubProcessStrategy processStrategy = nodeStrategyManager.getStrategy(SubProcessStrategy.class);
             processStrategy.execute(session);
-            return true;
+            return false;
         }
         return false;
     }

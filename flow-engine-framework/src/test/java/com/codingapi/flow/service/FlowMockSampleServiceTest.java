@@ -1491,9 +1491,9 @@ class FlowMockSampleServiceTest {
 
         List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
         assertEquals(2, records.size());
-        assertEquals(2, records.stream().filter(FlowRecord::isFinish).toList().size());
+        assertEquals(0, records.stream().filter(FlowRecord::isFinish).toList().size());
 
-        // 为老板再次创建一个待办流程
+        // 子流程已创建，主流程必须等待子流程结束
         bossRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, bossRecordList.size());
 

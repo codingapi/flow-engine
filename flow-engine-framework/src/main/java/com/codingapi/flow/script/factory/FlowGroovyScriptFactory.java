@@ -123,11 +123,32 @@ public class FlowGroovyScriptFactory {
                 .typeTwo("sub-process")
                 .description(description)
                 .method("run")
-                .returnType(FlowCreateRequest.class)
+                .returnType(Object.class)
                 .binds(Map.of("$bind", GroovyScriptBind.class))
                 .requests(Map.of("request", GroovyScriptRequest.class))
                 .build();
 
+        groovyScript.temp();
+        return groovyScript;
+    }
+
+    public static GroovyScript createSubProcessResultScript(String script) {
+        String key = FlowIDGeneratorGatewayContext.getInstance().generateFlowScriptKey();
+        String description = """
+                <strong>子流程结果确认脚本</strong>
+                每个子流程结束时执行，返回 true 时主流程继续；全部结束仍返回 false 时执行异常配置。
+                request 可获取子流程总数、本次结束记录以及指定节点的全部最终记录。
+                """;
+        GroovyScript groovyScript = GroovyScript.builder(key)
+                .script(script)
+                .typeOne(DEFAULT_SCRIPT_TYPE_ONE)
+                .typeTwo("sub-process-result")
+                .description(description)
+                .method("run")
+                .returnType(Boolean.class)
+                .binds(Map.of("$bind", GroovyScriptBind.class))
+                .requests(Map.of("request", GroovyScriptRequest.class))
+                .build();
         groovyScript.temp();
         return groovyScript;
     }

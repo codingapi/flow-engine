@@ -52,6 +52,7 @@ public class AutoConfiguration {
             DelayTaskRepository delayTaskRepository,
             UrgeIntervalRepository urgeIntervalRepository,
             FlowOperatorAssignmentRepository flowOperatorAssignmentRepository,
+            SubProcessRepository subProcessRepository,
             GatewayContextRegister gatewayContextRegister
     ) {
         return new RepositoryHolderContextRegister(
@@ -61,6 +62,7 @@ public class AutoConfiguration {
                 delayTaskRepository,
                 urgeIntervalRepository,
                 flowOperatorAssignmentRepository,
+                subProcessRepository,
                 gatewayContextRegister
         );
     }

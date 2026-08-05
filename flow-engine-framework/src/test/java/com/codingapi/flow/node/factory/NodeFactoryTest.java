@@ -5,13 +5,19 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.NodeType;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.StartNode;
+import com.codingapi.flow.node.nodes.SubProcessNode;
+import com.codingapi.flow.builder.NodeStrategyBuilder;
+import com.codingapi.flow.strategy.node.SubProcessStrategy;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NodeFactoryTest {
 
@@ -125,6 +131,53 @@ class NodeFactoryTest {
         IFlowNode node = NodeFactory.getInstance().createNode(NodeType.SUB_PROCESS);
         assertNotNull(node);
         assertEquals(node.getType(), NodeType.SUB_PROCESS.name());
+    }
+
+    @Test
+    void shouldPreserveSubProcessConfigurationWhenConvertingNode() {
+        SubProcessNode source = SubProcessNode.builder()
+                .name("子流程")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new SubProcessStrategy(
+                                "create-script", false, "result-script", true))
+                        .build())
+                .build();
+        Map<String, Object> data = JSON.parseObject(JSON.toJSONString(source.toMap()));
+
+        SubProcessNode restored = (SubProcessNode) NodeFactory.getInstance().createNode(data);
+        SubProcessStrategy strategy = restored.strategyManager().getStrategy(SubProcessStrategy.class);
+
+        assertNotNull(strategy);
+        assertEquals("create-script", strategy.getSubProcessScript().getScript());
+        assertEquals("result-script", strategy.getResultScript().getScript());
+        assertEquals(false, strategy.isSubmit());
+        assertTrue(strategy.isShowParentProcessRecords());
+    }
+
+    /**
+     * 测试目标：验证历史流程定义没有主流程记录展示配置时保持默认关闭。
+     * 前置条件：子流程策略 Map 中不包含 showParentProcessRecords。
+     * 执行步骤：通过节点工厂反序列化历史节点定义。
+     * 期望断言：主流程记录展示开关为 false。
+     */
+    @Test
+    void shouldDisableParentProcessRecordsForLegacySubProcessConfiguration() {
+        SubProcessNode source = SubProcessNode.builder()
+                .name("历史子流程")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new SubProcessStrategy("create-script", true, "result-script"))
+                        .build())
+                .build();
+        Map<String, Object> data = JSON.parseObject(JSON.toJSONString(source.toMap()));
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> strategies = (List<Map<String, Object>>) data.get("strategies");
+        strategies.get(0).remove("showParentProcessRecords");
+
+        SubProcessNode restored = (SubProcessNode) NodeFactory.getInstance().createNode(data);
+        SubProcessStrategy restoredStrategy = restored.strategyManager().getStrategy(SubProcessStrategy.class);
+
+        assertNotNull(restoredStrategy);
+        assertFalse(restoredStrategy.isShowParentProcessRecords());
     }
 
 

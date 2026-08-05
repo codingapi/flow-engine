@@ -863,9 +863,11 @@ class ApprovalNodeAuditModeTest {
         assertEquals(0, records.stream().filter(FlowRecord::isFinish).count(),
                 "分支2 未完成，流程不应结束");
 
-        // processNodes 视图：并行分支顺序不固定，按节点名称核实
+        // processNodes 视图：按块深度优先展开，先展示 B 或签分支，再展示 D 循序分支
         List<ProcessNode> nodeList = processNodes(d1Todo, d1, data);
         assertEquals(4, nodeList.size());
+        assertEquals(List.of(startNode.getName(), anyNode.getName(), sequenceNode.getName(), endNode.getName()),
+                nodeList.stream().map(ProcessNode::getNodeName).toList());
         assertEquals(ProcessNode.ApproveState.PASS,
                 nodeByName(nodeList, startNode.getName()).getApproveState());
         ProcessNode anyNodeView = nodeByName(nodeList, anyNode.getName());
@@ -898,6 +900,8 @@ class ApprovalNodeAuditModeTest {
         // 流程结束后视图：全部节点通过；d2 激活后循序分支视图展示两名审批人
         nodeList = processNodes(d2Todo, d2, data);
         assertEquals(4, nodeList.size());
+        assertEquals(List.of(startNode.getName(), anyNode.getName(), sequenceNode.getName(), endNode.getName()),
+                nodeList.stream().map(ProcessNode::getNodeName).toList());
         assertEquals(4, nodeList.stream().filter(ProcessNode::isHistory).count());
         assertEquals(2, nodeByName(nodeList, sequenceNode.getName()).getOperators().size());
     }
@@ -1127,9 +1131,11 @@ class ApprovalNodeAuditModeTest {
         assertEquals(0, records.stream().filter(FlowRecord::isFinish).count(),
                 "分支2 未完成，流程不应结束");
 
-        // processNodes 视图：并行分支顺序不固定，按节点名称核实
+        // processNodes 视图：按块深度优先展开，先展示嵌套条件命中的 B 分支，再展示 D 分支
         List<ProcessNode> nodeList = processNodes(d1Todo, d1, data);
         assertEquals(4, nodeList.size());
+        assertEquals(List.of(startNode.getName(), anyNode.getName(), singleDNode.getName(), endNode.getName()),
+                nodeList.stream().map(ProcessNode::getNodeName).toList());
         assertEquals(ProcessNode.ApproveState.PASS,
                 nodeByName(nodeList, startNode.getName()).getApproveState());
         ProcessNode anyNodeView = nodeByName(nodeList, anyNode.getName());
@@ -1157,6 +1163,8 @@ class ApprovalNodeAuditModeTest {
         // 流程结束后视图：全部节点通过
         nodeList = processNodes(d1Todo, d1, data);
         assertEquals(4, nodeList.size());
+        assertEquals(List.of(startNode.getName(), anyNode.getName(), singleDNode.getName(), endNode.getName()),
+                nodeList.stream().map(ProcessNode::getNodeName).toList());
         assertEquals(4, nodeList.stream().filter(ProcessNode::isHistory).count());
     }
 }

@@ -112,6 +112,17 @@ public class ScriptDefaultConstants {
             """;
 
     /**
+     * 默认子流程结果确认脚本：等待本次创建的全部子流程结束。
+     */
+    public static final String SCRIPT_DEFAULT_SUB_PROCESS_RESULT = """
+            // @SCRIPT_TITLE 全部子流程结束后继续
+            def run(request){
+                return request.findSubProcessRecords(request.getCurrentNode().getId()).size()
+                    == request.getSubProcessTotal();
+            }
+            """;
+
+    /**
      * 默认触发脚本
      */
     public static final String SCRIPT_DEFAULT_TRIGGER = """

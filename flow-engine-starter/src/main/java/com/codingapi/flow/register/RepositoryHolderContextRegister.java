@@ -17,6 +17,7 @@ public class RepositoryHolderContextRegister implements InitializingBean {
     private final DelayTaskRepository delayTaskRepository;
     private final UrgeIntervalRepository urgeIntervalRepository;
     private final FlowOperatorAssignmentRepository flowOperatorAssignmentRepository;
+    private final SubProcessRepository subProcessRepository;
     private final GatewayContextRegister gatewayContextRegister;
 
     @Override
@@ -28,7 +29,8 @@ public class RepositoryHolderContextRegister implements InitializingBean {
                 parallelBranchRepository,
                 delayTaskRepository,
                 urgeIntervalRepository,
-                flowOperatorAssignmentRepository
+                flowOperatorAssignmentRepository,
+                subProcessRepository
         );
     }
 }
