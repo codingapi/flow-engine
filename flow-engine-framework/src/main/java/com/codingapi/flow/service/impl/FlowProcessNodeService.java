@@ -8,6 +8,7 @@ import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.OperatorManager;
+import com.codingapi.flow.node.IBlockNode;
 import com.codingapi.flow.node.IDisplayNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.EndNode;
@@ -153,21 +154,23 @@ public class FlowProcessNodeService {
      */
     private void initDisplayNodeOrder() {
         int[] order = {0};
-        this.indexDisplayNodes(this.workflow.getNodes(), order);
+        this.indexDisplayNodes(this.workflow.getNodes(), order, false);
     }
 
-    private void indexDisplayNodes(List<IFlowNode> nodes, int[] order) {
+    private void indexDisplayNodes(List<IFlowNode> nodes, int[] order, boolean sortByOrder) {
         if (nodes == null || nodes.isEmpty()) {
             return;
         }
-        List<IFlowNode> sortedNodes = nodes.stream()
-                .sorted(Comparator.comparingInt(IFlowNode::getOrder))
-                .toList();
+        List<IFlowNode> sortedNodes = sortByOrder
+                ? nodes.stream().sorted(Comparator.comparingInt(IFlowNode::getOrder)).toList()
+                : nodes;
         for (IFlowNode node : sortedNodes) {
             if (node instanceof IDisplayNode) {
                 this.displayNodeOrderMap.putIfAbsent(node.getId(), order[0]++);
             }
-            this.indexDisplayNodes(node.blocks(), order);
+            // 只有控制节点的直属 blocks 是互斥/并行分支，需要按 order 排列；
+            // 顶层节点和分支内部节点是线性拓扑，必须保持定义列表顺序。
+            this.indexDisplayNodes(node.blocks(), order, node instanceof IBlockNode);
         }
     }
 
@@ -186,9 +189,7 @@ public class FlowProcessNodeService {
      */
     private List<ProcessNode> buildProcessNodeList() {
         if (this.hasRepeatedHistoryNode()) {
-            List<ProcessNode> result = new ArrayList<>(this.sortHistoryPreservingRepeatedRanges());
-            result.addAll(this.distinctAndSort(this.previewNodeList));
-            return result;
+            return this.buildRepeatedHistoryProcessNodeList();
         }
 
         Map<String, ProcessNode> nodeMap = new LinkedHashMap<>();
@@ -213,9 +214,34 @@ public class FlowProcessNodeService {
 
     /**
      * 退回会产生 A -> B -> A -> B 形式的重复历史。重复区间内部必须保持真实执行顺序，
-     * 区间之外仍按流程定义的树形顺序排列，避免最后完成的并行分支把汇聚后节点提前到其他分支之前。
+     * 区间之外的历史和预览仍应一起按流程定义的树形顺序排列。
+     *
+     * <p>异常回退可能同时留下 A(已办)、A(待办) 和 D1(待办)。从待办 A 预览时还会再次
+     * 遍历到 D1，因此需要移除与真实处理中节点重复的预览，但保留与已办历史重复的未来节点，
+     * 例如 B1 -> B2 -> B1 后仍需展示下一轮 B2。</p>
      */
-    private List<ProcessNode> sortHistoryPreservingRepeatedRanges() {
+    private List<ProcessNode> buildRepeatedHistoryProcessNodeList() {
+        List<DisplayOrderRange> repeatedRanges = this.loadRepeatedHistoryRanges();
+        Set<String> processingHistoryNodeIds = this.historyNodeList.stream()
+                .filter(node -> node.getApproveState() == ProcessNode.ApproveState.PROCESSING)
+                .map(ProcessNode::getNodeId)
+                .collect(java.util.stream.Collectors.toSet());
+
+        Map<String, ProcessNode> previewNodeMap = new LinkedHashMap<>();
+        for (ProcessNode previewNode : this.previewNodeList) {
+            if (!processingHistoryNodeIds.contains(previewNode.getNodeId())) {
+                previewNodeMap.putIfAbsent(previewNode.getNodeId(), previewNode);
+            }
+        }
+
+        List<ProcessNode> result = new ArrayList<>(this.historyNodeList);
+        result.addAll(previewNodeMap.values());
+        return result.stream()
+                .sorted(Comparator.comparingInt(node -> this.historyDisplayOrder(node, repeatedRanges)))
+                .toList();
+    }
+
+    private List<DisplayOrderRange> loadRepeatedHistoryRanges() {
         Map<String, List<Integer>> positions = new HashMap<>();
         for (int i = 0; i < this.historyNodeList.size(); i++) {
             positions.computeIfAbsent(this.historyNodeList.get(i).getNodeId(), key -> new ArrayList<>()).add(i);
@@ -238,10 +264,7 @@ public class FlowProcessNodeService {
             ranges.add(new DisplayOrderRange(minOrder, maxOrder));
         }
 
-        List<DisplayOrderRange> mergedRanges = this.mergeRanges(ranges);
-        return this.historyNodeList.stream()
-                .sorted(Comparator.comparingInt(node -> this.historyDisplayOrder(node, mergedRanges)))
-                .toList();
+        return this.mergeRanges(ranges);
     }
 
     private int historyDisplayOrder(ProcessNode node, List<DisplayOrderRange> ranges) {
@@ -279,14 +302,6 @@ public class FlowProcessNodeService {
         private boolean contains(int order) {
             return order >= start && order <= end;
         }
-    }
-
-    private List<ProcessNode> distinctAndSort(List<ProcessNode> nodes) {
-        Map<String, ProcessNode> nodeMap = new LinkedHashMap<>();
-        for (ProcessNode node : nodes) {
-            nodeMap.putIfAbsent(node.getNodeId(), node);
-        }
-        return this.sortProcessNodes(nodeMap.values());
     }
 
     private List<ProcessNode> sortProcessNodes(Collection<ProcessNode> nodes) {
