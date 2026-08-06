@@ -23,7 +23,11 @@ public class WorkflowMeta {
         this.workCode = workflow.getCode();
         IFlowNode startNode = workflow.getStartNode();
         ActionManager actionManager = startNode.actionManager();
-        this.actions = actionManager.getActions().stream().map(ActionOption::new).toList();
+        // 子流程配置的触发动作只返回启用的动作，禁用的动作不作为候选
+        this.actions = actionManager.getActions().stream()
+                .filter(IFlowAction::enable)
+                .map(ActionOption::new)
+                .toList();
     }
 
 
