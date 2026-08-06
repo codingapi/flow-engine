@@ -78,12 +78,27 @@ public class NodeStrategyManager {
 
     /**
      * 审批意见是否必填
+     * <p>隐藏审批意见时必填不生效，避免用户无法填写意见导致流程卡死
      */
     public boolean isAdviceRequired() {
         List<INodeStrategy> strategies = this.strategies;
         for (INodeStrategy strategy : strategies) {
             if (strategy instanceof AdviceStrategy) {
-                return ((AdviceStrategy) strategy).isAdviceRequired();
+                return ((AdviceStrategy) strategy).isAdviceRequired()
+                        && !((AdviceStrategy) strategy).isAdviceHidden();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 是否隐藏审批意见
+     */
+    public boolean isAdviceHidden() {
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof AdviceStrategy) {
+                return ((AdviceStrategy) strategy).isAdviceHidden();
             }
         }
         return false;

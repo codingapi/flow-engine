@@ -47,7 +47,10 @@ public class MockInstanceFactory {
 
 
     public void clear(String key) {
-        this.cache.remove(key);
+        MockInstance mockInstance = this.cache.remove(key);
+        if (mockInstance != null) {
+            mockInstance.cancel();
+        }
         log.info("clear mock:{}",key);
     }
 

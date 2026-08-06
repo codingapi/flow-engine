@@ -7,13 +7,25 @@ import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class NodeViewJavaScriptCacheContext {
 
     // 最大缓存时间15分钟
     public static final long MAX_CACHE_TIME = 1000 * 60 * 15;
+
+    /**
+     * 共享清理调度线程，替代每个缓存项一个 Timer 原生线程。
+     */
+    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor(
+            runnable -> {
+                Thread thread = new Thread(runnable, "node-view-javascript-clear");
+                thread.setDaemon(true);
+                return thread;
+            });
 
     private final Map<String, NodeViewJavaScriptClearJob> cache;
 
@@ -35,7 +47,11 @@ public class NodeViewJavaScriptCacheContext {
                 javaScript = new NodeViewJavaScript(code, script, System.currentTimeMillis(), System.currentTimeMillis());
             }
             javaScript.update(script);
-            this.cache.put(code, new NodeViewJavaScriptClearJob(javaScript, System.currentTimeMillis() + MAX_CACHE_TIME));
+            NodeViewJavaScriptClearJob previous = this.cache.put(
+                    code, new NodeViewJavaScriptClearJob(javaScript, MAX_CACHE_TIME));
+            if (previous != null) {
+                previous.cancel();
+            }
         }
     }
 
@@ -43,7 +59,7 @@ public class NodeViewJavaScriptCacheContext {
     public void save(NodeViewJavaScript javaScript) {
         if (nodeViewJavaScriptRepository != null) {
             nodeViewJavaScriptRepository.save(javaScript);
-            this.cache.remove(javaScript.getCode());
+            this.remove(javaScript.getCode());
         }
     }
 
@@ -60,12 +76,15 @@ public class NodeViewJavaScriptCacheContext {
 
 
     public void remove(String code) {
-        this.cache.remove(code);
+        NodeViewJavaScriptClearJob job = this.cache.remove(code);
+        if (job != null) {
+            job.cancel();
+        }
     }
 
 
     public void delete(String code) {
-        this.cache.remove(code);
+        this.remove(code);
         if (nodeViewJavaScriptRepository != null) {
             nodeViewJavaScriptRepository.delete(code);
         }
@@ -76,25 +95,18 @@ public class NodeViewJavaScriptCacheContext {
 
         @Getter
         private final NodeViewJavaScript javaScript;
-        private final long clearTime;
-        private final Timer timer;
+        private final ScheduledFuture<?> future;
 
-        public NodeViewJavaScriptClearJob(NodeViewJavaScript javaScript, long clearTime) {
+        public NodeViewJavaScriptClearJob(NodeViewJavaScript javaScript, long clearDelayMillis) {
             this.javaScript = javaScript;
-            this.clearTime = clearTime;
-            this.timer = new Timer();
-
-            this.initTimer();
+            this.future = SCHEDULER.schedule(
+                    () -> NodeViewJavaScriptCacheContext.getInstance().remove(javaScript.getCode()),
+                    clearDelayMillis,
+                    TimeUnit.MILLISECONDS);
         }
 
-
-        private void initTimer() {
-            this.timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    NodeViewJavaScriptCacheContext.getInstance().remove(javaScript.getCode());
-                }
-            }, this.clearTime);
+        public void cancel() {
+            this.future.cancel(false);
         }
     }
 }

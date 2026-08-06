@@ -1,6 +1,7 @@
 package com.codingapi.flow.node;
 
 import com.codingapi.flow.error.ErrorThrow;
+import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.javscript.annotation.NodeViewScript;
@@ -17,9 +18,11 @@ import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 @NoArgsConstructor
 public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
@@ -123,6 +126,21 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
      */
     @Override
     public List<FlowRecord> generateCurrentRecords(FlowSession session) {
+        return this.generateCurrentRecords(session, new LinkedHashSet<>(), 0);
+    }
+
+    /**
+     * 生成当前节点的记录。
+     * <p>
+     * 带本次生成链的已访问节点集合与递归深度，防护异常触发（errorTrigger）跳回已访问节点
+     * 或超深跳转导致的无限递归。
+     *
+     * @param session         触发会话
+     * @param visitedNodeIds  本次记录生成过程中已访问的节点id
+     * @param depth           本次 errorTrigger 递归深度
+     * @return 生成当前节点的记录
+     */
+    private List<FlowRecord> generateCurrentRecords(FlowSession session, Set<String> visitedNodeIds, int depth) {
 
         // 是否等待并行合并节点
         if (this.isWaitRecordMargeParallelNode(session)) {
@@ -140,7 +158,19 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
             }
             if(errorThrow.isNode()){
                 IFlowNode errorNode = errorThrow.getNode();
+                // 抄送/子流程节点不产生有效记录，跳转会静默停滞
+                verifyJumpTarget(errorNode);
+                if (!visitedNodeIds.add(errorNode.getId())) {
+                    throw FlowExecutionException.errorTriggerLoop();
+                }
+                int maxNestDepth = session.getWorkflow().getMaxNestDepth();
+                if (depth + 1 > maxNestDepth) {
+                    throw FlowExecutionException.errorTriggerDepthExceeded(maxNestDepth);
+                }
                 FlowSession errorSession = session.updateSession(errorNode);
+                if (errorNode instanceof BaseAuditNode auditNode) {
+                    return auditNode.generateCurrentRecords(errorSession, visitedNodeIds, depth + 1);
+                }
                 return errorNode.generateCurrentRecords(errorSession);
             }else {
                 operatorManager = new OperatorManager(errorThrow.getOperators());

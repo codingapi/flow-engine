@@ -2,6 +2,8 @@ package com.codingapi.flow.node.nodes;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.builder.BaseNodeBuilder;
+import com.codingapi.flow.context.LoopTriggerTraceContext;
+import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
@@ -84,6 +86,16 @@ public class NotifyNode extends BaseAuditNode implements IDisplayNode {
      * @return 生成当前节点的记录
      */
     public List<FlowRecord> generateCurrentRecords0(FlowSession session) {
+        // 被动式环检测：抄送节点正常只执行一次，时间窗口内同一实例再次触发说明存在自动流转环。
+        // 基于内存标记，不主动查询数据库。
+        FlowRecord currentRecord = session.getCurrentRecord();
+        if (currentRecord != null) {
+            String traceKey = currentRecord.getProcessId() + ":NOTIFY:" + this.getId();
+            if (LoopTriggerTraceContext.getInstance().trace(traceKey)) {
+                throw FlowExecutionException.nodeLoopDepthExceeded(
+                        session.getWorkflow().getMaxNestDepth());
+            }
+        }
         List<FlowRecord> records = new ArrayList<>();
         NodeStrategyManager nodeStrategyManager = this.strategyManager();
         OperatorManager operatorManager = nodeStrategyManager.loadOperators(session);

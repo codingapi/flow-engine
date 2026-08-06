@@ -73,6 +73,7 @@ class WorkflowBuilderTest {
                 .code("leave")
                 .createdOperator(user)
                 .form(form)
+                .maxNestDepth(5)
                 .addNode(startNode)
                 .addNode(approvalNode)
                 .addNode(endNode)
@@ -102,6 +103,7 @@ class WorkflowBuilderTest {
         assertEquals(workflow.getForm().getCode(), workflowBck.getForm().getCode());
         assertEquals(workflow.getNodes().size(), workflowBck.getNodes().size());
         assertEquals(workflow.getNodes().get(0).getId(), workflowBck.getNodes().get(0).getId());
+        assertEquals(workflow.getMaxNestDepth(), workflowBck.getMaxNestDepth());
 
     }
 

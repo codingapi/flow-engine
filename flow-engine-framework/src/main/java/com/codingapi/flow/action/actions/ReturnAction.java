@@ -7,6 +7,7 @@ import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
+import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -47,6 +48,9 @@ public class ReturnAction extends BaseAction {
         List<FlowRecord> recordList = new ArrayList<>();
 
         IFlowNode backNode = flowSession.getAdvice().getBackNode();
+
+        // 退回目标为抄送/子流程节点时无法产生有效记录，直接拒绝
+        BaseFlowNode.verifyJumpTarget(backNode);
 
         FlowRecord currentRecord = flowSession.getCurrentRecord();
         currentRecord.update(flowSession, true);

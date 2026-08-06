@@ -141,6 +141,40 @@ public class FlowSession {
     }
 
     /**
+     * 获取上一节点的审批人员Id列表。
+     *
+     * <p>以当前流程记录所在节点作为上一节点，按 fromId 查询该节点的全部流程记录，
+     * 提取审批人员Id并去重、排序后返回。
+     *
+     * <p>仅当该节点为当前节点的直接前驱节点时才返回数据；流程预览等场景下
+     * 当前记录可能尚未流转到当前节点（如停留在更早的节点），此时返回空列表，避免误读。
+     *
+     * @return 上一节点的审批人员Id列表，无法确定时返回空列表
+     */
+    public List<Long> loadPreviousNodeOperatorIds() {
+        if (currentRecord == null || currentNode == null) {
+            return List.of();
+        }
+        IFlowNode previousNode = workflow.getFlowNode(currentRecord.getNodeId());
+        if (previousNode == null) {
+            return List.of();
+        }
+        List<IFlowNode> nextNodes = workflow.nextNodes(previousNode);
+        boolean directPrevious = nextNodes != null
+                && nextNodes.stream().anyMatch(node -> node.getId().equals(currentNode.getId()));
+        if (!directPrevious) {
+            return List.of();
+        }
+        return repositoryHolder.findCurrentNodeRecords(currentRecord.getFromId(), currentRecord.getNodeId())
+                .stream()
+                .map(FlowRecord::getCurrentOperatorId)
+                .distinct()
+                .sorted()
+                .toList();
+    }
+
+
+    /**
      * 获取转交之后的审批人
      *
      * @param currentOperator 当前操作者

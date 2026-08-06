@@ -4,6 +4,7 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.builder.NodeMapBuilder;
 import com.codingapi.flow.common.IMapConvertor;
+import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.manager.ActionManager;
@@ -11,7 +12,9 @@ import com.codingapi.flow.manager.FlowNodeState;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.HandleNode;
+import com.codingapi.flow.node.nodes.NotifyNode;
 import com.codingapi.flow.node.nodes.StartNode;
+import com.codingapi.flow.node.nodes.SubProcessNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
@@ -257,6 +260,20 @@ public abstract class BaseFlowNode implements IFlowNode {
     @Override
     public List<FlowRecord> generateCurrentRecords(FlowSession session) {
         return new ArrayList<>();
+    }
+
+    /**
+     * 校验节点跳转目标是否有效。
+     * <p>
+     * 抄送节点与子流程节点不通过 {@link #generateCurrentRecords(FlowSession)} 产生有效记录，
+     * 异常触发/退回跳转到此类节点会静默停滞（无新待办、主流程卡死），应直接拒绝。
+     *
+     * @param targetNode 跳转目标节点
+     */
+    public static void verifyJumpTarget(IFlowNode targetNode) {
+        if (targetNode instanceof NotifyNode || targetNode instanceof SubProcessNode) {
+            throw FlowExecutionException.invalidJumpTarget(targetNode.getType());
+        }
     }
 
     @Override

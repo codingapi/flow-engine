@@ -199,6 +199,23 @@ public class GroovyScriptRequest {
     }
 
     /**
+     * 获取上一节点的审批人员Id列表。
+     * <p>由 {@link FlowSession#loadPreviousNodeOperatorIds()} 提供能力，此处仅做透传。
+     * 适用于后续节点需要复用前序节点审批人的场景，例如：
+     * <pre>
+     * def run(request){
+     *     return request.findPreviousNodeOperatorIds()
+     * }
+     * </pre>
+     *
+     * @return 上一节点的审批人员Id列表，无法确定时返回空列表
+     */
+    @ScriptFunction(name = "findPreviousNodeOperatorIds", description = "获取上一节点的审批人员Id列表")
+    public List<Long> findPreviousNodeOperatorIds() {
+        return this.flowSession.loadPreviousNodeOperatorIds();
+    }
+
+    /**
      * 获取当前操作对象
      */
     @ScriptFunction(name = "getCurrentAction", description = "获取当前操作对象")

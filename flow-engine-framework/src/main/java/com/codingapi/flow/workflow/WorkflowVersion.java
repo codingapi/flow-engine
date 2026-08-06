@@ -96,6 +96,11 @@ public class WorkflowVersion {
     private boolean enable;
 
     /**
+     * 最大子流程嵌套深度
+     */
+    private int maxNestDepth;
+
+    /**
      * 启用版本
      */
     public void enableVersion() {
@@ -123,6 +128,7 @@ public class WorkflowVersion {
         this.nodes = workflow.getNodes();
         this.strategies = workflow.getStrategies();
         this.enable = workflow.isEnable();
+        this.maxNestDepth = workflow.getMaxNestDepth();
         this.current = true;
     }
 
@@ -139,7 +145,8 @@ public class WorkflowVersion {
                 this.operatorCreateScript,
                 this.nodes,
                 this.strategies,
-                this.enable
+                this.enable,
+                this.maxNestDepth
         );
     }
 }

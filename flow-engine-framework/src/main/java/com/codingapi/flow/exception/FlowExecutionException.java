@@ -93,4 +93,82 @@ public class FlowExecutionException extends FlowException {
     public static FlowExecutionException customActionNextNotFound() {
         return new FlowExecutionException("execution.custom.action.nextNotFound", "Next action not found");
     }
+
+    /**
+     * Sub process loop detected
+     * <p>
+     * The same sub process node has been triggered repeatedly in the flow chain,
+     * which means the sub process creates itself or an ancestor flow.
+     *
+     * @return exception
+     */
+    public static FlowExecutionException subProcessLoop() {
+        return new FlowExecutionException("execution.subProcess.loop",
+                "Sub process loop detected: the same sub process node is triggered repeatedly in the flow chain.");
+    }
+
+    /**
+     * Sub process nesting depth exceeds the limit
+     *
+     * @param maxDepth max sub process depth
+     * @return exception
+     */
+    public static FlowExecutionException subProcessMaxDepth(int maxDepth) {
+        return new FlowExecutionException("execution.subProcess.maxDepth",
+                String.format("Sub process nesting depth exceeds the limit: %d", maxDepth));
+    }
+
+    /**
+     * Error trigger node loop detected
+     * <p>
+     * The error trigger jumps back to a node that has already been visited during
+     * the current record generation, which would cause infinite recursion.
+     *
+     * @return exception
+     */
+    public static FlowExecutionException errorTriggerLoop() {
+        return new FlowExecutionException("execution.node.errorTriggerLoop",
+                "Error trigger node loop detected: the error trigger jumps back to an already visited node.");
+    }
+
+    /**
+     * Error trigger recursion depth exceeds the limit
+     *
+     * @param maxDepth max nest depth
+     * @return exception
+     */
+    public static FlowExecutionException errorTriggerDepthExceeded(int maxDepth) {
+        return new FlowExecutionException("execution.node.errorTriggerDepth",
+                String.format("Error trigger recursion depth exceeds the limit: %d", maxDepth));
+    }
+
+    /**
+     * Invalid jump target
+     * <p>
+     * The error trigger / reject action jumps to a node type that cannot generate
+     * records (e.g. notify node or sub process node), which would silently stall
+     * the flow instead of producing a new todo.
+     *
+     * @param nodeType node type
+     * @return exception
+     */
+    public static FlowExecutionException invalidJumpTarget(String nodeType) {
+        return new FlowExecutionException("execution.node.invalidJumpTarget",
+                String.format("Jump target node type is not supported for jump: %s", nodeType));
+    }
+
+    /**
+     * Node execution count exceeds the limit
+     * <p>
+     * The same node has been executed too many times in the flow instance chain,
+     * which indicates a loop chain (e.g. A -> B -> C -> B) instead of a normal
+     * forward progress.
+     *
+     * @param maxDepth max nest depth
+     * @return exception
+     */
+    public static FlowExecutionException nodeLoopDepthExceeded(int maxDepth) {
+        return new FlowExecutionException("execution.node.loopDepth",
+                String.format("Node execution count exceeds the loop guard limit: %d", maxDepth));
+    }
 }
