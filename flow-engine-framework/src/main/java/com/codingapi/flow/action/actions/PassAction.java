@@ -176,6 +176,15 @@ public class PassAction extends BaseAction {
             }
         }
 
+        // 先保存当前记录及其状态变更（含顺序激活、或签并签自动已办），
+        // 再触发后续节点。子流程等嵌套执行在完成时会把当前记录标记为流程结束，
+        // 若在触发完成后再统一保存，会以本会话中陈旧的"运行中"状态覆盖已更新的流程状态，
+        // 导致最终流程记录停留在运行中（issue #184）。
+        if (!recordList.isEmpty()) {
+            repositoryHolder.saveRecords(recordList);
+            recordList.clear();
+        }
+
         if (isFinish) {
             // 是否转交审批人的流程
             if (currentRecord.isForward()) {
