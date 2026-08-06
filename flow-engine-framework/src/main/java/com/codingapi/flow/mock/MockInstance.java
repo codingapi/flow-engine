@@ -4,8 +4,10 @@ import com.codingapi.flow.query.FlowRecordQueryService;
 import com.codingapi.flow.service.FlowService;
 import lombok.Getter;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -22,7 +24,17 @@ public class MockInstance {
     @Getter
     private final FlowRecordQueryService flowRecordQueryService;
 
-    private final Timer timer;
+    /**
+     * 共享清理调度线程，替代每个实例一个 Timer 原生线程。
+     */
+    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor(
+            runnable -> {
+                Thread thread = new Thread(runnable, "mock-instance-clear");
+                thread.setDaemon(true);
+                return thread;
+            });
+
+    private final ScheduledFuture<?> timerFuture;
 
     @Getter
     private final long createTime;
@@ -38,10 +50,20 @@ public class MockInstance {
         this.repositoryHolder = repositoryHolder;
         this.flowService = flowService;
         this.flowRecordQueryService = flowRecordQueryService;
-        this.timer = new Timer();
         this.createTime = System.currentTimeMillis();
         this.expiredTime = this.createTime + MAX_KEEP_TIME;
-        this.initTimer();
+        this.timerFuture = SCHEDULER.scheduleAtFixedRate(() -> {
+            if (isExpired()) {
+                MockInstanceFactory.getInstance().clear(mockKey);
+            }
+        }, 0, 1, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 取消定时清理任务（外部主动清理时调用）。
+     */
+    public void cancel() {
+        this.timerFuture.cancel(false);
     }
 
     public void updateExpiredTime(){
@@ -53,18 +75,5 @@ public class MockInstance {
      */
     public boolean isExpired(){
         return System.currentTimeMillis() > expiredTime;
-    }
-
-    private void initTimer() {
-        this.timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (isExpired()) {
-                    MockInstanceFactory.getInstance().clear(mockKey);
-                    timer.cancel();
-                    return;
-                }
-            }
-        }, 0, 1000);
     }
 }

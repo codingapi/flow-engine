@@ -6,7 +6,12 @@ import com.codingapi.flow.service.impl.FlowDelayTriggerService;
 import com.codingapi.flow.session.IRepositoryHolder;
 import lombok.Getter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 延迟任务上下文管理对象
@@ -63,30 +68,32 @@ public class DelayTaskManager {
      * 延期任务队列
      */
     private static class DelayJob {
-        private final DelayTask task;
-        private final Timer timer;
+
+        /**
+         * 共享调度线程，替代每个任务一个 Timer 原生线程。
+         */
+        private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor(
+                runnable -> {
+                    Thread thread = new Thread(runnable, "delay-task-trigger");
+                    thread.setDaemon(true);
+                    return thread;
+                });
+
+        private final ScheduledFuture<?> future;
 
         public DelayJob(DelayTask task, IRepositoryHolder repositoryHolder) {
-            this.task = task;
-            this.timer = new Timer();
-            this.start(repositoryHolder);
+            long delayMillis = Math.max(0, task.getTriggerTime() - System.currentTimeMillis());
+            this.future = SCHEDULER.schedule(() -> {
+                FlowOperatorLocalThreadCache.getInstance().clear();
+                FlowRuntimeScriptLocalCache.getInstance().clear();
+                FlowDelayTriggerService flowDelayTriggerService = repositoryHolder.createDelayTriggerService(task);
+                flowDelayTriggerService.trigger();
+                repositoryHolder.deleteDelayTask(task);
+            }, delayMillis, TimeUnit.MILLISECONDS);
         }
 
         public void close() {
-            this.timer.cancel();
-        }
-
-        private void start(IRepositoryHolder repositoryHolder) {
-            this.timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    FlowOperatorLocalThreadCache.getInstance().clear();
-                    FlowRuntimeScriptLocalCache.getInstance().clear();
-                    FlowDelayTriggerService flowDelayTriggerService = repositoryHolder.createDelayTriggerService(task);
-                    flowDelayTriggerService.trigger();
-                    repositoryHolder.deleteDelayTask(task);
-                }
-            }, new Date(task.getTriggerTime()));
+            this.future.cancel(false);
         }
     }
 }
