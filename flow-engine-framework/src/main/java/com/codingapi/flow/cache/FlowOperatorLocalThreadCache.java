@@ -70,6 +70,21 @@ public class FlowOperatorLocalThreadCache {
 
         Map<Long, IFlowOperator> operatorCaches = this.getCache();
 
+        List<Long> queryIds = ids.stream()
+                .filter((id) -> !operatorCaches.containsKey(id))
+                .toList();
+
+        if (!queryIds.isEmpty()) {
+            List<IFlowOperator> newOperatorList = flowOperatorFinder.find(queryIds);
+            if (newOperatorList != null && !newOperatorList.isEmpty()) {
+                for (IFlowOperator operator : newOperatorList) {
+                    operatorCaches.put(operator.getUserId(), operator);
+                }
+                this.cache.set(operatorCaches);
+            }
+        }
+
+        // 按入参 ids 顺序返回，避免缓存命中情况影响结果顺序，保证多人审批顺序稳定
         List<IFlowOperator> operatorList = new ArrayList<>();
         for (long id : ids) {
             IFlowOperator operator = operatorCaches.get(id);
@@ -77,34 +92,6 @@ public class FlowOperatorLocalThreadCache {
                 operatorList.add(operator);
             }
         }
-        List<Long> matchIds = ids.stream()
-                .filter((id) -> !operatorCaches.containsKey(id))
-                .toList();
-
-        if (matchIds.isEmpty()) {
-            return operatorList;
-        }
-
-        List<IFlowOperator> newOperatorList;
-        if (operatorList.isEmpty()) {
-            newOperatorList = flowOperatorFinder.find(ids);
-        } else {
-            List<Long> queryIds = ids.stream()
-                    .filter((id) -> !operatorCaches.containsKey(id))
-                    .toList();
-            newOperatorList = flowOperatorFinder.find(queryIds);
-        }
-
-        if (newOperatorList != null && !newOperatorList.isEmpty()) {
-            for (IFlowOperator operator : newOperatorList) {
-                operatorCaches.put(operator.getUserId(), operator);
-            }
-
-            this.cache.set(operatorCaches);
-
-            operatorList.addAll(newOperatorList);
-        }
-
         return operatorList;
     }
 
