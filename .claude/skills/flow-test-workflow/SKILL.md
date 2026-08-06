@@ -112,6 +112,14 @@ gh issue view <编号> --repo codingapi/flow-engine   # 确认 issue 状态与�
 
 说明：`closes #N` 在提交合入默认分支（main）时才会自动关闭 issue，推送到 dev 阶段 issue 保持 OPEN 属正常现象。
 
+## 前端代码处理（submodule）
+
+本工程通过 **git submodule** 集成前端代码（`flow-frontend/` → `codingapi/flow-frontend` 仓库，main 分支）：
+
+- 涉及前端的改动（审批界面、流程设计器、待办列表等交互/展示）**必须进入 `flow-frontend/` 子模块目录内处理**，在前端仓库中提交与推送
+- **不能**把前端源码改动直接提交到当前后端仓库；后端仓库只记录子模块指针，如需更新指针，须在前端仓库提交推送后，再于后端仓库 `git add flow-frontend` 更新引用
+- 后端仅提供前端所需的数据/配置（如节点策略、详情接口字段），前后端联动的问题需同时在两个仓库处理时，分别提交、分别关联 issue
+
 ## 项目红线（CLAUDE.md）
 
 - **未经用户明确要求，禁止执行 `git commit` / `git push` / `git merge`**
