@@ -103,6 +103,11 @@ public class FlowContent {
     private boolean signRequired;
 
     /**
+     * 是否隐藏审批意见，开启后审批时不展示审批意见输入框
+     */
+    private boolean adviceHidden;
+
+    /**
      * 表单元数据
      */
     private FlowForm form;
@@ -207,6 +212,7 @@ public class FlowContent {
             this.actionList = actionManager.getActions().stream().map(IFlowAction::toMap).toList();
             this.adviceRequired = strategyManager.isAdviceRequired();
             this.signRequired = strategyManager.isSignRequired();
+            this.adviceHidden = strategyManager.isAdviceHidden();
             this.nodeId = currentNode.getId();
             this.nodeName = currentNode.getName();
             this.nodeType = currentNode.getType();
