@@ -161,8 +161,15 @@ public class SubProcessStrategy extends BaseStrategy {
         Set<Long> visited = new HashSet<>();
         FlowRecord ancestor = currentRecord;
         int depth = 1;
-        while (ancestor != null) {
-            if (!visited.add(ancestor.getId())) {
+        // 回溯层数不超过 maxDepth：超过后创建必定触发深度校验，无需继续回溯，
+        // 将最坏回溯查询次数限制在 maxNestDepth 层内。
+        while (ancestor != null && depth <= maxDepth) {
+            long ancestorId = ancestor.getId();
+            if (ancestorId <= 0) {
+                // 记录尚未落库（id 由数据库生成，运行时为 0），无法按 id 回溯与防环，跳过回溯
+                break;
+            }
+            if (!visited.add(ancestorId)) {
                 // 数据异常防环兜底，避免父链成环导致的死循环
                 break;
             }

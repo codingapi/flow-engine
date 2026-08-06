@@ -3,6 +3,7 @@ package com.codingapi.flow.service;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
+import com.codingapi.flow.context.LoopTriggerTraceContext;
 import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.form.DataType;
@@ -59,6 +60,7 @@ class FlowSubProcessLoopGuardTest {
     @BeforeEach
     void setUp() {
         factory = new MyFlowServiceFactory();
+        LoopTriggerTraceContext.getInstance().clear();
         initiator = saveUser(1, "发起人");
         form = FlowFormBuilder.builder()
                 .name("循环防护测试表单")
@@ -521,63 +523,6 @@ class FlowSubProcessLoopGuardTest {
                 () -> approve(startRecord, passAction(start), initiator, data),
                 "errorTrigger 递归深度超过 maxNestDepth 必须被拦截");
         assertEquals("execution.node.errorTriggerDepth", exception.getErrCode());
-    }
-
-    /**
-     * 测试目标：同一节点在实例链上的执行次数超过 maxNestDepth（环形状）时被拦截。
-     * 前置条件：A->B->C->D，C 拒绝退回 B，maxNestDepth=1（B 仅允许执行一次）。
-     * 执行步骤：提交 A 进入 B，通过 B 进入 C，拒绝 C 退回 B。
-     * 期望断言：B 第二次执行时抛出 FlowExecutionException，错误码为 execution.node.loopDepth。
-     */
-    @Test
-    void shouldRejectNodeExecutionCountExceeded() {
-        StartNode start = writableStart("环检测开始");
-        ApprovalNode nodeB = approvalNode("B", initiator);
-        ApprovalNode nodeC = approvalNode("C", initiator);
-        nodeC.actionManager().getActions().stream()
-                .filter(action -> "REJECT".equals(action.type()))
-                .findFirst()
-                .ifPresent(action -> {
-                    com.codingapi.flow.action.actions.RejectAction reject =
-                            (com.codingapi.flow.action.actions.RejectAction) action;
-                    reject.setScript(FlowGroovyScriptFactory.createActionRejectScript(
-                            "def run(request){ return '" + nodeB.getId() + "' }").getKey());
-                });
-        Workflow workflow = WorkflowBuilder.builder()
-                .title("节点执行次数检测")
-                .code("loop-guard-node-count")
-                .createdOperator(initiator)
-                .form(form)
-                .maxNestDepth(1)
-                .addNode(start)
-                .addNode(nodeB)
-                .addNode(nodeC)
-                .addNode(EndNode.builder().name("D").build())
-                .build();
-        factory.workflowService.saveWorkflow(workflow);
-
-        Map<String, Object> data = Map.of("content", "parent");
-        FlowCreateRequest request = new FlowCreateRequest();
-        request.setWorkCode("loop-guard-node-count");
-        request.setOperatorId(initiator.getUserId());
-        request.setActionId(passAction(start).id());
-        request.setFormData(data);
-        long recordId = factory.flowService.create(request);
-        FlowRecord startRecord = factory.flowRecordRepository.get(recordId);
-        approve(startRecord, passAction(start), initiator, data);
-
-        FlowRecord bTodo = todos(initiator, nodeB).get(0);
-        approve(bTodo, passAction(nodeB), initiator, data);
-
-        FlowRecord cTodo = todos(initiator, nodeC).get(0);
-        IFlowAction reject = nodeC.actionManager().getActions().stream()
-                .filter(action -> "REJECT".equals(action.type()))
-                .findFirst()
-                .orElseThrow();
-        FlowExecutionException exception = assertThrows(FlowExecutionException.class,
-                () -> approve(cTodo, reject, initiator, data),
-                "节点执行次数超过 maxNestDepth 必须被拦截（环形状）");
-        assertEquals("execution.node.loopDepth", exception.getErrCode());
     }
 
     private void saveWorkflowWithDepth(String code, String title, StartNode start,

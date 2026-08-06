@@ -142,9 +142,6 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
      */
     private List<FlowRecord> generateCurrentRecords(FlowSession session, Set<String> visitedNodeIds, int depth) {
 
-        // 节点执行次数兜底（环形状：同一节点在实例链上反复执行）
-        this.verifyNodeExecutionCount(session);
-
         // 是否等待并行合并节点
         if (this.isWaitRecordMargeParallelNode(session)) {
             return List.of();
@@ -212,30 +209,6 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         }
 
         return records;
-    }
-
-    /**
-     * 校验当前节点在流程实例链上的执行次数。
-     * <p>
-     * 同一节点在实例链上反复执行（如抄送节点参与的正向流转环 B -> C -> B）会不断产生记录，
-     * 超过流程级 {@link com.codingapi.flow.workflow.Workflow#getMaxNestDepth()} 时拒绝继续，
-     * 作为环形状循环的最后兜底。
-     *
-     * @param session 触发会话
-     */
-    protected void verifyNodeExecutionCount(FlowSession session) {
-        FlowRecord currentRecord = session.getCurrentRecord();
-        if (currentRecord == null) {
-            return;
-        }
-        int maxNestDepth = session.getWorkflow().getMaxNestDepth();
-        long executedCount = session.getRepositoryHolder()
-                .findProcessRecords(currentRecord.getProcessId()).stream()
-                .filter(record -> record.getNodeId().equals(session.getCurrentNodeId()))
-                .count();
-        if (executedCount + 1 > maxNestDepth) {
-            throw FlowExecutionException.nodeLoopDepthExceeded(maxNestDepth);
-        }
     }
 
 
