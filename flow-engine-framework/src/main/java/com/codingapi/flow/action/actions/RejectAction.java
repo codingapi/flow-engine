@@ -9,6 +9,7 @@ import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
+import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.action.ActionRejectScript;
@@ -85,6 +86,8 @@ public class RejectAction extends BaseAction {
         if (currentNode == null) {
             throw FlowStateException.currentNodeNotNull();
         }
+        // 退回目标为抄送/子流程节点时无法产生有效记录，直接拒绝
+        BaseFlowNode.verifyJumpTarget(currentNode);
         flowSession = flowSession.updateSession(currentNode);
         return currentNode.generateCurrentRecords(flowSession);
     }

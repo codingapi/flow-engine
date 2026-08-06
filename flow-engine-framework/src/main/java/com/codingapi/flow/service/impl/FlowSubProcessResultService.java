@@ -12,6 +12,7 @@ import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FormData;
+import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.SubProcessNode;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -130,6 +131,8 @@ public class FlowSubProcessResultService {
     }
 
     private void jumpToErrorNode(FlowSession session, IFlowNode errorNode) {
+        // 跳转目标为抄送/子流程节点时无法产生有效记录，直接拒绝而非静默停滞
+        BaseFlowNode.verifyJumpTarget(errorNode);
         List<FlowRecord> records = new ArrayList<>();
         List<IFlowEvent> events = new ArrayList<>();
         collectRecords(session.updateSession(errorNode), records, events);

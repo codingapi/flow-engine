@@ -75,4 +75,9 @@ public class WorkflowEntity {
      * 启用状态
      */
     private Boolean enable;
+
+    /**
+     * 最大子流程嵌套深度
+     */
+    private Integer maxNestDepth;
 }

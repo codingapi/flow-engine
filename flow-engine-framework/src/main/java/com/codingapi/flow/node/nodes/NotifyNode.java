@@ -84,6 +84,8 @@ public class NotifyNode extends BaseAuditNode implements IDisplayNode {
      * @return 生成当前节点的记录
      */
     public List<FlowRecord> generateCurrentRecords0(FlowSession session) {
+        // 抄送节点正常只执行一次，重复执行说明存在正向流转环（环形状）
+        this.verifyNodeExecutionCount(session);
         List<FlowRecord> records = new ArrayList<>();
         NodeStrategyManager nodeStrategyManager = this.strategyManager();
         OperatorManager operatorManager = nodeStrategyManager.loadOperators(session);

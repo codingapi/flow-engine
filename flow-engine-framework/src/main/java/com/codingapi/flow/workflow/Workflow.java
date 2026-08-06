@@ -95,6 +95,18 @@ public class Workflow {
      */
     private boolean enable;
 
+    /**
+     * 最大子流程嵌套深度。
+     * <p>运行期创建子流程时沿 parentId 父链统计嵌套层数，超过该值将拒绝创建，
+     * 用于兜底防护"子流程创建自身/祖先流程"等循环配置导致的无限递归。
+     */
+    private int maxNestDepth;
+
+    /**
+     * 默认最大子流程嵌套深度。
+     */
+    public static final int DEFAULT_MAX_NEST_DEPTH = 10;
+
 
     public boolean isDisable() {
         return !enable;
@@ -108,6 +120,7 @@ public class Workflow {
         this.nodes = new ArrayList<>();
         this.strategies = defaultStrategies();
         this.enable = false;
+        this.maxNestDepth = DEFAULT_MAX_NEST_DEPTH;
         this.updateTime();
     }
 
@@ -175,6 +188,10 @@ public class Workflow {
         this.strategies = strategies;
     }
 
+    protected void setMaxNestDepth(int maxNestDepth) {
+        this.maxNestDepth = maxNestDepth;
+    }
+
 
     /**
      * 转换为json
@@ -198,6 +215,7 @@ public class Workflow {
         map.put("createdTime", String.valueOf(createdTime));
         map.put("updatedTime", String.valueOf(updatedTime));
         map.put("strategies", strategies.stream().map(IWorkflowStrategy::toMap).toList());
+        map.put("maxNestDepth", maxNestDepth);
         return JSON.toJSONString(map);
     }
 
@@ -237,6 +255,11 @@ public class Workflow {
             }
             workflow.setStrategies(strategyList);
         }
+
+        Object maxNestDepth = data.get("maxNestDepth");
+        workflow.setMaxNestDepth(maxNestDepth == null
+                ? DEFAULT_MAX_NEST_DEPTH
+                : Integer.parseInt(maxNestDepth.toString()));
 
         return workflow;
     }

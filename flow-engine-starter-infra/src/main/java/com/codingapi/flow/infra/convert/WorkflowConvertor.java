@@ -32,6 +32,7 @@ public class WorkflowConvertor {
         entity.setNodes(flowNodeListConvertor.convertToDatabaseColumn(workflow.getNodes()));
         entity.setStrategies(workflowStrategyListConvertor.convertToDatabaseColumn(workflow.getStrategies()));
         entity.setEnable(workflow.isEnable());
+        entity.setMaxNestDepth(workflow.getMaxNestDepth());
         return entity;
     }
 
@@ -50,6 +51,9 @@ public class WorkflowConvertor {
                 operatorMatchScriptConvertor.convertToEntityAttribute(entity.getOperatorCreateScript()),
                 flowNodeListConvertor.convertToEntityAttribute(entity.getNodes()),
                 workflowStrategyListConvertor.convertToEntityAttribute(entity.getStrategies()),
-                entity.getEnable());
+                entity.getEnable(),
+                entity.getMaxNestDepth() == null
+                        ? Workflow.DEFAULT_MAX_NEST_DEPTH
+                        : entity.getMaxNestDepth());
     }
 }

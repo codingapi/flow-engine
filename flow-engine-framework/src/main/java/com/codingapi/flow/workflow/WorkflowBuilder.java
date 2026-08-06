@@ -65,6 +65,11 @@ public class WorkflowBuilder {
         return this;
     }
 
+    public WorkflowBuilder maxNestDepth(int maxNestDepth) {
+        workflow.setMaxNestDepth(maxNestDepth);
+        return this;
+    }
+
     public WorkflowBuilder addNode(IFlowNode node) {
         if (workflow.getNodes() == null) {
             workflow.setNodes(new ArrayList<>());

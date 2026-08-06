@@ -2,6 +2,7 @@ package com.codingapi.flow.infra.convert;
 
 import com.codingapi.flow.infra.entity.WorkflowVersionEntity;
 import com.codingapi.flow.infra.entity.convert.*;
+import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowVersion;
 
 public class WorkflowVersionConvertor {
@@ -37,6 +38,7 @@ public class WorkflowVersionConvertor {
         entity.setNodes(flowNodeListConvertor.convertToDatabaseColumn(workflowVersion.getNodes()));
         entity.setStrategies(workflowStrategyListConvertor.convertToDatabaseColumn(workflowVersion.getStrategies()));
         entity.setEnable(workflowVersion.isEnable());
+        entity.setMaxNestDepth(workflowVersion.getMaxNestDepth());
         return entity;
     }
 
@@ -59,6 +61,9 @@ public class WorkflowVersionConvertor {
                 operatorMatchScriptConvertor.convertToEntityAttribute(entity.getOperatorCreateScript()),
                 flowNodeListConvertor.convertToEntityAttribute(entity.getNodes()),
                 workflowStrategyListConvertor.convertToEntityAttribute(entity.getStrategies()),
-                entity.getEnable());
+                entity.getEnable(),
+                entity.getMaxNestDepth() == null
+                        ? Workflow.DEFAULT_MAX_NEST_DEPTH
+                        : entity.getMaxNestDepth());
     }
 }
