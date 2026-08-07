@@ -27,10 +27,10 @@ content_hash: 48847288af1a4551b8327e398d01a8ec4de643dce1c049b90dcdc8ad0134df3b
 
 提供流程引擎的业务服务层，将复杂的流程操作封装为高内聚的服务接口，解决以下问题：
 
-- **流程操作入口**：`FlowService` 作为流程审批操作的统一入口，支持创建、审批、撤销、催办
+- **流程操作入口**：`FlowService` 作为流程审批操作的统一入口，支持创建、审批、撤销、删除、催办
 - **流程设计管理**：`WorkflowService` 管理流程定义的 CRUD 和版本操作
 - **职责分离**：每种操作由独立的 Service 实现（如 `FlowActionService`、`FlowCreateService`），保持单一职责
-- **线程安全**：每次操作前通过 `FlowOperatorLocalThreadCache.clear()` 清理线程缓存
+- **线程安全**：每次操作前通过 `FlowOperatorLocalThreadCache.clear()` 与 `FlowRuntimeScriptLocalCache.clear()` 清理线程缓存
 
 ## 如何使用
 
@@ -41,6 +41,7 @@ content_hash: 48847288af1a4551b8327e398d01a8ec4de643dce1c049b90dcdc8ad0134df3b
 | `create(FlowCreateRequest)` | 创建流程实例，返回流程 ID |
 | `action(FlowActionRequest)` | 执行审批动作（通过/驳回/转办等） |
 | `revoke(FlowRevokeRequest)` | 撤销流程 |
+| `delete(FlowDeleteRequest)` | 作废尚未流转（位于开始节点且无后续记录）的流程实例 |
 | `urge(FlowUrgeRequest)` | 催办 |
 | `detail(FlowDetailRequest)` | 查询流程详情 |
 | `processNodes(FlowProcessNodeRequest)` | 查询流程节点记录 |
@@ -60,6 +61,7 @@ content_hash: 48847288af1a4551b8327e398d01a8ec4de643dce1c049b90dcdc8ad0134df3b
 | `FlowCreateService` | 创建流程实例，初始化节点和记录 |
 | `FlowActionService` | 执行审批动作，驱动流程流转 |
 | `FlowRevokeService` | 撤销流程实例 |
+| `FlowDeleteService` | 作废尚未流转的流程实例 |
 | `FlowDetailService` | 查询流程详情和当前状态 |
 | `FlowProcessNodeService` | 查询流程节点执行记录 |
 | `FlowDelayTriggerService` | 处理延迟触发任务 |
@@ -82,18 +84,20 @@ long flowId = flowService.create(createRequest);
 
 // 2. 审批通过
 FlowActionRequest actionRequest = new FlowActionRequest();
-actionRequest.setFlowId(flowId);
-actionRequest.setActionType("PASS");
-actionRequest.setOperatorId(userId);
+actionRequest.setRecordId(flowId);
+actionRequest.setFormData(Map.of("days", 3));
+actionRequest.setAdvice(new FlowAdviceBody("PASS", userId)); // 动作类型与操作人经 advice 传入
 ActionResponse response = flowService.action(actionRequest);
 
 // 3. 撤销流程
 FlowRevokeRequest revokeRequest = new FlowRevokeRequest();
-revokeRequest.setFlowId(flowId);
+revokeRequest.setRecordId(flowId);
+revokeRequest.setOperatorId(userId);
 flowService.revoke(revokeRequest);
 
 // 4. 查询流程详情
 FlowDetailRequest detailRequest = new FlowDetailRequest();
-detailRequest.setFlowId(flowId);
+detailRequest.setId(String.valueOf(flowId));
+detailRequest.setOperatorId(userId);
 FlowContent content = flowService.detail(detailRequest);
 ```

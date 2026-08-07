@@ -7,6 +7,7 @@ import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public interface WorkflowEntityRepository extends FastRepository<WorkflowEntity,
 
     WorkflowEntity getWorkflowEntityByCode(String code);
 
+    @Transactional
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select w from WorkflowEntity w where w.id = :id")
     WorkflowEntity lockById(@Param("id") String id);

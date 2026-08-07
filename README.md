@@ -41,8 +41,6 @@ flow-engine
 │       │   ├── ActionType        # 动作类型枚举（8种）
 │       │   ├── BaseAction        # 动作抽象基类
 │       │   └── IFlowAction       # 动作接口
-│       ├── backup                # 流程备份
-│       │   └── WorkflowBackup    # 流程备份管理
 │       ├── builder               # 构建器（6种）
 │       │   ├── ActionBuilder             # 动作构建器
 │       │   ├── BaseNodeBuilder            # 节点构建器基类
@@ -55,11 +53,15 @@ flow-engine
 │       │   └── IMapConvertor     # Map转换接口
 │       ├── context               # 上下文
 │       │   ├── GatewayContext           # 网关上下文
-│       │   └── RepositoryHolderContext  # 仓储持有者上下文
+│       │   ├── RepositoryHolderContext  # 仓储持有者上下文
+│       │   ├── ActionResponseContext    # 动作响应上下文
+│       │   └── LoopTriggerTraceContext  # 循环触发跟踪上下文
 │       ├── domain                # 领域对象
 │       │   ├── DelayTask         # 延迟任务
 │       │   ├── DelayTaskManager  # 延迟任务管理器
-│       │   └── UrgeInterval      # 催办间隔
+│       │   ├── UrgeInterval      # 催办间隔
+│       │   ├── SubProcessContext # 子流程上下文
+│       │   └── SubProcessRecord  # 子流程记录
 │       ├── error                 # 错误处理
 │       │   └── ErrorThrow        # 错误抛出器
 │       ├── event                 # 事件系统（7种）
@@ -77,16 +79,20 @@ flow-engine
 │       │   ├── FlowNotFoundException     # 资源未找到异常
 │       │   ├── FlowStateException        # 状态异常
 │       │   ├── FlowPermissionException   # 权限异常
-│       │   ├── FlowConfigException       # 配置异常
 │       │   └── FlowExecutionException    # 执行异常
 │       ├── form                  # 表单系统
 │       │   ├── permission        # 字段权限
 │       │   │   ├── FormFieldPermission # 字段权限实体
 │       │   │   └── PermissionType       # 权限类型枚举
+│       │   ├── FlowForm          # 表单元数据
+│       │   ├── FlowFormBuilder   # 表单构建器
 │       │   ├── FormData          # 表单数据容器
-│       │   ├── FormFieldMeta     # 字段元数据
-│       │   ├── FormMeta          # 表单元数据
-│       │   └── FormMetaBuilder   # 表单构建器
+│       │   ├── FormDataVerify    # 表单数据校验
+│       │   ├── FormField         # 字段定义
+│       │   ├── FieldAttribute    # 字段属性
+│       │   ├── DataType          # 数据类型枚举
+│       │   ├── IValueConvertor   # 值转换接口
+│       │   └── ValueConvertorContext # 值转换上下文
 │       ├── gateway               # 网关接口防腐层
 │       │   └── FlowOperatorGateway # 操作者网关
 │       ├── manager               # 管理器层
@@ -135,40 +141,52 @@ flow-engine
 │       │   │   ├── FlowCreateRequest  # 创建请求
 │       │   │   ├── FlowRevokeRequest  # 撤回请求
 │       │   │   ├── FlowDeleteRequest  # 删除请求
-│       │   │   └── FlowUrgeRequest    # 催办请求
+│       │   │   ├── FlowUrgeRequest    # 催办请求
+│       │   │   ├── FlowDetailRequest  # 详情请求
+│       │   │   └── FlowProcessNodeRequest # 流程节点请求
 │       │   └── response          # 响应对象
 │       │       ├── FlowOperator   # 流程操作者
-│       │       └── FlowContent   # 流程内容
+│       │       ├── FlowContent   # 流程内容
+│       │       ├── ActionResponse # 动作响应
+│       │       ├── FlowRecordContent # 流程记录内容
+│       │       ├── NodeOption     # 节点选项
+│       │       └── ProcessNode    # 流程节点
 │       ├── record                # 流程记录
 │       │   ├── FlowRecord        # 执行记录（TODO/DONE状态）
 │       │   ├── FlowTodoRecord    # 待办记录
 │       │   └── FlowTodoMerge     # 待办合并记录
 │       ├── repository            # 仓储接口（持久化抽象）
 │       │   ├── WorkflowRepository
+│       │   ├── WorkflowVersionRepository
+│       │   ├── WorkflowRuntimeRepository
 │       │   ├── FlowRecordRepository
-│       │   ├── WorkflowBackupRepository
-│       │   ├── ParallelBranchRepository
-│       │   ├── DelayTaskRepository
-│       │   ├── UrgeIntervalRepository
 │       │   ├── FlowTodoRecordRepository
-│       │   └── FlowTodoMergeRepository
+│       │   ├── FlowTodoMergeRepository
+│       │   ├── FlowOperatorAssignmentRepository
+│       │   ├── NodeViewJavaScriptRepository
+│       │   ├── ParallelBranchRepository
+│       │   ├── SubProcessRepository
+│       │   ├── DelayTaskRepository
+│       │   └── UrgeIntervalRepository
 │       ├── script                # 脚本系统
-│       │   ├── node              # 节点脚本（8种）
+│       │   ├── node              # 节点脚本（9种）
 │       │   │   ├── OperatorMatchScript  # 发起人匹配脚本
 │       │   │   ├── OperatorLoadScript   # 审批人加载脚本
 │       │   │   ├── NodeTitleScript      # 节点标题脚本
 │       │   │   ├── ConditionScript      # 条件判断脚本
 │       │   │   ├── RouterNodeScript     # 路由脚本
 │       │   │   ├── SubProcessScript     # 子流程脚本
+│       │   │   ├── SubProcessResultScript # 子流程结果脚本
 │       │   │   ├── TriggerScript        # 触发脚本
 │       │   │   └── ErrorTriggerScript   # 异常触发脚本
 │       │   ├── runtime           # 脚本运行时
-│       │   │   ├── ScriptRuntimeContext # Groovy脚本执行环境
-│       │   │   ├── FlowScriptContext    # 脚本上下文
-│       │   │   └── IBeanFactory         # Bean工厂接口
-│       │   └── action            # 动作脚本（2种）
-│       │       ├── RejectActionScript   # 拒绝动作脚本
-│       │       └── CustomScript         # 自定义动作脚本
+│       │   │   ├── FlowScriptRuntimeContext # Groovy脚本执行环境
+│       │   │   ├── FlowScriptContext        # 脚本上下文
+│       │   │   └── IBeanFactory             # Bean工厂接口
+│       │   └── action            # 动作脚本（3种）
+│       │       ├── ActionRejectScript  # 拒绝动作脚本
+│       │       ├── ActionCustomScript  # 自定义动作脚本
+│       │       └── ActionDisplayScript # 动作展示脚本
 │       ├── service               # 服务层
 │       │   ├── impl              # 服务实现
 │       │   │   ├── FlowCreateService    # 流程创建服务
@@ -177,12 +195,19 @@ flow-engine
 │       │   │   ├── FlowRevokeService    # 流程撤回服务
 │       │   │   ├── FlowDeleteService    # 流程删除服务
 │       │   │   ├── FlowUrgeService      # 流程催办服务
-│       │   │   └── FlowDetailService   # 流程详情服务
-│       │   └── FlowService       # 服务接口
+│       │   │   ├── FlowDetailService    # 流程详情服务
+│       │   │   ├── FlowProcessNodeService # 流程节点服务
+│       │   │   ├── FlowSubProcessResultService # 子流程结果服务
+│       │   │   └── OperatorAssignmentService # 操作者分配服务
+│       │   ├── FlowService       # 流程门面服务（@Transactional 具体类）
+│       │   ├── FlowRecordSaveService # 流程记录批量保存服务
+│       │   ├── FlowRecordService # 流程记录服务
+│       │   ├── WorkflowService   # 流程定义服务
+│       │   └── WorkflowGroovyScriptUtils # 流程脚本工具
 │       ├── session               # 会话层
 │       │   ├── FlowSession       # 执行上下文
 │       │   └── FlowAdvice        # 审批参数（意见、签名、退回节点等）
-│       ├── strategy              # 策略层（18种：16种节点策略 + 2种工作流策略）
+│       ├── strategy              # 策略层（17种：15种节点策略 + 2种工作流策略）
 │       │   ├── node                # 节点策略
 │       │   │   ├── MultiOperatorAuditStrategy  # 多人审批策略
 │       │   │   ├── TimeoutStrategy          # 超时策略
@@ -209,15 +234,16 @@ flow-engine
 │       │       ├── BaseStrategy             # 工作流策略抽象基类
 │       │       └── IWorkflowStrategy        # 工作流策略接口
 │       ├── utils                 # 工具类
-│       │   ├── RandomUtils       # 随机工具
-│       │   └── Sha256Utils       # SHA256加密工具
+│       │   └── Base64Utils       # Base64 编解码工具
 │       └── workflow              # 流程层
 │           ├── Workflow          # 流程对象
-│           └── WorkflowBuilder   # 流程构建器
+│           ├── WorkflowBuilder   # 流程构建器
+│           └── runtime           # 运行时快照
+│               └── WorkflowRuntime # 流程运行时快照
 │   └── src/test/java             # 测试代码
 ├── flow-engine-starter           # Spring Boot 自动配置入口
 ├── flow-engine-starter-api       # REST API 层（FlowRecordController、WorkflowController）
-├── flow-engine-starter-infra     # 持久化层（JPA 实体、8个仓储实现、达梦方言）
+├── flow-engine-starter-infra     # 持久化层（JPA 实体、11个仓储实现）
 ├── flow-engine-starter-query     # 查询层（FlowRecordQueryController、WorkflowQueryController）
 ├── flow-engine-example           # 示例项目（H2/达梦数据库、JWT 认证、端口 8090）
 └── flow-frontend                 # 前端项目（独立 Git 仓库）
@@ -401,7 +427,7 @@ pnpm run dev:app-mobile
 
 ### 设计模式
 
-- **建造者模式** (Builder Pattern) - WorkflowBuilder、NodeBuilder、FormMetaBuilder
+- **建造者模式** (Builder Pattern) - WorkflowBuilder、BaseNodeBuilder、FlowFormBuilder
 - **工厂模式** (Factory Pattern) - FlowActionFactory、NodeFactory、NodeStrategyFactory
 - **策略模式** (Strategy Pattern) - INodeStrategy、IWorkflowStrategy
 - **模板方法模式** (Template Method Pattern) - BaseAction、BaseFlowNode
@@ -476,7 +502,7 @@ category.subcategory.errorType
 
 示例：
 - `notFound.workflow.definition` - 流程定义未找到
-- `permission.field.readOnly` - 字段只读
+- `validation.field.readOnly` - 字段只读
 - `state.record.alreadyDone` - 记录已完成
 - `state.record.notSupportDelete` - 记录不允许删除
 - `state.node.notStart` - 记录不在开始节点
@@ -489,7 +515,7 @@ category.subcategory.errorType
 
 示例应用（`flow-engine-example`）提供了一个开箱即用的完整演示环境：
 
-- **默认数据库**：H2（内存数据库，无需额外配置）
+- **默认数据库**：H2（文件数据库，默认落地 `example.db`）
 - **可选数据库**：达梦（`--spring.profiles.active=dm`）
 - **认证**：JWT Token 认证
 - **访问端口**：8090

@@ -8,12 +8,15 @@
 |------|------|------|------|------|
 | [commons/lang3](./commons/lang3.md) | commons | Apache Commons 工具库，提供字符串、集合、IO 等通用工具方法 | 后端 | 框架:Apache Commons |
 | [flow-engine-framework/action](./flow-engine-framework/action.md) | flow-engine-framework | 流程动作体系，包含 8 种动作类型、动作接口和动作工厂 | 后端 | 项目自有 |
+| [flow-engine-framework/delay](./flow-engine-framework/delay.md) | flow-engine-framework | 延迟任务调度能力，支持延迟节点的定时触发、任务持久化与共享调度线程 | 后端 | 项目自有 |
 | [flow-engine-framework/exception](./flow-engine-framework/exception.md) | flow-engine-framework | 流程异常体系，包含异常基类和 5 种业务异常子类 | 后端 | 项目自有 |
 | [flow-engine-framework/flow-service](./flow-engine-framework/flow-service.md) | flow-engine-framework | 流程服务层，封装流程的创建、审批、撤销、催办等核心业务操作 | 后端 | 项目自有 |
 | [flow-engine-framework/gateway-context](./flow-engine-framework/gateway-context.md) | flow-engine-framework | 网关上下文，提供操作者网关的注入和线程级缓存 | 后端 | 项目自有 |
 | [flow-engine-framework/node-manager](./flow-engine-framework/node-manager.md) | flow-engine-framework | 流程节点管理器，负责节点查找、下一节点计算和节点状态管理 | 后端 | 项目自有 |
 | [flow-engine-framework/node-strategy](./flow-engine-framework/node-strategy.md) | flow-engine-framework | 节点策略体系，包含 15 种策略类型、策略接口、策略工厂和策略管理器 | 后端 | 项目自有 |
 | [flow-engine-framework/node](./flow-engine-framework/node.md) | flow-engine-framework | 流程节点体系，包含 19 种节点类型、节点接口层次和节点工厂 | 后端 | 项目自有 |
+| [flow-engine-framework/node-view-javascript](./flow-engine-framework/node-view-javascript.md) | flow-engine-framework | 节点视图脚本能力，支持视图脚本的缓存、保存与查询（含缓存自动清理） | 后端 | 项目自有 |
+| [flow-engine-framework/operator-assignment](./flow-engine-framework/operator-assignment.md) | flow-engine-framework | 操作人分配能力，支持发起人/审批人设定的分配校验与落库 | 后端 | 项目自有 |
 | [flow-engine-framework/repository](./flow-engine-framework/repository.md) | flow-engine-framework | 仓储抽象层，定义流程引擎的持久化接口和仓储持有者上下文 | 后端 | 项目自有 |
 | [flow-engine-framework/script](./flow-engine-framework/script.md) | flow-engine-framework | Groovy 脚本运行时，包含脚本注册表、脚本类型封装和脚本执行上下文 | 后端 | 项目自有 |
 | [flow-engine-framework/sub-process](./flow-engine-framework/sub-process.md) | flow-engine-framework | 子流程聚合执行能力，支持批量创建、主流程等待、脚本结果判定与异常跳转 | 后端 | 项目自有 |
@@ -28,4 +31,4 @@
 
 ---
 
-**统计**: 共 19 篇 — 已实现 19 / 计划中 0 / 已废弃 0
+**统计**: 共 22 篇 — 已实现 22 / 计划中 0 / 已废弃 0

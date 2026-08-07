@@ -35,7 +35,7 @@ content_hash: cead1cab34f0a1357e650ae764b4f008247c530ad9b4eff0cd0ffeb9c93d44e3
 
 | 模块 | AutoConfiguration 职责 |
 |------|----------------------|
-| `flow-engine-starter` | 注册 `WorkflowService`、`FlowService`、`RepositoryHolderContext` |
+| `flow-engine-starter` | 注册 8 个 Bean：`NodeViewJavaScriptCacheContextRegister`、`FlowDelayTaskRunner`、`GatewayContextRegister`、`FlowScriptContextRegister`、`RepositoryHolderContextRegister`、`FlowRecordService`、`WorkflowService`、`FlowService` |
 | `flow-engine-starter-api` | 注册 REST Controller（`WorkflowController` 等） |
 | `flow-engine-starter-infra` | 注册 JPA Repository 实现、数据库实体 |
 | `flow-engine-starter-query` | 注册查询服务（`FlowRecordQueryService` 等） |
@@ -46,8 +46,9 @@ content_hash: cead1cab34f0a1357e650ae764b4f008247c530ad9b4eff0cd0ffeb9c93d44e3
 
 ### 业务扩展
 
-业务项目只需实现以下接口即可接入流程引擎：
+业务项目需实现以下接口即可接入流程引擎：
 - `FlowOperatorGateway` — 提供操作者信息查询
+- `NodeViewJavaScriptRepository` — 提供节点视图脚本的持久化（`NodeViewJavaScriptCacheContextRegister` Bean 依赖此接口，框架层未提供默认实现，业务项目需自行实现并注册为 Spring Bean，参考 `flow-engine-example` 中的 `NodeViewJavaScriptRepositoryImpl`）
 - 自定义 Controller（如需覆盖默认 API）
 
 ## 使用实例

@@ -47,17 +47,21 @@ content_hash: 057987ed8ab209759993dfc2792699ccdcd110a1c291ffd49fea7af09e1af895
 | `DelayTaskRepository` | 延迟任务的 CRUD |
 | `UrgeIntervalRepository` | 催办间隔配置的 CRUD |
 | `NodeViewJavaScriptRepository` | 节点视图 JS 脚本的 CRUD |
+| `SubProcessRepository` | 子流程执行记录的 CRUD（子流程聚合持久化依赖） |
 
 ### IRepositoryHolder
 
-`IRepositoryHolder` 是所有 Repository 的统一访问入口，通过 `RepositoryHolderContext` 注册和获取：
+`IRepositoryHolder` 是所有 Repository 的统一访问入口，通过 `RepositoryHolderContext` 注册和获取。它对外暴露的是服务与业务方法，而非各 Repository 的 getter：
 
 ```java
 public interface IRepositoryHolder {
     WorkflowService getWorkflowService();
-    WorkflowRepository getWorkflowRepository();
-    WorkflowVersionRepository getWorkflowVersionRepository();
-    // ... 其他 Repository
+    FlowRecordService getFlowRecordService();
+    FlowOperatorGateway getFlowOperatorGateway();
+    SubProcessRepository getSubProcessRepository();
+    void saveRecords(List<FlowRecord> flowRecords);
+    List<FlowRecord> findProcessRecords(String processId);
+    // ... 其余业务方法
 }
 ```
 
@@ -71,16 +75,16 @@ public interface IRepositoryHolder {
 ## 使用实例
 
 ```java
-// 通过 IRepositoryHolder 获取仓储
-IRepositoryHolder holder = repositoryHolderContext.getHolder();
-WorkflowRepository workflowRepo = holder.getWorkflowRepository();
-FlowRecordRepository recordRepo = holder.getFlowRecordRepository();
+// 通过 IRepositoryHolder 获取服务（单例上下文）
+IRepositoryHolder holder = RepositoryHolderContext.getInstance();
+WorkflowService workflowService = holder.getWorkflowService();
+FlowRecordService recordService = holder.getFlowRecordService();
 
 // 查询流程定义
-Workflow workflow = workflowRepo.findByCode("leave-request");
+Workflow workflow = workflowService.getWorkflowByCode("leave-request");
 
 // 保存流程记录
-recordRepo.saveAll(flowRecords);
+holder.saveRecords(flowRecords);
 
 // 实现自定义 Repository（在 infra 模块中）
 @Repository
@@ -89,8 +93,8 @@ public class WorkflowRepositoryImpl implements WorkflowRepository {
     private WorkflowEntityRepository jpaRepo;
 
     @Override
-    public Workflow findByCode(String code) {
-        return jpaRepo.findByCode(code).toWorkflow();
+    public Workflow getByCode(String code) {
+        return jpaRepo.getWorkflowEntityByCode(code).toWorkflow();
     }
 }
 ```

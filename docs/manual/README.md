@@ -16,7 +16,7 @@ Flow Engine 是企业级工作流引擎，采用前后端分离架构：后端�
 
 ## 当前版本
 
-- 版本号：`0.0.52`（前后端对齐）
+- 版本号：`0.1.0-SNAPSHOT`（前后端对齐）
 - 后端：JDK 17 / Spring Boot 3.5.9 / Spring Data JPA（默认 H2，支持达梦 DM）
 - 前端：React 18 / TypeScript 5 / pnpm 10 / antd 6（PC）/ antd-mobile 5（移动）/ @flowgram.ai 1.0.8
 

@@ -287,6 +287,14 @@ public class ProcessNode {
          */
         private long readTime;
 
+        /**
+         * 是否自动跳过（未实际审批）。
+         * <p>多人审批（或签/并签）场景下，节点完成后其他候选人的待办被自动置为已办，
+         * 未发生实际审批动作。由后端依据 {@link FlowRecord#isAutoDone()} 判定，
+         * 前端据此展示"自动跳过"，无需自行推断。
+         */
+        private boolean autoSkip;
+
         public FlowOperatorBody(FlowRecord flowRecord, IFlowOperator flowOperator) {
             this.advice = flowRecord.getAdvice();
             this.signKey = flowRecord.getSignKey();
@@ -295,6 +303,7 @@ public class ProcessNode {
             this.actionType = flowRecord.getActionType();
             this.flowOperator = flowOperator;
             this.readTime = flowRecord.getReadTime();
+            this.autoSkip = flowRecord.isAutoDone();
         }
 
         public FlowOperatorBody(IFlowOperator flowOperator) {
@@ -303,18 +312,57 @@ public class ProcessNode {
 
     }
 
+    /**
+     * 子流程节点的一次聚合执行信息（响应体）。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SubProcessBody {
+
+        /**
+         * 子流程执行记录id
+         */
         private long recordId;
+
+        /**
+         * 本次子流程执行的分组id
+         */
         private String groupId;
+
+        /**
+         * 父流程中子流程节点的执行记录id
+         */
         private long parentRecordId;
+
+        /**
+         * 本次创建的子流程实例总数
+         */
         private int totalCount;
+
+        /**
+         * 已结束的子流程实例数
+         */
         private int finishedCount;
+
+        /**
+         * 本次子流程执行的聚合状态
+         */
         private SubProcessRecord.State state;
+
+        /**
+         * 创建时间（毫秒时间戳）
+         */
         private long createTime;
+
+        /**
+         * 结束时间（毫秒时间戳），未结束时为 0
+         */
         private long finishTime;
+
+        /**
+         * 本次创建的全部子流程实例
+         */
         private List<SubProcessInstanceBody> instances;
 
         private static SubProcessBody create(SubProcessRecord record, Function<Long, String> workTitleLoader) {
@@ -338,15 +386,42 @@ public class ProcessNode {
         }
     }
 
+    /**
+     * 子流程实例信息（响应体）。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SubProcessInstanceBody {
+
+        /**
+         * 子流程开始节点（发起）的执行记录id
+         */
         private long startRecordId;
+
+        /**
+         * 子流程的流程id
+         */
         private String processId;
+
+        /**
+         * 子流程的流程名称；历史数据可能缺省
+         */
         private String workTitle;
+
+        /**
+         * 子流程最终执行记录id，未结束时为 0
+         */
         private long finishRecordId;
+
+        /**
+         * 子流程实例运行状态
+         */
         private SubProcessRecord.InstanceState state;
+
+        /**
+         * 结束时间（毫秒时间戳），未结束时为 0
+         */
         private long finishTime;
 
         private static SubProcessInstanceBody create(SubProcessRecord.Instance instance,

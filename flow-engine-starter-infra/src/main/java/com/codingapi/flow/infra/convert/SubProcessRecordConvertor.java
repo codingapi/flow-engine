@@ -8,11 +8,21 @@ import com.codingapi.flow.infra.entity.SubProcessRecordEntity;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 子流程执行记录的领域对象与持久化实体互转工具。
+ */
 public class SubProcessRecordConvertor {
 
     private SubProcessRecordConvertor() {
     }
 
+    /**
+     * 持久化实体转换为领域对象。
+     * <p>实例列表从 JSON 文本反序列化，聚合状态由枚举名还原。
+     *
+     * @param entity 持久化实体
+     * @return 领域对象；实体为 null 时返回 null
+     */
     public static SubProcessRecord convert(SubProcessRecordEntity entity) {
         if (entity == null) {
             return null;
@@ -33,11 +43,25 @@ public class SubProcessRecordConvertor {
                 entity.getFinishTime());
     }
 
+    /**
+     * 领域对象转换为持久化实体（新建）。
+     *
+     * @param record 领域对象
+     * @return 持久化实体
+     */
     public static SubProcessRecordEntity convert(SubProcessRecord record) {
         SubProcessRecordEntity entity = new SubProcessRecordEntity();
         return convert(record, entity);
     }
 
+    /**
+     * 领域对象转换为持久化实体（可复用已有实体）。
+     * <p>实例列表序列化为 JSON 文本，聚合状态存为枚举名。
+     *
+     * @param record 领域对象
+     * @param entity 待填充的持久化实体（记录已持久化时携带主键）
+     * @return 填充后的持久化实体
+     */
     public static SubProcessRecordEntity convert(SubProcessRecord record, SubProcessRecordEntity entity) {
         if (record.getId() > 0) {
             entity.setId(record.getId());

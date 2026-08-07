@@ -27,7 +27,7 @@ content_hash: c764fa48f064de57d0710ddb8deab0e6cec8505ab809b518b6606ae719c97972
 
 ### 核心接口
 
-`IWorkflowStrategy` 继承 `IMapConvertor`，通过 `TYPE_KEY` 字段标识策略类型。
+`IWorkflowStrategy` 继承 `IMapConvertor` 与 `ICopyAbility<IWorkflowStrategy>`，通过 `TYPE_KEY`（`strategyType`）字段标识策略类型。
 
 ### 策略类型
 
@@ -59,11 +59,11 @@ Map<String, Object> strategyData = Map.of(
 IWorkflowStrategy strategy = WorkflowStrategyFactory.getInstance().createStrategy(strategyData);
 
 // 在流程构建时附加工作流策略
+UrgeStrategy urgeStrategy = UrgeStrategy.defaultStrategy();
+urgeStrategy.setInterval(3600);      // 每小时可催办一次
+InterfereStrategy interfereStrategy = InterfereStrategy.defaultStrategy(); // 默认 enable=true
 Workflow workflow = WorkflowBuilder.builder()
     .id("flow-001")
-    .strategies(List.of(
-        new UrgeStrategy(3600),        // 每小时可催办一次
-        new InterfereStrategy(true)    // 允许管理员干预
-    ))
+    .strategies(List.of(urgeStrategy, interfereStrategy))
     .build();
 ```

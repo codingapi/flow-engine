@@ -143,8 +143,12 @@ public class FlowSession {
     /**
      * 获取上一节点的审批人员Id列表。
      *
-     * <p>以当前流程记录所在节点作为上一节点，按 fromId 查询该节点的全部流程记录，
-     * 提取审批人员Id并去重、排序后返回。
+     * <p>以当前流程记录所在节点作为上一节点，按 fromId 查询该节点的流程记录，
+     * 提取<b>实际审批过</b>的人员Id并去重、排序后返回。
+     *
+     * <p>多人审批（或签/并签）场景下，节点完成后其他候选人的待办会被自动置为已办
+     * （自动跳过，{@link FlowRecord#isAutoDone()}），但他们并未实际审批，取数时排除，
+     * 确保下游节点取到的是真实审批人（issue #188）。
      *
      * <p>仅当该节点为当前节点的直接前驱节点时才返回数据；流程预览等场景下
      * 当前记录可能尚未流转到当前节点（如停留在更早的节点），此时返回空列表，避免误读。
@@ -167,6 +171,7 @@ public class FlowSession {
         }
         return repositoryHolder.findCurrentNodeRecords(currentRecord.getFromId(), currentRecord.getNodeId())
                 .stream()
+                .filter(record -> !record.isAutoDone())
                 .map(FlowRecord::getCurrentOperatorId)
                 .distinct()
                 .sorted()
