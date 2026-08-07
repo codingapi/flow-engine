@@ -512,6 +512,18 @@ public class FlowRecord {
         this.recordState = SATE_RECORD_DONE;
     }
 
+    /**
+     * 是否自动跳过的记录。
+     * <p>多人审批（或签/并签）场景下，节点完成后同节点其他候选人的待办被自动置为已办，
+     * 未发生实际审批动作（无审批动作信息）。真实审批的记录 {@code update()} 会写入 actionId，
+     * 自动跳过的记录保持新建时的 actionId 为空，据此区分。
+     *
+     * @return true 表示该记录为自动跳过（未实际审批）；false 表示待办或已实际审批
+     */
+    public boolean isAutoDone() {
+        return recordState == SATE_RECORD_DONE && actionId == null;
+    }
+
 
     /**
      * 流程结束

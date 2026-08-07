@@ -287,6 +287,14 @@ public class ProcessNode {
          */
         private long readTime;
 
+        /**
+         * 是否自动跳过（未实际审批）。
+         * <p>多人审批（或签/并签）场景下，节点完成后其他候选人的待办被自动置为已办，
+         * 未发生实际审批动作。由后端依据 {@link FlowRecord#isAutoDone()} 判定，
+         * 前端据此展示"自动跳过"，无需自行推断。
+         */
+        private boolean autoSkip;
+
         public FlowOperatorBody(FlowRecord flowRecord, IFlowOperator flowOperator) {
             this.advice = flowRecord.getAdvice();
             this.signKey = flowRecord.getSignKey();
@@ -295,6 +303,7 @@ public class ProcessNode {
             this.actionType = flowRecord.getActionType();
             this.flowOperator = flowOperator;
             this.readTime = flowRecord.getReadTime();
+            this.autoSkip = flowRecord.isAutoDone();
         }
 
         public FlowOperatorBody(IFlowOperator flowOperator) {
