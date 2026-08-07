@@ -15,7 +15,7 @@ framework_version: "由 Spring Boot Parent 管理"
 
 - **Getter/Setter**：通过 `@Getter` / `@Setter` 自动生成，减少数百行重复代码
 - **构造器**：通过 `@AllArgsConstructor` / `@NoArgsConstructor` / `@RequiredArgsConstructor` 自动生成构造器
-- **Builder 模式**：通过 `@Builder` 自动生成建造者模式代码
+- **Builder 模式**：Lombok 提供 `@Builder` 自动生成建造者模式代码（本项目未使用，节点类为手写 Builder）
 - **日志**：通过 `@Slf4j` / `@Log4j2` 自动注入日志对象
 - **异常处理**：通过 `@SneakyThrows` 简化受检异常的处理
 
@@ -26,15 +26,15 @@ framework_version: "由 Spring Boot Parent 管理"
 | 注解 | 用途 |
 |------|------|
 | `@Getter` / `@Setter` | 自动生成 getter/setter |
-| `@AllArgsConstructor` | 全参构造器 |
+| `@AllArgsConstructor` | 构造器注入依赖（服务类、Controller、Repository 实现） |
 | `@NoArgsConstructor` | 无参构造器 |
-| `@Builder` | 建造者模式（用于 Node、Action 等） |
 | `@SneakyThrows` | 自动处理受检异常（用于工厂方法中的反射调用） |
-| `@ToString` | toString 方法 |
+
+> 注：`@Builder`、`@ToString` 在项目中未使用；节点类的链式构建是手写 Builder（继承 `BaseNodeBuilder`）实现。
 
 ### 典型使用场景
 
-- 节点类（`ApprovalNode`、`ConditionNode` 等）使用 `@Builder` 提供链式构建
+- 节点类（`ApprovalNode`、`ConditionNode` 等）通过手写 Builder（`extends BaseNodeBuilder`）提供链式构建，`defaultNode()` 静态工厂方法手工 set 属性
 - 工厂类（`NodeFactory`、`FlowActionFactory` 等）使用 `@SneakyThrows` 简化反射
 - 服务类使用 `@Getter` 暴露字段
 
@@ -55,14 +55,28 @@ public class WorkflowVersion {
     }
 }
 
-// 建造者模式
-@Builder
-public class ApprovalNode extends BaseAuditNode {
+// 手写 Builder（继承 BaseNodeBuilder）实现链式构建
+public class ApprovalNode extends BaseAuditNode implements IDisplayNode {
+
     public static ApprovalNode defaultNode() {
-        return ApprovalNode.builder()
-            .id(UUID.randomUUID().toString())
-            .name("审批节点")
-            .build();
+        ApprovalNode approvalNode = new ApprovalNode();
+        approvalNode.setId(FlowIDGeneratorGatewayContext.getInstance().generateNodeId());
+        approvalNode.setName(DEFAULT_NAME);
+        approvalNode.setView(DEFAULT_VIEW);
+        approvalNode.setCode(FlowIDGeneratorGatewayContext.getInstance().generateViewCode());
+        approvalNode.setActions(defaultActions());
+        approvalNode.setStrategies(defaultStrategies());
+        return approvalNode;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder extends BaseNodeBuilder<Builder, ApprovalNode> {
+        public Builder() {
+            super(ApprovalNode.defaultNode());
+        }
     }
 }
 

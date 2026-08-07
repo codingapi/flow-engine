@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-Flow Engine 是一个企业级工作流引擎，基于 Java 17 和 Spring Boot 3.5.9 构建（当前版本 0.0.53）。
+Flow Engine 是一个企业级工作流引擎，基于 Java 17 和 Spring Boot 3.5.9 构建（当前版本 0.1.0-SNAPSHOT）。
 
 ### 核心模块
 
@@ -146,25 +146,36 @@ cd flow-engine-example && mvn spring-boot:run
 **示例（基于 flow-engine-framework 的脚本测试）：**
 
 ```java
-// flow-engine-framework/src/test/java/com/codingapi/flow/script/ScriptRuntimeContextTest.java
 package com.codingapi.flow.script;
 
-import com.codingapi.flow.script.runtime.ScriptRuntimeContext;
+import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
+import com.codingapi.springboot.script.GroovyScript;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ScriptRuntimeContextTest {
 
     @Test
     void should_execute_groovy_script() {
         // given
-        String script = "return 1 + 1";
+        String script = "def run(abc){return 1}";
+        String key = FlowIDGeneratorGatewayContext.getInstance().generateFlowScriptKey();
+        GroovyScript groovyScript = GroovyScript
+                .builder(key)
+                .script(script)
+                .method("run")
+                .returnType(Integer.class)
+                .requests(Map.of("abc", Integer.class))
+                .build();
 
         // when
-        Object result = ScriptRuntimeContext.getInstance().executeScript(script, context);
+        int value = groovyScript.invoke(1);
 
         // then
-        assertEquals(2, result);
+        assertEquals(1, value);
     }
 }
 ```

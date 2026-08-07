@@ -55,7 +55,6 @@ IFlowNode（核心节点接口）
 ├── BaseFlowNode（基础流程节点）
 │   ├── StartNode          — 开始节点
 │   ├── EndNode            — 结束节点
-│   ├── HandleNode         — 办理节点
 │   ├── DelayNode          — 延迟节点
 │   ├── RouterNode         — 路由节点
 │   ├── SubProcessNode     — 子流程节点
@@ -64,8 +63,9 @@ IFlowNode（核心节点接口）
 │   ├── InclusiveNode      — 包容节点 (IBlockNode)
 │   ├── ParallelNode       — 并行节点 (IBlockNode)
 │   └── ManualNode         — 自选节点 (IBlockNode + IDisplayNode)
-├── BaseAuditNode（审批基类）
+├── BaseAuditNode（审批/办理基类）
 │   ├── ApprovalNode       — 审批节点 (IDisplayNode)
+│   ├── HandleNode         — 办理节点 (IDisplayNode)
 │   └── NotifyNode         — 通知节点 (IDisplayNode)
 └── 分支节点
     ├── ConditionBranchNode / ConditionElseBranchNode

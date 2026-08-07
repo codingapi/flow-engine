@@ -36,7 +36,7 @@ content_hash: 42b4c00cdcb8aac4c1695f7d503b1ec953ab4ea3b3f92067e2312c31ea9d4a69
 
 - **脚本注册表**：通过 `ScriptRegistryContext` 单例管理各类默认脚本，支持替换默认实现
 - **脚本类型封装**：将各种脚本场景封装为强类型类（如 `RouterNodeScript`、`ConditionScript` 等）
-- **脚本执行上下文**：`FlowScriptContext` 提供脚本执行时的上下文环境，包括 Spring Bean 注入
+- **脚本执行上下文**：`FlowScriptContext` 提供脚本 `$bind` 上下文（Spring Bean、流程记录、操作者查询）；脚本的实际执行由 `FlowScriptRuntimeContext` 结合 spring-boot 的 `GroovyScript` 完成
 - **脚本请求封装**：`GroovyScriptRequest` / `GroovyWorkflowRequest` 封装脚本执行所需的参数
 
 ## 如何使用
@@ -56,7 +56,9 @@ content_hash: 42b4c00cdcb8aac4c1695f7d503b1ec953ab4ea3b3f92067e2312c31ea9d4a69
 | `getOperatorMatchScript()` | 操作者匹配脚本 — 匹配操作者 |
 | `getErrorTriggerScript()` | 错误触发脚本 — 异常处理规则 |
 | `getActionCustomScript()` | 自定义动作脚本 — 自定义动作行为 |
+| `getActionDisplayScript()` | 动作展示脚本 — 控制动作按钮是否展示 |
 | `getActionRejectScript()` | 拒绝动作脚本 — 拒绝动作行为 |
+| `getSubProcessResultScript()` | 子流程结果确认脚本 — 判断子流程结果（默认委托 `getConditionScript`） |
 
 ### 自定义脚本注册
 
@@ -73,7 +75,7 @@ ScriptRegistryContext.getInstance().setRegistry(new IScriptRegistry() {
 
 ### 脚本执行上下文
 
-`FlowScriptContext` 实现 `IBeanFactory`，允许 Groovy 脚本访问 Spring 容器中的 Bean。
+`FlowScriptContext` 承载脚本的 `$bind` 上下文，实现 `IBeanFactory`，供 Groovy 脚本以 `$bind.getBean(...)`、`$bind.getRecordById(...)`、`$bind.getOperatorById(...)` 等方式访问 Spring 容器中的 Bean、流程记录与操作者信息；脚本的实际执行由 `FlowScriptRuntimeContext` 结合 spring-boot 的 `GroovyScript` 完成。
 
 ## 使用实例
 
@@ -81,19 +83,9 @@ ScriptRegistryContext.getInstance().setRegistry(new IScriptRegistry() {
 // 获取默认路由脚本
 String routerScript = ScriptRegistryContext.getInstance().getRouterScript();
 
-// 创建路由脚本实例
+// 创建路由脚本实例并结合 FlowSession 执行
 RouterNodeScript script = new RouterNodeScript(routerScript);
-
-// 使用 GroovyScriptRequest 构建执行请求
-GroovyScriptRequest request = GroovyScriptRequest.builder()
-    .script(script)
-    .bind(new GroovyScriptBind()
-        .add("session", flowSession)
-        .add("context", applicationContext))
-    .build();
-
-// 执行脚本
-Object result = FlowScriptContext.execute(request);
+Object result = script.execute(flowSession);
 
 // 替换默认脚本注册
 ScriptRegistryContext.getInstance().setRegistry(customRegistry);

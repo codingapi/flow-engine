@@ -54,14 +54,18 @@ content_hash: 0ec57b5fb719f4df594be65eda1e92ba172dad9dfb2aa8f9ec272b275e0a8321
 
 | 方法 | 说明 |
 |------|------|
+| `type()` | 动作类型标识 |
+| `id()` | 动作 ID |
+| `title()` | 动作名称 |
+| `display()` | 返回 `ActionDisplay` 展示配置 |
+| `enable()` | 动作是否可用 |
+| `show(FlowSession)` | 控制动作按钮在当前节点是否展示 |
 | `run(FlowSession)` | 执行动作（触发流程流转） |
 | `generateRecords(FlowSession)` | 生成流程记录 |
-| `enable()` | 动作是否可用 |
-| `display()` | 返回 `ActionDisplay` 展示配置 |
 
 ### BaseAction 扩展
 
-`BaseAction` 提供 `triggerNode()` 方法递归触发后续节点，子类只需关注自身逻辑。
+`BaseAction` 提供 `triggerNode(FlowSession flowSession, Consumer<FlowSession> consumer)` 方法，消费下一个待办会话并递归触发后续节点，子类只需关注自身逻辑。
 
 ## 使用实例
 
@@ -78,10 +82,7 @@ IFlowAction action = FlowActionFactory.getInstance().createAction(actionData);
 // 执行动作
 action.run(flowSession);
 
-// 构建自定义动作
-CustomAction customAction = CustomAction.builder()
-    .id("custom-1")
-    .title("特殊审批")
-    .enable(true)
-    .build();
+// 构建自定义动作（默认构造或从 Map 反序列化）
+CustomAction customAction = CustomAction.defaultAction();
+CustomAction fromMapAction = CustomAction.fromMap(actionData);
 ```

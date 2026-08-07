@@ -32,7 +32,7 @@ content_hash: 29094b1005058e20724c464ed636bd78a8b1b34c9b83b14caacaf4d32d1560bb
 | `Workflow` | 流程核心模型，包含 id、code、title、nodes、strategies、form 等 |
 | `WorkflowBuilder` | 链式构建器，通过 `builder()` 静态方法创建 |
 | `WorkflowVersion` | 流程版本，支持 `enableVersion()` / `disableVersion()` 切换 |
-| `WorkflowRuntime` | 运行时快照，通过 `toJson()` / `formJson()` 实现序列化 |
+| `WorkflowRuntime` | 运行时快照，构造时经 `Workflow.toJson()` 固化 JSON 字符串，再通过 `toWorkflow()` 恢复 |
 
 ### 依赖说明
 

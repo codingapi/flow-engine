@@ -89,7 +89,7 @@ ApprovalNode node = ApprovalNode.builder()
     .id("approval-1")
     .strategies(List.of(
         new RouterStrategy(routerScript),
-        new TimeoutStrategy(3600, "auto-pass"),
+        new TimeoutStrategy(TimeoutStrategy.Type.PASS, 3600L),
         new FormFieldPermissionStrategy(fieldPermissions)
     ))
     .build();
