@@ -312,18 +312,57 @@ public class ProcessNode {
 
     }
 
+    /**
+     * 子流程节点的一次聚合执行信息（响应体）。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SubProcessBody {
+
+        /**
+         * 子流程执行记录id
+         */
         private long recordId;
+
+        /**
+         * 本次子流程执行的分组id
+         */
         private String groupId;
+
+        /**
+         * 父流程中子流程节点的执行记录id
+         */
         private long parentRecordId;
+
+        /**
+         * 本次创建的子流程实例总数
+         */
         private int totalCount;
+
+        /**
+         * 已结束的子流程实例数
+         */
         private int finishedCount;
+
+        /**
+         * 本次子流程执行的聚合状态
+         */
         private SubProcessRecord.State state;
+
+        /**
+         * 创建时间（毫秒时间戳）
+         */
         private long createTime;
+
+        /**
+         * 结束时间（毫秒时间戳），未结束时为 0
+         */
         private long finishTime;
+
+        /**
+         * 本次创建的全部子流程实例
+         */
         private List<SubProcessInstanceBody> instances;
 
         private static SubProcessBody create(SubProcessRecord record, Function<Long, String> workTitleLoader) {
@@ -347,15 +386,42 @@ public class ProcessNode {
         }
     }
 
+    /**
+     * 子流程实例信息（响应体）。
+     */
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SubProcessInstanceBody {
+
+        /**
+         * 子流程开始节点（发起）的执行记录id
+         */
         private long startRecordId;
+
+        /**
+         * 子流程的流程id
+         */
         private String processId;
+
+        /**
+         * 子流程的流程名称；历史数据可能缺省
+         */
         private String workTitle;
+
+        /**
+         * 子流程最终执行记录id，未结束时为 0
+         */
         private long finishRecordId;
+
+        /**
+         * 子流程实例运行状态
+         */
         private SubProcessRecord.InstanceState state;
+
+        /**
+         * 结束时间（毫秒时间戳），未结束时为 0
+         */
         private long finishTime;
 
         private static SubProcessInstanceBody create(SubProcessRecord.Instance instance,
