@@ -25,6 +25,7 @@ public class OperatorAssignmentService {
     /**
      * 校验并保存操作人分配。
      * <p>
+     * 数量校验：节点配置了最大可选人数（maxOperatorCount >= 0）时，所选人数超过上限则抛出异常。
      * 当目标节点配置了可选人员范围（范围非空）时，校验所选人员是否全部落在范围内，越界则抛出异常；
      * 范围为空（未配置脚本或脚本执行结果为空）表示不限范围，跳过校验。
      *
@@ -41,6 +42,11 @@ public class OperatorAssignmentService {
         IRepositoryHolder repositoryHolder = baseSession.getRepositoryHolder();
         operatorSelectMap.forEach((nodeId, operatorIds) -> {
             IFlowNode node = workflow.getFlowNode(nodeId);
+            // 校验可选人数上限（-1 表示不限制）
+            int maxOperatorCount = node.strategyManager().getMaxOperatorCount();
+            if (maxOperatorCount >= 0 && operatorIds.size() > maxOperatorCount) {
+                throw FlowValidationException.operatorCountExceeded(nodeId, maxOperatorCount);
+            }
             List<IFlowOperator> range = node.strategyManager()
                     .loadOperatorRange(baseSession.updateSession(node));
             if (range != null && !range.isEmpty()) {

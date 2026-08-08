@@ -28,6 +28,12 @@ public class OperatorLoadStrategy extends BaseStrategy {
     @Getter
     private OperatorSelectType selectType = OperatorSelectType.SCRIPT;
 
+    /**
+     * 最大可选人数，-1 表示不限制，0 表示不允许选择，正整数表示可选人员的最大数
+     */
+    @Getter
+    private int maxOperatorCount = -1;
+
     public OperatorLoadStrategy(String script) {
         this.operatorLoadScript = new OperatorLoadScript(script);
         this.selectType = OperatorSelectType.SCRIPT;
@@ -38,6 +44,7 @@ public class OperatorLoadStrategy extends BaseStrategy {
         OperatorLoadStrategy t = (OperatorLoadStrategy) target;
         this.operatorLoadScript = t.operatorLoadScript;
         this.selectType = t.selectType;
+        this.maxOperatorCount = t.maxOperatorCount;
     }
 
 
@@ -107,6 +114,18 @@ public class OperatorLoadStrategy extends BaseStrategy {
     }
 
     /**
+     * 创建发起人设定策略（带可选人员范围脚本与可选人数上限）
+     *
+     * @param rangeScript     范围脚本，返回该节点的可选人员范围；为空表示不限范围
+     * @param maxOperatorCount 最大可选人数，-1 表示不限制
+     */
+    public static OperatorLoadStrategy initiatorSelectStrategy(String rangeScript, int maxOperatorCount) {
+        OperatorLoadStrategy strategy = initiatorSelectStrategy(rangeScript);
+        strategy.maxOperatorCount = maxOperatorCount;
+        return strategy;
+    }
+
+    /**
      * 创建审批人设定策略（不限可选人员范围）
      */
     public static OperatorLoadStrategy approverSelectStrategy() {
@@ -126,11 +145,36 @@ public class OperatorLoadStrategy extends BaseStrategy {
         return strategy;
     }
 
+    /**
+     * 创建审批人设定策略（带可选人员范围脚本与可选人数上限）
+     *
+     * @param rangeScript     范围脚本，返回该节点的可选人员范围；为空表示不限范围
+     * @param maxOperatorCount 最大可选人数，-1 表示不限制
+     */
+    public static OperatorLoadStrategy approverSelectStrategy(String rangeScript, int maxOperatorCount) {
+        OperatorLoadStrategy strategy = approverSelectStrategy(rangeScript);
+        strategy.maxOperatorCount = maxOperatorCount;
+        return strategy;
+    }
+
+    /**
+     * 设置最大可选人数
+     *
+     * @param maxOperatorCount 最大可选人数，-1 表示不限制
+     */
+    public void setMaxOperatorCount(int maxOperatorCount) {
+        this.maxOperatorCount = maxOperatorCount;
+    }
+
 
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = super.toMap();
         map.put("selectType", selectType.name());
+        // 仅在非默认值（-1）时写出 maxOperatorCount，历史数据保持向后兼容
+        if (maxOperatorCount != -1) {
+            map.put("maxOperatorCount", maxOperatorCount);
+        }
         // SCRIPT 模式存审批人脚本；INITIATOR/APPROVER 模式存可选人员范围脚本
         if (operatorLoadScript != null) {
             map.put("script", operatorLoadScript.getScript());
@@ -147,6 +191,11 @@ public class OperatorLoadStrategy extends BaseStrategy {
         } else {
             // 向后兼容旧数据（没有 selectType 字段），默认为 SCRIPT
             strategy.selectType = OperatorSelectType.SCRIPT;
+        }
+        // 向后兼容旧数据（没有 maxOperatorCount 字段），默认 -1 表示不限制
+        Object maxOperatorCount = map.get("maxOperatorCount");
+        if (maxOperatorCount != null) {
+            strategy.maxOperatorCount = ((Number) maxOperatorCount).intValue();
         }
         if (strategy.selectType == OperatorSelectType.SCRIPT) {
             strategy.operatorLoadScript = new OperatorLoadScript((String) map.get("script"));

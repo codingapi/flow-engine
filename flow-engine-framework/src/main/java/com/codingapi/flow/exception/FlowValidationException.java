@@ -98,4 +98,16 @@ public class FlowValidationException extends FlowException {
         return new FlowValidationException("validation.operator.outOfRange",
                 String.format("Selected operators for node '%s' exceed the allowed range", nodeId));
     }
+
+    /**
+     * Selected operators exceed the max count
+     *
+     * @param nodeId           node id
+     * @param maxOperatorCount max operator count
+     * @return exception
+     */
+    public static FlowValidationException operatorCountExceeded(String nodeId, int maxOperatorCount) {
+        return new FlowValidationException("validation.operator.countExceeded",
+                String.format("Selected operators for node '%s' exceed the max count %d", nodeId, maxOperatorCount));
+    }
 }

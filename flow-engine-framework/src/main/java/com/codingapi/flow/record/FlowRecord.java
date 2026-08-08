@@ -504,12 +504,15 @@ public class FlowRecord {
     /**
      * 多人审批（或签/并签）场景下，节点完成后同节点其他未办理的待办记录自动置为已办（已审核）。
      * <p>仅更新记录状态与时间，不记录动作信息，也不视为流程干预。
+     * 自动办结未发生实际审批动作，需同步清空继承的审批意见与签名，避免展示上一审批人的签名。
      */
     public void autoDone() {
         this.readable = true;
         this.readTime = System.currentTimeMillis();
         this.updateTime = System.currentTimeMillis();
         this.recordState = SATE_RECORD_DONE;
+        this.advice = null;
+        this.signKey = null;
     }
 
     /**
@@ -635,9 +638,11 @@ public class FlowRecord {
 
     /**
      * 设置为新的记录
+     * <p>新记录尚未执行任何审批动作，不能继承触发节点生成的上游审批意见、签名及动作信息。
      */
     public void newRecord() {
         this.setAdvice(null);
+        this.setSignKey(null);
         this.setActionId(null);
     }
 

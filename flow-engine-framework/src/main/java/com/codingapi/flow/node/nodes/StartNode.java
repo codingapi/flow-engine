@@ -93,7 +93,6 @@ public class StartNode extends BaseFlowNode implements IDisplayNode {
             // 异常跳转或退回到开始节点时生成的是一条新的待办，尚未执行任何审批动作，
             // 不能继承触发该跳转的上游审批意见、签名及 PASS/RETURN 等动作信息。
             flowRecord.newRecord();
-            flowRecord.setSignKey(null);
             flowRecord.cleanAction();
             records.add(flowRecord);
         }

@@ -225,7 +225,19 @@ public class PassAction extends BaseAction {
         }
         repositoryHolder.saveRecords(recordList);
 
-        flowEvents.forEach(EventPusher::push);
+        // 结束节点的虚拟记录不持久化、状态为已完成（operatorId=-1），并非真实业务待办，
+        // 其 Todo 事件在引擎内虽会生成，但推送业务订阅方前需拦截，避免下游收到"已完成流程的待办"。
+        flowEvents.stream()
+                .filter(event -> !isEndNodeTodoEvent(event))
+                .forEach(EventPusher::push);
+    }
+
+    /**
+     * 是否为结束节点虚拟记录的待办事件（非真实业务待办，推送时需要拦截）
+     */
+    private boolean isEndNodeTodoEvent(IFlowEvent event) {
+        return event instanceof FlowRecordTodoEvent todoEvent
+                && !todoEvent.getFlowRecord().isNotEndNode();
     }
 
     /**

@@ -33,10 +33,23 @@ public class DelegateAction extends BaseAction {
      */
     private OperatorLoadScript script;
 
+    /**
+     * 最大可选人数，-1 表示不限制，正整数表示可选人员的最大数
+     */
+    private int maxOperatorCount = -1;
+
     public void setScript(String script) {
         if (StringUtils.hasText(script)) {
             this.script = new OperatorLoadScript(script);
         }
+    }
+
+    public int getMaxOperatorCount() {
+        return maxOperatorCount;
+    }
+
+    public void setMaxOperatorCount(int maxOperatorCount) {
+        this.maxOperatorCount = maxOperatorCount;
     }
 
 
@@ -66,6 +79,9 @@ public class DelegateAction extends BaseAction {
 
         List<IFlowOperator> operators = flowSession.getAdvice().getForwardOperators();
 
+        if (maxOperatorCount >= 0 && operators.size() > maxOperatorCount) {
+            throw FlowExecutionException.operatorCountExceeded("delegate", maxOperatorCount);
+        }
         if (script != null) {
             OperatorManager operatorManager = new OperatorManager(script.execute(flowSession));
             for (IFlowOperator auditOperator : operators) {
@@ -98,6 +114,7 @@ public class DelegateAction extends BaseAction {
     public void copy(IFlowAction action) {
         super.copy(action);
         this.script = ((DelegateAction) action).script;
+        this.maxOperatorCount = ((DelegateAction) action).maxOperatorCount;
     }
 
 
@@ -105,6 +122,10 @@ public class DelegateAction extends BaseAction {
         DelegateAction action = BaseAction.fromMap(data, DelegateAction.class);
         String script = (String) data.get("script");
         action.setScript(script);
+        Object maxOperatorCount = data.get("maxOperatorCount");
+        if (maxOperatorCount != null) {
+            action.setMaxOperatorCount(((Number) maxOperatorCount).intValue());
+        }
         return action;
     }
 
@@ -113,6 +134,10 @@ public class DelegateAction extends BaseAction {
         Map<String, Object> data = super.toMap();
         if (script != null) {
             data.put("script", script.getScript());
+        }
+        // 仅在非默认值（-1）时写出 maxOperatorCount，历史数据保持向后兼容
+        if (maxOperatorCount != -1) {
+            data.put("maxOperatorCount", maxOperatorCount);
         }
         return data;
     }
