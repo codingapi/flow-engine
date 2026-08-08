@@ -250,6 +250,25 @@ public class FlowSession {
     }
 
     /**
+     * 创建流程请求，用于自流程的创建（支持手动传入流程标题）
+     *
+     * @param workCode 流程Code
+     * @param actionId 动作类型
+     * @param formData 流程数据
+     * @param workTitle 手动传入的流程标题；为空时回落流程定义标题
+     */
+    public FlowCreateRequest toCreateRequest(String workCode,
+                                             long operatorId,
+                                             String actionId,
+                                             String formData,
+                                             String workTitle) {
+
+        FlowCreateRequest request = this.toCreateRequest(workCode, operatorId, actionId, formData);
+        request.setWorkTitle(workTitle);
+        return request;
+    }
+
+    /**
      * 创建流程请求，用于自流程的创建
      *
      * @param workCode   流程Code
@@ -266,6 +285,25 @@ public class FlowSession {
         request.setWorkCode(workCode);
         request.setOperatorId(operatorId);
         request.setFormData(formData);
+        return request;
+    }
+
+    /**
+     * 创建流程请求，用于自流程的创建（支持手动传入流程标题）
+     *
+     * @param workCode 流程Code
+     * @param actionId 动作类型
+     * @param formData 流程数据
+     * @param workTitle 手动传入的流程标题；为空时回落流程定义标题
+     */
+    public FlowCreateRequest toCreateRequest(String workCode,
+                                             long operatorId,
+                                             String actionId,
+                                             Map<String, Object> formData,
+                                             String workTitle) {
+
+        FlowCreateRequest request = this.toCreateRequest(workCode, operatorId, actionId, formData);
+        request.setWorkTitle(workTitle);
         return request;
     }
 

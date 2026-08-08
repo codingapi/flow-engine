@@ -323,6 +323,28 @@ public class GroovyScriptRequest {
     }
 
     /**
+     * 创建流程请求，用于自流程的创建（支持手动传入流程标题）
+     *
+     * @param workCode   流程设计流程workCode
+     * @param operatorId 流程发起人id
+     * @param actionId   动作类型
+     * @param formData   流程数据
+     * @param workTitle  手动传入的流程标题；为空时回落流程定义标题
+     */
+    @ScriptFunction(
+            name = "toCreateRequest",
+            description = "创建流程请求，用于自流程的创建（支持手动传入流程标题）"
+    )
+    public FlowCreateRequest toCreateRequest(
+            @ScriptParameter(description = "流程workCode") String workCode,
+            @ScriptParameter(description = "流程发起人id") long operatorId,
+            @ScriptParameter(description = "流程动作actionId") String actionId,
+            @ScriptParameter(description = "流程数据formData（JSON格式）") String formData,
+            @ScriptParameter(description = "流程标题workTitle（可为空）") String workTitle) {
+        return flowSession.toCreateRequest(workCode, operatorId, actionId, formData, workTitle);
+    }
+
+    /**
      * 创建流程请求，用于自流程的创建
      *
      * @param workCode 流程设计流程workCode
@@ -339,6 +361,27 @@ public class GroovyScriptRequest {
                                              @ScriptParameter(description = "流程动作actionId") String actionId,
                                              @ScriptParameter(description = "流程数据formData（Map<String,Object>格式）") Map<String, Object> formData) {
         return flowSession.toCreateRequest(workCode, operatorId, actionId, formData);
+    }
+
+    /**
+     * 创建流程请求，用于自流程的创建（支持手动传入流程标题）
+     *
+     * @param workCode   流程设计流程workCode
+     * @param operatorId 流程发起人id
+     * @param actionId   动作类型
+     * @param formData   流程数据
+     * @param workTitle  手动传入的流程标题；为空时回落流程定义标题
+     */
+    @ScriptFunction(
+            name = "toCreateRequest",
+            description = "创建流程请求，用于自流程的创建（支持手动传入流程标题）"
+    )
+    public FlowCreateRequest toCreateRequest(@ScriptParameter(description = "流程workCode") String workCode,
+                                             @ScriptParameter(description = "流程发起人id") long operatorId,
+                                             @ScriptParameter(description = "流程动作actionId") String actionId,
+                                             @ScriptParameter(description = "流程数据formData（Map<String,Object>格式）") Map<String, Object> formData,
+                                             @ScriptParameter(description = "流程标题workTitle（可为空）") String workTitle) {
+        return flowSession.toCreateRequest(workCode, operatorId, actionId, formData, workTitle);
     }
 
 
