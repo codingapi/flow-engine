@@ -210,6 +210,16 @@ public class NodeStrategyManager {
     }
 
     /**
+     * 获取节点的最大可选人数
+     *
+     * @return 最大可选人数，-1 表示不限制；未配置 OperatorLoadStrategy 时返回 -1
+     */
+    public int getMaxOperatorCount() {
+        OperatorLoadStrategy strategy = getStrategy(OperatorLoadStrategy.class);
+        return strategy == null ? -1 : strategy.getMaxOperatorCount();
+    }
+
+    /**
      * 获取节点的字段权限配置
      */
     public List<FormFieldPermission> getFieldPermissions() {

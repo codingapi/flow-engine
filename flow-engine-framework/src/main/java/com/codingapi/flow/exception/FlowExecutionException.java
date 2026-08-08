@@ -86,6 +86,18 @@ public class FlowExecutionException extends FlowException {
     }
 
     /**
+     * Operator count exceeds the max count
+     *
+     * @param actionType       action type (delegate/transfer/addAudit)
+     * @param maxOperatorCount max operator count
+     * @return exception
+     */
+    public static FlowExecutionException operatorCountExceeded(String actionType, int maxOperatorCount) {
+        return new FlowExecutionException("execution." + actionType + ".operatorCountExceeded",
+                String.format("Operator count exceeds the max count %d of the %s action", maxOperatorCount, actionType));
+    }
+
+    /**
      * Custom action next not found
      *
      * @return exception

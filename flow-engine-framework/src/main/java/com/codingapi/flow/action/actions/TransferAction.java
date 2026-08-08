@@ -34,6 +34,11 @@ public class TransferAction extends BaseAction {
      */
     private OperatorLoadScript script;
 
+    /**
+     * 最大可选人数，-1 表示不限制，正整数表示可选人员的最大数
+     */
+    private int maxOperatorCount = -1;
+
 
     public static TransferAction defaultAction() {
         TransferAction action = new TransferAction();
@@ -50,6 +55,14 @@ public class TransferAction extends BaseAction {
         if (StringUtils.hasText(script)) {
             this.script = new OperatorLoadScript(script);
         }
+    }
+
+    public int getMaxOperatorCount() {
+        return maxOperatorCount;
+    }
+
+    public void setMaxOperatorCount(int maxOperatorCount) {
+        this.maxOperatorCount = maxOperatorCount;
     }
 
     /**
@@ -73,6 +86,9 @@ public class TransferAction extends BaseAction {
         flowEvents.add(new FlowRecordDoneEvent(currentRecord,flowSession.isMock()));
 
         List<IFlowOperator> operators = flowSession.getAdvice().getForwardOperators();
+        if (maxOperatorCount >= 0 && operators.size() > maxOperatorCount) {
+            throw FlowExecutionException.operatorCountExceeded("transfer", maxOperatorCount);
+        }
         if (script != null) {
             OperatorManager operatorManager = new OperatorManager(script.execute(flowSession));
             for (IFlowOperator auditOperator : operators) {
@@ -96,6 +112,7 @@ public class TransferAction extends BaseAction {
     public void copy(IFlowAction action) {
         super.copy(action);
         this.script = ((TransferAction) action).script;
+        this.maxOperatorCount = ((TransferAction) action).maxOperatorCount;
     }
 
 
@@ -103,6 +120,10 @@ public class TransferAction extends BaseAction {
         TransferAction action = BaseAction.fromMap(data, TransferAction.class);
         String script = (String) data.get("script");
         action.setScript(script);
+        Object maxOperatorCount = data.get("maxOperatorCount");
+        if (maxOperatorCount != null) {
+            action.setMaxOperatorCount(((Number) maxOperatorCount).intValue());
+        }
         return action;
     }
 
@@ -111,6 +132,10 @@ public class TransferAction extends BaseAction {
         Map<String, Object> data = super.toMap();
         if (script != null) {
             data.put("script", script.getScript());
+        }
+        // 仅在非默认值（-1）时写出 maxOperatorCount，历史数据保持向后兼容
+        if (maxOperatorCount != -1) {
+            data.put("maxOperatorCount", maxOperatorCount);
         }
         return data;
     }

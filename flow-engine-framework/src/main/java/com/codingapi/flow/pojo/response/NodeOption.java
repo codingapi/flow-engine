@@ -23,6 +23,11 @@ public class NodeOption {
      */
     private List<IFlowOperator> operators;
 
+    /**
+     * 最大可选人数，-1 表示不限制。
+     */
+    private int maxOperatorCount;
+
     public NodeOption(IFlowNode node) {
         this(node, null);
     }
@@ -33,5 +38,6 @@ public class NodeOption {
         this.type = node.getType();
         this.display = node instanceof IDisplayNode;
         this.operators = operators;
+        this.maxOperatorCount = node.strategyManager().getMaxOperatorCount();
     }
 }
