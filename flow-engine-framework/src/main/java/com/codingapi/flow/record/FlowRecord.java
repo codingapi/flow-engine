@@ -294,7 +294,11 @@ public class FlowRecord {
         this.id = FlowIDGeneratorGatewayContext.getInstance().generateRecordId();
         this.workCode = flowSession.getWorkCode();
         this.workRuntimeId = flowSession.getWorkflowRuntimeId();
-        this.workTitle = flowSession.getWorkflow().getTitle();
+        // 后续流转记录继承自定义 workTitle（issue #197）：当前记录存在标题时沿用，否则回落流程定义标题
+        FlowRecord currentFlowRecord = flowSession.getCurrentRecord();
+        this.workTitle = currentFlowRecord != null && StringUtils.hasText(currentFlowRecord.getWorkTitle())
+                ? currentFlowRecord.getWorkTitle()
+                : flowSession.getWorkflow().getTitle();
         this.nodeId = flowSession.getCurrentNodeId();
         this.nodeType = flowSession.getCurrentNodeType();
         this.nodeName = flowSession.getCurrentNodeName();

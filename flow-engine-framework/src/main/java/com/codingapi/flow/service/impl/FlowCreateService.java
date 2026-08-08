@@ -22,6 +22,7 @@ import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.springboot.framework.event.EventPusher;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +77,11 @@ public class FlowCreateService {
             flowRecords.forEach(flowRecord -> {
                 flowRecord.setParentId(this.request.getParentRecordId());
             });
+        }
+
+        // 支持手动传入流程标题：非空时覆盖默认流程定义标题（issue #197）
+        if (StringUtils.hasText(request.getWorkTitle()) && !flowRecords.isEmpty()) {
+            flowRecords.forEach(flowRecord -> flowRecord.setWorkTitle(request.getWorkTitle()));
         }
 
         currentNode.verifySession(session);

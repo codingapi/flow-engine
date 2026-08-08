@@ -44,6 +44,11 @@ public class FlowCreateRequest {
      */
     private Map<String, List<Long>> operatorSelectMap;
 
+    /**
+     * 手动传入的流程标题（子流程实例区分用）；为空时回落流程定义标题
+     */
+    private String workTitle;
+
 
     public FlowActionRequest toActionRequest(long recordId) {
         FlowActionRequest flowActionRequest = new FlowActionRequest();
