@@ -12,6 +12,7 @@ import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.nodes.ConditionNode;
 import com.codingapi.flow.node.nodes.ManualNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
@@ -254,11 +255,17 @@ public class PassAction extends BaseAction {
                 result.add(new NodeOption(node, range));
             }
         }
-        // 若节点包含子块（如条件分支），递归检查其子节点
-        if (node.blocks() != null) {
-            for (IFlowNode block : node.blocks()) {
-                collectApproverSelectNodes(flowSession, block, operatorSelectMap, result);
-            }
+        List<IFlowNode> blocks = node.blocks();
+        if (blocks == null || blocks.isEmpty()) {
+            return;
+        }
+        // 条件控制节点：仅沿实际命中的分支递归，避免把不会执行的分支中
+        // 的审批人设定节点误加入提示（issue #200）
+        if (node instanceof ConditionNode) {
+            blocks = blocks.get(0).filterBranches(blocks, flowSession);
+        }
+        for (IFlowNode block : blocks) {
+            collectApproverSelectNodes(flowSession, block, operatorSelectMap, result);
         }
     }
 }
