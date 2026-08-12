@@ -9,6 +9,7 @@ import java.util.Map;
 public class FlowRecordRepositoryImpl implements FlowRecordRepository {
 
     private final Map<Long, FlowRecord> cache = new HashMap<>();
+    private long nextId = 1;
 
     @Override
     public FlowRecord get(long id) {
@@ -34,9 +35,10 @@ public class FlowRecordRepositoryImpl implements FlowRecordRepository {
         if (flowRecord.getId() > 0) {
             cache.put(flowRecord.getId(), flowRecord);
         } else {
-            long id = cache.size() + 1;
-            flowRecord.setId(id);
-            cache.put(id, flowRecord);
+            // 使用单调递增 id：删除后的 cache.size()+1 可能与已删除的 id 重复，
+            // 进而覆盖其他记录（mock 模式下 generateRecordId() 返回 0，id 由仓储分配）
+            flowRecord.setId(nextId++);
+            cache.put(flowRecord.getId(), flowRecord);
         }
     }
 

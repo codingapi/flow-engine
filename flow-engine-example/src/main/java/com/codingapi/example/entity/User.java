@@ -72,7 +72,7 @@ public class User implements IFlowOperator {
     @Override
     @ScriptFunction(name = "isFlowManager",description = "是否为流程管理员")
     public boolean isFlowManager() {
-        return flowManager;
+        return flowManager!=null && flowManager ;
     }
 
     @Override

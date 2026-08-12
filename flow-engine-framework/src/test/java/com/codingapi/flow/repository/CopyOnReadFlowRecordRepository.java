@@ -136,6 +136,7 @@ public class CopyOnReadFlowRecordRepository implements FlowRecordRepository {
                 record.getErrMessage(),
                 record.getTimeoutTime(),
                 record.isMergeable(),
+                record.getMergeType(),
                 record.getInterferedOperatorId(),
                 record.getInterferedOperatorName(),
                 record.getDelegateId(),

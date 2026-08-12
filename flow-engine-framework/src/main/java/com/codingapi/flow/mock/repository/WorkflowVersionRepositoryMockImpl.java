@@ -11,6 +11,7 @@ import java.util.Map;
 public class WorkflowVersionRepositoryMockImpl implements WorkflowVersionRepository {
 
     private final Map<Long, WorkflowVersion> cache = new HashMap<>();
+    private long nextId = 1;
 
     @Override
     public WorkflowVersion get(long id) {
@@ -56,9 +57,10 @@ public class WorkflowVersionRepositoryMockImpl implements WorkflowVersionReposit
         if (workflowVersion.getId() > 0) {
             cache.put(workflowVersion.getId(), workflowVersion);
         } else {
-            long id = cache.size() + 1;
-            workflowVersion.setId(id);
-            cache.put(id, workflowVersion);
+            // 使用单调递增 id：删除后的 cache.size()+1 可能与已删除的 id 重复，
+            // 进而覆盖其他版本
+            workflowVersion.setId(nextId++);
+            cache.put(workflowVersion.getId(), workflowVersion);
         }
     }
 }

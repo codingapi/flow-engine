@@ -3,6 +3,7 @@ package com.codingapi.flow.infra.convert;
 import com.codingapi.flow.infra.entity.FlowRecordEntity;
 import com.codingapi.flow.infra.entity.convert.MapConvertor;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.strategy.node.RecordMergeStrategy;
 
 public class FlowRecordConvertor {
 
@@ -52,6 +53,9 @@ public class FlowRecordConvertor {
                 entity.getErrMessage(),
                 entity.getTimeoutTime(),
                 entity.getMergeable(),
+                entity.getMergeType() != null
+                        ? RecordMergeStrategy.MergeType.valueOf(entity.getMergeType())
+                        : RecordMergeStrategy.MergeType.APPROVER,
                 entity.getInterferedOperatorId(),
                 entity.getInterferedOperatorName(),
                 entity.getDelegateId(),
@@ -107,6 +111,9 @@ public class FlowRecordConvertor {
         entity.setErrMessage(record.getErrMessage());
         entity.setTimeoutTime(record.getTimeoutTime());
         entity.setMergeable(record.isMergeable());
+        entity.setMergeType(record.getMergeType() == null
+                ? RecordMergeStrategy.MergeType.APPROVER.name()
+                : record.getMergeType().name());
         entity.setInterferedOperatorId(record.getInterferedOperatorId());
         entity.setInterferedOperatorName(record.getInterferedOperatorName());
         entity.setDelegateId(record.getDelegateId());

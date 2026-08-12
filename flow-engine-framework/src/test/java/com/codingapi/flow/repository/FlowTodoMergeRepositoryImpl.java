@@ -9,14 +9,16 @@ import java.util.Map;
 public class FlowTodoMergeRepositoryImpl implements FlowTodoMergeRepository {
 
     private final Map<Long, FlowTodoMerge> cache = new HashMap<>();
+    private long nextId = 1;
 
     private void save(FlowTodoMerge relation) {
         if (relation.getId() > 0) {
             cache.put(relation.getId(), relation);
         } else {
-            long id = cache.size() + 1;
-            relation.setId(id);
-            cache.put(id, relation);
+            // 使用单调递增 id：删除后的 cache.size()+1 可能与已删除的 id 重复，
+            // 进而覆盖其他记录
+            relation.setId(nextId++);
+            cache.put(relation.getId(), relation);
         }
     }
 

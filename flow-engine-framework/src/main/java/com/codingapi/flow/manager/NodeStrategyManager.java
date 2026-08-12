@@ -50,6 +50,19 @@ public class NodeStrategyManager {
     }
 
     /**
+     * 合并审批类型
+     */
+    public RecordMergeStrategy.MergeType getMergeType() {
+        List<INodeStrategy> strategies = this.strategies;
+        for (INodeStrategy strategy : strategies) {
+            if (strategy instanceof RecordMergeStrategy) {
+                return ((RecordMergeStrategy) strategy).getMergeType();
+            }
+        }
+        return RecordMergeStrategy.MergeType.APPROVER;
+    }
+
+    /**
      * 是否支持撤回
      */
     public boolean isEnableRevoke(){
