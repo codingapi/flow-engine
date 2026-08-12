@@ -9,15 +9,17 @@ import java.util.Map;
 public class WorkflowRuntimeRepositoryMockImpl implements WorkflowRuntimeRepository {
 
     private final Map<Long, WorkflowRuntime> cache = new HashMap<>();
+    private long nextId = 1;
 
     @Override
     public void save(WorkflowRuntime workflowRuntime) {
         if (workflowRuntime.getId() > 0) {
             cache.put(workflowRuntime.getId(), workflowRuntime);
         } else {
-            long id = cache.size() + 1;
-            workflowRuntime.setId(id);
-            cache.put(id, workflowRuntime);
+            // 使用单调递增 id：删除后的 cache.size()+1 可能与已删除的 id 重复，
+            // 进而覆盖其他记录（WorkflowRuntime id 被 FlowRecord.workRuntimeId 引用）
+            workflowRuntime.setId(nextId++);
+            cache.put(workflowRuntime.getId(), workflowRuntime);
         }
     }
 

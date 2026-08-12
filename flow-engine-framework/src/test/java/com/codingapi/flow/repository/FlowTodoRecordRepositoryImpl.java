@@ -10,15 +10,17 @@ public class FlowTodoRecordRepositoryImpl implements FlowTodoRecordRepository {
 
     private final Map<Long, FlowTodoRecord> cache = new HashMap<>();
     private final Map<String, FlowTodoRecord> cacheByMageKey = new HashMap<>();
+    private long nextId = 1;
 
     @Override
     public void save(FlowTodoRecord record) {
         if (record.getId() > 0) {
             cache.put(record.getId(), record);
         } else {
-            long id = cache.size() + 1;
-            record.setId(id);
-            cache.put(id, record);
+            // 使用单调递增 id：删除后的 cache.size()+1 可能与已删除的 id 重复，
+            // 进而覆盖其他待办（多级流程中 B 待办删除后新建 C 待办会冲突）
+            record.setId(nextId++);
+            cache.put(record.getId(), record);
         }
         cacheByMageKey.put(record.getTodoKey(), record);
     }

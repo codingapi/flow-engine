@@ -10,11 +10,14 @@ import java.util.Map;
 public class SubProcessRepositoryMockImpl implements SubProcessRepository {
 
     private final Map<Long, SubProcessRecord> cache = new LinkedHashMap<>();
+    private long nextId = 1;
 
     @Override
     public synchronized void save(SubProcessRecord record) {
         if (record.getId() == 0) {
-            record.setId(cache.size() + 1L);
+            // 使用单调递增 id：删除后（如有）的 cache.size()+1 可能与已删除的 id 重复，
+            // 进而覆盖其他记录
+            record.setId(nextId++);
         }
         cache.put(record.getId(), record);
     }
