@@ -12,6 +12,7 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
+import com.codingapi.flow.strategy.node.RecordMergeStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -230,6 +231,10 @@ public class FlowRecord {
      */
     private boolean mergeable;
     /**
+     * 合并审批类型，决定 {@link FlowRecord#getTodoKey()} 的合并依据
+     */
+    private RecordMergeStrategy.MergeType mergeType = RecordMergeStrategy.MergeType.APPROVER;
+    /**
      * 被干预的用户Id
      */
     private long interferedOperatorId;
@@ -261,11 +266,23 @@ public class FlowRecord {
 
     /**
      * 数据合并的依据,当开启时值为固定值，否则为随机数据
-     * 相同的 {@link FlowRecord#currentOperatorId} {@link FlowRecord#workRuntimeId} {@link FlowRecord#nodeId}字段的数据合并到一条记录上。
+     * <p>合并依据由 {@link RecordMergeStrategy.MergeType} 决定：
+     * <ul>
+     *     <li>APPROVER — 审批人合并，按 {@link FlowRecord#currentOperatorId}</li>
+     *     <li>CREATOR — 发起人合并，按 {@link FlowRecord#createOperatorId}</li>
+     *     <li>SUBMITTER — 提交人合并，按 {@link FlowRecord#submitOperatorId}</li>
+     * </ul>
+     * 相同依据字段 + {@link FlowRecord#workRuntimeId} + {@link FlowRecord#nodeId} 的数据合并到一条记录上。
      */
     public String getTodoKey() {
         if (mergeable) {
-            return String.format("%s-%s-%s", currentOperatorId, workRuntimeId, nodeId);
+            long mergeOperatorId;
+            switch (mergeType) {
+                case CREATOR -> mergeOperatorId = createOperatorId;
+                case SUBMITTER -> mergeOperatorId = submitOperatorId;
+                default -> mergeOperatorId = currentOperatorId;
+            }
+            return String.format("%s-%s-%s", mergeOperatorId, workRuntimeId, nodeId);
         } else {
             return String.valueOf(id);
         }
@@ -550,6 +567,7 @@ public class FlowRecord {
         this.setTitle(nodeStrategyManager.generateTitle(flowSession));
         this.setTimeoutTime(nodeStrategyManager.getTimeoutTime());
         this.setMergeable(nodeStrategyManager.isEnableMergeable());
+        this.setMergeType(nodeStrategyManager.getMergeType());
         this.update(flowSession, true);
         this.clearNotify();
     }

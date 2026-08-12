@@ -192,6 +192,11 @@ public class FlowRecordEntity {
      * 是否可合并
      */
     private Boolean mergeable;
+
+    /**
+     * 合并审批类型（APPROVER / CREATOR / SUBMITTER）
+     */
+    private String mergeType;
     /**
      * 被干预的用户
      */
