@@ -39,6 +39,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 问题 210 复现测试：主流程 C（子流程节点）一次性创建 6 个子流程、每个子流程 B 节点 20 个审批人。
@@ -125,6 +126,30 @@ class FlowIssue210SubProcessPerformanceTest {
         gateway.printReport();
         System.out.println("[issue-210] 主流程 B/C 节点提交总耗时: " + elapsedMs + " ms"
                 + " (网关延时 " + GATEWAY_DELAY_MS + "ms/次)");
+    }
+
+    /**
+     * 测试目标：验证保存待办时不再逐条 getByTodoKey（N+1），而是改用批量 findByKeys。
+     * 前置条件：网关不带延时（本类每次测试都新建 factory），强制执行 bulk 场景。
+     * 执行步骤：完成与 {@code shouldMeasureSubProcessBulkCreationTimeWithGatewayDelay} 相同的
+     *           6 子流程 × 20 审批人（120 条待办）创建。
+     * 期望断言：逐条 getByTodoKey 的调用次数远小于待办数量（仅来自节点完成清理路径），
+     *           且调用过批量 findByKeys。
+     */
+    @Test
+    void shouldBatchLoadExistingTodosInsteadOfPerRecordGet() {
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("content", "parent");
+        data.put("approvers", approvers.stream().map(User::getUserId).toList());
+        long parentRecordId = createParent(data);
+        approveMain(factory.flowRecordRepository.get(parentRecordId), parentStart, data);
+        FlowRecord parentBRecord = findTodo(initiator, parentB.getId());
+        approveMain(parentBRecord, parentB, data);
+
+        assertTrue(factory.flowTodoRecordRepository.getGetByTodoKeyCalls() < APPROVER_COUNT,
+                "批量创建待办时应以批量 findByKeys 替代逐条 getByTodoKey，避免 N+1");
+        assertTrue(factory.flowTodoRecordRepository.getFindByKeysCalls() >= 1,
+                "应调用批量 findByKeys 加载已存在待办");
     }
 
     // ---------- 网关延时 + 计数 ----------

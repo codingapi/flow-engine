@@ -6,9 +6,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface FlowTodoRecordEntityRepository extends FastRepository<FlowTodoRecordEntity,Long> {
 
     FlowTodoRecordEntity getByTodoKey(String todoKey);
+
+    @Query("from FlowTodoRecordEntity r where r.todoKey in ?1")
+    List<FlowTodoRecordEntity> findByKeys(List<String> keys);
 
 
     @Query("from FlowTodoRecordEntity r where r.currentOperatorId = ?1")
