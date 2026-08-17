@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
@@ -28,7 +29,8 @@ public class SubProcessRecordEntity {
      * 主键，由序列生成（替代数据库自增，配合 hibernate 批插降低批量往返）
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "flow_sub_process_record_seq")
+    @SequenceGenerator(name = "flow_sub_process_record_seq", sequenceName = "t_flow_sub_process_record_seq", allocationSize = 50)
     private Long id;
 
     /**

@@ -9,7 +9,8 @@ import lombok.Data;
 public class FlowTodoMargeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "flow_todo_marge_seq")
+    @SequenceGenerator(name = "flow_todo_marge_seq", sequenceName = "t_flow_todo_marge_seq", allocationSize = 50)
     private Long id;
     /**
      * 待办id

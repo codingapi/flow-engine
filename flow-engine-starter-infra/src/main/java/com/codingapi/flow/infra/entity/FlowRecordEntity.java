@@ -11,7 +11,8 @@ public class FlowRecordEntity {
      * 记录id
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "flow_record_seq")
+    @SequenceGenerator(name = "flow_record_seq", sequenceName = "t_flow_record_seq", allocationSize = 50)
     private Long id;
     /**
      * 工作id
