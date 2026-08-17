@@ -25,10 +25,10 @@ import lombok.Data;
 public class SubProcessRecordEntity {
 
     /**
-     * 主键，自增
+     * 主键，由序列生成（替代数据库自增，配合 hibernate 批插降低批量往返）
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     /**
