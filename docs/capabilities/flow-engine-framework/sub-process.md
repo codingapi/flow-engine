@@ -67,7 +67,7 @@ def run(request){
 
 ## 子流程查看主流程历史
 
-`SubProcessStrategy.showParentProcessRecords` 控制子流程参与人能否在节点记录中查看主流程历史，默认关闭，历史流程定义保持关闭：
+`SubProcessStrategy.showParentProcessRecords` 控制子流程参与人能否在节点记录中查看主流程历史，默认关闭（存量历史流程定义同样保持关闭，不自动开启）：
 
 - 开启后，查询子流程节点记录会递归拼接可见的祖先流程历史、对应子流程聚合节点以及当前子流程实际记录。
 - 主流程历史严格沿持久化 `fromId` 链回溯，仅展示到触发当前子流程为止的实际路径，不执行主流程未来节点推演，也不展开无关分支。

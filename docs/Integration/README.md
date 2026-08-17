@@ -33,7 +33,7 @@
 | [流程用户体系](./user-integration.md) | `FlowOperatorGateway` / `IFlowOperator` / `GatewayContext` / 线程缓存 / 当前登录人 |
 | [流程默认脚本](./script-integration.md) | 12 种脚本类型、`GroovyScriptRequest` 完整 API、`$bind`、默认脚本替换、脚本生命周期 |
 | [流程事件机制](./event-integration.md) | 7 种事件、`EventPusher`、`IHandler` 订阅、异步分发管道、事务变体、推送时机 |
-| [仓储抽象与持久化](./repository-integration.md) | `IRepositoryHolder`、12 个仓储接口、JPA 实现、脚本仓储、锁机制 |
+| [仓储抽象与持久化](./repository-integration.md) | `IRepositoryHolder`、12 个仓储接口（含 11 个 JPA 实现 + 需自行实现的 `NodeViewJavaScriptRepository`）、脚本仓储、锁机制 |
 | [Spring Boot 自动配置](./auto-configuration.md) | `AutoConfiguration` 8 个 Bean、4 个 Register、必选/可选 Bean 清单 |
 | [REST API](./rest-api.md) | 4 个 Controller、`mockKey`/`operatorId` 分流机制、请求/响应结构 |
 | [Mock 模式](./mock-mode.md) | 全内存沙箱 `MockInstance`、15 分钟过期、接入方式 |
