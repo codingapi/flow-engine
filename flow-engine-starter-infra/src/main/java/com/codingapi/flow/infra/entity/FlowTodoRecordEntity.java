@@ -14,7 +14,8 @@ public class FlowTodoRecordEntity {
      * <p>使用序列生成（而非数据库自增），配合 hibernate 批插，降低高频批量写表的 DB 往返。
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "flow_todo_record_seq")
+    @SequenceGenerator(name = "flow_todo_record_seq", sequenceName = "t_flow_todo_record_seq", allocationSize = 50)
     private Long id;
 
     /**
