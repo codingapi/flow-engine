@@ -8,12 +8,20 @@ import com.codingapi.flow.repository.FlowTodoMergeRepository;
 import com.codingapi.flow.repository.FlowTodoRecordRepository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 流程记录保存服务,负责保存流程记录和待办记录的合并关系
  */
 class FlowRecordSaveService {
+
+    /**
+     * 批量加载已存在待办时单批查询的 key 上限，避免单个 IN 子句过大（SQL 限制）与结果集过大（内存）。
+     */
+    private static final int TODO_KEY_BATCH_SIZE = 500;
 
     private final List<FlowRecord> flowRecords;
 
@@ -41,12 +49,29 @@ class FlowRecordSaveService {
 
 
     private void saveTodoMargeRecords() {
+        // 批量加载已存在的待办（而非逐条 getByTodoKey 的 N+1）：
+        // 按分块大小分批 findByKeys，避免海量 key 拼在单个 IN 子句里导致 SQL/结果集过大（OOM 风险）。
+        List<String> todoKeys = flowRecords.stream()
+                .filter(FlowRecord::isTodo)
+                .map(FlowRecord::getTodoKey)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        Map<String, FlowTodoRecord> existedByKey = new HashMap<>();
+        for (int start = 0; start < todoKeys.size(); start += TODO_KEY_BATCH_SIZE) {
+            List<String> chunk = todoKeys.subList(start, Math.min(start + TODO_KEY_BATCH_SIZE, todoKeys.size()));
+            for (FlowTodoRecord existed : flowTodoRecordRepository.findByKeys(chunk)) {
+                existedByKey.put(existed.getTodoKey(), existed);
+            }
+        }
+
         List<FlowTodoRecord> flowTodoRecords = new ArrayList<>();
         for (FlowRecord flowRecord : flowRecords) {
             if (flowRecord.isTodo()) {
-                FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByTodoKey(flowRecord.getTodoKey());
+                FlowTodoRecord todoMargeRecord = existedByKey.get(flowRecord.getTodoKey());
                 if (todoMargeRecord == null) {
                     todoMargeRecord = new FlowTodoRecord(flowRecord);
+                    existedByKey.put(flowRecord.getTodoKey(), todoMargeRecord);
                 } else {
                     todoMargeRecord.update(flowRecord);
                     if (flowRecord.isMergeable()) {

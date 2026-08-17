@@ -11,7 +11,7 @@ public class FlowRecordEntity {
      * 记录id
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     /**
      * 工作id

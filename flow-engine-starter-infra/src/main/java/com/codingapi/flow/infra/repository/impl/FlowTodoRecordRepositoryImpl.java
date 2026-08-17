@@ -27,6 +27,13 @@ public class FlowTodoRecordRepositoryImpl implements FlowTodoRecordRepository {
     }
 
     @Override
+    public List<FlowTodoRecord> findByKeys(List<String> keys) {
+        return flowTodoRecordEntityRepository.findByKeys(keys).stream()
+                .map(FlowTodoRecordConvertor::convert)
+                .toList();
+    }
+
+    @Override
     public void delete(FlowTodoRecord margeRecord) {
         flowTodoRecordEntityRepository.deleteById(margeRecord.getId());
     }

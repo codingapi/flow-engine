@@ -11,9 +11,10 @@ public class FlowTodoRecordEntity {
 
     /**
      * 合并记录id
+     * <p>使用序列生成（而非数据库自增），配合 hibernate 批插，降低高频批量写表的 DB 往返。
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     /**

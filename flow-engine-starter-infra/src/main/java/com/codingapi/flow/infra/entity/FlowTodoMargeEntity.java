@@ -9,7 +9,7 @@ import lombok.Data;
 public class FlowTodoMargeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     /**
      * 待办id
