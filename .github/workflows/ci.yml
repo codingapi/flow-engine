@@ -33,5 +33,13 @@ jobs:
       - name: Test
         run: ./mvnw test -P travis
 
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: flow-engine-framework/target/site/jacoco/jacoco.xml
+          fail_ci_if_error: true
+          verbose: true
+
       - name: Install
         run: ./mvnw install -P travis -DskipTests
