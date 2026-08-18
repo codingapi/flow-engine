@@ -6,7 +6,7 @@ status: 已实现
 scope: 后端
 source: 框架:Spring Boot
 import: "com.codingapi.springboot:springboot-starter-data-fast"
-framework_version: "由 codingapi.framework.version 3.4.55 管理"
+framework_version: "由 codingapi.framework.version 17.3.0 管理"
 ---
 
 ## 解决什么问题

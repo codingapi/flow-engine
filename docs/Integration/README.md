@@ -72,7 +72,7 @@ REST 请求 → FlowRecordController
 ## 版本约定
 
 - 引擎版本：`0.1.0-SNAPSHOT`（根 pom `revision`）
-- 外部框架依赖（根 pom `codingapi.framework.version = 3.4.55`）：
+- 外部框架依赖（根 pom `codingapi.framework.version = 17.3.0`）：
   - `com.codingapi.springboot:springboot-starter` —— 事件体系（`EventPusher`/`IHandler`）、`UserContext`、`LocaleMessageException`
   - `com.codingapi.springboot:springboot-starter-script` —— Groovy 脚本引擎（`GroovyScript`/注解/仓储 SPI）
   - `com.codingapi.springboot:springboot-starter-data-fast` —— `FastRepository`（JPA 仓储基类）
