@@ -153,7 +153,7 @@ request.getWorkflow()           // Workflow 对象（可访问 form/nodes 等）
 
 ### 4.1 脚本对象（`GroovyScript`）
 
-来自外部依赖 `com.codingapi.springboot:springboot-starter-script:3.4.55`。构造方式：
+来自外部依赖 `com.codingapi.springboot:springboot-starter-script:17.3.0`。构造方式：
 
 ```java
 GroovyScript groovyScript = GroovyScript.builder(key)
