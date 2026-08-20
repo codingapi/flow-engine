@@ -73,6 +73,21 @@ class FlowScriptRuntimeContextTest {
     }
 
     @Test
+    void should_execute_snapshot_after_design_script_deleted() {
+        // given 运行时已固化脚本正文，随后设计态脚本被物理删除
+        registerGlobalScript(NEW_CONTENT);
+        FlowRuntimeScriptLocalCache.getInstance().set(Map.of(KEY, OLD_CONTENT));
+        GroovyScriptCacheContext.getInstance().remove(KEY);
+
+        // when
+        GroovyScript runtimeScript = FlowScriptRuntimeContext.getInstance().getGroovyScript(KEY);
+
+        // then 不再依赖设计态脚本对象，仍可使用运行时正文执行
+        assertEquals(OLD_CONTENT, runtimeScript.getScript());
+        assertEquals("OLD", runtimeScript.invoke("request"));
+    }
+
+    @Test
     void should_return_global_script_when_no_runtime_cache() {
         // given 无运行时快照
         registerGlobalScript(NEW_CONTENT);

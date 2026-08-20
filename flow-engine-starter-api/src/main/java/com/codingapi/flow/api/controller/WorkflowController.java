@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.api.pojo.NodeCreateRequest;
 import com.codingapi.flow.api.pojo.WorkflowMeta;
+import com.codingapi.flow.api.pojo.WorkflowImportRequest;
 import com.codingapi.flow.api.pojo.WorkflowUpdateVersionNameRequest;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowPermissionException;
@@ -121,22 +122,26 @@ public class WorkflowController {
     }
 
     @PostMapping("/import")
-    public SingleResponse<String> importWorkflow(@RequestBody JSONObject body) {
+    public SingleResponse<String> importWorkflow(@RequestBody WorkflowImportRequest request) {
         IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
-        String workId = workflowService.importWorkflow(body.getString("file"),current);
+        String workId = workflowService.importWorkflow(request.getFile(), current, request.getMode());
         return SingleResponse.of(workId);
+    }
+
+    @GetMapping("/exists")
+    public SingleResponse<Boolean> exists(@RequestParam String code) {
+        return SingleResponse.of(workflowService.getWorkflowByCode(code) != null);
     }
 
     @GetMapping("/export")
     public void export(IdRequest request, HttpServletResponse response) {
-        Workflow workflow = workflowService.getWorkflowById(request.getStringId());
-        JSONObject jsonObject = JSONObject.parseObject(workflow.toJson());
+        String content = workflowService.exportWorkflow(request.getStringId());
         try {
             response.setContentType("application/json;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
             String fileName = URLEncoder.encode("workflow_" + request.getStringId() + ".json", StandardCharsets.UTF_8);
             response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
-            response.getWriter().write(jsonObject.toJSONString());
+            response.getWriter().write(content);
             response.getWriter().flush();
         } catch (Exception e) {
             throw new LocaleMessageException("export.error", e);
