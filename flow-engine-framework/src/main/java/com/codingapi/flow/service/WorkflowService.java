@@ -6,6 +6,8 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.repository.WorkflowRuntimeRepository;
 import com.codingapi.flow.repository.WorkflowVersionRepository;
+import com.codingapi.flow.transfer.WorkflowImportMode;
+import com.codingapi.flow.transfer.WorkflowTransferService;
 import com.codingapi.flow.utils.Base64Utils;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowVersion;
@@ -170,8 +172,15 @@ public class WorkflowService {
      *
      * @param workId 流程编码
      */
+    @Transactional
     public void delete(String workId) {
         Workflow workflow = workflowRepository.getById(workId);
+        List<WorkflowVersion> versions = workflowVersionRepository.findVersion(workId);
+        if (versions != null) {
+            versions.forEach(WorkflowGroovyScriptUtils::deleteScripts);
+        }
+        // 主流程与当前版本通常引用同一组脚本；这里仍单独清理，用于兼容历史数据中
+        // 主流程与版本脚本key不一致的情况。重复删除同一key是幂等的。
         WorkflowGroovyScriptUtils.deleteScripts(workflow);
         workflowVersionRepository.delete(workId);
         workflowRepository.delete(workId);
@@ -247,13 +256,32 @@ public class WorkflowService {
      * @return 流程id
      */
     public String importWorkflow(String body, IFlowOperator createOperator) {
+        return this.importWorkflow(body, createOperator, WorkflowImportMode.INCREMENTAL);
+    }
+
+    /**
+     * 导入流程。
+     *
+     * @param body base64格式的流程文件
+     * @param createOperator 导入操作人
+     * @param mode 导入模式
+     * @return 导入后的流程id
+     */
+    @Transactional
+    public String importWorkflow(String body,
+                                 IFlowOperator createOperator,
+                                 WorkflowImportMode mode) {
         String json = Base64Utils.toJson(body);
-        Workflow workflow = Workflow.formJson(json);
-        workflow.resetWorkflow(createOperator);
-        // 替换脚本
-        WorkflowGroovyScriptUtils.resetScripts(workflow);
-        this.saveWorkflow(workflow, false);
-        return workflow.getId();
+        return new WorkflowTransferService(workflowVersionRepository, workflowRepository)
+                .importWorkflow(json, createOperator, mode);
+    }
+
+    /**
+     * 导出流程及其全部版本和Groovy脚本。
+     */
+    public String exportWorkflow(String workId) {
+        return new WorkflowTransferService(workflowVersionRepository, workflowRepository)
+                .exportWorkflow(workId);
     }
 
 

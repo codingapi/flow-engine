@@ -46,6 +46,7 @@ public class WorkflowGroovyScriptUtils {
             List<String> keys = GroovyScriptAnnotationScannerUtils.findGroovyScriptFields(target).getKeys();
             for (String key : keys) {
                 GroovyScriptRepositoryContext.getInstance().delete(key);
+                GroovyScriptCacheContext.getInstance().remove(key);
             }
         }
     }
