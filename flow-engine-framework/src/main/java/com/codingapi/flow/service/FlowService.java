@@ -114,4 +114,20 @@ public class FlowService {
         FlowUrgeService flowUrgeService = new FlowUrgeService(request, this.repositoryHolder);
         flowUrgeService.urge();
     }
+
+    /**
+     * 子流程数据重置（独立接口，不属于常规审批动作）。
+     * <p>
+     * 将已完成的子流程聚合记录中的选中实例从头重建为新子流程，主流程退回子流程节点重新等待。
+     * 仅当子流程节点配置了重置能力（{@code SubProcessStrategy.resettable}）时允许执行。
+     *
+     * @param request 重置请求
+     */
+    public void resetSubProcess(FlowSubProcessResetRequest request) {
+        FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowRuntimeScriptLocalCache.getInstance().clear();
+        FlowSubProcessResetService flowSubProcessResetService =
+                new FlowSubProcessResetService(request, this.repositoryHolder);
+        flowSubProcessResetService.reset();
+    }
 }

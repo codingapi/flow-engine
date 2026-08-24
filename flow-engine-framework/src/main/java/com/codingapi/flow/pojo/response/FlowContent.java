@@ -177,6 +177,13 @@ public class FlowContent {
     private boolean urge;
 
     /**
+     * 支持子流程数据重置（独立能力标识，非审批动作）。
+     * <p>当前待办记录位于已开启重置能力、且已汇聚完成的子流程下游时为 true；
+     * 前端可据此标识自行决定交互呈现方式，调用 {@code /api/cmd/record/subProcess/reset} 接口。</p>
+     */
+    private boolean resetSubProcess;
+
+    /**
      * 设置操作动作按钮
      *
      */

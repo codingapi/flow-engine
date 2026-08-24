@@ -76,6 +76,18 @@ public class LoopTriggerTraceContext {
     }
 
     /**
+     * 清除指定流程实例的全部触发标记。
+     * <p>子流程重置等"退回重走"场景会作废既有记录链并重新触发下游节点，
+     * 旧执行留下的标记不应把合法的重走误判为循环。</p>
+     *
+     * @param processId 流程实例标识
+     */
+    public void clearByProcess(String processId) {
+        String prefix = processId + ":";
+        this.traces.keySet().removeIf(key -> key.startsWith(prefix));
+    }
+
+    /**
      * 清空全部标记（测试隔离用）。
      */
     public void clear() {

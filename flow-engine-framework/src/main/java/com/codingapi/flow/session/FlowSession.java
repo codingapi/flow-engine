@@ -442,8 +442,11 @@ public class FlowSession {
                 && subProcessContext.getSubProcessRecord().getNodeId().equals(subProcessNodeId)) {
             records = List.of(subProcessContext.getSubProcessRecord());
         } else {
+            // 已取代的聚合组不参与脚本查询，重置后脚本仅可见当前有效组（含继承实例的最终记录）
             records = repositoryHolder.getSubProcessRepository()
-                    .findByParentProcessIdAndNodeId(currentRecord.getProcessId(), subProcessNodeId);
+                    .findByParentProcessIdAndNodeId(currentRecord.getProcessId(), subProcessNodeId).stream()
+                    .filter(record -> !record.isSuperseded())
+                    .toList();
         }
         List<Long> ids = records.stream()
                 .flatMap(record -> record.findFinishedRecordIds().stream())

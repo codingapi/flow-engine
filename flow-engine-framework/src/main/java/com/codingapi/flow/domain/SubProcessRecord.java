@@ -1,7 +1,6 @@
 package com.codingapi.flow.domain;
 
 import com.codingapi.flow.record.FlowRecord;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +16,6 @@ import java.util.List;
  * 并恢复主流程；全部实例结束但结果未通过时置为 {@link State#ERROR} 并跳转异常节点。</p>
  */
 @Getter
-@AllArgsConstructor
 public class SubProcessRecord {
 
     /**
@@ -77,6 +75,74 @@ public class SubProcessRecord {
     private long finishTime;
 
     /**
+     * 是否已被重置取代。
+     * <p>子流程数据重置时旧聚合组被标记为已取代（状态保持不变以保留审计语义），
+     * 新聚合组取代其成为当前有效数据；已取代的组不再参与结果判定、脚本查询与重置。</p>
+     */
+    private boolean superseded;
+
+    /**
+     * 全字段构造（持久化转换使用）。
+     *
+     * @param id                  记录id
+     * @param groupId             本次子流程执行的分组id
+     * @param parentProcessId     父流程（主流程）的流程id
+     * @param parentRecordId      父流程中子流程节点的执行记录id
+     * @param parentWorkRuntimeId 父流程（主流程）的运行实例id
+     * @param nodeId              父流程中子流程节点的节点id
+     * @param totalCount          本次创建的子流程实例总数
+     * @param instances           本次创建的全部子流程实例
+     * @param state               本次子流程执行的聚合状态
+     * @param createTime          创建时间（毫秒时间戳）
+     * @param finishTime          结束时间（毫秒时间戳），未结束时为 0
+     */
+    public SubProcessRecord(long id,
+                            String groupId,
+                            String parentProcessId,
+                            long parentRecordId,
+                            long parentWorkRuntimeId,
+                            String nodeId,
+                            int totalCount,
+                            List<Instance> instances,
+                            State state,
+                            long createTime,
+                            long finishTime) {
+        this(id, groupId, parentProcessId, parentRecordId, parentWorkRuntimeId, nodeId,
+                totalCount, instances, state, createTime, finishTime, false);
+    }
+
+    /**
+     * 全字段构造（含已取代标记）。
+     *
+     * @param superseded 是否已被重置取代
+     */
+    public SubProcessRecord(long id,
+                            String groupId,
+                            String parentProcessId,
+                            long parentRecordId,
+                            long parentWorkRuntimeId,
+                            String nodeId,
+                            int totalCount,
+                            List<Instance> instances,
+                            State state,
+                            long createTime,
+                            long finishTime,
+                            boolean superseded) {
+        this.id = id;
+        this.groupId = groupId;
+        this.parentProcessId = parentProcessId;
+        this.parentRecordId = parentRecordId;
+        this.parentWorkRuntimeId = parentWorkRuntimeId;
+        this.nodeId = nodeId;
+        this.totalCount = totalCount;
+        this.instances = instances;
+        this.state = state;
+        this.createTime = createTime;
+        this.finishTime = finishTime;
+        this.superseded = superseded;
+    }
+
+    /**
      * 创建子流程执行记录，初始状态为等待子流程结果。
      *
      * @param groupId      本次子流程执行的分组id
@@ -99,6 +165,31 @@ public class SubProcessRecord {
                 State.WAITING,
                 System.currentTimeMillis(),
                 0);
+    }
+
+    /**
+     * 标记本次执行已被重置取代。
+     * <p>聚合状态保持不变（保留审计语义），仅置位已取代标记。</p>
+     */
+    public void supersede() {
+        this.superseded = true;
+    }
+
+    /**
+     * 是否已被重置取代。
+     */
+    public boolean isSuperseded() {
+        return superseded;
+    }
+
+    /**
+     * 生成本记录的不可变快照（供事件携带，避免异步消费时被后续状态变更污染）。
+     *
+     * @return 字段相同的副本，实例列表不可变
+     */
+    public SubProcessRecord snapshot() {
+        return new SubProcessRecord(id, groupId, parentProcessId, parentRecordId, parentWorkRuntimeId,
+                nodeId, totalCount, List.copyOf(instances), state, createTime, finishTime, superseded);
     }
 
     /**
@@ -206,7 +297,6 @@ public class SubProcessRecord {
      * 子流程实例。
      */
     @Getter
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class Instance {
 
@@ -241,6 +331,61 @@ public class SubProcessRecord {
         private long finishTime;
 
         /**
+         * 是否为继承实例：子流程数据重置时未被选中重置的实例直接沿用原结果，
+         * 不再重新执行，仅在新聚合组中继承其最终状态。
+         */
+        private boolean inherited;
+
+        /**
+         * 重建实例替换的旧实例流程id：重置时重建的实例记录其取代的旧实例，
+         * 供订阅方完成旧 → 新流程id映射；继承实例与常规实例为 null。
+         */
+        private String sourceProcessId;
+
+        /**
+         * 全字段构造（持久化转换与测试使用）。
+         *
+         * @param startRecordId  子流程开始节点（发起）的执行记录id
+         * @param processId      子流程的流程id
+         * @param workTitle      子流程的流程名称
+         * @param finishRecordId 子流程最终执行记录id，未结束时为 0
+         * @param state          子流程实例运行状态
+         * @param finishTime     结束时间（毫秒时间戳），未结束时为 0
+         */
+        public Instance(long startRecordId,
+                        String processId,
+                        String workTitle,
+                        long finishRecordId,
+                        InstanceState state,
+                        long finishTime) {
+            this(startRecordId, processId, workTitle, finishRecordId, state, finishTime, false, null);
+        }
+
+        /**
+         * 全字段构造（含重置标记）。
+         *
+         * @param inherited       是否为继承实例
+         * @param sourceProcessId 重建实例替换的旧实例流程id（继承实例与常规实例为 null）
+         */
+        public Instance(long startRecordId,
+                        String processId,
+                        String workTitle,
+                        long finishRecordId,
+                        InstanceState state,
+                        long finishTime,
+                        boolean inherited,
+                        String sourceProcessId) {
+            this.startRecordId = startRecordId;
+            this.processId = processId;
+            this.workTitle = workTitle;
+            this.finishRecordId = finishRecordId;
+            this.state = state;
+            this.finishTime = finishTime;
+            this.inherited = inherited;
+            this.sourceProcessId = sourceProcessId;
+        }
+
+        /**
          * 创建子流程实例，初始状态为运行中。
          *
          * @param startRecord 子流程开始节点（发起）的执行记录
@@ -248,6 +393,27 @@ public class SubProcessRecord {
         public Instance(FlowRecord startRecord) {
             this(startRecord.getId(), startRecord.getProcessId(), startRecord.getWorkTitle(),
                     0, InstanceState.RUNNING, 0);
+        }
+
+        /**
+         * 创建重置重建的子流程实例，初始状态为运行中。
+         *
+         * @param startRecord     重建子流程开始节点（发起）的执行记录
+         * @param sourceProcessId 被替换的旧实例流程id
+         */
+        public static Instance rebuiltFrom(FlowRecord startRecord, String sourceProcessId) {
+            return new Instance(startRecord.getId(), startRecord.getProcessId(), startRecord.getWorkTitle(),
+                    0, InstanceState.RUNNING, 0, false, sourceProcessId);
+        }
+
+        /**
+         * 创建重置继承的子流程实例：完整沿用原实例的最终状态，不再重新执行。
+         *
+         * @param source 被取代聚合组中的原实例
+         */
+        public static Instance inheritFrom(Instance source) {
+            return new Instance(source.getStartRecordId(), source.getProcessId(), source.getWorkTitle(),
+                    source.getFinishRecordId(), source.getState(), source.getFinishTime(), true, null);
         }
 
         /**

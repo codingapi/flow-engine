@@ -53,6 +53,8 @@ public class FlowSubProcessResultService {
         }
         SubProcessRecord subProcessRecord = subProcessRepository
                 .findByParentRecordId(childFinalRecord.getParentId()).stream()
+                // 已取代的聚合组不参与结果判定，避免继承实例同时归属新旧两组时命中旧组导致主流程停滞
+                .filter(record -> !record.isSuperseded())
                 .filter(record -> record.containsChildProcess(childFinalRecord.getProcessId()))
                 .findFirst()
                 .orElse(null);

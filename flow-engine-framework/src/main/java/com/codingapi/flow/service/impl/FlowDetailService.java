@@ -85,8 +85,12 @@ public class FlowDetailService {
             FlowSession flowSession = flowRecord.createFlowSession(repositoryHolder, workflow, currentOperator,
                     createOperator, submitOperator, formData, flowAdvice);
 
-            return new FlowContentFactory(flowSession, workflow, flowRecord, currentOperator,
+            FlowContent flowContent = new FlowContentFactory(flowSession, workflow, flowRecord, currentOperator,
                     repositoryHolder.getFlowRecordService()).create();
+            // 子流程重置为独立能力（非审批动作）：仅当当前待办位于已开启重置能力、
+            // 且已汇聚完成的子流程下游时携带标识，由前端自行决定交互呈现
+            flowContent.setResetSubProcess(FlowSubProcessResetService.canReset(flowRecord, repositoryHolder));
+            return flowContent;
         }
     }
 

@@ -365,6 +365,11 @@ public class ProcessNode {
          */
         private List<SubProcessInstanceBody> instances;
 
+        /**
+         * 是否已被重置取代（历史聚合组，仅保留审计用途）
+         */
+        private boolean superseded;
+
         private static SubProcessBody create(SubProcessRecord record, Function<Long, String> workTitleLoader) {
             List<SubProcessInstanceBody> instances = record.getInstances().stream()
                     .map(instance -> SubProcessInstanceBody.create(instance, workTitleLoader))
@@ -381,7 +386,8 @@ public class ProcessNode {
                     record.getState(),
                     record.getCreateTime(),
                     record.getFinishTime(),
-                    instances
+                    instances,
+                    record.isSuperseded()
             );
         }
     }
@@ -424,6 +430,16 @@ public class ProcessNode {
          */
         private long finishTime;
 
+        /**
+         * 是否为继承实例：重置时未被选中重置的实例沿用原结果，未重新执行
+         */
+        private boolean inherited;
+
+        /**
+         * 重建实例替换的旧实例流程id；继承实例与常规实例为 null
+         */
+        private String sourceProcessId;
+
         private static SubProcessInstanceBody create(SubProcessRecord.Instance instance,
                                                      Function<Long, String> workTitleLoader) {
             String workTitle = instance.getWorkTitle();
@@ -436,7 +452,9 @@ public class ProcessNode {
                     workTitle,
                     instance.getFinishRecordId(),
                     instance.getState(),
-                    instance.getFinishTime()
+                    instance.getFinishTime(),
+                    instance.isInherited(),
+                    instance.getSourceProcessId()
             );
         }
     }

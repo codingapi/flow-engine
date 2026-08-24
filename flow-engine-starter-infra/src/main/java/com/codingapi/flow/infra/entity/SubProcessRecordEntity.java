@@ -95,6 +95,12 @@ public class SubProcessRecordEntity {
     private Long finishTime;
 
     /**
+     * 是否已被重置取代；存量数据为 null 时按未取代处理
+     */
+    @Column
+    private Boolean superseded;
+
+    /**
      * 乐观锁版本号（由 JPA {@link Version} 自动维护）
      */
     @Version
