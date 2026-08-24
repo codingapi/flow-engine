@@ -16,7 +16,7 @@ framework_version: "3.5.9"
 - **依赖注入**：容器管理 Bean 之间的依赖关系。本项目不使用 `@Autowired` / `@Inject` 注解，统一通过 Lombok `@AllArgsConstructor` 构造器注入（如 `WorkflowController`、`WorkflowService`、各 `RepositoryImpl`）
 - **Bean 生命周期管理**：容器统一管理 Bean 的创建、初始化和销毁
 - **AOP 支持**：框架提供 `@Aspect` 横切关注点能力（本项目未使用）
-- **事件发布**：本项目不使用 Spring `ApplicationEventPublisher`，事件系统为自研 `IFlowEvent` + `EventPusher`（`flow-engine-framework/event/` 下 7 种事件类，操作完成后通过 `EventPusher.push(event)` 推送）
+- **事件发布**：本项目不使用 Spring `ApplicationEventPublisher`，事件系统为自研 `IFlowEvent` + `EventPusher`（`flow-engine-framework/event/` 下 8 种事件类，操作完成后通过 `EventPusher.push(event)` 推送）
 - **自动配置**：通过 `@Configuration` + `@Conditional` 实现条件化 Bean 注册
 
 ## 如何使用

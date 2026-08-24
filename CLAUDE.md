@@ -64,7 +64,7 @@ REST 层通过请求参数 `mockKey` 分流到 Mock 实例（见 `FlowRecordCont
 
 ### 事件（IFlowEvent + EventPusher）
 
-7 种事件：开始 / 待办 / 已办 / 完成 / 催办 / 撤销（`FlowRecordRevokeEvent`）/ 删除（`FlowRecordDeleteEvent`）。操作完成后用 `EventPusher.push(event)` 推送；事件通常携带 `FlowRecord` + `mock` 标记。外部可用 Spring `@EventListener` 订阅。
+8 种事件：开始 / 待办 / 已办 / 完成 / 催办 / 撤销（`FlowRecordRevokeEvent`）/ 删除（`FlowRecordDeleteEvent`）/ 子流程重置（`FlowSubProcessResetEvent`）。操作完成后用 `EventPusher.push(event)` 推送；记录类事件携带 `FlowRecord` + `mock` 标记，重置事件携带新旧聚合组快照。外部可用 Spring `@EventListener` 订阅。
 
 ### API 模块划分
 

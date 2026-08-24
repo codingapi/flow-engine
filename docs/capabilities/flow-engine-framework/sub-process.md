@@ -1,7 +1,7 @@
 ---
 name: flow-engine-framework/sub-process
 module: flow-engine-framework
-description: 子流程聚合执行能力，支持批量创建、主流程等待、脚本结果判定与异常跳转
+description: 子流程聚合执行能力，支持批量创建、主流程等待、脚本结果判定、异常跳转与数据重置（退回重走）
 status: 已实现
 scope: 后端
 source: 项目自有
@@ -115,7 +115,7 @@ def run(request){
 
 ### 可见性（详情标识字段）
 
-重置不是节点动作，不出现在动作列表中。流程详情 `FlowContent` 新增 `resetSubProcess` 布尔标识：当前待办位于「开启重置能力、已汇聚完成」的子流程下游时为 `true`。前端解析到该标识即可自行提供重置交互（呈现方式由使用方决定，不限定于操作列）；节点视图中新旧聚合组同时呈现，`ProcessNode.SubProcessBody.superseded` 与 `SubProcessInstanceBody.inherited/sourceProcessId` 供前端区分。
+重置不是节点动作，不出现在动作列表中。流程详情 `FlowContent` 新增 `resetSubProcess` 布尔标识：当前待办位于「开启重置能力、已汇聚完成」的子流程的**锁定合并节点**上时为 `true`（更深层下游节点为 `false`）。前端解析到该标识即可自行提供重置交互（呈现方式由使用方决定，不限定于操作列）；节点视图中新旧聚合组同时呈现，`ProcessNode.SubProcessBody.superseded` 与 `SubProcessInstanceBody.inherited/sourceProcessId` 供前端区分。
 
 ### 数据结构兼容性
 

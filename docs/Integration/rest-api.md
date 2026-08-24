@@ -180,7 +180,7 @@ form（FlowForm 元数据） / fieldPermissions（字段权限）
 todos（当前节点待办 Body 列表） / actions / actionList
 mergeable / createOperator / currentOperator / flowState / recordState
 histories（审批历史） / nodes（NodeOption 可操作节点） / revoke / urge
-resetSubProcess（子流程重置能力标识：当前待办位于开启重置能力、已汇聚完成的子流程下游时为 true）
+resetSubProcess（子流程重置能力标识：当前待办位于开启重置能力、已汇聚完成的子流程的锁定合并节点上时为 true；更深层下游节点为 false）
 ```
 
 ### `FlowRecordContent`（列表响应，字段摘要）

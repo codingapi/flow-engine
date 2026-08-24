@@ -284,7 +284,7 @@ spring.jpa.properties.hibernate.dialect=com.codingapi.example.dialect.HydDmDiale
 
 <table>
   <tr><th>扩展点</th><th>说明</th></tr>
-  <tr><td>事件订阅</td><td>实现 <code>IHandler&lt;E&gt;</code> 订阅 7 种事件：Start / Todo / Done / Finish / Urge / Revoke / Delete，自动被 Spring 扫描</td></tr>
+  <tr><td>事件订阅</td><td>实现 <code>IHandler&lt;E&gt;</code> 订阅 8 种事件：Start / Todo / Done / Finish / Urge / Revoke / Delete / SubProcessReset，自动被 Spring 扫描</td></tr>
   <tr><td>节点策略</td><td>15 种策略（OperatorLoad / RecordMerge / Revoke / Router / FormFieldPermission 等）由 <code>NodeStrategyManager</code> 持有（工厂固定注册，不支持新增策略类型；业务方通过策略配置 + Groovy 脚本表达差异）</td></tr>
   <tr><td>自定义动作</td><td>8 种内置动作（PASS/REJECT/RETURN/TRANSFER/DELEGATE/ADD_AUDIT/SAVE/CUSTOM）由 <code>FlowActionFactory</code> 固定注册（不支持新增动作类型）；业务方通过 CUSTOM 动作 + Groovy 脚本表达自定义行为</td></tr>
   <tr><td>自定义脚本注册</td><td><code>ScriptRegistryContext.getInstance().setRegistry(new CustomScriptRegistry())</code> 替换默认 Groovy 脚本</td></tr>
