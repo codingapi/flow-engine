@@ -27,9 +27,9 @@ public interface IAsyncEvent extends IEvent {}        // 异步事件标记 ← 
 
 同步/异步由 `DomainEventContext.push` 的 `instanceof` 判定：`IAsyncEvent` → 异步（线程池执行）；`ISyncEvent`/裸 `IEvent` → 同步（发布线程内联执行）。
 
-### 1.2 七种事件
+### 1.2 八种事件
 
-所有事件均携带 `FlowRecord`（或当前记录）与 `boolean mock` 标记（Mock 模式为 `true`）。
+记录类事件均携带 `FlowRecord`（或当前记录）与 `boolean mock` 标记（Mock 模式为 `true`）。
 
 | 事件类 | 触发时机 | 构造参数 | 访问器 |
 |---|---|---|---|
@@ -40,6 +40,19 @@ public interface IAsyncEvent extends IEvent {}        // 异步事件标记 ← 
 | `FlowRecordRevokeEvent` | 撤销（被撤销的后置记录） | `FlowRecord currentRecord, boolean mock` | `getCurrentRecord()` / `isMock()` |
 | `FlowRecordUrgeEvent` | 催办（每条待办） | `FlowRecord, IFlowOperator urgeOperator, boolean mock` | `getFlowRecord()` / `getUrgeOperator()` / `isMock()` |
 | `FlowRecordDeleteEvent` | 删除未流转实例（开始节点） | `FlowRecord, boolean mock` | `getFlowRecord()` / `isMock()` |
+| `FlowSubProcessResetEvent` | 子流程数据重置（issue #219） | `SubProcessRecord oldRecord, SubProcessRecord newRecord, long resetRecordId, IFlowOperator resetOperator, boolean mock` | `getOldRecord()` / `getNewRecord()` / `getResetRecordId()` / `getResetOperator()` / `isMock()` |
+
+**子流程重置事件订阅须知**：
+
+- 事件提醒业务方子流程数据已被重置：`oldRecord` 为被取代的旧聚合组快照（含全部旧实例流程id），
+  `newRecord` 为重置后的新聚合组——继承实例沿用原流程id，重建实例为新流程id，
+  重建实例的 `getSourceProcessId()` 记录其替换的旧实例流程id，据此完成旧 → 新流程id映射；
+- 事件经异步线程池分发、到达顺序不保证（重置同时伴随被作废记录的 `RevokeEvent`
+  与重建实例的 `StartEvent`/`TodoEvent`），订阅方应按「同一 `parentRecordId` + 节点维度下
+  **最大聚合组 id 为活跃组**」做幂等覆盖式收敛，禁止增量累加；
+- 事件的 `oldRecord` id 与订阅方当前活跃组 id 不一致时，说明存在丢失的重置事件，
+  应通过节点记录查询（`/api/cmd/record/processNodes`）全量对账；
+- 旧实例记录不会被删除（仅聚合组标记已取代），订阅方收到事件后应自行将旧流程id的数据标记失效。
 
 范例（`FlowRecordUrgeEvent.java`，唯一带三个字段的事件）：
 
@@ -107,6 +120,7 @@ EventPusher.push(new FlowRecordStartEvent(flowRecord, session.isMock()));
 | `FlowUrgeService.urge()` | 每条待办 `UrgeEvent` |
 | `FlowRevokeService.revoke()` | 当前记录恢复待办 `TodoEvent` + 被撤销后置记录 `RevokeEvent` |
 | `FlowDeleteService.delete()` | `DeleteEvent` |
+| `FlowSubProcessResetService.reset()` | 被作废记录链逐条 `RevokeEvent` + 子流程重置 `SubProcessResetEvent`；重建实例经 `FlowCreateService` 推送各自的 `StartEvent` + `TodoEvent` |
 
 > 事件在 `repositoryHolder.saveRecords(...)` **落库之后**推送，保证订阅方看到的记录已持久化。
 

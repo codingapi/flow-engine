@@ -47,22 +47,38 @@ public class SubProcessStrategy extends BaseStrategy {
      */
     private boolean showParentProcessRecords;
 
+    /**
+     * 是否允许在子流程汇聚完成后，由下游节点对该子流程执行数据重置（退回重走）。
+     * <p>默认关闭。开启后，主流程走到该子流程下游的待办记录上时，详情数据会携带
+     * 重置标识，业务方可调用独立的子流程重置接口；未开启则接口拒绝执行。</p>
+     */
+    private boolean resettable;
+
     public SubProcessStrategy(String subProcessScript, boolean submit) {
-        this(subProcessScript, submit, SubProcessResultScript.defaultScript().getScript(), false);
+        this(subProcessScript, submit, SubProcessResultScript.defaultScript().getScript(), false, false);
     }
 
     public SubProcessStrategy(String subProcessScript, boolean submit, String resultScript) {
-        this(subProcessScript, submit, resultScript, false);
+        this(subProcessScript, submit, resultScript, false, false);
     }
 
     public SubProcessStrategy(String subProcessScript,
                               boolean submit,
                               String resultScript,
                               boolean showParentProcessRecords) {
+        this(subProcessScript, submit, resultScript, showParentProcessRecords, false);
+    }
+
+    public SubProcessStrategy(String subProcessScript,
+                              boolean submit,
+                              String resultScript,
+                              boolean showParentProcessRecords,
+                              boolean resettable) {
         this.submit = submit;
         this.subProcessScript = new SubProcessScript(subProcessScript);
         this.resultScript = new SubProcessResultScript(resultScript);
         this.showParentProcessRecords = showParentProcessRecords;
+        this.resettable = resettable;
     }
 
     @Override
@@ -72,6 +88,7 @@ public class SubProcessStrategy extends BaseStrategy {
         this.subProcessScript = strategy.subProcessScript;
         this.resultScript = strategy.resultScript;
         this.showParentProcessRecords = strategy.showParentProcessRecords;
+        this.resettable = strategy.resettable;
     }
 
     public static SubProcessStrategy defaultStrategy() {
@@ -80,6 +97,7 @@ public class SubProcessStrategy extends BaseStrategy {
         processStrategy.resultScript = SubProcessResultScript.defaultScript();
         processStrategy.submit = true;
         processStrategy.showParentProcessRecords = false;
+        processStrategy.resettable = false;
         return processStrategy;
     }
 
@@ -90,6 +108,7 @@ public class SubProcessStrategy extends BaseStrategy {
         map.put("submit", submit);
         map.put("resultScript", resultScript.getScript());
         map.put("showParentProcessRecords", showParentProcessRecords);
+        map.put("resettable", resettable);
         return map;
     }
 
@@ -105,6 +124,10 @@ public class SubProcessStrategy extends BaseStrategy {
         Object showParentProcessRecords = map.get("showParentProcessRecords");
         processStrategy.showParentProcessRecords = showParentProcessRecords != null
                 && Boolean.parseBoolean(showParentProcessRecords.toString());
+        // 历史配置无该字段时默认关闭，保证旧版本流程定义加载后行为不变
+        Object resettable = map.get("resettable");
+        processStrategy.resettable = resettable != null
+                && Boolean.parseBoolean(resettable.toString());
         return processStrategy;
     }
 

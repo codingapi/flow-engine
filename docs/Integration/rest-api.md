@@ -27,6 +27,7 @@ operatorId 请求参数 → 存在 → 使用该 id 作为当前操作人
 | POST | `/api/cmd/record/processNodes` | `FlowProcessNodeRequest` | `MultiResponse<ProcessNode>` | 流程流转节点预览 |
 | POST | `/api/cmd/record/create` | `FlowCreateRequest` | `SingleResponse<Long>` | 发起流程，返回首条记录 id |
 | POST | `/api/cmd/record/action` | `FlowActionRequest` | `SingleResponse<ActionResponse>` | 执行动作（通过/拒绝/加签/委派/退回/转办/自定义/保存） |
+| POST | `/api/cmd/record/subProcess/reset` | `FlowSubProcessResetRequest` | `Response` | 子流程数据重置（独立接口，需子流程节点开启重置能力） |
 | POST | `/api/cmd/record/urge` | `IdRequest` | `Response` | 催办 |
 | POST | `/api/cmd/record/revoke` | `IdRequest` | `Response` | 撤销 |
 | POST | `/api/cmd/record/delete` | `IdRequest` | `Response` | 删除（仅未流转实例，开始节点） |
@@ -139,6 +140,20 @@ public interface FlowRecordQueryService {
 - `forwardOperatorIds`：加签/委派/转办的目标操作人。
 - `backNodeId`：退回动作的目标节点（仅 Start/Approval/Handle 可退回）。
 
+### `FlowSubProcessResetRequest`（子流程数据重置，独立接口）
+
+```json
+{
+  "recordId": 456,
+  "resetInstanceProcessIds": ["选中重建的子流程实例流程id"],
+  "advice": "重置说明"
+}
+```
+
+- 重置不属于审批动作，不经过 `/action` 接口；仅当子流程节点开启 `resettable` 能力且当前待办位于其下游时可调用。
+- 无需指定子流程节点：由选中实例流程id定位其所属聚合组，选中实例须同属一个已放行且未取代的聚合组。
+- 流程详情 `FlowContent.resetSubProcess` 标识字段表明当前记录是否具备该能力，前端据此提供交互。
+
 ### `ActionResponse`
 
 ```json
@@ -165,6 +180,7 @@ form（FlowForm 元数据） / fieldPermissions（字段权限）
 todos（当前节点待办 Body 列表） / actions / actionList
 mergeable / createOperator / currentOperator / flowState / recordState
 histories（审批历史） / nodes（NodeOption 可操作节点） / revoke / urge
+resetSubProcess（子流程重置能力标识：当前待办位于开启重置能力、已汇聚完成的子流程下游时为 true）
 ```
 
 ### `FlowRecordContent`（列表响应，字段摘要）

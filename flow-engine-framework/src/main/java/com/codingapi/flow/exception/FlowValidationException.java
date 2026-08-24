@@ -32,6 +32,17 @@ public class FlowValidationException extends FlowException {
                 String.format("Required field %s cannot be empty", fieldName));
     }
 
+    /**
+     * Reset selected instance not found in current sub process group
+     *
+     * @param processId selected instance process id
+     * @return exception
+     */
+    public static FlowValidationException resetInstanceNotFound(String processId) {
+        return new FlowValidationException("validation.resetInstance.notFound",
+                String.format("Reset selected instance %s not found in current sub process group", processId));
+    }
+
 
     /**
      * Field is read-only

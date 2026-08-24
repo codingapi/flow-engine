@@ -112,4 +112,18 @@ public class FlowRecordController {
         return SingleResponse.of(response);
     }
 
+    /**
+     * 子流程数据重置（独立接口，不属于常规审批动作）。
+     * <p>仅当子流程节点开启重置能力且当前记录位于其下游时可调用，
+     * 详情数据中的 {@code resetSubProcess} 标识字段表明当前记录是否具备该能力。</p>
+     */
+    @PostMapping("/subProcess/reset")
+    public Response resetSubProcess(@RequestBody FlowSubProcessResetRequest request) {
+        FlowService flowService = this.loadFlowService();
+        long operatorId = loadCurrentOperatorId();
+        request.setOperatorId(operatorId);
+        flowService.resetSubProcess(request);
+        return Response.buildSuccess();
+    }
+
 }

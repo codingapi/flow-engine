@@ -144,4 +144,34 @@ public class FlowStateException extends FlowException {
     public static FlowStateException recordAlreadyRunning() {
         return new FlowStateException("state.record.alreadyRunning", "Flow is already running, delete not allowed");
     }
+
+    /**
+     * Sub process group not support reset (no passed group / group not finished / already superseded)
+     *
+     * @return exception
+     */
+    public static FlowStateException subProcessNotSupportReset() {
+        return new FlowStateException("state.subProcess.notSupportReset",
+                "Sub process group not support reset, only a passed group with all instances finished can be reset");
+    }
+
+    /**
+     * Sub process reset not allowed while any group is waiting
+     *
+     * @return exception
+     */
+    public static FlowStateException subProcessResetWaiting() {
+        return new FlowStateException("state.subProcess.resetWaiting",
+                "Sub process reset not allowed while any sub process group is waiting");
+    }
+
+    /**
+     * Sub process reset only allowed on the locked merge node record
+     *
+     * @return exception
+     */
+    public static FlowStateException subProcessResetMergeNodeOnly() {
+        return new FlowStateException("state.subProcess.resetMergeNodeOnly",
+                "Sub process reset only allowed on the todo record of the locked merge node");
+    }
 }

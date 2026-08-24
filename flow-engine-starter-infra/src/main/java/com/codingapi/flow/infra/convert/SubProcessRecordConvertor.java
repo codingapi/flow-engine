@@ -40,7 +40,8 @@ public class SubProcessRecordConvertor {
                 new ArrayList<>(instances),
                 SubProcessRecord.State.valueOf(entity.getState()),
                 entity.getCreateTime(),
-                entity.getFinishTime());
+                entity.getFinishTime(),
+                Boolean.TRUE.equals(entity.getSuperseded()));
     }
 
     /**
@@ -76,6 +77,7 @@ public class SubProcessRecordConvertor {
         entity.setState(record.getState().name());
         entity.setCreateTime(record.getCreateTime());
         entity.setFinishTime(record.getFinishTime());
+        entity.setSuperseded(record.isSuperseded());
         return entity;
     }
 }
