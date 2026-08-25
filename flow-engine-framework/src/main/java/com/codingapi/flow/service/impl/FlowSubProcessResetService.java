@@ -141,13 +141,12 @@ public class FlowSubProcessResetService {
                 newInstances);
         subProcessRepository.save(newGroup);
 
-        for (FlowActionRequest submitRequest : submitRequests) {
-            flowService.action(submitRequest);
-        }
-
-        // 作废触发锚点之后的记录链（复用撤销语义）：重置后主流程退回子流程节点等待，
+        // 作废触发锚点之后的旧记录链（复用撤销语义）：重置后主流程退回子流程节点等待，
         // 锚点之后的旧记录不再代表有效路径，且其 fromId + 节点与恢复后新建记录相同，
-        // 不作废会被同节点记录查询误判为多人审批
+        // 不作废会被同节点记录查询误判为多人审批。
+        // 作废必须先于重建实例提交：纯自动子流程会在提交中同步跑完并触发结果判定
+        // 恢复主流程（新记录 fromId == 锚点id），之后再作废会把刚恢复的新记录一并作废，
+        // 导致主流程卡死
         List<FlowRecord> invalidatedRecords = new ArrayList<>();
         List<FlowRecord> afterRecords = repositoryHolder
                 .findAfterRecords(currentRecord.getProcessId(), anchorRecord.getId());
@@ -163,6 +162,10 @@ public class FlowSubProcessResetService {
         // 重置属于有意的退回重走：清除该流程的循环触发标记，
         // 避免重走再次触发下游节点（如抄送）时被被动式环检测误判为循环
         LoopTriggerTraceContext.getInstance().clearByProcess(currentRecord.getProcessId());
+
+        for (FlowActionRequest submitRequest : submitRequests) {
+            flowService.action(submitRequest);
+        }
 
         boolean mock = repositoryHolder instanceof MockRepositoryHolder;
         IFlowOperator resetOperator = repositoryHolder.getOperatorById(request.getOperatorId());

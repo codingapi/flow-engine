@@ -139,7 +139,7 @@ class NodeFactoryTest {
                 .name("子流程")
                 .strategies(NodeStrategyBuilder.builder()
                         .addStrategy(new SubProcessStrategy(
-                                "create-script", false, "result-script", true))
+                                "create-script", false, "result-script", true, true))
                         .build())
                 .build();
         Map<String, Object> data = JSON.parseObject(JSON.toJSONString(source.toMap()));
@@ -152,6 +152,7 @@ class NodeFactoryTest {
         assertEquals("result-script", strategy.getResultScript().getScript());
         assertEquals(false, strategy.isSubmit());
         assertTrue(strategy.isShowParentProcessRecords());
+        assertTrue(strategy.isResettable());
     }
 
     /**
@@ -178,6 +179,32 @@ class NodeFactoryTest {
 
         assertNotNull(restoredStrategy);
         assertFalse(restoredStrategy.isShowParentProcessRecords());
+    }
+
+    /**
+     * 测试目标：验证历史流程定义没有重置能力配置时保持默认关闭（issue #219）。
+     * 前置条件：子流程策略 Map 中不包含 resettable。
+     * 执行步骤：通过节点工厂反序列化历史节点定义。
+     * 期望断言：重置能力开关为 false。
+     */
+    @Test
+    void shouldDisableResettableForLegacySubProcessConfiguration() {
+        SubProcessNode source = SubProcessNode.builder()
+                .name("历史子流程")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new SubProcessStrategy("create-script", true, "result-script"))
+                        .build())
+                .build();
+        Map<String, Object> data = JSON.parseObject(JSON.toJSONString(source.toMap()));
+        @SuppressWarnings("unchecked")
+        List<Map<String, Object>> strategies = (List<Map<String, Object>>) data.get("strategies");
+        strategies.get(0).remove("resettable");
+
+        SubProcessNode restored = (SubProcessNode) NodeFactory.getInstance().createNode(data);
+        SubProcessStrategy restoredStrategy = restored.strategyManager().getStrategy(SubProcessStrategy.class);
+
+        assertNotNull(restoredStrategy);
+        assertFalse(restoredStrategy.isResettable());
     }
 
 

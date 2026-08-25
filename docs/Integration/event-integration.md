@@ -225,5 +225,5 @@ public class MyFlowRecordUrgeEventHandler implements IHandler<FlowRecordUrgeEven
 
 ## 6. Mock 模式标记
 
-- 事件携带 `mock` 标记：有 session 的场景用 `session.isMock()`（等价于 `repositoryHolder instanceof MockRepositoryHolder`）；无 session 的服务（`FlowDeleteService`/`FlowUrgeService`/`FlowRevokeService`）直接用 `repositoryHolder instanceof MockRepositoryHolder`。
+- 事件携带 `mock` 标记：有 session 的场景用 `session.isMock()`（等价于 `repositoryHolder instanceof MockRepositoryHolder`）；无 session 的服务（`FlowDeleteService`/`FlowUrgeService`/`FlowRevokeService`/`FlowSubProcessResetService`）直接用 `repositoryHolder instanceof MockRepositoryHolder`。
 - 订阅方可通过 `event.isMock()` 区分测试/演示流量与生产流量（例如不发送真实消息）。

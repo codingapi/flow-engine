@@ -786,6 +786,68 @@ class FlowSubProcessResetServiceTest {
                 "重走后流程应正常结束");
     }
 
+    /**
+     * 测试目标：验证重建实例同步跑完（纯自动子流程）时，主流程不会因作废范围
+     * 误伤新恢复的记录而卡死。
+     * 前置条件：主流程 开始 -> 子流程(可重置,单实例) -> 最终审批 -> 结束；
+     * 子流程为纯自动流程（开始 -> 结束），放行后同步完成。
+     * 执行步骤：主流程停在最终审批待办后调用重置接口。
+     * 期望断言：重置后主流程恢复出有效的最终审批待办且未被作废，新聚合组放行，流程不卡死。
+     */
+    @Test
+    void shouldNotInvalidateResumedRecordsWhenRebuiltChildCompletesSynchronously() {
+        StartNode autoStart = writableStart("自动子流程开始");
+        Workflow autoWorkflow = WorkflowBuilder.builder()
+                .title("子流程重置测试-自动子流程")
+                .code(CHILD_CODE + "-auto")
+                .createdOperator(initiator)
+                .form(form)
+                .addNode(autoStart)
+                .addNode(EndNode.builder().name("自动子流程结束").build())
+                .build();
+        factory.workflowService.saveWorkflow(autoWorkflow);
+        String autoScript = """
+                def run(request){
+                    return request.toCreateRequest('%s', %d, '%s', [content:'auto-child'])
+                }
+                """.formatted(CHILD_CODE + "-auto", initiator.getUserId(), passAction(autoStart).id());
+
+        StartNode start = writableStart("同步开始");
+        SubProcessNode subProcess = resettableSubProcess(autoScript);
+        ApprovalNode syncFinalApproval = approvalNode("同步最终审批", finalOperator);
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("子流程重置测试-同步完成")
+                .code(PARENT_CODE + "-sync")
+                .createdOperator(initiator)
+                .form(form)
+                .addNode(start)
+                .addNode(subProcess)
+                .addNode(syncFinalApproval)
+                .addNode(EndNode.builder().name("同步结束").build())
+                .build();
+        factory.workflowService.saveWorkflow(workflow);
+
+        submitWorkflow(PARENT_CODE + "-sync", start, Map.of("content", "sync"));
+        FlowRecord finalTodo = todos(finalOperator, syncFinalApproval).get(0);
+
+        SubProcessRecord group = factory.subProcessRepository
+                .findByParentProcessId(finalTodo.getProcessId()).get(0);
+        factory.flowService.resetSubProcess(new FlowSubProcessResetRequest(
+                finalTodo.getId(), finalOperator.getUserId(),
+                List.of(group.getInstances().get(0).getProcessId())));
+
+        List<FlowRecord> resumedTodos = todos(finalOperator, syncFinalApproval);
+        assertEquals(1, resumedTodos.size(),
+                "重建实例同步完成后主流程应恢复出有效待办，不能卡死");
+        assertFalse(resumedTodos.get(0).isRevoked(), "新恢复的记录不能被误作废");
+        SubProcessRecord latestGroup = factory.subProcessRepository
+                .findByParentProcessIdAndNodeId(finalTodo.getProcessId(), subProcess.getId()).stream()
+                .filter(record -> !record.isSuperseded())
+                .findFirst().orElseThrow();
+        assertEquals(SubProcessRecord.State.PASSED, latestGroup.getState(),
+                "同步完成的新聚合组应放行");
+    }
+
     // ==================== 流程构建与操作辅助 ====================
 
     private SubProcessNode resettableSubProcess(String script) {

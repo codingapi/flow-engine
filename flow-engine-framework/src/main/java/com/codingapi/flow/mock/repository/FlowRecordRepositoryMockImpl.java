@@ -33,11 +33,13 @@ public class FlowRecordRepositoryMockImpl implements FlowRecordRepository {
     }
 
     public List<FlowRecord> findDoneByOperator(long operatorId) {
-        return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId && !flowRecord.isTodo()).toList();
+        // 与 JPA 口径一致：已办列表过滤已作废与隐藏记录（撤销/重置产生的作废记录不进入已办）
+        return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId && flowRecord.isDone()).toList();
     }
 
     public List<FlowRecord> findNotifyByOperator(long operatorId) {
-        return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId && flowRecord.isNotify()).toList();
+        // 与 JPA 口径一致：抄送列表过滤已作废与隐藏记录
+        return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId && flowRecord.isNotify() && !flowRecord.isRevoked() && !flowRecord.isHidden()).toList();
     }
 
 
