@@ -260,7 +260,7 @@ public class FlowContent {
             body.setNodeName(item.getNodeName());
             body.setNodeType(item.getNodeType());
             body.setSubmitOperator(new FlowOperator(item.getSubmitOperatorId(), item.getSubmitOperatorName()));
-            body.setCreatedOperator(new FlowOperator(record.getCreateOperatorId(), record.getCreateOperatorName()));
+            body.setCreatedOperator(new FlowOperator(item.getCreateOperatorId(), item.getCreateOperatorName()));
             body.setTitle(item.getTitle());
             body.setData(item.getFormData());
             body.setRecordState(item.getRecordState());

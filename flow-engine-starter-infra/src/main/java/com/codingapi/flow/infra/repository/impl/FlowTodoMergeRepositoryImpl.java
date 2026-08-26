@@ -37,4 +37,13 @@ public class FlowTodoMergeRepositoryImpl implements FlowTodoMergeRepository {
         return flowTodoMargeEntityRepository.findByTodoId(todoId)
                 .stream().map(FlowTodoMargeConvertor::convert).toList();
     }
+
+    @Override
+    public List<FlowTodoMerge> findByTodoIds(List<Long> todoIds) {
+        if (todoIds == null || todoIds.isEmpty()) {
+            return List.of();
+        }
+        return flowTodoMargeEntityRepository.findByTodoIdIn(todoIds)
+                .stream().map(FlowTodoMargeConvertor::convert).toList();
+    }
 }
