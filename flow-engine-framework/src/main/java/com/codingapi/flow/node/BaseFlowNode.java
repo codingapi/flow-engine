@@ -77,6 +77,10 @@ public abstract class BaseFlowNode implements IFlowNode {
     /**
      * 节点策略
      *
+     * <p>节点默认持有完整策略集（如 {@link ApprovalNode} 的默认集），自定义/反序列化传入的策略按类型合并：
+     * 类型已存在则覆盖其配置，类型不存在则追加保留——保证显式配置的策略（如
+     * {@link com.codingapi.flow.strategy.node.SameOperatorAuditStrategy}，未注册为默认）能真正生效（配置驱动）。
+     *
      * @param strategies 节点策略
      */
     public void setStrategies(List<INodeStrategy> strategies) {
@@ -87,6 +91,8 @@ public abstract class BaseFlowNode implements IFlowNode {
                     INodeStrategy currentStrategy = nodeStrategyManager.getStrategy(nodeStrategy.getClass());
                     if (currentStrategy != null) {
                         currentStrategy.copy(nodeStrategy);
+                    } else {
+                        this.strategies.add(nodeStrategy);
                     }
                 }
             }else {

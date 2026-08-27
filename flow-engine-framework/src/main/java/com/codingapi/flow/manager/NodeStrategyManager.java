@@ -171,6 +171,19 @@ public class NodeStrategyManager {
         return 0;
     }
 
+    /**
+     * 提交人与审批人一致时是否自动审批
+     *
+     * <p>对应 {@link SameOperatorAuditStrategy.Type#AUTO_PASS}：
+     * 当前节点的审批人为流程提交人本人时，自动通过该节点（无需本人审批，issue #224）。
+     *
+     * @return true 表示提交人与审批人相同时自动通过当前节点
+     */
+    public boolean isSameOperatorAutoPass() {
+        SameOperatorAuditStrategy strategy = getStrategy(SameOperatorAuditStrategy.class);
+        return strategy != null && strategy.getType() == SameOperatorAuditStrategy.Type.AUTO_PASS;
+    }
+
     public void verifyNode(FlowForm form) {
         for (INodeStrategy strategy : strategies) {
             strategy.verifyNode(form);
