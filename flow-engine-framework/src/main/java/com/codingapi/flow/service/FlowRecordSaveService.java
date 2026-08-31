@@ -9,9 +9,11 @@ import com.codingapi.flow.repository.FlowTodoRecordRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * 流程记录保存服务,负责保存流程记录和待办记录的合并关系
@@ -65,6 +67,22 @@ class FlowRecordSaveService {
             }
         }
 
+        // 幂等登记：预加载已存在待办的合并关系，用于判断某条流程记录是否已登记过，
+        // 避免已读/详情等场景重复保存时反复新增合并关系、膨胀合并计数（issue #223）
+        List<Long> existedTodoIds = existedByKey.values().stream()
+                .map(FlowTodoRecord::getId)
+                .toList();
+        Map<Long, Set<Long>> recordIdsByTodoId = new HashMap<>();
+        if (!existedTodoIds.isEmpty()) {
+            for (FlowTodoMerge relation : flowTodoMergeRepository.findByTodoIds(existedTodoIds)) {
+                recordIdsByTodoId.computeIfAbsent(relation.getTodoId(), k -> new HashSet<>())
+                        .add(relation.getRecordId());
+            }
+        }
+
+        // 需要新增的合并关系：todoKey -> 流程记录id（新建待办或该流程记录首次登记时产生）
+        Map<String, List<Long>> relationCandidates = new HashMap<>();
+
         List<FlowTodoRecord> flowTodoRecords = new ArrayList<>();
         for (FlowRecord flowRecord : flowRecords) {
             if (flowRecord.isTodo()) {
@@ -72,10 +90,20 @@ class FlowRecordSaveService {
                 if (todoMargeRecord == null) {
                     todoMargeRecord = new FlowTodoRecord(flowRecord);
                     existedByKey.put(flowRecord.getTodoKey(), todoMargeRecord);
+                    if (flowRecord.isMergeable()) {
+                        relationCandidates
+                                .computeIfAbsent(flowRecord.getTodoKey(), k -> new ArrayList<>())
+                                .add(flowRecord.getId());
+                    }
                 } else {
                     todoMargeRecord.update(flowRecord);
-                    if (flowRecord.isMergeable()) {
+                    if (flowRecord.isMergeable()
+                            && !recordIdsByTodoId.getOrDefault(todoMargeRecord.getId(), Set.of())
+                                    .contains(flowRecord.getId())) {
                         todoMargeRecord.addMergeCount();
+                        relationCandidates
+                                .computeIfAbsent(flowRecord.getTodoKey(), k -> new ArrayList<>())
+                                .add(flowRecord.getId());
                     }
                 }
                 flowTodoRecords.add(todoMargeRecord);
@@ -85,11 +113,13 @@ class FlowRecordSaveService {
             flowTodoRecordRepository.saveAll(flowTodoRecords);
         }
 
-        if (!flowTodoRecords.isEmpty()) {
+        if (!relationCandidates.isEmpty()) {
             List<FlowTodoMerge> relationList = new ArrayList<>();
-            for (FlowTodoRecord margeRecord : flowTodoRecords) {
-                if (margeRecord.isMergeable()) {
-                    relationList.add(new FlowTodoMerge(margeRecord));
+            for (Map.Entry<String, List<Long>> entry : relationCandidates.entrySet()) {
+                FlowTodoRecord todoMargeRecord = existedByKey.get(entry.getKey());
+                for (long recordId : entry.getValue()) {
+                    relationList.add(new FlowTodoMerge(0L, todoMargeRecord.getId(), recordId,
+                            todoMargeRecord.getCreateTime()));
                 }
             }
             flowTodoMergeRepository.saveAll(relationList);

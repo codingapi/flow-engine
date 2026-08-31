@@ -178,6 +178,22 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
             }
         }
         List<IFlowOperator> operators = operatorManager.getOperators();
+        // 提交人与审批人一致时自动审批（issue #224）：提交人流转到该节点且审批人含提交人本人时，
+        // 过滤掉与提交人一致的操作员，避免本人审批本人提交的节点（AUTO_PASS 自动通过 / MANUAL_PASS 不跳过）。
+        // 守卫条件（currentOperator == submitOperator）用于区分正常流转与加签等"为他人新增记录"的调用路径：
+        // 加签（AddAuditAction）通过 updateSession(加签目标) 构造会话，currentOperator 为被加签人而非提交人。
+        if (nodeStrategyManager.isSameOperatorAutoPass()
+                && session.getCurrentOperator() != null
+                && session.getCurrentOperator().getUserId() == session.getSubmitOperatorId()) {
+            long submitOperatorId = session.getSubmitOperatorId();
+            operators = operators.stream()
+                    .filter(operator -> operator.getUserId() != submitOperatorId)
+                    .toList();
+            // 全部审批人均与提交人一致，当前节点自动通过，继续向后续节点生成记录
+            if (operators.isEmpty()) {
+                return this.generateNextNodeRecords(session);
+            }
+        }
         for (int order = 0; order < operators.size(); order++) {
             IFlowOperator operator = operators.get(order);
             FlowRecord flowRecord = new FlowRecord(session.updateSession(operator), order);
@@ -209,6 +225,34 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
             }
         }
 
+        return records;
+    }
+
+
+    /**
+     * 当前节点自动通过（如审批人均为提交人本人且配置相同人员自动审批），
+     * 继续向后续节点生成流程记录。
+     *
+     * <p>与 {@link com.codingapi.flow.action.BaseAction#triggerNode} 的节点遍历语义一致：
+     * 控制节点（条件/并行等）递归深入，业务节点直接生成记录（issue #224）。
+     *
+     * @param session 当前会话（currentNode 为自动通过的节点）
+     * @return 后续节点生成的流程记录，可能为空
+     */
+    private List<FlowRecord> generateNextNodeRecords(FlowSession session) {
+        List<IFlowNode> nextNodes = session.matchNextNodes();
+        if (nextNodes == null || nextNodes.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<FlowRecord> records = new ArrayList<>();
+        for (IFlowNode node : nextNodes) {
+            FlowSession nextSession = session.updateSession(node);
+            if (node.handle(nextSession)) {
+                records.addAll(this.generateNextNodeRecords(nextSession));
+            } else {
+                records.addAll(node.generateCurrentRecords(nextSession));
+            }
+        }
         return records;
     }
 

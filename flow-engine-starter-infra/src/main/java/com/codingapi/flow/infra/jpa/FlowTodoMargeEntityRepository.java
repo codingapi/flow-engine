@@ -8,4 +8,6 @@ import java.util.List;
 public interface FlowTodoMargeEntityRepository extends FastRepository<FlowTodoMargeEntity,Long> {
 
     List<FlowTodoMargeEntity> findByTodoId(long todoId);
+
+    List<FlowTodoMargeEntity> findByTodoIdIn(List<Long> todoIds);
 }

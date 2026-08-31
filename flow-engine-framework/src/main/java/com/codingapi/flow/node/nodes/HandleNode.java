@@ -43,7 +43,8 @@ public class HandleNode extends BaseAuditNode implements IDisplayNode {
         List<INodeStrategy> strategies = new ArrayList<>();
         strategies.add(TimeoutStrategy.defaultStrategy());
         strategies.add(MultiOperatorAuditStrategy.defaultStrategy());
-        strategies.add(SameOperatorAuditStrategy.defaultStrategy());
+        // 相同人员审批（SameOperatorAuditStrategy）不设默认：配置驱动，显式配置才生效（issue #224）。
+        // 若默认 AUTO_PASS 会令所有"提交人==办理人"节点被自动跳过，改变未配置流程的传统行为。
         strategies.add(RecordMergeStrategy.defaultStrategy());
         strategies.add(ResubmitStrategy.defaultStrategy());
         strategies.add(AdviceStrategy.defaultStrategy());

@@ -12,4 +12,11 @@ public interface FlowTodoMergeRepository {
 
     List<FlowTodoMerge> findByTodoId(long todoId);
 
+    /**
+     * 按待办id批量查询合并关系
+     * @param todoIds 待办id列表
+     * @return 合并关系列表
+     */
+    List<FlowTodoMerge> findByTodoIds(List<Long> todoIds);
+
 }
