@@ -202,7 +202,9 @@ public class FlowContent {
                 this.urge = false;
             }
 
-            if (flowRecord.isDone() && !flowRecord.isFinish()) {
+            // 自动办结记录（相同人员自动通过 / 或签并签遗留待办的自动已办）未发生真实审批，
+            // 不暴露撤销/催办入口，与服务端 FlowRevokeService 的 isAutoDone 拦截保持一致（issue #226）
+            if (flowRecord.isDone() && !flowRecord.isFinish() && !flowRecord.isAutoDone()) {
                 IFlowNode node = workflow.getFlowNode(flowRecord.getNodeId());
                 this.revoke = node.strategyManager().isEnableRevoke();
                 this.urge = workflow.strategyManager().isEnableUrge();

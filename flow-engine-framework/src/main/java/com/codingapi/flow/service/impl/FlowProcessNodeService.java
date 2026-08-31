@@ -548,6 +548,11 @@ public class FlowProcessNodeService {
             }
             IFlowNode sourceNode = this.workflow.getFlowNode(parentRecord.getNodeId());
             IFlowAction sourceAction = sourceNode.actionManager().getActionById(parentRecord.getActionId());
+            // 前驱记录可能为相同人员自动通过的留痕记录（actionId=null，issue #226）：
+            // 预览会话与恢复语义一致，以来源节点通过动作兜底
+            if (sourceAction == null && parentRecord.isAutoDone()) {
+                sourceAction = sourceNode.actionManager().getAction(PassAction.class);
+            }
             IFlowNode subProcessNode = this.workflow.getFlowNode(subProcessRecord.getNodeId());
             IFlowOperator createOperator = this.loadRecordOperator(parentRecord.getCreateOperatorId());
             IFlowOperator submitOperator = this.loadRecordOperator(parentRecord.getSubmitOperatorId());

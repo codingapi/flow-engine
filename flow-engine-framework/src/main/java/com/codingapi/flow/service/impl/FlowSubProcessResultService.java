@@ -2,6 +2,7 @@ package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.BaseAction;
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
 import com.codingapi.flow.domain.SubProcessContext;
 import com.codingapi.flow.domain.SubProcessRecord;
@@ -101,6 +102,11 @@ public class FlowSubProcessResultService {
         Workflow workflow = workflowRuntime.toWorkflow();
         IFlowNode sourceNode = workflow.getFlowNode(parentRecord.getNodeId());
         IFlowAction action = sourceNode.actionManager().getActionById(parentRecord.getActionId());
+        // 前驱记录可能为相同人员自动通过的留痕记录（无审批动作，actionId=null，issue #226）：
+        // 恢复下游以来源节点的通过动作兜底，避免空动作会话导致 NPE 使主流程永久停滞
+        if (action == null && parentRecord.isAutoDone()) {
+            action = sourceNode.actionManager().getAction(PassAction.class);
+        }
         IFlowOperator currentOperator = repositoryHolder.getOperatorById(parentRecord.getCurrentOperatorId());
         IFlowOperator createdOperator = repositoryHolder.getOperatorById(parentRecord.getCreateOperatorId());
         IFlowOperator submitOperator = repositoryHolder.getOperatorById(parentRecord.getSubmitOperatorId());

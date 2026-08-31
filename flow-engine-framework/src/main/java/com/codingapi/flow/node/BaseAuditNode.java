@@ -1,6 +1,9 @@
 package com.codingapi.flow.node;
 
+import com.codingapi.flow.action.ActionType;
+import com.codingapi.flow.context.LoopTriggerTraceContext;
 import com.codingapi.flow.error.ErrorThrow;
+import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.exception.FlowExecutionException;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FlowForm;
@@ -11,6 +14,7 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.MultiOperatorAuditStrategy;
+import com.codingapi.springboot.framework.event.EventPusher;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -180,18 +184,22 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         List<IFlowOperator> operators = operatorManager.getOperators();
         // 提交人与审批人一致时自动审批（issue #224）：提交人流转到该节点且审批人含提交人本人时，
         // 过滤掉与提交人一致的操作员，避免本人审批本人提交的节点（AUTO_PASS 自动通过 / MANUAL_PASS 不跳过）。
-        // 守卫条件（currentOperator == submitOperator）用于区分正常流转与加签等"为他人新增记录"的调用路径：
-        // 加签（AddAuditAction）通过 updateSession(加签目标) 构造会话，currentOperator 为被加签人而非提交人。
+        // 守卫条件（currentOperator == submitOperator）用于区分正常流转与加签等"为他人新增记录"的调用路径；
+        // 动作类型限定为 PASS（issue #226 评审）：仅正向通过触发本机制，退回（ReturnAction）、拒绝
+        // （RejectAction）、加签（AddAuditAction）等路径保持普通记录生成契约——它们的消费方按"返回的
+        // 即当前节点待办记录"处理（resetAddAudit、先清后存等），自动通过的留痕记录落库/事件副作用会破坏其语义。
         if (nodeStrategyManager.isSameOperatorAutoPass()
                 && session.getCurrentOperator() != null
-                && session.getCurrentOperator().getUserId() == session.getSubmitOperatorId()) {
+                && session.getCurrentOperator().getUserId() == session.getSubmitOperatorId()
+                && session.getCurrentAction() != null
+                && ActionType.PASS.name().equalsIgnoreCase(session.getCurrentAction().type())) {
             long submitOperatorId = session.getSubmitOperatorId();
             operators = operators.stream()
                     .filter(operator -> operator.getUserId() != submitOperatorId)
                     .toList();
-            // 全部审批人均与提交人一致，当前节点自动通过，继续向后续节点生成记录
+            // 全部审批人均与提交人一致，当前节点自动通过：生成留痕记录并继续向后续节点生成记录（issue #226）
             if (operators.isEmpty()) {
-                return this.generateNextNodeRecords(session);
+                return this.autoPassAndGenerateNextNodeRecords(session, records);
             }
         }
         for (int order = 0; order < operators.size(); order++) {
@@ -228,6 +236,52 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         return records;
     }
 
+
+    /**
+     * 当前节点自动通过（审批人均为提交人本人且配置相同人员自动审批，issue #226）。
+     *
+     * <p>自动通过不等于静默跳过：为当前节点生成一条无审批动作的已办记录
+     * （{@link FlowRecord#autoDone()}，与或签/并签遗留待办的自动办结同一语义，
+     * 展示层依据 {@link FlowRecord#isAutoDone()} 标记 autoSkip），并立即持久化、
+     * 推送已办事件。该记录随后作为记录链上的前驱，继续向后续节点生成记录，
+     * 保证流程记录与节点展示中保留当前节点的审批痕迹。
+     *
+     * <p>记录不入调用方返回列表：调用方（如 {@code PassAction}）在后续节点触发完成后
+     * 才统一保存返回列表，若本记录走同一保存路径，会以运行中状态覆盖结束节点
+     * {@code fillNewRecord} 已写入的流程结束状态。
+     *
+     * <p>已办事件在本节点下游记录流转成功之后推送：下游生成（取审批人、异常跳转等）是
+     * 最易抛出异常的环节，先流转后推事件保证抛错时事件尚未派发；推送时刻该记录已被
+     * 结束节点 {@code over()} 定型，订阅方拿到的载荷即终态。事件相对调用方
+     * {@code FlowRecordDoneEvent(前驱)} 的先后次序不受控，与
+     * {@code EndNode#fillNewRecord} 直推 {@code FlowRecordFinishEvent} 属同一引擎既有模式。
+     *
+     * @param session 当前会话（currentNode 为自动通过的节点）
+     * @param records 当前调用已累计的记录集合
+     * @return 本记录不入列，返回后续节点生成的流程记录，可能为空
+     */
+    private List<FlowRecord> autoPassAndGenerateNextNodeRecords(FlowSession session, List<FlowRecord> records) {
+        FlowRecord currentRecord = session.getCurrentRecord();
+        if (currentRecord != null) {
+            // 被动式环检测：与抄送节点（NotifyNode）同一模式，时间窗口内同一流程实例的
+            // 同一节点再次自动通过即判定为自动流转环，在任何留痕落库/事件派发之前终止
+            String traceKey = currentRecord.getProcessId() + ":AUTO_PASS:" + this.getId();
+            if (LoopTriggerTraceContext.getInstance().trace(traceKey)) {
+                throw FlowExecutionException.nodeLoopDepthExceeded(session.getWorkflow().getMaxNestDepth());
+            }
+        }
+        FlowRecord autoPassRecord = new FlowRecord(session.updateSession(session.getCurrentOperator()), 0);
+        autoPassRecord.cleanAction();
+        autoPassRecord.autoDone();
+        // 先行持久化：级联直达结束节点时，EndNode.fillNewRecord 按 processId 加载历史并标记完成，
+        // 必须包含本记录，否则本记录以运行中状态滞留、流程终态不一致
+        session.getRepositoryHolder().saveRecord(autoPassRecord);
+        // 本记录作为后续节点记录的前驱，fromId 链经过当前节点
+        session.setCurrentRecord(autoPassRecord);
+        records.addAll(this.generateNextNodeRecords(session));
+        EventPusher.push(new FlowRecordDoneEvent(autoPassRecord, session.isMock()));
+        return records;
+    }
 
     /**
      * 当前节点自动通过（如审批人均为提交人本人且配置相同人员自动审批），
