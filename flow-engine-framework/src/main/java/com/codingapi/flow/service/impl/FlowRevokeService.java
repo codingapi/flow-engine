@@ -22,7 +22,9 @@ import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.springboot.framework.event.EventPusher;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 撤销流程服务
@@ -54,6 +56,11 @@ public class FlowRevokeService {
         if (currentRecord.isFinish()) {
             throw FlowStateException.recordNotSupportRevoke();
         }
+        // 自动办结记录（无审批动作的已办：相同人员自动通过 / 或签并签遗留待办）从未产生过待办，
+        // 不存在"撤回自己办理的审批"的语义，不支持撤销（issue #226）
+        if (currentRecord.isAutoDone()) {
+            throw FlowStateException.recordNotSupportRevoke();
+        }
         boolean waitingSubProcess = repositoryHolder.getSubProcessRepository()
                 .findByParentRecordId(currentRecord.getId()).stream()
                 .anyMatch(SubProcessRecord::isWaiting);
@@ -78,11 +85,37 @@ public class FlowRevokeService {
         }
 
         List<FlowRecord> afterRecords = flowRecordService.findFlowRecordAfterRecords(currentRecord.getProcessId(), currentRecord.getId());
-        // 退回下级记录, 如果下级记录都完成则不允许退回
+        // 退回下级记录, 如果下级记录都完成则不允许退回。
+        // 计算有效直接后继时，自动办结记录（isAutoDone：相同人员自动通过的留痕记录）视为透明节点，
+        // 沿 fromId 链向下穿透到真实后继——否则自动通过留痕会让"下级已办"误判成立，
+        // 在更下游仍有真实待办时永久阻断撤回（issue #226）。
+        // 仅当透明记录确有下游后继时才穿透，或签/并签遗留的 autoDone 记录无后继，保持原判。
         if (revokeStrategy.isRemoveNext()) {
-            List<FlowRecord> nextRecords = afterRecords.stream()
-                    .filter(flowRecord -> flowRecord.getFromId() == currentRecord.getId())
-                    .toList();
+            List<FlowRecord> nextRecords = new ArrayList<>();
+            Set<Long> frontier = new HashSet<>();
+            frontier.add(currentRecord.getId());
+            while (!frontier.isEmpty()) {
+                Set<Long> currentFrontier = frontier;
+                List<FlowRecord> directRecords = afterRecords.stream()
+                        .filter(flowRecord -> currentFrontier.contains(flowRecord.getFromId()))
+                        .toList();
+                boolean hasTodo = false;
+                Set<Long> nextFrontier = new HashSet<>();
+                for (FlowRecord directRecord : directRecords) {
+                    if (directRecord.isAutoDone()) {
+                        nextFrontier.add(directRecord.getId());
+                    } else {
+                        nextRecords.add(directRecord);
+                        if (directRecord.isTodo()) {
+                            hasTodo = true;
+                        }
+                    }
+                }
+                if (hasTodo) {
+                    break;
+                }
+                frontier = nextFrontier;
+            }
             boolean nextRecordDone = true;
             for (FlowRecord nextRecord : nextRecords) {
                 if (nextRecord.isTodo()) {

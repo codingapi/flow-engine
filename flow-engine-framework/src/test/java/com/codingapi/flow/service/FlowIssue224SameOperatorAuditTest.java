@@ -40,8 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *     <li>MANUAL_PASS —— 即使提交人与审批人相同，仍需手动审批。</li>
  * </ul>
  *
- * <p>场景一：B 节点审批人仅为 a（与提交人一致）+ 相同人员自动审批，a 提交后应自动跳过
- * B 节点，直达 C 节点由 c 审批。
+ * <p>场景一：B 节点审批人仅为 a（与提交人一致）+ 相同人员自动审批，a 提交后 B 节点自动通过
+ * （a 无待办，但保留一条自动通过的已办记录，issue #226），直达 C 节点由 c 审批。
  *
  * <p>场景二：B 节点审批人为 a、b（提交人 a 位列首位）+ 相同人员自动审批 + 依次审批，
  * a 提交后应自动跳过 a 本人，B 节点直接转交 b 审批。
@@ -163,15 +163,15 @@ class FlowIssue224SameOperatorAuditTest {
         return factory.flowRecordRepository.findProcessRecords(anyRecord.getProcessId());
     }
 
-    // ==================== 场景一：单审批人 = 提交人，自动通过，跳过 B 节点 ====================
+    // ==================== 场景一：单审批人 = 提交人，自动通过（保留已办记录，issue #226） ====================
 
     /**
      * 场景一：B 节点审批人仅为 a（与发起人一致）+ 相同人员自动审批（AUTO_PASS）。
-     * <p>a 提交后应自动跳过 B 节点（B 节点不产生记录、a 无待办），
+     * <p>a 提交后 B 节点自动通过：a 无待办，但 B 节点保留一条无审批动作的自动通过已办记录（issue #226），
      * 直接流转到 C 节点由 c 审批。
      */
     @Test
-    void autoPassShouldSkipBNodeWhenOnlyApproverIsInitiator() {
+    void autoPassShouldKeepDoneRecordAndSkipToDoWhenOnlyApproverIsInitiator() {
         User a = new User(A, "a");
         User c = new User(C, "c");
         registerUsers(a, c);
@@ -186,23 +186,27 @@ class FlowIssue224SameOperatorAuditTest {
         Workflow workflow = saveWorkflow(a, startNode, bNode, cNode, endNode);
         submitStart(workflow, startNode, a, data());
 
-        // a 本人不应收到 B 节点待办（相同人员自动通过，跳过 B 节点）
+        // a 本人不应收到 B 节点待办（相同人员自动通过）
         assertNoTodo(a);
 
         // 直接流转到 C 节点：c 收到待办，且待办节点为 C 审批节点
         FlowRecord cTodo = todoOf(c);
         assertEquals(cNode.getId(), cTodo.getNodeId(), "a 提交后应直达 C 节点，待办应落在 C 审批节点");
 
-        // 流程记录：开始 + C 共 2 条，B 节点未产生任何记录（自动通过）
+        // 流程记录：开始 + B 自动通过 + C 共 3 条（issue #226：自动通过保留已办记录留痕）
         List<FlowRecord> records = processRecords(cTodo);
-        assertEquals(2, records.size(), "B 节点自动通过，流程记录应仅含 开始、C 两条");
-        assertEquals(0, records.stream().filter(r -> bNode.getId().equals(r.getNodeId())).count(),
-                "B 节点不应产生流程记录");
+        assertEquals(3, records.size(), "B 节点自动通过，流程记录应含 开始、B、C 三条");
+        List<FlowRecord> bRecords = records.stream()
+                .filter(r -> bNode.getId().equals(r.getNodeId()))
+                .toList();
+        assertEquals(1, bRecords.size(), "B 节点应保留一条自动通过的流程记录");
+        assertTrue(bRecords.get(0).isDone(), "B 节点自动通过记录应为已办状态");
+        assertTrue(bRecords.get(0).isAutoDone(), "B 节点记录应为无审批动作的自动办结（autoSkip）");
 
         // c 审批后流程正常结束
         pass(cTodo, cNode, c, data());
         records = processRecords(cTodo);
-        assertEquals(2, records.size());
+        assertEquals(3, records.size());
         assertTrue(records.stream().allMatch(FlowRecord::isFinish), "流程结束后全部记录应为完成状态");
         assertNoTodo(c);
     }

@@ -3,6 +3,7 @@ package com.codingapi.flow.service.impl;
 import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
 
 import com.codingapi.flow.action.IFlowAction;
+import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.cache.FlowOperatorLocalThreadCache;
 import com.codingapi.flow.domain.DelayTask;
 import com.codingapi.flow.exception.FlowNotFoundException;
@@ -63,6 +64,11 @@ public class FlowDelayTriggerService {
         IFlowOperator submitOperator = flowOperatorGateway.get(flowRecord.getSubmitOperatorId());
         IFlowOperator currentOperator = flowOperatorGateway.get(flowRecord.getCurrentOperatorId());
         IFlowAction flowAction = currentNode.actionManager().getActionById(flowRecord.getActionId());
+        // 延迟任务固化的前驱记录可能为相同人员自动通过的留痕记录（无审批动作，actionId=null，issue #226）：
+        // 以该记录所在审批节点的通过动作兜底恢复流转，避免 NPE 使流程永久停滞在延迟节点
+        if (flowAction == null && flowRecord.isAutoDone()) {
+            flowAction = currentNode.actionManager().getAction(PassAction.class);
+        }
         FormData formData = new FormData(workflow.getForm());
         formData.reset(flowRecord.getFormData());
 
