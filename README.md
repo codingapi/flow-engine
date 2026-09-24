@@ -17,6 +17,7 @@ Flow Engine 是一个基于 Java 17 和 Spring Boot 3.5.9 构建的企业级工�
 - **策略驱动配置** - 所有关键配置通过策略实现，支持动态扩展
 - **Groovy 脚本扩展** - 支持发起人动态匹配、审批人加载、条件判断、自定义操作等
 - **多人审批模式** - 顺序审批、会签审批（可配置比例）、或签审批、随机审批
+- **子流程支持** - 子流程节点挂载，支持子流程结果回传与重置机制
 - **层次化节点结构** - 通过blocks属性实现节点间的层次关系，不再使用独立的边关系
 - **线程安全** - 脚本运行时使用细粒度同步锁，支持不同脚本并发执行
 - **自动资源清理** - 双重清理机制（阈值触发 + 定时清理）避免内存泄漏
@@ -26,247 +27,46 @@ Flow Engine 是一个基于 Java 17 和 Spring Boot 3.5.9 构建的企业级工�
 
 ```
 flow-engine
-├── flow-engine-framework         # 核心流程引擎框架
-│   └── src/main/java/com/codingapi/flow
-│       ├── action                # 动作层
-│       │   ├── actions           # 动作实现（8个类）
-│       │   │   ├── PassAction    # 通过动作
-│       │   │   ├── RejectAction  # 拒绝动作
-│       │   │   ├── SaveAction    # 保存动作
-│       │   │   ├── ReturnAction  # 退回动作
-│       │   │   ├── TransferAction # 转办动作
-│       │   │   ├── AddAuditAction # 加签动作
-│       │   │   ├── DelegateAction # 委派动作
-│       │   │   └── CustomAction  # 自定义动作
-│       │   ├── factory           # FlowActionFactory 动作工厂
-│       │   ├── ActionDisplay     # 动作显示元数据
-│       │   ├── ActionType        # 动作类型枚举（8种）
-│       │   ├── BaseAction        # 动作抽象基类
-│       │   └── IFlowAction       # 动作接口
-│       ├── builder               # 构建器（6种）
-│       │   ├── ActionBuilder             # 动作构建器
-│       │   ├── BaseNodeBuilder            # 节点构建器基类
-│       │   ├── FormFieldPermissionsBuilder # 字段权限构建器
-│       │   ├── NodeMapBuilder             # 节点映射构建器
-│       │   ├── NodeStrategyBuilder        # 节点策略构建器
-│       │   └── WorkflowStrategyBuilder    # 工作流策略构建器
-│       ├── common                # 通用接口
-│       │   ├── ICopyAbility      # 复制能力接口
-│       │   └── IMapConvertor     # Map转换接口
-│       ├── context               # 上下文
-│       │   ├── GatewayContext           # 网关上下文
-│       │   ├── RepositoryHolderContext  # 仓储持有者上下文
-│       │   ├── ActionResponseContext    # 动作响应上下文
-│       │   └── LoopTriggerTraceContext  # 循环触发跟踪上下文
-│       ├── domain                # 领域对象
-│       │   ├── DelayTask         # 延迟任务
-│       │   ├── DelayTaskManager  # 延迟任务管理器
-│       │   ├── UrgeInterval      # 催办间隔
-│       │   ├── SubProcessContext # 子流程上下文
-│       │   └── SubProcessRecord  # 子流程记录
-│       ├── error                 # 错误处理
-│       │   └── ErrorThrow        # 错误抛出器
-│       ├── event                 # 事件系统（7种）
-│       │   ├── IFlowEvent                # 事件接口
-│       │   ├── FlowRecordStartEvent      # 流程开始事件
-│       │   ├── FlowRecordTodoEvent       # 待办事件
-│       │   ├── FlowRecordDoneEvent       # 已办事件
-│       │   ├── FlowRecordFinishEvent     # 流程完成事件
-│       │   ├── FlowRecordUrgeEvent       # 催办事件
-│       │   ├── FlowRecordRevokeEvent     # 流程撤销事件
-│       │   └── FlowRecordDeleteEvent     # 流程删除事件
-│       ├── exception             # 异常系统（6种）
-│       │   ├── FlowException             # 异常基类
-│       │   ├── FlowValidationException   # 参数验证异常
-│       │   ├── FlowNotFoundException     # 资源未找到异常
-│       │   ├── FlowStateException        # 状态异常
-│       │   ├── FlowPermissionException   # 权限异常
-│       │   └── FlowExecutionException    # 执行异常
-│       ├── form                  # 表单系统
-│       │   ├── permission        # 字段权限
-│       │   │   ├── FormFieldPermission # 字段权限实体
-│       │   │   └── PermissionType       # 权限类型枚举
-│       │   ├── FlowForm          # 表单元数据
-│       │   ├── FlowFormBuilder   # 表单构建器
-│       │   ├── FormData          # 表单数据容器
-│       │   ├── FormDataVerify    # 表单数据校验
-│       │   ├── FormField         # 字段定义
-│       │   ├── FieldAttribute    # 字段属性
-│       │   ├── DataType          # 数据类型枚举
-│       │   ├── IValueConvertor   # 值转换接口
-│       │   └── ValueConvertorContext # 值转换上下文
-│       ├── gateway               # 网关接口防腐层
-│       │   └── FlowOperatorGateway # 操作者网关
-│       ├── manager               # 管理器层
-│       │   ├── ActionManager     # 动作管理器
-│       │   ├── NodeStrategyManager # 节点策略管理器
-│       │   ├── OperatorManager   # 操作者管理器
-│       │   ├── FlowNodeManager  # 节点管理器
-│       │   ├── FlowNodeState    # 节点状态分类
-│       │   └── WorkflowStrategyManager # 工作流策略管理器
-│       ├── node                  # 节点层
-│       │   ├── nodes             # 节点实现（19种）
-│       │   │   ├── StartNode              # 开始节点
-│       │   │   ├── EndNode                # 结束节点
-│       │   │   ├── ApprovalNode           # 审批节点
-│       │   │   ├── HandleNode             # 办理节点
-│       │   │   ├── NotifyNode             # 通知节点
-│       │   │   ├── ManualNode             # 人工节点（块节点）
-│       │   │   ├── ManualBranchNode       # 人工分支节点
-│       │   │   ├── ConditionNode          # 条件控制节点（块节点）
-│       │   │   ├── ConditionBranchNode    # 条件分支节点
-│       │   │   ├── ConditionElseBranchNode # 条件Else分支节点
-│       │   │   ├── ParallelNode           # 并行控制节点（块节点）
-│       │   │   ├── ParallelBranchNode     # 并行分支节点
-│       │   │   ├── RouterNode             # 路由节点
-│       │   │   ├── InclusiveNode          # 包容控制节点（块节点）
-│       │   │   ├── InclusiveBranchNode    # 包容分支节点
-│       │   │   ├── InclusiveElseBranchNode # 包容Else分支节点
-│       │   │   ├── SubProcessNode         # 子流程节点
-│       │   │   ├── DelayNode              # 延迟节点
-│       │   │   └── TriggerNode            # 触发节点
-│       │   ├── factory           # NodeFactory 节点工厂
-│       │   ├── helper            # 节点助手
-│       │   │   ├── BackNodeHelper           # 退回节点助手
-│       │   │   └── ParallelNodeRelationHelper # 并行关系助手
-│       │   ├── IBlockNode       # 块节点接口
-│       │   ├── BaseFlowNode      # 节点抽象基类
-│       │   ├── BaseAuditNode     # 审批节点抽象基类
-│       │   ├── IFlowNode         # 节点接口
-│       │   └── NodeType          # 节点类型枚举
-│       ├── operator              # 操作者接口
-│       │   └── IFlowOperator     # 操作者接口
-│       ├── pojo                  # 数据对象
-│       │   ├── body              # FlowAdviceBody 请求体
-│       │   ├── request           # 请求对象
-│       │   │   ├── FlowActionRequest  # 动作请求
-│       │   │   ├── FlowCreateRequest  # 创建请求
-│       │   │   ├── FlowRevokeRequest  # 撤回请求
-│       │   │   ├── FlowDeleteRequest  # 删除请求
-│       │   │   ├── FlowUrgeRequest    # 催办请求
-│       │   │   ├── FlowDetailRequest  # 详情请求
-│       │   │   └── FlowProcessNodeRequest # 流程节点请求
-│       │   └── response          # 响应对象
-│       │       ├── FlowOperator   # 流程操作者
-│       │       ├── FlowContent   # 流程内容
-│       │       ├── ActionResponse # 动作响应
-│       │       ├── FlowRecordContent # 流程记录内容
-│       │       ├── NodeOption     # 节点选项
-│       │       └── ProcessNode    # 流程节点
-│       ├── record                # 流程记录
-│       │   ├── FlowRecord        # 执行记录（TODO/DONE状态）
-│       │   ├── FlowTodoRecord    # 待办记录
-│       │   └── FlowTodoMerge     # 待办合并记录
-│       ├── repository            # 仓储接口（持久化抽象）
-│       │   ├── WorkflowRepository
-│       │   ├── WorkflowVersionRepository
-│       │   ├── WorkflowRuntimeRepository
-│       │   ├── FlowRecordRepository
-│       │   ├── FlowTodoRecordRepository
-│       │   ├── FlowTodoMergeRepository
-│       │   ├── FlowOperatorAssignmentRepository
-│       │   ├── NodeViewJavaScriptRepository
-│       │   ├── ParallelBranchRepository
-│       │   ├── SubProcessRepository
-│       │   ├── DelayTaskRepository
-│       │   └── UrgeIntervalRepository
-│       ├── script                # 脚本系统
-│       │   ├── node              # 节点脚本（9种）
-│       │   │   ├── OperatorMatchScript  # 发起人匹配脚本
-│       │   │   ├── OperatorLoadScript   # 审批人加载脚本
-│       │   │   ├── NodeTitleScript      # 节点标题脚本
-│       │   │   ├── ConditionScript      # 条件判断脚本
-│       │   │   ├── RouterNodeScript     # 路由脚本
-│       │   │   ├── SubProcessScript     # 子流程脚本
-│       │   │   ├── SubProcessResultScript # 子流程结果脚本
-│       │   │   ├── TriggerScript        # 触发脚本
-│       │   │   └── ErrorTriggerScript   # 异常触发脚本
-│       │   ├── runtime           # 脚本运行时
-│       │   │   ├── FlowScriptRuntimeContext # Groovy脚本执行环境
-│       │   │   ├── FlowScriptContext        # 脚本上下文
-│       │   │   └── IBeanFactory             # Bean工厂接口
-│       │   └── action            # 动作脚本（3种）
-│       │       ├── ActionRejectScript  # 拒绝动作脚本
-│       │       ├── ActionCustomScript  # 自定义动作脚本
-│       │       └── ActionDisplayScript # 动作展示脚本
-│       ├── service               # 服务层
-│       │   ├── impl              # 服务实现
-│       │   │   ├── FlowCreateService    # 流程创建服务
-│       │   │   ├── FlowActionService    # 流程动作服务
-│       │   │   ├── FlowDelayTriggerService # 延迟触发服务
-│       │   │   ├── FlowRevokeService    # 流程撤回服务
-│       │   │   ├── FlowDeleteService    # 流程删除服务
-│       │   │   ├── FlowUrgeService      # 流程催办服务
-│       │   │   ├── FlowDetailService    # 流程详情服务
-│       │   │   ├── FlowProcessNodeService # 流程节点服务
-│       │   │   ├── FlowSubProcessResultService # 子流程结果服务
-│       │   │   └── OperatorAssignmentService # 操作者分配服务
-│       │   ├── FlowService       # 流程门面服务（@Transactional 具体类）
-│       │   ├── FlowRecordSaveService # 流程记录批量保存服务
-│       │   ├── FlowRecordService # 流程记录服务
-│       │   ├── WorkflowService   # 流程定义服务
-│       │   └── WorkflowGroovyScriptUtils # 流程脚本工具
-│       ├── session               # 会话层
-│       │   ├── FlowSession       # 执行上下文
-│       │   └── FlowAdvice        # 审批参数（意见、签名、退回节点等）
-│       ├── strategy              # 策略层（17种：15种节点策略 + 2种工作流策略）
-│       │   ├── node                # 节点策略
-│       │   │   ├── MultiOperatorAuditStrategy  # 多人审批策略
-│       │   │   ├── TimeoutStrategy          # 超时策略
-│       │   │   ├── SameOperatorAuditStrategy # 同一操作者审批策略
-│       │   │   ├── RecordMergeStrategy      # 记录合并策略
-│       │   │   ├── ResubmitStrategy         # 重新提交策略
-│       │   │   ├── AdviceStrategy           # 审批意见策略
-│       │   │   ├── OperatorLoadStrategy     # 审批人加载策略
-│       │   │   ├── ErrorTriggerStrategy     # 异常触发策略
-│       │   │   ├── NodeTitleStrategy        # 节点标题策略
-│       │   │   ├── FormFieldPermissionStrategy # 字段权限策略
-│       │   │   ├── DelayStrategy            # 延迟策略
-│       │   │   ├── TriggerStrategy          # 触发策略
-│       │   │   ├── RouterStrategy          # 路由策略
-│       │   │   ├── SubProcessStrategy       # 子流程策略
-│       │   │   ├── RevokeStrategy           # 撤回策略
-│       │   │   ├── NodeStrategyFactory      # 节点策略工厂
-│       │   │   ├── BaseStrategy             # 节点策略抽象基类
-│       │   │   └── INodeStrategy            # 节点策略接口
-│       │   └── workflow            # 工作流策略
-│       │       ├── InterfereStrategy        # 干预策略
-│       │       ├── UrgeStrategy             # 催办策略
-│       │       ├── WorkflowStrategyFactory  # 工作流策略工厂
-│       │       ├── BaseStrategy             # 工作流策略抽象基类
-│       │       └── IWorkflowStrategy        # 工作流策略接口
-│       ├── utils                 # 工具类
-│       │   └── Base64Utils       # Base64 编解码工具
-│       └── workflow              # 流程层
-│           ├── Workflow          # 流程对象
-│           ├── WorkflowBuilder   # 流程构建器
-│           └── runtime           # 运行时快照
-│               └── WorkflowRuntime # 流程运行时快照
-│   └── src/test/java             # 测试代码
-├── flow-engine-starter           # Spring Boot 自动配置入口
-├── flow-engine-starter-api       # REST API 层（FlowRecordController、WorkflowController）
-├── flow-engine-starter-infra     # 持久化层（JPA 实体、11个仓储实现）
-├── flow-engine-starter-query     # 查询层（FlowRecordQueryController、WorkflowQueryController）
-├── flow-engine-example           # 示例项目（H2/达梦数据库、JWT 认证、端口 8090）
-└── flow-frontend                 # 前端项目（独立 Git 仓库）
-    ├── apps
-    │   ├── app-pc                # PC 端应用
-    │   └── app-mobile            # 移动端应用
-    └── packages
-        ├── flow-core            # 核心框架库（HTTP、Hooks、Presenter 等）
-        ├── flow-types           # TypeScript 类型定义库
-        ├── flow-icons           # 图标库
-        ├── flow-approval-presenter # 审批展示器框架
-        ├── flow-design          # 流程设计器组件库
-        ├── flow-pc              # PC 端组件库
-        │   ├── flow-pc-ui       # PC 端基础 UI 组件库
-        │   ├── flow-pc-form     # PC 端表单组件库
-        │   └── flow-pc-approval # PC 端审批组件库
-        └── flow-mobile          # 移动端组件库
-            ├── flow-mobile-ui       # 移动端基础 UI 组件库
-            ├── flow-mobile-form     # 移动端表单组件库
-            └── flow-mobile-approval # 移动端审批组件库
+├── flow-engine-framework      # 核心流程引擎框架
+├── flow-engine-starter        # Spring Boot 自动配置入口
+├── flow-engine-starter-api    # REST API 层（命令操作：create / action / revoke / delete / urge / detail）
+├── flow-engine-starter-infra  # 持久化层（JPA 实体、11 个仓储实现、含达梦方言）
+├── flow-engine-starter-query  # 查询层（流程记录与流程定义只读 API）
+├── flow-engine-example        # 示例应用（H2/达梦数据库、JWT 认证、端口 8090）
+└── flow-frontend              # 前端项目（独立 Git 仓库，PC + 移动端，详见下文“前端模块架构”）
 ```
+
+### 框架层包结构
+
+`flow-engine-framework` 的包路径为 `com.codingapi.flow.*`：
+
+| 包 | 职责 |
+|------|------|
+| `workflow` | 流程定义：Workflow、WorkflowVersion、运行时快照（runtime） |
+| `node` | 19 种流程节点、节点工厂与节点助手 |
+| `action` | 8 种流程动作与动作工厂 |
+| `strategy` | 策略层：15 种节点策略 + 2 种工作流策略 |
+| `script` | Groovy 脚本系统：9 种节点脚本、3 种动作脚本、运行时、注册表、工厂 |
+| `transfer` | 流程定义导入导出（旧版 Schema 兼容、脚本迁移） |
+| `service` | 业务服务层：FlowService 事务门面 + 各流程操作独立服务（创建 / 动作 / 撤销 / 删除 / 催办 / 详情 / 子流程重置等） |
+| `query` | 流程记录查询服务 |
+| `manager` | 管理器层：动作、节点、策略、操作者管理 |
+| `session` | 执行上下文：FlowSession、FlowAdvice、IRepositoryHolder |
+| `record` | 流程记录：FlowRecord、FlowTodoRecord、FlowTodoMerge |
+| `repository` | 12 个仓储接口（持久化抽象，由 infra 模块实现） |
+| `event` | 8 种流程事件：开始 / 待办 / 已办 / 完成 / 催办 / 撤销 / 删除 / 子流程重置 |
+| `exception` | 框架异常体系：异常基类 + 6 种具体异常（验证 / 未找到 / 状态 / 权限 / 执行 / 导入导出） |
+| `form` | 表单系统：字段定义、数据校验、字段权限、值转换 |
+| `builder` | 6 种构建器（流程、节点、动作、策略、字段权限、节点映射） |
+| `pojo` | 请求 / 响应对象 |
+| `domain` | 领域对象：延迟任务、催办间隔、子流程上下文 |
+| `context` | 各类上下文（网关、仓储持有者、动作响应、循环触发跟踪） |
+| `cache` | 本地缓存（操作者线程缓存、脚本缓存、流程运行时缓存） |
+| `generator` | 流程 ID 生成器网关 |
+| `gateway` / `operator` | 网关接口防腐层与操作者接口 |
+| `javscript` | 节点视图 JavaScript（注解扫描与缓存） |
+| `mock` | Mock 模式支持（MockRepositoryHolder 及 mock 仓储 / 服务） |
+| `common` / `error` / `utils` | 通用接口、错误抛出器、工具类 |
 
 ## 技术栈
 
@@ -510,6 +310,7 @@ category.subcategory.errorType
 - `state.node.notStart` - 记录不在开始节点
 - `validation.field.required` - 必填字段为空
 - `execution.script.error` - 脚本执行错误
+- `workflow.transfer.schema.invalid` - 流程导入 Schema 无效
 
 所有异常消息使用英文。
 
@@ -526,6 +327,10 @@ category.subcategory.errorType
 ## 文档
 
 - [CLAUDE.md](CLAUDE.md) - Claude Code 开发指南
+- [docs/Integration](docs/Integration/README.md) - 集成文档（快速开始、REST API、事件、脚本、仓储与用户集成等）
+- [docs/manual](docs/manual/README.md) - 使用手册
+- [docs/conventions](docs/conventions/index.md) - 项目开发规范
+- [docs/capabilities](docs/capabilities/index.md) - 可复用能力知识库
 
 ## 测试
 
