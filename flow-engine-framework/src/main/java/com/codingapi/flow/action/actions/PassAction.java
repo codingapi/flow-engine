@@ -9,6 +9,7 @@ import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
+import com.codingapi.flow.manager.FlowNodeState;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.IFlowNode;
@@ -242,8 +243,14 @@ public class PassAction extends BaseAction {
     }
 
     /**
-     * 收集需要审批人设定的下游节点
-     * 若下游节点本身是控制节点（如条件节点），则递归检查其子节点
+     * 收集需要审批人设定的下游节点。
+     *
+     * <p>仅沿本次提交后实际会执行到的节点递归，避免把分支内更靠后的节点提前纳入提示（issue #231）：
+     * <ul>
+     *     <li>控制节点（条件、并行、包容、人工）：进入其下各分支，条件节点仅沿命中的分支（issue #200）</li>
+     *     <li>分支节点：分支内是线性执行链，只检查排在最前的首个节点；
+     *     分支内的后续节点由该分支上前一个节点提交时再提示</li>
+     * </ul>
      */
     private void collectApproverSelectNodes(FlowSession flowSession, IFlowNode node, Map<String, List<Long>> operatorSelectMap, List<NodeOption> result) {
         OperatorSelectType selectType = node.strategyManager().getOperatorSelectType();
@@ -259,13 +266,21 @@ public class PassAction extends BaseAction {
         if (blocks == null || blocks.isEmpty()) {
             return;
         }
-        // 条件控制节点：仅沿实际命中的分支递归，避免把不会执行的分支中
-        // 的审批人设定节点误加入提示（issue #200）
-        if (node instanceof ConditionNode) {
-            blocks = blocks.get(0).filterBranches(blocks, flowSession);
-        }
-        for (IFlowNode block : blocks) {
-            collectApproverSelectNodes(flowSession, block, operatorSelectMap, result);
+        FlowNodeState nodeState = new FlowNodeState(node);
+        if (nodeState.isBlockNode()) {
+            // 控制节点：递归进入各分支；条件节点仅沿实际命中的分支递归，
+            // 避免把不会执行的分支中的审批人设定节点误加入提示（issue #200）
+            if (node instanceof ConditionNode) {
+                blocks = blocks.get(0).filterBranches(blocks, flowSession);
+            }
+            for (IFlowNode block : blocks) {
+                collectApproverSelectNodes(flowSession, block, operatorSelectMap, result);
+            }
+        } else if (nodeState.isBranchNode()) {
+            // 分支节点：仅检查分支的首个节点，分支内后续节点由前序节点提交时再提示（issue #231）
+            for (IFlowNode firstNode : nodeState.getFirstBlocks()) {
+                collectApproverSelectNodes(flowSession, firstNode, operatorSelectMap, result);
+            }
         }
     }
 }
