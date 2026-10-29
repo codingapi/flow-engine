@@ -1,6 +1,8 @@
 package com.codingapi.flow.action;
 
 import com.codingapi.flow.common.IMapConvertor;
+import com.codingapi.flow.event.FlowRecordTodoEvent;
+import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -108,6 +110,14 @@ public abstract class BaseAction implements IFlowAction {
 
     @Override
     public void run(FlowSession flowSession) {
+    }
+
+    /**
+     * 是否为结束节点虚拟记录的待办事件（非真实业务待办，推送时需要拦截）
+     */
+    protected boolean isEndNodeTodoEvent(IFlowEvent event) {
+        return event instanceof FlowRecordTodoEvent todoEvent
+                && !todoEvent.getFlowRecord().isNotEndNode();
     }
 
     /**

@@ -235,14 +235,6 @@ public class PassAction extends BaseAction {
     }
 
     /**
-     * 是否为结束节点虚拟记录的待办事件（非真实业务待办，推送时需要拦截）
-     */
-    private boolean isEndNodeTodoEvent(IFlowEvent event) {
-        return event instanceof FlowRecordTodoEvent todoEvent
-                && !todoEvent.getFlowRecord().isNotEndNode();
-    }
-
-    /**
      * 收集需要审批人设定的下游节点。
      *
      * <p>仅沿本次提交后实际会执行到的节点递归，避免把分支内更靠后的节点提前纳入提示（issue #231）：

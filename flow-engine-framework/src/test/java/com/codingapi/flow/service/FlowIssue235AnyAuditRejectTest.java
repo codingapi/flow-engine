@@ -9,6 +9,8 @@ import com.codingapi.flow.builder.ActionBuilder;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
+import com.codingapi.flow.event.FlowRecordFinishEvent;
+import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.form.DataType;
@@ -22,6 +24,7 @@ import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
+import com.codingapi.flow.pojo.request.FlowDetailRequest;
 import com.codingapi.flow.pojo.request.FlowProcessNodeRequest;
 import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.record.FlowRecord;
@@ -32,8 +35,16 @@ import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
+import com.codingapi.springboot.framework.event.DomainEvent;
+import com.codingapi.springboot.framework.event.SpringEventInitializer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +68,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class FlowIssue235AnyAuditRejectTest {
 
     private final MyFlowServiceFactory factory = new MyFlowServiceFactory();
+    private final List<com.codingapi.springboot.framework.event.IEvent> capturedEvents = new ArrayList<>();
+
+    @AfterEach
+    void resetEventContext() throws Exception {
+        // 还原 DomainEventContext 的 Spring 上下文，避免影响其他测试（无上下文时事件再次被丢弃）
+        Class<?> clazz = Class.forName("com.codingapi.springboot.framework.event.DomainEventContext");
+        java.lang.reflect.Method getInstance = clazz.getDeclaredMethod("getInstance");
+        getInstance.setAccessible(true);
+        Object instance = getInstance.invoke(null);
+        Field field = clazz.getDeclaredField("context");
+        field.setAccessible(true);
+        field.set(instance, null);
+    }
+
+    private void initEventCapture() throws Exception {
+        ApplicationContext mockContext = Mockito.mock(ApplicationContext.class);
+        Mockito.doAnswer(invocation -> {
+            DomainEvent domainEvent = invocation.getArgument(0);
+            capturedEvents.add(domainEvent.getEvent());
+            return null;
+        }).when(mockContext).publishEvent(Mockito.any(ApplicationEvent.class));
+        new SpringEventInitializer(mockContext).afterPropertiesSet();
+    }
 
     @Test
     void anyAuditRejectShouldAutoDoneSiblingTodoAndReturnToStart() {
@@ -133,6 +167,76 @@ class FlowIssue235AnyAuditRejectTest {
         assertTrue(cHistoryView.getOperators().stream()
                         .noneMatch(operator -> ActionType.PASS.name().equals(operator.getActionType())),
                 "C 节点历史中不应把拒绝误记为通过");
+    }
+
+    /**
+     * 拒绝配置为「终止流程」时，或签节点的其他待办同样应自动办结，流程正常终止。
+     */
+    @Test
+    void anyAuditRejectTerminateShouldCloseSiblingAndTerminateFlow() throws Exception {
+        // given：A-B-C-D，C 为任意审核（c1/c2），拒绝动作终止流程
+        User a = new User(1, "a");
+        User b1 = new User(2, "b1");
+        User c1 = new User(3, "c1");
+        User c2 = new User(4, "c2");
+        registerUsers(a, b1, c1, c2);
+
+        StartNode startNode = startNode();
+        ApprovalNode bNode = approvalNode("B审批", "[2]", null);
+        RejectAction rejectAction = RejectAction.defaultAction();
+        rejectAction.setScript(FlowGroovyScriptFactory
+                .createActionRejectScript("def run(request){return 'TERMINATE'}")
+                .getKey());
+        ApprovalNode cNode = approvalNode("C审批", "[3,4]",
+                new MultiOperatorAuditStrategy(MultiOperatorAuditStrategy.Type.ANY, 0), rejectAction);
+        EndNode endNode = EndNode.builder().build();
+        Workflow workflow = saveWorkflow(a, startNode, bNode, cNode, endNode);
+        Map<String, Object> data = data();
+
+        // 1. 流程到达 C 节点，c1、c2 同时收到待办
+        startAndSubmit(workflow, startNode, a, data);
+        pass(todoOf(b1), bNode, b1, data);
+        FlowRecord c1Todo = todoOf(c1);
+        FlowRecord c2Todo = todoOf(c2);
+
+        // 捕获拒绝环节推送的事件，用于校验结束节点虚拟待办事件被拦截
+        initEventCapture();
+        capturedEvents.clear();
+
+        // when：c1 拒绝并终止流程
+        reject(c1Todo, cNode, c1, data);
+
+        // then：c1、c2 均无待办，流程终止
+        assertNoTodo(c1);
+        assertNoTodo(c2);
+        List<FlowRecord> records = processRecords(c1Todo);
+        assertEquals(2, recordsOfNode(records, cNode).stream().filter(FlowRecord::isDone).count(),
+                "C 节点两条记录都应为已办");
+        assertTrue(records.stream().filter(FlowRecord::isTodo).findFirst().isEmpty(),
+                "流程终止后不应遗留待办");
+        assertTrue(records.stream()
+                        .filter(record -> cNode.getId().equals(record.getNodeId()))
+                        .allMatch(FlowRecord::isFinish),
+                "流程终止后 C 节点记录应处于结束状态");
+
+        // 结束节点的虚拟记录（operatorId=-1）不是真实业务待办，不应推送 Todo 事件，
+        // 否则订阅方按操作人加载时会拿到空对象而出现空指针
+        assertTrue(capturedEvents.stream()
+                        .filter(FlowRecordTodoEvent.class::isInstance)
+                        .map(FlowRecordTodoEvent.class::cast)
+                        .allMatch(event -> event.getFlowRecord().isNotEndNode()),
+                "结束节点虚拟记录不应推送待办事件");
+        assertTrue(capturedEvents.stream().anyMatch(FlowRecordFinishEvent.class::isInstance),
+                "流程终止后应推送流程结束事件");
+
+        // 流程终止后查询流程视图应正常返回
+        List<ProcessNode> nodeList = processNodes(records.get(records.size() - 1), a, data);
+        assertTrue(nodeList.stream().anyMatch(node -> cNode.getId().equals(node.getNodeId())),
+                "流程视图应包含 C 节点");
+
+        // 以自动办结的 c2 记录为入口查询流程视图与详情，均不应报错
+        processNodes(c2Todo, c2, data);
+        factory.flowService.detail(new FlowDetailRequest(c2Todo.getId(), c2.getUserId()));
     }
 
     // ==================== 流程装配 ====================
