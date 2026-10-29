@@ -1,6 +1,7 @@
 package com.codingapi.flow.script.runtime;
 
 import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
+import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.springboot.script.GroovyScript;
 import com.codingapi.springboot.script.cache.GroovyScriptCacheContext;
 import org.junit.jupiter.api.AfterEach;
@@ -11,6 +12,8 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 流程运行时脚本代理测试。
@@ -99,6 +102,30 @@ class FlowScriptRuntimeContextTest {
         // then 代理不干预, 直接返回全局缓存中的同一对象
         assertSame(GroovyScriptCacheContext.getInstance().getGroovyScript(KEY), script);
         assertEquals(NEW_CONTENT, script.getScript());
+    }
+
+    @Test
+    void should_throw_clear_exception_when_script_missing_everywhere() {
+        // given 脚本在任何缓存与仓储中都不存在（模拟脚本未持久化或数据丢失）
+        String missingKey = "missing-script-" + System.nanoTime();
+        FlowRuntimeScriptLocalCache.getInstance().clear();
+
+        // when / then 不再返回 null 导致调用方空指针，而是抛出明确的流程状态异常
+        FlowStateException exception = assertThrows(FlowStateException.class,
+                () -> FlowScriptRuntimeContext.getInstance().getGroovyScript(missingKey));
+        assertTrue(exception.getMessage().contains(missingKey),
+                "异常信息应包含缺失的脚本key，便于定位");
+    }
+
+    @Test
+    void should_throw_clear_exception_when_runtime_snapshot_missing_key() {
+        // given 存在运行时快照，但快照中不包含目标脚本key，且全局缓存也没有
+        String missingKey = "missing-runtime-script-" + System.nanoTime();
+        FlowRuntimeScriptLocalCache.getInstance().set(Map.of(KEY, OLD_CONTENT));
+
+        // when / then
+        assertThrows(FlowStateException.class,
+                () -> FlowScriptRuntimeContext.getInstance().getGroovyScript(missingKey));
     }
 
     @Test

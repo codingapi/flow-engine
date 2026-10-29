@@ -1,6 +1,7 @@
 package com.codingapi.flow.script.runtime;
 
 import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
+import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.springboot.script.GroovyScript;
 import com.codingapi.springboot.script.cache.GroovyScriptCacheContext;
 
@@ -34,6 +35,11 @@ public class FlowScriptRuntimeContext {
     public GroovyScript getGroovyScript(String key) {
         GroovyScript cached = GroovyScriptCacheContext.getInstance().getGroovyScript(key);
         String snapshot = FlowRuntimeScriptLocalCache.getInstance().get(key);
+        if (cached == null && snapshot == null) {
+            // 全局缓存、临时缓存、持久化仓储与运行时快照均找不到脚本，
+            // 直接抛出明确异常，避免调用方在 invoke 处出现难以定位的空指针
+            throw FlowStateException.scriptNotFound(key);
+        }
         if (snapshot == null) {
             // 非运行态：不干预，返回全局缓存中的脚本对象
             return cached;

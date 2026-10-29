@@ -58,6 +58,34 @@ public class WorkflowGroovyScriptTransferService {
     }
 
     /**
+     * 将字段中直接保存的脚本正文归一化为脚本key。
+     * <p>
+     * 旧版设计器可能把脚本正文直接写入动作/节点的脚本字段，而引擎的保存、运行时与导入导出
+     * 都以脚本key为准。保存流程前先做一次归一化：把正文按字段所属脚本类型注册为临时脚本
+     * 并回填脚本key，随后由 {@code WorkflowGroovyScriptUtils.resetScripts} 统一生成持久化脚本。
+     *
+     * @param target 目标对象
+     */
+    public void normalizeInlineScripts(Object target) {
+        if (target == null) {
+            return;
+        }
+        AnnotationTargetFieldResult<String> fields = findFields(target);
+        Map<String, String> keyMapping = new LinkedHashMap<>();
+        fields.fetch(field -> {
+            String value = field.getValue();
+            if (keyMapping.containsKey(value) || !looksLikeInlineScript(value)) {
+                return;
+            }
+            GroovyScript groovyScript = ScriptType.from(field.getTarget()).create(value);
+            keyMapping.put(value, groovyScript.getKey());
+        });
+        if (!keyMapping.isEmpty()) {
+            fields.update(value -> keyMapping.getOrDefault(value, value));
+        }
+    }
+
+    /**
      * 按脚本引用所属类型重建脚本，并将所有旧key替换为新key。
      *
      * @return 旧key到新key的映射

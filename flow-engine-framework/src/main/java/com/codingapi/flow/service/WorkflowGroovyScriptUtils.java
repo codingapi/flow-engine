@@ -1,5 +1,6 @@
 package com.codingapi.flow.service;
 
+import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.javscript.NodeViewJavaScript;
 import com.codingapi.flow.javscript.NodeViewJavaScriptCacheContext;
@@ -66,12 +67,14 @@ public class WorkflowGroovyScriptUtils {
             GroovyScriptFieldResult result = GroovyScriptAnnotationScannerUtils.findGroovyScriptFields(target);
             result.update((key) -> {
                 GroovyScript groovyScript = GroovyScriptCacheContext.getInstance().getGroovyScript(key);
-                if (groovyScript != null) {
-                    GroovyScript latestScript = groovyScript.copy(FlowIDGeneratorGatewayContext.getInstance().generateFlowScriptKey());
-                    latestScript.save();
-                    return latestScript.getKey();
+                if (groovyScript == null) {
+                    // 脚本内容已丢失（例如设计器临时脚本超过有效期），若继续保存会把悬空的脚本key写入流程定义，
+                    // 直到对应节点执行时才以空指针的形式暴露，因此保存阶段直接给出明确错误
+                    throw FlowStateException.scriptNotFound(key);
                 }
-                return key;
+                GroovyScript latestScript = groovyScript.copy(FlowIDGeneratorGatewayContext.getInstance().generateFlowScriptKey());
+                latestScript.save();
+                return latestScript.getKey();
             });
         }
     }

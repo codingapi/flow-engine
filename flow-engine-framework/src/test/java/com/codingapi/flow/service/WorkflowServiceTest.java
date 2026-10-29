@@ -1,5 +1,9 @@
 package com.codingapi.flow.service;
 
+import com.codingapi.flow.action.actions.PassAction;
+import com.codingapi.flow.action.actions.RejectAction;
+import com.codingapi.flow.builder.ActionBuilder;
+import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.form.DataType;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FormField;
@@ -16,13 +20,17 @@ import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
 import com.codingapi.flow.workflow.WorkflowVersion;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
+import com.codingapi.springboot.script.cache.GroovyScriptCacheContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WorkflowServiceTest {
 
@@ -98,6 +106,86 @@ class WorkflowServiceTest {
                 .get(0);
         assertEquals("description", permission.getFieldCode());
         assertEquals(PermissionType.WRITE, permission.getType());
+    }
+
+    @Test
+    void should_fail_fast_when_saving_workflow_with_missing_script() {
+        // given：流程引用的拒绝脚本在任何缓存/仓储中都不存在（模拟设计器临时脚本已过期）
+        SnapshotWorkflowVersionRepository versionRepository = new SnapshotWorkflowVersionRepository();
+        WorkflowRepository workflowRepository = new WorkflowRepositoryImpl();
+        WorkflowRuntimeRepository runtimeRepository = new WorkflowRuntimeRepositoryImpl();
+        WorkflowService service = new WorkflowService(versionRepository, workflowRepository, runtimeRepository);
+
+        String missingScriptKey = "missing-script-" + System.nanoTime();
+        RejectAction rejectAction = RejectAction.defaultAction();
+        rejectAction.setScript(missingScriptKey);
+
+        ApprovalNode approvalNode = ApprovalNode.builder()
+                .name("审批节点")
+                .actions(ActionBuilder.builder()
+                        .addAction(PassAction.defaultAction())
+                        .addAction(rejectAction)
+                        .build())
+                .build();
+
+        Workflow workflow = WorkflowBuilder.builder()
+                .id("workflow-missing-script")
+                .code("leave-workflow")
+                .title("请假流程")
+                .form(formWithDescriptionField())
+                .addNode(approvalNode)
+                .build(false);
+
+        // when / then：保存阶段直接失败，避免悬空脚本key在运行时才以空指针暴露
+        FlowStateException exception = assertThrows(FlowStateException.class,
+                () -> service.saveWorkflow(workflow));
+        assertTrue(exception.getMessage().contains(missingScriptKey));
+    }
+
+    /**
+     * 历史设计数据中，动作的 script 字段可能直接保存脚本正文（旧版设计器的问题）。
+     * 保存流程时应把正文归一化为脚本key，避免运行时按key查找脚本失败（issue #235）。
+     */
+    @Test
+    void should_normalize_inline_reject_script_to_script_key_when_saving_workflow() {
+        // given
+        String inlineScript = """
+                // @SCRIPT_TITLE 终止流程
+                // @SCRIPT_META {"type":"TERMINATE"}
+                def run(request){ return 'TERMINATE' }
+                """;
+        SnapshotWorkflowVersionRepository versionRepository = new SnapshotWorkflowVersionRepository();
+        WorkflowService service = new WorkflowService(versionRepository,
+                new WorkflowRepositoryImpl(), new WorkflowRuntimeRepositoryImpl());
+
+        RejectAction rejectAction = RejectAction.defaultAction();
+        rejectAction.setScript(inlineScript);
+
+        ApprovalNode approvalNode = ApprovalNode.builder()
+                .name("审批节点")
+                .actions(ActionBuilder.builder()
+                        .addAction(PassAction.defaultAction())
+                        .addAction(rejectAction)
+                        .build())
+                .build();
+
+        Workflow workflow = WorkflowBuilder.builder()
+                .id("workflow-inline-script")
+                .code("leave-inline-workflow")
+                .title("请假流程")
+                .form(formWithDescriptionField())
+                .addNode(approvalNode)
+                .build(false);
+
+        // when
+        service.saveWorkflow(workflow);
+
+        // then：脚本字段被替换为脚本key，且key可以取回原始脚本正文
+        String savedScriptKey = rejectAction.getScript().getScript();
+        assertNotEquals(inlineScript, savedScriptKey);
+        assertTrue(!savedScriptKey.contains("def run"), "保存后的脚本字段应为脚本key而不是脚本正文");
+        assertEquals(inlineScript,
+                GroovyScriptCacheContext.getInstance().getGroovyScript(savedScriptKey).getScript());
     }
 
     private FlowForm formWithDescriptionField() {

@@ -35,6 +35,7 @@ import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.user.User;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.WorkflowBuilder;
+import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.springboot.framework.event.DomainEvent;
 import com.codingapi.springboot.framework.event.SpringEventInitializer;
 import org.junit.jupiter.api.AfterEach;
@@ -237,6 +238,44 @@ class FlowIssue235AnyAuditRejectTest {
         // 以自动办结的 c2 记录为入口查询流程视图与详情，均不应报错
         processNodes(c2Todo, c2, data);
         factory.flowService.detail(new FlowDetailRequest(c2Todo.getId(), c2.getUserId()));
+    }
+
+    /**
+     * 运行时脚本快照必须包含拒绝动作脚本，否则应用重启后（全局脚本缓存为空时）拒绝操作会因脚本缺失而失败。
+     */
+    @Test
+    void workflowRuntimeShouldSnapshotRejectScript() {
+        // given：C 节点配置了自定义的拒绝脚本
+        User a = new User(1, "a");
+        User b1 = new User(2, "b1");
+        User c1 = new User(3, "c1");
+        User c2 = new User(4, "c2");
+        registerUsers(a, b1, c1, c2);
+
+        RejectAction rejectAction = RejectAction.defaultAction();
+        rejectAction.setScript(FlowGroovyScriptFactory
+                .createActionRejectScript("def run(request){return 'TERMINATE'}")
+                .getKey());
+
+        ApprovalNode bNode = approvalNode("B审批", "[2]", null);
+        ApprovalNode cNode = approvalNode("C审批", "[3,4]",
+                new MultiOperatorAuditStrategy(MultiOperatorAuditStrategy.Type.ANY, 0), rejectAction);
+        Workflow workflow = saveWorkflow(a, startNode(), bNode, cNode, EndNode.builder().build());
+
+        // 保存版本时会重建脚本key，因此以保存后的流程定义中的key为准
+        String savedRejectScriptKey = workflow.getFlowNode(cNode.getId())
+                .actionManager().getActions().stream()
+                .filter(action -> ActionType.REJECT.name().equals(action.type()))
+                .map(RejectAction.class::cast)
+                .findFirst().orElseThrow()
+                .getScript().getScript();
+
+        // when：创建运行时快照
+        WorkflowRuntime workflowRuntime = new WorkflowRuntime(workflow);
+
+        // then：快照中包含拒绝脚本正文
+        assertTrue(workflowRuntime.getScripts().containsKey(savedRejectScriptKey),
+                "运行时快照应包含拒绝动作脚本");
     }
 
     // ==================== 流程装配 ====================
