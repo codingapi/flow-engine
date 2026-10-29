@@ -6,6 +6,7 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.repository.WorkflowRepository;
 import com.codingapi.flow.repository.WorkflowRuntimeRepository;
 import com.codingapi.flow.repository.WorkflowVersionRepository;
+import com.codingapi.flow.transfer.WorkflowGroovyScriptTransferService;
 import com.codingapi.flow.transfer.WorkflowImportMode;
 import com.codingapi.flow.transfer.WorkflowTransferService;
 import com.codingapi.flow.utils.Base64Utils;
@@ -44,6 +45,9 @@ public class WorkflowService {
 
         currentVersion.enableVersion();
         if (currentVersion.getId() == 0) {
+            // 兼容历史设计数据：旧版设计器可能把脚本正文直接写入脚本字段，
+            // 保存前先归一化为脚本key，避免悬空的脚本内容在运行时才以空指针暴露（issue #235）
+            new WorkflowGroovyScriptTransferService().normalizeInlineScripts(currentVersion);
             // 新创建的版本，替换脚本
             WorkflowGroovyScriptUtils.resetScripts(currentVersion);
         }

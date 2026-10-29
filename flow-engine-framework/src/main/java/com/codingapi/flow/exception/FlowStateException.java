@@ -174,4 +174,17 @@ public class FlowStateException extends FlowException {
         return new FlowStateException("state.subProcess.resetMergeNodeOnly",
                 "Sub process reset only allowed on the todo record of the locked merge node");
     }
+
+    /**
+     * Workflow script not found when executing a node or action
+     *
+     * @param key script key
+     * @return exception
+     */
+    public static FlowStateException scriptNotFound(String key) {
+        return new FlowStateException("state.script.notFound",
+                String.format("Workflow script not found: %s. "
+                        + "Please check that the script is persisted (GroovyScriptRepository is registered) "
+                        + "and that the workflow version referencing it is saved correctly", key));
+    }
 }

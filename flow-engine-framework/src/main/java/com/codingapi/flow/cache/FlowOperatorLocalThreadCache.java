@@ -48,7 +48,7 @@ public class FlowOperatorLocalThreadCache {
 
         operator = operatorLoader.get();
         if (operator != null) {
-            operatorCaches.put(operator.getUserId(), operator);
+            operatorCaches.put(id, operator);
             this.cache.set(operatorCaches);
         }
         return operator;
