@@ -176,6 +176,19 @@ public class FlowStateException extends FlowException {
     }
 
     /**
+     * Sub process reset script result does not match the original group instance count
+     *
+     * @param expected original group instance count
+     * @param actual   create request count returned by the creation script
+     * @return exception
+     */
+    public static FlowStateException subProcessResetScriptMismatch(int expected, int actual) {
+        return new FlowStateException("state.subProcess.resetScriptMismatch",
+                String.format("Sub process reset creation script returned %d create requests, "
+                        + "but the original group has %d instances", actual, expected));
+    }
+
+    /**
      * Workflow script not found when executing a node or action
      *
      * @param key script key
