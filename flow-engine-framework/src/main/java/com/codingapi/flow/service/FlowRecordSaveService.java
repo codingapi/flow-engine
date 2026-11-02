@@ -8,6 +8,7 @@ import com.codingapi.flow.repository.FlowTodoMergeRepository;
 import com.codingapi.flow.repository.FlowTodoRecordRepository;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -147,6 +148,8 @@ class FlowRecordSaveService {
                                     flowTodoMergeRepository.delete(margeRelation);
                                     todoMargeRecord.divMergeCount();
                                     if (todoMargeRecord.hasMergeCount()) {
+                                        // 代表记录可能正是本次办结的记录，需要重新指向组内剩余的待办记录（issue #240）
+                                        refreshTodoMergeRecord(todoMargeRecord, margeRelations, flowRecord.getId());
                                         flowTodoRecordRepository.save(todoMargeRecord);
                                     } else {
                                         flowTodoRecordRepository.delete(todoMargeRecord);
@@ -170,6 +173,45 @@ class FlowRecordSaveService {
                 }
             }
         }
+    }
+
+    /**
+     * 将合并待办的代表记录刷新为组内剩余的待办记录（issue #240）。
+     *
+     * <p>合并待办的 {@code recordId} 会随组内任意一条记录的保存而更新（{@link FlowTodoRecord#update}），
+     * 部分审批后该记录可能恰好是刚办结的记录。此时组内仍有剩余待办，但待办列表行指向已办记录：
+     * 列表展示的是已完成的流程，详情也会因代表记录不是待办而无法加载整组。
+     * 因此从剩余的合并关系中重新选择一条待办记录回写代表记录。
+     *
+     * @param todoMargeRecord 合并待办组
+     * @param margeRelations  删除合并关系之前的组内关系列表
+     * @param doneRecordId    本次办结、且合并关系已被删除的记录id
+     */
+    private void refreshTodoMergeRecord(FlowTodoRecord todoMargeRecord, List<FlowTodoMerge> margeRelations,
+                                        long doneRecordId) {
+        List<Long> remainingRecordIds = margeRelations.stream()
+                .map(FlowTodoMerge::getRecordId)
+                .filter(recordId -> recordId != doneRecordId)
+                .distinct()
+                .sorted()
+                .toList();
+        if (remainingRecordIds.isEmpty()) {
+            return;
+        }
+        List<FlowRecord> remainingRecords = flowRecordRepository.findByIds(remainingRecordIds).stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparingLong(FlowRecord::getId))
+                .toList();
+        // 代表记录仍是待办时无需变更，避免无谓改变待办列表展示的数据
+        boolean representativeTodo = remainingRecords.stream()
+                .anyMatch(record -> record.getId() == todoMargeRecord.getRecordId() && record.isTodo());
+        if (representativeTodo) {
+            return;
+        }
+        remainingRecords.stream()
+                .filter(FlowRecord::isTodo)
+                .findFirst()
+                .ifPresent(todoMargeRecord::update);
     }
 
     public void saveAll() {
