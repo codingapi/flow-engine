@@ -848,6 +848,256 @@ class FlowSubProcessResetServiceTest {
                 "同步完成的新聚合组应放行");
     }
 
+    /**
+     * 测试目标：验证 issue #237 场景——主流程在子流程节点前有审批节点，
+     * 子流程节点发起 3 个子流程，全部通过后由下游审批对其中 1 条发起退回重填。
+     * 前置条件：主流程 开始 -> B(审批) -> C(子流程,3 实例,可重置) -> D(审批) -> 结束。
+     * 执行步骤：B 审批通过 → 3 个子流程全部通过 → D 待办上重置选中 1 条 →
+     * 完成重建子流程 → 审批 D。
+     * 期望断言：旧聚合组被取代（被重置的实例不再有效）；新组含 2 个继承实例与 1 个重建实例；
+     * 主流程退回子流程节点等待（D 待办作废）；重建完成后 D 重新生成待办，流程正常结束。
+     * 重建请求由创建脚本重新生成并按旧实例创建顺序取用，重置选中的是第 2 条数据，
+     * 因此重建实例应拿到脚本输出的第 2 份参数，证明多实例创建顺序没有被重置打乱。
+     */
+    @Test
+    void shouldResetOneOfThreeInstancesAfterIntermediateApproval() {
+        User beforeOperator = saveUser(20, "B节点审批人");
+        User afterOperator = saveUser(21, "D节点审批人");
+        StartNode start = writableStart("237开始");
+        ApprovalNode beforeApproval = approvalNode("237-B审批", beforeOperator);
+        SubProcessNode subProcess = SubProcessNode.builder()
+                .name("237-C子流程")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(new SubProcessStrategy(
+                                FlowGroovyScriptFactory.createSubProcessScript(threeChildScript()).getKey(),
+                                true,
+                                SubProcessResultScript.defaultScript().getScript(),
+                                false,
+                                true))
+                        .build())
+                .build();
+        ApprovalNode afterApproval = approvalNode("237-D审批", afterOperator);
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("issue237 子流程退回重填")
+                .code(PARENT_CODE + "-237")
+                .createdOperator(initiator)
+                .form(form)
+                .addNode(start)
+                .addNode(beforeApproval)
+                .addNode(subProcess)
+                .addNode(afterApproval)
+                .addNode(EndNode.builder().name("237结束").build())
+                .build();
+        factory.workflowService.saveWorkflow(workflow);
+
+        submitWorkflow(PARENT_CODE + "-237", start, Map.of("content", "issue237"));
+        FlowRecord beforeTodo = todos(beforeOperator, beforeApproval).get(0);
+        approve(beforeTodo, passAction(beforeApproval), beforeOperator, beforeTodo.getFormData());
+
+        List<FlowRecord> childTodos = todos(childOperator, childApproval);
+        assertEquals(3, childTodos.size(), "子流程节点应发起 3 个子流程");
+        for (FlowRecord childTodo : childTodos) {
+            approve(childTodo, passAction(childApproval), childOperator, childTodo.getFormData());
+        }
+
+        FlowRecord afterTodo = todos(afterOperator, afterApproval).get(0);
+        SubProcessRecord passedGroup = factory.subProcessRepository
+                .findByParentProcessId(afterTodo.getProcessId()).get(0);
+        assertAll("3 个子流程全部通过后进入 D 节点",
+                () -> assertEquals(3, passedGroup.getTotalCount()),
+                () -> assertEquals(SubProcessRecord.State.PASSED, passedGroup.getState()));
+        String resetProcessId = passedGroup.getInstances().get(1).getProcessId();
+        FlowRecord oldResetStartRecord = factory.flowRecordRepository
+                .get(passedGroup.getInstances().get(1).getStartRecordId());
+
+        resetSubProcess(afterTodo, List.of(resetProcessId), afterOperator);
+
+        List<SubProcessRecord> groups = factory.subProcessRepository
+                .findByParentProcessIdAndNodeId(afterTodo.getProcessId(), subProcess.getId());
+        assertEquals(2, groups.size(), "重置应保留旧组并新增一组");
+        SubProcessRecord newGroup = groups.get(1);
+        List<SubProcessRecord.Instance> rebuiltInstances = newGroup.getInstances().stream()
+                .filter(instance -> !instance.isInherited())
+                .toList();
+        assertAll("issue237 重置后的聚合组",
+                () -> assertTrue(groups.get(0).isSuperseded(), "旧聚合组应标记为已取代"),
+                () -> assertEquals(SubProcessRecord.State.WAITING, newGroup.getState()),
+                () -> assertEquals(3, newGroup.getTotalCount()),
+                () -> assertEquals(2, newGroup.getInstances().stream()
+                                .filter(SubProcessRecord.Instance::isInherited).count(),
+                        "未选中的 2 条数据应继承原结果"),
+                () -> assertEquals(1, rebuiltInstances.size(), "选中的 1 条数据应重建"),
+                () -> assertEquals(resetProcessId, rebuiltInstances.get(0).getSourceProcessId(),
+                        "重建实例应记录被替换的旧实例流程id"));
+        assertAll("主流程退回子流程节点等待",
+                () -> assertTrue(factory.flowRecordRepository.get(afterTodo.getId()).isRevoked()),
+                () -> assertTrue(todos(afterOperator, afterApproval).isEmpty()));
+        assertEquals(1, todos(childOperator, childApproval).size(), "仅重建实例需要重新审批");
+
+        FlowRecord rebuiltStartRecord = factory.flowRecordRepository
+                .get(rebuiltInstances.get(0).getStartRecordId());
+        assertAll("重建按旧实例创建顺序复用创建脚本输出",
+                () -> assertEquals(oldResetStartRecord.getFormData(), rebuiltStartRecord.getFormData()),
+                () -> assertEquals(oldResetStartRecord.getCreateOperatorId(),
+                        rebuiltStartRecord.getCreateOperatorId()),
+                () -> assertEquals("child-2", rebuiltStartRecord.getFormData().get("content"),
+                        "重置第 2 条数据应取脚本输出的第 2 份请求，不能打乱创建顺序"));
+
+        FlowRecord rebuiltTodo = todos(childOperator, childApproval).get(0);
+        approve(rebuiltTodo, passAction(childApproval), childOperator, rebuiltTodo.getFormData());
+
+        List<FlowRecord> resumedTodos = todos(afterOperator, afterApproval);
+        assertEquals(1, resumedTodos.size(), "3 条子流程数据全部完成后 D 节点重新生成待办");
+        approve(resumedTodos.get(0), passAction(afterApproval), afterOperator, resumedTodos.get(0).getFormData());
+        assertTrue(factory.flowRecordRepository.get(resumedTodos.get(0).getId()).isFinish(),
+                "退回重填完成后流程应正常结束");
+    }
+
+    /**
+     * 测试目标：验证重置与首次发起使用同一套创建脚本——子流程审批节点配置为发起人设定
+     * （INITIATOR_SELECT）时，脚本设置的 operatorSelectMap 在重建实例上同样生效。
+     * 前置条件：子流程 开始 -> 审批(INITIATOR_SELECT) -> 结束；创建脚本为子流程审批节点
+     * 设置 operatorSelectMap=[childOperator]；主流程 开始 -> 子流程(可重置) -> 审批 -> 结束。
+     * 执行步骤：发起主流程并完成子流程 → 主流程下游待办上重置该子流程 → 观察重建实例。
+     * 期望断言：重建实例自动提交成功，不产生子流程开始待办；新流程的人员分配已按脚本
+     * 写入，子流程审批待办直接生成给脚本指定的人员；完成后续流程正常结束。
+     */
+    @Test
+    void shouldReuseCreationScriptOperatorSelectWhenRebuildingInitiatorSelectChild() {
+        StartNode selectChildStart = writableStart("发起人设定子流程开始");
+        ApprovalNode initiatorSelectApproval = ApprovalNode.builder()
+                .name("发起人设定审批")
+                .strategies(NodeStrategyBuilder.builder()
+                        .addStrategy(readonlyPermission())
+                        .addStrategy(OperatorLoadStrategy.initiatorSelectStrategy())
+                        .build())
+                .build();
+        Workflow childWorkflow = WorkflowBuilder.builder()
+                .title("issue237-发起人设定子流程")
+                .code(CHILD_CODE + "-initiator-select")
+                .createdOperator(initiator)
+                .form(form)
+                .addNode(selectChildStart)
+                .addNode(initiatorSelectApproval)
+                .addNode(EndNode.builder().name("发起人设定子流程结束").build())
+                .build();
+        factory.workflowService.saveWorkflow(childWorkflow);
+
+        String createScript = """
+                def run(request){
+                    def createRequest = request.toCreateRequest('%s', %d, '%s', [content:'initiator-select-child'])
+                    createRequest.operatorSelectMap = ['%s': [%dL]]
+                    return createRequest
+                }
+                """.formatted(CHILD_CODE + "-initiator-select", initiator.getUserId(),
+                passAction(selectChildStart).id(), initiatorSelectApproval.getId(),
+                childOperator.getUserId());
+
+        StartNode parentStart = writableStart("发起人设定主流程开始");
+        SubProcessNode subProcess = resettableSubProcess(createScript);
+        ApprovalNode parentApproval = approvalNode("发起人设定主流程审批", finalOperator);
+        Workflow parentWorkflow = WorkflowBuilder.builder()
+                .title("issue237-发起人设定主流程")
+                .code(PARENT_CODE + "-initiator-select")
+                .createdOperator(initiator)
+                .form(form)
+                .addNode(parentStart)
+                .addNode(subProcess)
+                .addNode(parentApproval)
+                .addNode(EndNode.builder().name("发起人设定主流程结束").build())
+                .build();
+        factory.workflowService.saveWorkflow(parentWorkflow);
+
+        submitWorkflow(PARENT_CODE + "-initiator-select", parentStart,
+                Map.of("content", "initiator-select"));
+
+        assertTrue(todos(initiator, selectChildStart).isEmpty(),
+                "首次发起应自动提交成功，子流程开始节点不应留下待办");
+        List<FlowRecord> firstChildTodos = todos(childOperator, initiatorSelectApproval);
+        assertEquals(1, firstChildTodos.size(), "首次发起应按脚本设置生成子流程审批待办");
+        approve(firstChildTodos.get(0), passAction(initiatorSelectApproval), childOperator,
+                firstChildTodos.get(0).getFormData());
+
+        FlowRecord parentTodo = todos(finalOperator, parentApproval).get(0);
+        SubProcessRecord passedGroup = factory.subProcessRepository
+                .findByParentProcessId(parentTodo.getProcessId()).get(0);
+        String resetProcessId = passedGroup.getInstances().get(0).getProcessId();
+
+        resetSubProcess(parentTodo, List.of(resetProcessId), finalOperator);
+
+        assertTrue(todos(initiator, selectChildStart).isEmpty(),
+                "重建实例也应自动提交，不能停在子流程开始节点");
+        List<FlowRecord> rebuiltChildTodos = todos(childOperator, initiatorSelectApproval);
+        assertEquals(1, rebuiltChildTodos.size(),
+                "重建实例应按脚本设置的 operatorSelectMap 生成子流程审批待办");
+        FlowRecord rebuiltChildTodo = rebuiltChildTodos.get(0);
+        assertEquals(List.of(childOperator.getUserId()),
+                factory.flowOperatorAssignmentRepository.findOperatorIds(
+                        rebuiltChildTodo.getProcessId(), initiatorSelectApproval.getId()),
+                "新子流程应保存脚本设置的人员分配");
+
+        approve(rebuiltChildTodo, passAction(initiatorSelectApproval), childOperator,
+                rebuiltChildTodo.getFormData());
+        FlowRecord resumedParentTodo = todos(finalOperator, parentApproval).get(0);
+        approve(resumedParentTodo, passAction(parentApproval), finalOperator,
+                resumedParentTodo.getFormData());
+        assertTrue(factory.flowRecordRepository.get(resumedParentTodo.getId()).isFinish(),
+                "发起人设定子流程重走后主流程应正常结束");
+    }
+
+    /**
+     * 测试目标：验证重置时创建脚本输出与原子流程实例数不一致时拒绝重置，
+     * 避免按错位的请求重建、打乱原有多实例的数据组装。
+     * 前置条件：子流程初始创建 2 个实例；重置前修改锚点记录表单数据，使创建脚本在
+     * 重置时只返回 1 个创建请求。
+     * 执行步骤：在主流程下游待办上发起重置。
+     * 期望断言：抛出状态异常；旧聚合组未被取代，未产生新聚合组，当前待办仍有效。
+     */
+    @Test
+    void shouldRejectResetWhenCreationScriptOutputCountMismatchesOriginalGroup() {
+        StartNode start = writableStart("数量校验开始");
+        SubProcessNode subProcess = resettableSubProcess(countChangingScript());
+        ApprovalNode finalApprovalNode = approvalNode("数量校验审批", finalOperator);
+        Workflow workflow = WorkflowBuilder.builder()
+                .title("issue237-脚本数量校验")
+                .code(PARENT_CODE + "-count-check")
+                .createdOperator(initiator)
+                .form(form)
+                .addNode(start)
+                .addNode(subProcess)
+                .addNode(finalApprovalNode)
+                .addNode(EndNode.builder().name("数量校验结束").build())
+                .build();
+        factory.workflowService.saveWorkflow(workflow);
+
+        long parentStartRecordId = submitWorkflow(PARENT_CODE + "-count-check", start,
+                Map.of("content", "normal"));
+        List<FlowRecord> childTodos = todos(childOperator, childApproval);
+        assertEquals(2, childTodos.size());
+        for (FlowRecord childTodo : childTodos) {
+            approve(childTodo, passAction(childApproval), childOperator, childTodo.getFormData());
+        }
+        FlowRecord finalTodo = todos(finalOperator, finalApprovalNode).get(0);
+
+        SubProcessRecord passedGroup = factory.subProcessRepository
+                .findByParentProcessId(finalTodo.getProcessId()).get(0);
+        FlowRecord anchorRecord = factory.flowRecordRepository.get(passedGroup.getParentRecordId());
+        assertEquals(parentStartRecordId, anchorRecord.getId());
+        anchorRecord.setFormData(Map.of("content", "changed"));
+        factory.flowRecordRepository.save(anchorRecord);
+
+        String resetProcessId = passedGroup.getInstances().get(0).getProcessId();
+        assertThrows(FlowStateException.class,
+                () -> resetSubProcess(finalTodo, List.of(resetProcessId), finalOperator));
+
+        List<SubProcessRecord> groups = factory.subProcessRepository
+                .findByParentProcessIdAndNodeId(finalTodo.getProcessId(), subProcess.getId());
+        assertAll("脚本数量不一致时拒绝重置",
+                () -> assertEquals(1, groups.size()),
+                () -> assertFalse(groups.get(0).isSuperseded()),
+                () -> assertTrue(factory.flowRecordRepository.get(finalTodo.getId()).isTodo()));
+    }
+
     // ==================== 流程构建与操作辅助 ====================
 
     private SubProcessNode resettableSubProcess(String script) {
@@ -917,6 +1167,38 @@ class FlowSubProcessResetServiceTest {
                         request.toCreateRequest('%s', %d, '%s', [content:'child-1']),
                         request.toCreateRequest('%s', %d, '%s', [content:'child-2'])
                     ]
+                }
+                """.formatted(CHILD_CODE, initiator.getUserId(), passAction(childStart).id(),
+                CHILD_CODE, initiator.getUserId(), passAction(childStart).id());
+    }
+
+    private String threeChildScript() {
+        return """
+                def run(request){
+                    return [
+                        request.toCreateRequest('%s', %d, '%s', [content:'child-1']),
+                        request.toCreateRequest('%s', %d, '%s', [content:'child-2']),
+                        request.toCreateRequest('%s', %d, '%s', [content:'child-3'])
+                    ]
+                }
+                """.formatted(CHILD_CODE, initiator.getUserId(), passAction(childStart).id(),
+                CHILD_CODE, initiator.getUserId(), passAction(childStart).id(),
+                CHILD_CODE, initiator.getUserId(), passAction(childStart).id());
+    }
+
+    /**
+     * 首次发起返回 2 个创建请求；表单内容变为 changed 后只返回 1 个，
+     * 用于模拟父流程数据变化导致重置脚本输出数量与旧组实例数不一致。
+     */
+    private String countChangingScript() {
+        return """
+                def run(request){
+                    def first = request.toCreateRequest('%s', %d, '%s', [content:'child-1'])
+                    if (request.getFormData('content') == 'changed') {
+                        return first
+                    }
+                    def second = request.toCreateRequest('%s', %d, '%s', [content:'child-2'])
+                    return [first, second]
                 }
                 """.formatted(CHILD_CODE, initiator.getUserId(), passAction(childStart).id(),
                 CHILD_CODE, initiator.getUserId(), passAction(childStart).id());

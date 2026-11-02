@@ -16,6 +16,7 @@ symbols:
   - SubProcessResultScript
   - FlowSubProcessResultService
   - FlowSubProcessResetService
+  - SubProcessSessionFactory
   - FlowSubProcessResetRequest
   - FlowSubProcessResetEvent
   - FlowSession.findSubProcessRecords
@@ -89,7 +90,9 @@ def run(request){
 ### 接口与定位方式
 
 - 请求 `FlowSubProcessResetRequest`：`recordId`（当前操作的待办记录）+ `resetInstanceProcessIds`（选中重建的实例流程id）+ `advice`（重置说明）。
-- **不需要指定子流程节点**：由选中实例的流程id定位其所属聚合组（全部选中实例须同属一个未取代聚合组），重置始终是整个子流程**从头重走一次**——重建实例经由子流程节点配置的创建脚本与自动提交策略重新发起，不跳转、不迁移、不自动跳过任何历史数据。
+- **不需要指定子流程节点**：由选中实例的流程id定位其所属聚合组（全部选中实例须同属一个未取代聚合组），重置始终是整个子流程**从头重走一次**——重建时重新执行子流程节点配置的创建脚本，按旧实例在聚合组中的创建顺序取对应的 `FlowCreateRequest`，再按创建脚本的自动提交策略提交；不跳转、不迁移、不自动跳过任何历史数据。
+- **参数与人员设定由脚本决定**：重置接口不接受表单、发起人、流程标题或人员设定参数，这些均以创建脚本重新执行的输出为准（`FlowCreateRequest.formData` / `operatorId` / `operatorSelectMap` / `workTitle` / `actionId`），与首次发起完全一致；「发起人设定 / 审批人设定」（`INITIATOR_SELECT` / `APPROVER_SELECT`）类节点在重置后仍由脚本指定的人员接收待办。
+- **数量一致性校验**：创建脚本返回的创建请求数量必须与旧聚合组实例数一致，否则抛出 `state.subProcess.resetScriptMismatch` 并拒绝重置，避免按错位请求重建、打乱多实例的创建顺序与数据组装。
 - 前置约束：当前记录为待办且操作人匹配；目标聚合组已放行（PASSED）、未被取代、全部实例已结束；当前流程无等待中聚合组；当前记录位于**锁定合并节点**（见下）。
 
 ### 锁定合并节点（复杂下游拓扑支持）
@@ -106,7 +109,8 @@ def run(request){
 
 - **聚合组建模**：旧聚合组标记 `superseded`（聚合状态保持不变，历史记录保留有效可查），新建一条聚合组取代其成为当前有效数据。新组由两类实例组成：
   - **继承实例**（未选中，`Instance.inherited=true`）：沿用原实例的流程id与最终状态，不重新执行；
-  - **重建实例**（选中）：基于旧实例的启动记录反推创建请求（沿用原子流程定义、表单数据、流程标题与原发起人），创建全新子流程（新流程id），`Instance.sourceProcessId` 记录其替换的旧实例流程id，供订阅方完成旧 → 新映射。
+  - **重建实例**（选中）：重新执行子流程创建脚本，按旧实例在聚合组中的创建顺序取对应的 `FlowCreateRequest`（表单数据、发起人、人员设定、流程标题与开始动作均以脚本输出为准，不再基于旧启动记录反推请求），创建全新子流程（新流程id），`Instance.sourceProcessId` 记录其替换的旧实例流程id，供订阅方完成旧 → 新映射。
+- **脚本上下文一致**：重置与结果判定共用 `SubProcessSessionFactory` 以锚点记录重建父流程会话（当前节点为子流程节点、表单/审批意见/动作均取自锚点记录），保证重置时创建脚本拿到的 `request` 与首次触发子流程时一致。
 - **锚点不变**：新组沿用旧组的 `parentRecordId`（原触发记录），保证结果判定后主流程恢复位置不变。
 - **记录链作废**：触发锚点之后的主流程记录链以撤销语义作废（含执行重置的当前待办，重置说明写入该记录供审计），主流程退回子流程节点重新等待——**原待办从待办列表消失，新聚合组放行后生成全新的下游待办**；作废链路与 `FlowRevokeService` 一致，逐条推送 `FlowRecordRevokeEvent`。
 - **结果判定自愈**：重建实例全部结束后，`FlowSubProcessResultService` 按新组判定（结果脚本经上下文可见继承 + 重建实例的完整最终记录集），放行后生成新的下游待办；`complete()` 定位聚合组时跳过已取代组，避免继承实例同属新旧两组时命中旧组。

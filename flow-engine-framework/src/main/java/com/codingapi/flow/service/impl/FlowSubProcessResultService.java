@@ -1,31 +1,21 @@
 package com.codingapi.flow.service.impl;
 
 import com.codingapi.flow.action.BaseAction;
-import com.codingapi.flow.action.IFlowAction;
-import com.codingapi.flow.action.actions.PassAction;
-import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
 import com.codingapi.flow.domain.SubProcessContext;
 import com.codingapi.flow.domain.SubProcessRecord;
 import com.codingapi.flow.error.ErrorThrow;
 import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
-import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowValidationException;
-import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.node.BaseFlowNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.SubProcessNode;
-import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.SubProcessRepository;
-import com.codingapi.flow.service.WorkflowService;
-import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.SubProcessStrategy;
-import com.codingapi.flow.workflow.Workflow;
-import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
 import com.codingapi.springboot.framework.event.EventPusher;
 
 import java.util.ArrayList;
@@ -39,13 +29,11 @@ public class FlowSubProcessResultService {
     private final FlowRecord childFinalRecord;
     private final IRepositoryHolder repositoryHolder;
     private final SubProcessRepository subProcessRepository;
-    private final WorkflowService workflowService;
 
     public FlowSubProcessResultService(FlowRecord childFinalRecord, IRepositoryHolder repositoryHolder) {
         this.childFinalRecord = childFinalRecord;
         this.repositoryHolder = repositoryHolder;
         this.subProcessRepository = repositoryHolder.getSubProcessRepository();
-        this.workflowService = repositoryHolder.getWorkflowService();
     }
 
     public void complete() {
@@ -90,42 +78,8 @@ public class FlowSubProcessResultService {
     }
 
     private FlowSession createParentSession(SubProcessRecord subProcessRecord) {
-        FlowRecord parentRecord = repositoryHolder.getRecordById(subProcessRecord.getParentRecordId());
-        if (parentRecord == null) {
-            throw FlowNotFoundException.record(subProcessRecord.getParentRecordId());
-        }
-        WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(subProcessRecord.getParentWorkRuntimeId());
-        if (workflowRuntime == null) {
-            throw FlowNotFoundException.workflow(subProcessRecord.getParentWorkRuntimeId() + " not found");
-        }
-        FlowRuntimeScriptLocalCache.getInstance().set(workflowRuntime.getScripts());
-        Workflow workflow = workflowRuntime.toWorkflow();
-        IFlowNode sourceNode = workflow.getFlowNode(parentRecord.getNodeId());
-        IFlowAction action = sourceNode.actionManager().getActionById(parentRecord.getActionId());
-        // 前驱记录可能为相同人员自动通过的留痕记录（无审批动作，actionId=null，issue #226）：
-        // 恢复下游以来源节点的通过动作兜底，避免空动作会话导致 NPE 使主流程永久停滞
-        if (action == null && parentRecord.isAutoDone()) {
-            action = sourceNode.actionManager().getAction(PassAction.class);
-        }
-        IFlowOperator currentOperator = repositoryHolder.getOperatorById(parentRecord.getCurrentOperatorId());
-        IFlowOperator createdOperator = repositoryHolder.getOperatorById(parentRecord.getCreateOperatorId());
-        IFlowOperator submitOperator = repositoryHolder.getOperatorById(parentRecord.getSubmitOperatorId());
-        FormData formData = new FormData(workflow.getForm());
-        formData.reset(parentRecord.getFormData());
-        FlowAdvice advice = parentRecord.toAdvice(workflow);
-        IFlowNode subProcessNode = workflow.getFlowNode(subProcessRecord.getNodeId());
-        FlowSession session = new FlowSession(repositoryHolder,
-                currentOperator,
-                createdOperator,
-                submitOperator,
-                workflow,
-                subProcessNode,
-                action,
-                formData,
-                parentRecord,
-                List.of(),
-                parentRecord.getWorkRuntimeId(),
-                advice);
+        FlowSession session = SubProcessSessionFactory.createParentSession(
+                subProcessRecord, repositoryHolder, repositoryHolder.getWorkflowService());
         session.setSubProcessContext(new SubProcessContext(subProcessRecord, childFinalRecord));
         return session;
     }

@@ -20,6 +20,7 @@ import com.codingapi.flow.repository.SubProcessRepository;
 import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.FlowService;
 import com.codingapi.flow.service.WorkflowService;
+import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.SubProcessStrategy;
 import com.codingapi.flow.workflow.Workflow;
@@ -112,15 +113,27 @@ public class FlowSubProcessResetService {
             throw FlowStateException.subProcessResetMergeNodeOnly();
         }
 
+        // 重建与首次发起共用同一套创建脚本与数据组装过程：重新执行子流程创建脚本，
+        // 按旧实例在聚合组中的创建顺序取对应请求，保证参数、发起人、发起人设定的人员
+        // 与首次发起一致，且不会打乱多实例的创建顺序
+        FlowSession parentSession = SubProcessSessionFactory.createParentSession(
+                currentGroup, repositoryHolder, workflowService);
+        List<FlowCreateRequest> scriptRequests = strategy.getSubProcessScript().execute(parentSession);
+        List<SubProcessRecord.Instance> oldInstances = currentGroup.getInstances();
+        if (scriptRequests.size() != oldInstances.size()) {
+            throw FlowStateException.subProcessResetScriptMismatch(oldInstances.size(), scriptRequests.size());
+        }
+
         // 先创建重建实例（不触发自动提交），落库新聚合组后再统一提交，
         // 避免重建实例在新组落库前结束导致结果判定找不到聚合组
         boolean submit = strategy.isSubmit();
         FlowService flowService = repositoryHolder.createFlowService();
         List<SubProcessRecord.Instance> newInstances = new ArrayList<>();
         List<FlowActionRequest> submitRequests = new ArrayList<>();
-        for (SubProcessRecord.Instance instance : currentGroup.getInstances()) {
+        for (int index = 0; index < oldInstances.size(); index++) {
+            SubProcessRecord.Instance instance = oldInstances.get(index);
             if (request.getResetInstanceProcessIds().contains(instance.getProcessId())) {
-                FlowCreateRequest createRequest = buildRebuildRequest(instance, anchorRecord);
+                FlowCreateRequest createRequest = scriptRequests.get(index);
                 long newRecordId = flowService.create(createRequest);
                 FlowRecord newStartRecord = repositoryHolder.getRecordById(newRecordId);
                 newInstances.add(SubProcessRecord.Instance.rebuiltFrom(newStartRecord, instance.getProcessId()));
@@ -234,29 +247,6 @@ public class FlowSubProcessResetService {
                 .filter(record -> !record.isNotify())
                 .min(Comparator.comparingLong(FlowRecord::getId))
                 .orElse(null);
-    }
-
-    /**
-     * 依据旧实例的启动记录反推重建请求：沿用原子流程定义、表单数据、流程标题与原发起人，
-     * 锚定到原触发记录。
-     *
-     * @param oldInstance  被重置的旧实例
-     * @param anchorRecord 父流程中子流程节点的触发记录
-     * @return 重建子流程的创建请求
-     */
-    private FlowCreateRequest buildRebuildRequest(SubProcessRecord.Instance oldInstance, FlowRecord anchorRecord) {
-        FlowRecord oldStartRecord = repositoryHolder.getRecordById(oldInstance.getStartRecordId());
-        if (oldStartRecord == null) {
-            throw FlowNotFoundException.record(oldInstance.getStartRecordId());
-        }
-        FlowCreateRequest request = new FlowCreateRequest();
-        request.setWorkCode(oldStartRecord.getWorkCode());
-        request.setOperatorId(oldStartRecord.getCreateOperatorId());
-        request.setActionId(oldStartRecord.getActionId());
-        request.setFormData(oldStartRecord.getFormData());
-        request.setWorkTitle(oldInstance.getWorkTitle());
-        request.setParentRecordId(anchorRecord.getId());
-        return request;
     }
 
     /**
