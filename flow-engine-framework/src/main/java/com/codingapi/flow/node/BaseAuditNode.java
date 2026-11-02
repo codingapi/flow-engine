@@ -22,6 +22,7 @@ import lombok.SneakyThrows;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -99,27 +100,64 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         if (currentRecords.size() > 1) {
             NodeStrategyManager nodeStrategyManager = this.strategyManager();
             MultiOperatorAuditStrategy.Type multiOperatorAuditStrategyType = nodeStrategyManager.getMultiOperatorAuditStrategyType();
-            // 顺序审批
+            // 顺序审批：以实际最大审批序号判定。转办/委派会产生与原审批人同序号的替换记录，
+            // 不能用记录条数推断最大序号，否则节点会提前完成或永远无法完成（issue #239）
             if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.SEQUENCE) {
-                int currentOrder = currentRecord.getNodeOrder();
-                int maxNodeOrder = currentRecords.size() - 1;
-                return currentOrder >= maxNodeOrder;
+                int maxNodeOrder = currentRecords.stream()
+                        .mapToInt(FlowRecord::getNodeOrder)
+                        .max()
+                        .orElse(currentRecord.getNodeOrder());
+                return currentRecord.getNodeOrder() >= maxNodeOrder;
             }
             // 或签
             if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.ANY) {
                 return true;
             }
-            // 并签
+            // 并签：按审批槽位（nodeOrder）统计。转办/委派的替换记录占用原槽位，不新增席位；
+            // 转办/委派出让本身不算审批完成，避免替换人一次通过就误判达到比例（issue #239）
             if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.MERGE) {
                 float percent = nodeStrategyManager.getMultiOperatorAuditMergePercent();
-                long total = currentRecords.size();
-                // 尚未办理的数量为所有待办数-1，1是当前办理的这条记录
-                long todoCount = currentRecords.stream().filter(FlowRecord::isTodo).count() - 1;
-                long doneCount = total - todoCount;
-                return doneCount >= total * percent;
+                long total = currentRecords.stream()
+                        .map(FlowRecord::getNodeOrder)
+                        .distinct()
+                        .count();
+                long approved = approvedNodeOrderCount(currentRecords, currentRecord);
+                return approved >= total * percent;
             }
         }
         return true;
+    }
+
+    /**
+     * 统计当前节点实例中已审批的槽位数量（同一 nodeOrder 只计一次）。
+     *
+     * <p>以下记录不计为已审批：
+     * <ul>
+     *     <li>自动办结记录（{@link FlowRecord#isAutoDone()}）：未发生实际审批动作；</li>
+     *     <li>委派替办记录（{@link FlowRecord#isDelegate()}）：临时办理人，原审批人返回确认后才算该席位完成；</li>
+     *     <li>转办/委派出让记录：动作类型不是通过，代表审批人已把席位交予他人。</li>
+     * </ul>
+     * 当前正在办理的记录即将通过，按通过计入（委派替办记录除外）。
+     *
+     * @param currentRecords 当前节点实例的全部记录
+     * @param currentRecord  当前正在办理的记录
+     * @return 已审批的槽位数量
+     */
+    private long approvedNodeOrderCount(List<FlowRecord> currentRecords, FlowRecord currentRecord) {
+        Set<Integer> approvedOrders = new HashSet<>();
+        for (FlowRecord record : currentRecords) {
+            if (record.getId() == currentRecord.getId()) {
+                if (!currentRecord.isDelegate()) {
+                    approvedOrders.add(record.getNodeOrder());
+                }
+            } else if (record.isDone()
+                    && !record.isAutoDone()
+                    && !record.isDelegate()
+                    && ActionType.PASS.name().equalsIgnoreCase(record.getActionType())) {
+                approvedOrders.add(record.getNodeOrder());
+            }
+        }
+        return approvedOrders.size();
     }
 
 

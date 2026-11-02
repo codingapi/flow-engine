@@ -73,7 +73,8 @@ public class FlowDelayTriggerService {
         formData.reset(flowRecord.getFormData());
 
         FlowAdvice advice = flowRecord.toAdvice(workflow);
-        List<FlowRecord> currentRecords = repositoryHolder.findCurrentNodeRecords(flowRecord.getFromId(), flowRecord.getNodeId());
+        long nodeInstanceFromId = flowRecord.resolveNodeInstanceFromId(repositoryHolder);
+        List<FlowRecord> currentRecords = repositoryHolder.findCurrentNodeRecords(nodeInstanceFromId, flowRecord.getNodeId());
 
         // 获取延迟任务节点
         IFlowNode delayNode = workflow.getFlowNode(delayTask.getDelayNodeId());

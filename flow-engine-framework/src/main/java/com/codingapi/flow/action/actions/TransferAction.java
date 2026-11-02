@@ -100,6 +100,8 @@ public class TransferAction extends BaseAction {
 
         for (IFlowOperator operator : operators) {
             FlowRecord flowRecord = currentRecord.create(flowSession.updateSession(operator));
+            // 转办是在同一节点内替换办理人：新记录必须加入原记录的节点实例分组（issue #239）
+            flowRecord.inheritNodeInstance(currentRecord);
             recordList.add(flowRecord);
             flowEvents.add(new FlowRecordTodoEvent(flowRecord,flowSession.isMock()));
         }

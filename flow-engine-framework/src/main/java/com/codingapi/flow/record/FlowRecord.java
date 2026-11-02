@@ -19,8 +19,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 流程流转记录数据模型
@@ -380,6 +382,61 @@ public class FlowRecord {
     }
 
     /**
+     * 让新记录归属原记录所在的节点实例。
+     *
+     * <p>转办、委派等"在同一节点内替换办理人"的动作会新建记录，新记录必须：
+     * <ul>
+     *     <li>与同节点其他记录共享 {@code fromId}（节点实例的分组依据）；</li>
+     *     <li>继承原记录的 {@code nodeOrder}（多人审批的顺序槽位，转办/委派不新增审批席位）。</li>
+     * </ul>
+     * 否则 {@code findCurrentNodeRecords(fromId, nodeId)} 只能查到新记录自身，
+     * 多人审批的完成判定、遗留待办自动办结和下游取数都会基于残缺的分组执行（issue #239）。
+     *
+     * @param record 原节点记录
+     */
+    public void inheritNodeInstance(FlowRecord record) {
+        this.fromId = record.getFromId();
+        this.nodeOrder = record.getNodeOrder();
+    }
+
+    /**
+     * 解析当前记录所属节点实例的分组 id（同节点记录共享的 {@code fromId}）。
+     *
+     * <p>历史上转办/委派产生的记录会把 {@code fromId} 指向同节点的原记录，
+     * 这里沿 {@code fromId} 链向上归并到真正的前驱记录，确保升级前已在运行的流程
+     * 仍能按同一节点实例归组（issue #239）。
+     *
+     * @param repositoryHolder 仓储持有者
+     * @return 节点实例分组 id
+     */
+    public long resolveNodeInstanceFromId(IRepositoryHolder repositoryHolder) {
+        return resolveNodeInstanceFromId(repositoryHolder, this.fromId, this.nodeId);
+    }
+
+    /**
+     * 解析指定节点实例的分组 id。
+     *
+     * @param repositoryHolder 仓储持有者
+     * @param fromId           记录来源 id
+     * @param nodeId           节点 id
+     * @return 节点实例分组 id
+     */
+    public static long resolveNodeInstanceFromId(IRepositoryHolder repositoryHolder,
+                                                 long fromId,
+                                                 String nodeId) {
+        long instanceFromId = fromId;
+        Set<Long> visited = new HashSet<>();
+        while (instanceFromId > 0 && visited.add(instanceFromId)) {
+            FlowRecord parent = repositoryHolder.getRecordById(instanceFromId);
+            if (parent == null || !nodeId.equals(parent.getNodeId())) {
+                break;
+            }
+            instanceFromId = parent.getFromId();
+        }
+        return instanceFromId;
+    }
+
+    /**
      * 当满足条件以后需要清空并行的记录数据
      */
     public void clearParallel() {
@@ -692,7 +749,8 @@ public class FlowRecord {
                                          IFlowOperator submitOperator,
                                          FormData formData,
                                          FlowAdvice advice) {
-        List<FlowRecord> currentRecords = repositoryHolder.findCurrentNodeRecords(this.getFromId(), this.getNodeId());
+        long nodeInstanceFromId = this.resolveNodeInstanceFromId(repositoryHolder);
+        List<FlowRecord> currentRecords = repositoryHolder.findCurrentNodeRecords(nodeInstanceFromId, this.getNodeId());
         IFlowNode currentNode = workflow.getFlowNode(nodeId);
         return new FlowSession(
                 repositoryHolder,

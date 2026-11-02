@@ -150,12 +150,14 @@ public class PassAction extends BaseAction {
         flowEvents.add(new FlowRecordDoneEvent(currentRecord, flowSession.isMock()));
         recordList.add(currentRecord);
 
-        // 激活下一个按顺序审批的记录数据
+        // 激活下一个按顺序审批的记录数据。
+        // 委派记录只是临时办理人，原审批人尚未确认，不能提前激活后续顺序的审批人（issue #239）；
+        // 只激活尚未展示过的记录，避免委派返回后重复激活已显示/已办理的人员。
         NodeStrategyManager nodeStrategyManager = currentNode.strategyManager();
-        if (nodeStrategyManager.isSequenceMultiOperatorType()) {
+        if (!currentRecord.isDelegate() && nodeStrategyManager.isSequenceMultiOperatorType()) {
             List<FlowRecord> currentRecords = flowSession.getCurrentNodeRecords();
             for (FlowRecord record : currentRecords) {
-                if (record.getNodeOrder() == currentRecord.getNodeOrder() + 1) {
+                if (record.getNodeOrder() == currentRecord.getNodeOrder() + 1 && record.isHidden()) {
                     record.show();
                     recordList.add(record);
                     flowEvents.add(new FlowRecordTodoEvent(record, flowSession.isMock()));
@@ -164,12 +166,20 @@ public class PassAction extends BaseAction {
         }
 
         // 或签/并签：节点完成后，将同节点其他未办理的待办记录自动置为已办（已审核），
-        // 避免其他审批人的遗留待办再次触发后续节点
+        // 避免其他审批人的遗留待办再次触发后续节点（issue #188 / #239）。
+        // 委派记录通过后节点尚未真正完成（还需原审批人确认），此时不能办结其他待办。
+        // 顺序审批（SEQUENCE）与随机一人（RANDOM_ONE）在节点完成时不会遗留同节点待办，
+        // 且仓储按 (fromId, nodeId) 查询可能命中其他流程实例的开始节点记录（fromId=0），
+        // 因此仅对或签/并签执行自动办结，并限定在同一流程实例内。
         MultiOperatorAuditStrategy.Type multiOperatorAuditType = nodeStrategyManager.getMultiOperatorAuditStrategyType();
         if (isFinish
+                && !currentRecord.isDelegate()
                 && (multiOperatorAuditType == MultiOperatorAuditStrategy.Type.ANY
                 || multiOperatorAuditType == MultiOperatorAuditStrategy.Type.MERGE)) {
             for (FlowRecord record : flowSession.getCurrentNodeRecords()) {
+                if (!currentRecord.getProcessId().equals(record.getProcessId())) {
+                    continue;
+                }
                 if (record.getId() != currentRecord.getId() && record.isTodo()) {
                     record.autoDone();
                     recordList.add(record);
@@ -187,43 +197,44 @@ public class PassAction extends BaseAction {
             recordList.clear();
         }
 
-        if (isFinish) {
-            // 是否转交审批人的流程
-            if (currentRecord.isForward()) {
-                IFlowOperator forwardOperator = repositoryHolder.getOperatorById(currentRecord.getForwardOperatorId());
-                FlowRecord notifyRecord = currentRecord.create(flowSession.updateSession(forwardOperator));
-                notifyRecord.notifyRecord(flowSession.updateSession(forwardOperator));
-                // 如果不存储这个记录，若下一流程是结束流程时，无法更新流程状态为结束状态。
-                repositoryHolder.saveRecord(notifyRecord);
-                flowEvents.add(new FlowRecordDoneEvent(notifyRecord, flowSession.isMock()));
-            }
+        // 是否转交审批人的流程
+        if (isFinish && currentRecord.isForward()) {
+            IFlowOperator forwardOperator = repositoryHolder.getOperatorById(currentRecord.getForwardOperatorId());
+            FlowRecord notifyRecord = currentRecord.create(flowSession.updateSession(forwardOperator));
+            notifyRecord.notifyRecord(flowSession.updateSession(forwardOperator));
+            // 如果不存储这个记录，若下一流程是结束流程时，无法更新流程状态为结束状态。
+            repositoryHolder.saveRecord(notifyRecord);
+            flowEvents.add(new FlowRecordDoneEvent(notifyRecord, flowSession.isMock()));
+        }
 
-            // 是否委托记录
-            if (currentRecord.isDelegate()) {
-                FlowRecord delegateRecord = repositoryHolder.getRecordById(currentRecord.getDelegateId());
-                IFlowOperator delegateOperator = repositoryHolder.getOperatorById(delegateRecord.getCurrentOperatorId());
-                FlowRecord rebackRecord = delegateRecord.create(flowSession.updateSession(delegateOperator));
-                rebackRecord.clearDelegate();
+        // 委派记录办理完成后必须交还原审批人确认，与当前节点是否达到完成条件无关：
+        // 多人审批时其他待办可能尚未完成，若只在 isFinish 时返回，委派记录会永久滞留（issue #239）
+        if (currentRecord.isDelegate()) {
+            FlowRecord delegateRecord = repositoryHolder.getRecordById(currentRecord.getDelegateId());
+            IFlowOperator delegateOperator = repositoryHolder.getOperatorById(delegateRecord.getCurrentOperatorId());
+            FlowRecord rebackRecord = delegateRecord.create(flowSession.updateSession(delegateOperator));
+            // 返回记录同样归属原委托记录的节点实例与审批槽位（issue #239）
+            rebackRecord.inheritNodeInstance(delegateRecord);
+            rebackRecord.clearDelegate();
 
-                recordList.add(rebackRecord);
-                flowEvents.add(new FlowRecordTodoEvent(rebackRecord, flowSession.isMock()));
-            } else {
-                this.triggerNode(flowSession, (triggerSession) -> {
-                    List<FlowRecord> records = this.generateRecords(triggerSession);
-                    if (!records.isEmpty()) {
-                        for (FlowRecord record : records) {
-                            if (record.isShow()) {
-                                if (record.isNotify()) {
-                                    flowEvents.add(new FlowRecordDoneEvent(record, flowSession.isMock()));
-                                } else {
-                                    flowEvents.add(new FlowRecordTodoEvent(record, flowSession.isMock()));
-                                }
+            recordList.add(rebackRecord);
+            flowEvents.add(new FlowRecordTodoEvent(rebackRecord, flowSession.isMock()));
+        } else if (isFinish) {
+            this.triggerNode(flowSession, (triggerSession) -> {
+                List<FlowRecord> records = this.generateRecords(triggerSession);
+                if (!records.isEmpty()) {
+                    for (FlowRecord record : records) {
+                        if (record.isShow()) {
+                            if (record.isNotify()) {
+                                flowEvents.add(new FlowRecordDoneEvent(record, flowSession.isMock()));
+                            } else {
+                                flowEvents.add(new FlowRecordTodoEvent(record, flowSession.isMock()));
                             }
                         }
-                        recordList.addAll(records);
                     }
-                });
-            }
+                    recordList.addAll(records);
+                }
+            });
         }
         repositoryHolder.saveRecords(recordList);
 
