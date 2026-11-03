@@ -169,7 +169,9 @@ public class FlowSession {
         if (!directPrevious) {
             return List.of();
         }
-        return repositoryHolder.findCurrentNodeRecords(currentRecord.getFromId(), currentRecord.getNodeId())
+        long nodeInstanceFromId = FlowRecord.resolveNodeInstanceFromId(
+                repositoryHolder, currentRecord.getFromId(), currentRecord.getNodeId());
+        return repositoryHolder.findCurrentNodeRecords(nodeInstanceFromId, currentRecord.getNodeId())
                 .stream()
                 .filter(record -> !record.isAutoDone())
                 .map(FlowRecord::getCurrentOperatorId)

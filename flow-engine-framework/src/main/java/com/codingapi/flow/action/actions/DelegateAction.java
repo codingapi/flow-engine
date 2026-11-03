@@ -93,6 +93,8 @@ public class DelegateAction extends BaseAction {
 
         for (IFlowOperator operator : operators) {
             FlowRecord flowRecord = currentRecord.create(flowSession.updateSession(operator));
+            // 委派是在同一节点内临时替换办理人：新记录加入原节点实例分组并占用原审批槽位（issue #239）
+            flowRecord.inheritNodeInstance(currentRecord);
             flowRecord.resetDelegate(currentRecord);
             recordList.add(flowRecord);
             flowEvents.add(new FlowRecordTodoEvent(flowRecord, flowSession.isMock()));
