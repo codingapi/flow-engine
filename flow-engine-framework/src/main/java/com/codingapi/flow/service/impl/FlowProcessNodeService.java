@@ -476,7 +476,12 @@ public class FlowProcessNodeService {
 
     private void loadEndNode(boolean finish) {
         IFlowNode endNode = this.workflow.getEndNode();
-        this.previewNodeList.add(ProcessNode.createByEndNode(endNode, finish));
+        // 区分正常结束与终止：EndNode 以 finish(pass) 记录终态，正常结束为 SATE_FLOW_FINISH，
+        // 拒绝终止、异常结束时为其他终态，需要单独标记，避免展示成「已审批」
+        boolean terminated = finish
+                && this.flowRecord != null
+                && this.flowRecord.getFlowState() != FlowRecord.SATE_FLOW_FINISH;
+        this.previewNodeList.add(ProcessNode.createByEndNode(endNode, finish, terminated));
     }
 
 
