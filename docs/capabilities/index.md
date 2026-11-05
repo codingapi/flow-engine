@@ -9,7 +9,7 @@
 | [commons/lang3](./commons/lang3.md) | commons | Apache Commons 工具库，提供字符串、集合、IO 等通用工具方法 | 后端 | 框架:Apache Commons |
 | [flow-engine-framework/action](./flow-engine-framework/action.md) | flow-engine-framework | 流程动作体系，包含 8 种动作类型、动作接口和动作工厂 | 后端 | 项目自有 |
 | [flow-engine-framework/delay](./flow-engine-framework/delay.md) | flow-engine-framework | 延迟任务调度能力，支持延迟节点的定时触发、任务持久化与共享调度线程 | 后端 | 项目自有 |
-| [flow-engine-framework/exception](./flow-engine-framework/exception.md) | flow-engine-framework | 流程异常体系，包含异常基类和 5 种业务异常子类 | 后端 | 项目自有 |
+| [flow-engine-framework/exception](./flow-engine-framework/exception.md) | flow-engine-framework | 流程异常体系，包含异常基类和 6 种业务异常子类 | 后端 | 项目自有 |
 | [flow-engine-framework/flow-service](./flow-engine-framework/flow-service.md) | flow-engine-framework | 流程服务层，封装流程的创建、审批、撤销、催办等核心业务操作 | 后端 | 项目自有 |
 | [flow-engine-framework/gateway-context](./flow-engine-framework/gateway-context.md) | flow-engine-framework | 网关上下文，提供操作者网关的注入和线程级缓存 | 后端 | 项目自有 |
 | [flow-engine-framework/node-manager](./flow-engine-framework/node-manager.md) | flow-engine-framework | 流程节点管理器，负责节点查找、下一节点计算和节点状态管理 | 后端 | 项目自有 |
@@ -24,7 +24,7 @@
 | [flow-engine-framework/workflow](./flow-engine-framework/workflow.md) | flow-engine-framework | 工作流引擎核心模型，包含流程定义、构建器、版本管理和运行时快照 | 后端 | 项目自有 |
 | [flow-engine-starter/auto-configuration](./flow-engine-starter/auto-configuration.md) | flow-engine-starter | Spring Boot 自动配置入口，注册流程引擎的核心组件和仓储上下文 | 后端 | 项目自有 |
 | [lombok/lombok](./lombok/lombok.md) | lombok | Lombok 代码简化工具，通过注解自动生成 getter/setter/builder 等样板代码 | 后端 | 框架:Lombok |
-| [springboot/cache](./springboot/cache.md) | springboot | Spring Cache 声明式缓存能力，通过注解简化缓存操作 | 后端 | 框架:Spring Boot |
+| [springboot/cache](./springboot/cache.md) | springboot | 手写 LRU 本地缓存能力（LinkedHashCache/WorkflowRuntimeCache），通过 LinkedHashMap accessOrder 实现 | 后端 | 框架:Spring Boot |
 | [springboot/data-jpa](./springboot/data-jpa.md) | springboot | Spring Data JPA 能力，提供 ORM、Repository 抽象和分页查询 | 后端 | 框架:Spring Boot |
 | [springboot/ioc](./springboot/ioc.md) | springboot | Spring Framework IoC 容器、依赖注入、AOP 和事件发布 | 后端 | 框架:Spring Boot |
 | [springboot/web](./springboot/web.md) | springboot | Spring Boot Web 能力，提供 REST API、Controller 和请求处理 | 后端 | 框架:Spring Boot |

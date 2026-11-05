@@ -72,7 +72,7 @@ public class GatewayContext {
 
 ### 3.1 用户实体实现 `IFlowOperator`
 
-`flow-engine-example/src/main/java/com/codingapi/example/entity/User.java`：
+`flow-engine-example/src/main/java/com/codingapi/example/entity/User.java`（节选，实际类还包含 `ADMIN_ROLE`/`ADMIN_ACCOUNT` 等常量、静态工厂 `admin(PasswordEncoder)`、`getRoles()`、`encodePassword()` 等成员）：
 
 ```java
 package com.codingapi.example.entity;

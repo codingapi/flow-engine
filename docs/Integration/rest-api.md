@@ -53,6 +53,7 @@ operatorId 请求参数 → 存在 → 使用该 id 作为当前操作人
 | POST | `/api/cmd/workflow/create-custom-action` | — | `SingleResponse<Map>` | 创建自定义动作默认配置 |
 | POST | `/api/cmd/workflow/mock` | — | `SingleResponse<String>` | 创建 Mock 沙箱，返回 mockKey（需流程管理员） |
 | POST | `/api/cmd/workflow/cleanMock` | `IdRequest` | `Response` | 清理 Mock 沙箱 |
+| GET | `/api/cmd/workflow/exists` | query `code` | `SingleResponse<Boolean>` | 判断流程编码是否存在 |
 
 ## 4. 查询（`/api/query/record`）
 
@@ -86,11 +87,14 @@ public interface FlowRecordQueryService {
 | GET | `/api/query/workflow/options` | — | `MultiResponse<WorkflowOption>` | 流程下拉选项 |
 | GET | `/api/query/workflow/versions` | query `id`（workId） | `MultiResponse<WorkflowVersionOption>` | 流程版本列表 |
 
-## 6. 节点视图脚本（`/api/view/javascript`）
+## 6. 节点视图脚本（`/api/cmd/node-view`）
 
 `flow-engine-starter-api/src/main/java/com/codingapi/flow/api/controller/NodeViewJavaScriptController.java`
 
-提供节点视图 JS 的读写接口（`NodeViewJavaScript` 持久化经 `NodeViewJavaScriptRepository`）。
+| 方法 | 路径 | 参数/请求体 | 说明 |
+|---|---|---|---|
+| GET | `/api/cmd/node-view/getScript` | query `key` | 按缓存 key 获取节点视图 JS 内容 |
+| POST | `/api/cmd/node-view/save` | JSON 请求体 | 保存节点视图 JS（`NodeViewJavaScript`，持久化经 `NodeViewJavaScriptRepository`） |
 
 ## 7. Groovy 脚本接口（`/api/groovy-script`）
 
@@ -145,10 +149,13 @@ public interface FlowRecordQueryService {
 ```json
 {
   "recordId": 456,
+  "operatorId": 1001,
   "resetInstanceProcessIds": ["选中重建的子流程实例流程id"],
   "advice": "重置说明"
 }
 ```
+
+- `operatorId` 必填（`verify()` 强制大于 0，缺失抛 `FlowValidationException.required("operatorId")`）。
 
 - 重置不属于审批动作，不经过 `/action` 接口；仅当子流程节点开启 `resettable` 能力且当前待办位于其下游时可调用。
 - 无需指定子流程节点：由选中实例流程id定位其所属聚合组，选中实例须同属一个已放行且未取代的聚合组。
@@ -201,4 +208,4 @@ recordId / timeoutTime / recordState / flowState / notify
 | `SingleResponse<T>` | `{ data: T, success, ... }` |
 | `MultiResponse<T>` | `{ data: T[], total, success, ... }` |
 
-异常统一为 `LocaleMessageException` 体系（`FlowException` 的 5 个子类，见 [扩展点](./extension-points.md#异常体系)），错误码见各异常工厂方法。
+异常统一为 `LocaleMessageException` 体系（`FlowException` 的 6 个子类，见 [扩展点](./extension-points.md#异常体系)），错误码见各异常工厂方法。

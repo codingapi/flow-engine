@@ -150,7 +150,7 @@ IFlowAction#run
 
 ## 5. 异常体系
 
-基类 `FlowException extends LocaleMessageException`，5 个子类（`exception/` 包），均以静态工厂方法构造：
+基类 `FlowException extends LocaleMessageException`，6 个子类（`exception/` 包），均以静态工厂方法构造：
 
 | 子类 | 典型工厂方法与错误场景 |
 |---|---|
@@ -159,5 +159,6 @@ IFlowAction#run
 | `FlowStateException` | `repositoryNotRegistered`、`recordAlreadyDone`、`operatorNotMatch`、`workflowAlreadyDisable`、`recordNotSupportRevoke` 等 |
 | `FlowNotFoundException` | `workflow(workCode)`、`record(recordId)`、`node(nodeId)`、`operator(operatorId)`、`action(actionId)` |
 | `FlowPermissionException` | `accessDenied(operation)` |
+| `WorkflowTransferException` | `invalidSchema()`、`unsupportedSchema()`、`scriptNotFound()`、`scriptTypeUnsupported()`、`replaceTargetNotFound()`（流程导入导出） |
 
 REST 层经 `LocaleMessageException` 统一转换为 `{ errCode, errMessage }` 响应。

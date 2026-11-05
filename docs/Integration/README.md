@@ -35,7 +35,7 @@
 | [流程事件机制](./event-integration.md) | 8 种事件、`EventPusher`、`IHandler` 订阅、异步分发管道、事务变体、推送时机 |
 | [仓储抽象与持久化](./repository-integration.md) | `IRepositoryHolder`、12 个仓储接口（含 11 个 JPA 实现 + 需自行实现的 `NodeViewJavaScriptRepository`）、脚本仓储、锁机制 |
 | [Spring Boot 自动配置](./auto-configuration.md) | `AutoConfiguration` 8 个 Bean、4 个 Register、必选/可选 Bean 清单 |
-| [REST API](./rest-api.md) | 4 个 Controller、`mockKey`/`operatorId` 分流机制、请求/响应结构 |
+| [REST API](./rest-api.md) | 5 个 Controller、`mockKey`/`operatorId` 分流机制、请求/响应结构 |
 | [Mock 模式](./mock-mode.md) | 全内存沙箱 `MockInstance`、15 分钟过期、接入方式 |
 | [节点/动作/策略扩展](./extension-points.md) | 19 种节点 × 8 种动作 × 15 种节点策略 × 2 种流程策略，扩展方式 |
 | [编程式 API](./programmatic-api.md) | `WorkflowBuilder`/`FlowFormBuilder` 构建流程、`FlowService` 服务编排、查询服务 |
@@ -72,7 +72,7 @@ REST 请求 → FlowRecordController
 ## 版本约定
 
 - 引擎版本：`0.1.0-SNAPSHOT`（根 pom `revision`）
-- 外部框架依赖（根 pom `codingapi.framework.version = 17.3.0`）：
+- 外部框架依赖（根 pom `codingapi.framework.version = 17.3.1`）：
   - `com.codingapi.springboot:springboot-starter` —— 事件体系（`EventPusher`/`IHandler`）、`UserContext`、`LocaleMessageException`
   - `com.codingapi.springboot:springboot-starter-script` —— Groovy 脚本引擎（`GroovyScript`/注解/仓储 SPI）
   - `com.codingapi.springboot:springboot-starter-data-fast` —— `FastRepository`（JPA 仓储基类）

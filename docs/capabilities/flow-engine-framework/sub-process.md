@@ -89,7 +89,7 @@ def run(request){
 
 ### 接口与定位方式
 
-- 请求 `FlowSubProcessResetRequest`：`recordId`（当前操作的待办记录）+ `resetInstanceProcessIds`（选中重建的实例流程id）+ `advice`（重置说明）。
+- 请求 `FlowSubProcessResetRequest`：`recordId`（当前操作的待办记录）+ `operatorId`（必填，当前操作人）+ `resetInstanceProcessIds`（选中重建的实例流程id）+ `advice`（重置说明）。
 - **不需要指定子流程节点**：由选中实例的流程id定位其所属聚合组（全部选中实例须同属一个未取代聚合组），重置始终是整个子流程**从头重走一次**——重建时重新执行子流程节点配置的创建脚本，按旧实例在聚合组中的创建顺序取对应的 `FlowCreateRequest`，再按创建脚本的自动提交策略提交；不跳转、不迁移、不自动跳过任何历史数据。
 - **参数与人员设定由脚本决定**：重置接口不接受表单、发起人、流程标题或人员设定参数，这些均以创建脚本重新执行的输出为准（`FlowCreateRequest.formData` / `operatorId` / `operatorSelectMap` / `workTitle` / `actionId`），与首次发起完全一致；「发起人设定 / 审批人设定」（`INITIATOR_SELECT` / `APPROVER_SELECT`）类节点在重置后仍由脚本指定的人员接收待办。
 - **数量一致性校验**：创建脚本返回的创建请求数量必须与旧聚合组实例数一致，否则抛出 `state.subProcess.resetScriptMismatch` 并拒绝重置，避免按错位请求重建、打乱多实例的创建顺序与数据组装。

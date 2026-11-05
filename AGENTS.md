@@ -36,7 +36,7 @@ Flow Engine 是一个企业级工作流引擎，基于 Java 17 和 Spring Boot 3
 
 ### 服务编排模式（FlowService）
 
-`FlowService`（`flow-engine-framework/.../service/FlowService.java`）是 `@Transactional` 业务入口。**每个流程操作对应一个独立的 `FlowXxxService`**（`FlowCreateService` / `FlowActionService` / `FlowRevokeService` / `FlowDeleteService` / `FlowUrgeService` / `FlowDetailService`），通过 `IRepositoryHolder` 注入依赖，且每次操作前调用 `FlowOperatorLocalThreadCache.getInstance().clear()` 清理线程缓存。新增流程操作应沿用此模式：新建 `FlowXxxService(request, repositoryHolder)`，并在 `FlowService` 暴露一个入口方法。
+`FlowService`（`flow-engine-framework/.../service/FlowService.java`）是 `@Transactional` 业务入口，共 8 个入口方法（detail / processNodes / create / action / revoke / delete / urge / resetSubProcess）。**每个流程操作对应一个独立的 `FlowXxxService`**（`FlowCreateService` / `FlowActionService` / `FlowRevokeService` / `FlowDeleteService` / `FlowUrgeService` / `FlowDetailService` / `FlowProcessNodeService` / `FlowSubProcessResetService` / `FlowSubProcessResultService` / `FlowDelayTriggerService` / `OperatorAssignmentService` 等），通过 `IRepositoryHolder` 注入依赖，且每次操作前调用 `FlowOperatorLocalThreadCache.getInstance().clear()` 与 `FlowRuntimeScriptLocalCache` 清理线程缓存。新增流程操作应沿用此模式：新建 `FlowXxxService(request, repositoryHolder)`，并在 `FlowService` 暴露一个入口方法。
 
 ### 仓储持有者（IRepositoryHolder）
 
@@ -64,11 +64,11 @@ REST 层通过请求参数 `mockKey` 分流到 Mock 实例（见 `FlowRecordCont
 
 ### 事件（IFlowEvent + EventPusher）
 
-7 种事件：开始 / 待办 / 已办 / 完成 / 催办 / 撤销（`FlowRecordRevokeEvent`）/ 删除（`FlowRecordDeleteEvent`）。操作完成后用 `EventPusher.push(event)` 推送；事件通常携带 `FlowRecord` + `mock` 标记。外部可用 Spring `@EventListener` 订阅。
+8 种事件：开始 / 待办 / 已办 / 完成 / 催办 / 撤销（`FlowRecordRevokeEvent`）/ 删除（`FlowRecordDeleteEvent`）/ 子流程重置（`FlowSubProcessResetEvent`）。操作完成后用 `EventPusher.push(event)` 推送；记录类事件携带 `FlowRecord` + `mock` 标记，重置事件携带新旧聚合组快照。外部可用 Spring `@EventListener` 订阅。
 
 ### API 模块划分
 
-- **命令操作**：`flow-engine-starter-api` — `FlowRecordController`（`/api/cmd/record`：create / action / revoke / delete / urge / detail）与 `WorkflowController`（`/api/cmd/workflow`：流程设计 CRUD）
+- **命令操作**：`flow-engine-starter-api` — `FlowRecordController`（`/api/cmd/record`：create / action / revoke / delete / urge / detail / processNodes / subProcess/reset）、`WorkflowController`（`/api/cmd/workflow`：流程设计 CRUD 及导入导出）与 `NodeViewJavaScriptController`（`/api/cmd/node-view`：节点视图脚本 getScript / save）
 - **查询**：`flow-engine-starter-query` — `FlowRecordQueryController`（`/api/query/record`：list / todo / done / notify）与 `WorkflowQueryController`（`/api/query/workflow`：list / options / versions）
 - **持久化**：`flow-engine-starter-infra` — JPA 实体与仓储实现（含达梦方言）
 

@@ -1,7 +1,7 @@
 ---
 name: flow-engine-framework/exception
 module: flow-engine-framework
-description: 流程异常体系，包含异常基类和 5 种业务异常子类
+description: 流程异常体系，包含异常基类和 6 种业务异常子类
 status: 已实现
 scope: 后端
 source: 项目自有
@@ -13,6 +13,7 @@ symbols:
   - FlowStateException
   - FlowNotFoundException
   - FlowPermissionException
+  - WorkflowTransferException
 content_hash: 1a3438bf88b6b98d84a03fabe6f08ed66948a8da8f44fea35b8a9d49d1f84458
 ---
 
@@ -20,7 +21,7 @@ content_hash: 1a3438bf88b6b98d84a03fabe6f08ed66948a8da8f44fea35b8a9d49d1f84458
 
 提供流程引擎的标准化异常体系，解决以下问题：
 
-- **异常分类**：按业务语义将异常分为执行异常、验证异常、状态异常、未找到异常和权限异常五类
+- **异常分类**：按业务语义将异常分为执行异常、验证异常、状态异常、未找到异常、权限异常和导入导出异常六类
 - **错误码标准化**：每种异常使用 `errorCode + message` 格式，支持国际化消息
 - **工厂方法创建**：每种异常提供静态工厂方法，统一异常创建方式并确保错误码一致
 
@@ -30,11 +31,12 @@ content_hash: 1a3438bf88b6b98d84a03fabe6f08ed66948a8da8f44fea35b8a9d49d1f84458
 
 ```
 FlowException（抽象基类，继承 LocaleMessageException）
-├── FlowExecutionException   — 流程执行过程中的错误
-├── FlowValidationException  — 流程配置或参数验证错误
-├── FlowStateException       — 流程状态不允许当前操作
-├── FlowNotFoundException    — 请求的资源不存在
-└── FlowPermissionException  — 操作者无权限执行操作
+├── FlowExecutionException    — 流程执行过程中的错误
+├── FlowValidationException   — 流程配置或参数验证错误
+├── FlowStateException        — 流程状态不允许当前操作
+├── FlowNotFoundException     — 请求的资源不存在
+├── FlowPermissionException   — 操作者无权限执行操作
+└── WorkflowTransferException — 流程定义导入导出错误
 ```
 
 ### 各类异常的工厂方法
@@ -46,6 +48,7 @@ FlowException（抽象基类，继承 LocaleMessageException）
 | `FlowStateException` | `repositoryNotRegistered()`, `recordAlreadyDone()`, `operatorNotMatch()`, `edgeConfigError()`, `recordLimitUrgeError()` |
 | `FlowNotFoundException` | `workflow()`, `record()`, `node()`, `operator()`, `action()` |
 | `FlowPermissionException` | `accessDenied()` |
+| `WorkflowTransferException` | `invalidSchema()`, `unsupportedSchema()`, `scriptNotFound()`, `scriptTypeUnsupported()`, `replaceTargetNotFound()` |
 
 ### 扩展新异常
 

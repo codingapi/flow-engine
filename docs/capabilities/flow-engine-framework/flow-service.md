@@ -18,6 +18,10 @@ symbols:
   - FlowProcessNodeService
   - FlowRevokeService
   - FlowUrgeService
+  - FlowDeleteService
+  - FlowSubProcessResetService
+  - FlowSubProcessResultService
+  - SubProcessSessionFactory
   - OperatorAssignmentService
   - WorkflowGroovyScriptUtils
 content_hash: 48847288af1a4551b8327e398d01a8ec4de643dce1c049b90dcdc8ad0134df3b
@@ -27,7 +31,7 @@ content_hash: 48847288af1a4551b8327e398d01a8ec4de643dce1c049b90dcdc8ad0134df3b
 
 提供流程引擎的业务服务层，将复杂的流程操作封装为高内聚的服务接口，解决以下问题：
 
-- **流程操作入口**：`FlowService` 作为流程审批操作的统一入口，支持创建、审批、撤销、删除、催办
+- **流程操作入口**：`FlowService` 作为流程审批操作的统一入口，支持创建、审批、撤销、删除、催办、子流程重置
 - **流程设计管理**：`WorkflowService` 管理流程定义的 CRUD 和版本操作
 - **职责分离**：每种操作由独立的 Service 实现（如 `FlowActionService`、`FlowCreateService`），保持单一职责
 - **线程安全**：每次操作前通过 `FlowOperatorLocalThreadCache.clear()` 与 `FlowRuntimeScriptLocalCache.clear()` 清理线程缓存
@@ -45,6 +49,7 @@ content_hash: 48847288af1a4551b8327e398d01a8ec4de643dce1c049b90dcdc8ad0134df3b
 | `urge(FlowUrgeRequest)` | 催办 |
 | `detail(FlowDetailRequest)` | 查询流程详情 |
 | `processNodes(FlowProcessNodeRequest)` | 查询流程节点记录 |
+| `resetSubProcess(FlowSubProcessResetRequest)` | 子流程数据重置（独立接口，REST 端点 `POST /api/cmd/record/subProcess/reset`） |
 
 ### WorkflowService — 流程设计管理
 

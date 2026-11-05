@@ -36,7 +36,7 @@ content_hash: 42b4c00cdcb8aac4c1695f7d503b1ec953ab4ea3b3f92067e2312c31ea9d4a69
 
 - **脚本注册表**：通过 `ScriptRegistryContext` 单例管理各类默认脚本，支持替换默认实现
 - **脚本类型封装**：将各种脚本场景封装为强类型类（如 `RouterNodeScript`、`ConditionScript` 等）
-- **脚本执行上下文**：`FlowScriptContext` 提供脚本 `$bind` 上下文（Spring Bean、流程记录、操作者查询）；脚本的实际执行由 `FlowScriptRuntimeContext` 结合 spring-boot 的 `GroovyScript` 完成
+- **脚本执行上下文**：`FlowScriptContext` 提供脚本 `$bind` 上下文（Spring Bean、流程记录、操作者查询），内部持有 `IBeanFactory` 并委托其实现；脚本的实际执行由 `FlowScriptRuntimeContext` 结合 spring-boot 的 `GroovyScript` 完成
 - **脚本请求封装**：`GroovyScriptRequest` / `GroovyWorkflowRequest` 封装脚本执行所需的参数
 
 ## 如何使用
@@ -75,7 +75,7 @@ ScriptRegistryContext.getInstance().setRegistry(new IScriptRegistry() {
 
 ### 脚本执行上下文
 
-`FlowScriptContext` 承载脚本的 `$bind` 上下文，实现 `IBeanFactory`，供 Groovy 脚本以 `$bind.getBean(...)`、`$bind.getRecordById(...)`、`$bind.getOperatorById(...)` 等方式访问 Spring 容器中的 Bean、流程记录与操作者信息；脚本的实际执行由 `FlowScriptRuntimeContext` 结合 spring-boot 的 `GroovyScript` 完成。
+`FlowScriptContext` 承载脚本的 `$bind` 上下文，内部持有 `IBeanFactory` 字段并委托其实现（具体实现由 starter 的 `FlowScriptContextRegister` 装配），供 Groovy 脚本以 `$bind.getBean(...)`、`$bind.getRecordById(...)`、`$bind.getOperatorById(...)` 等方式访问 Spring 容器中的 Bean、流程记录与操作者信息；脚本的实际执行由 `FlowScriptRuntimeContext` 结合 spring-boot 的 `GroovyScript` 完成。
 
 ## 使用实例
 
