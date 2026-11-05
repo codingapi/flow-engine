@@ -91,7 +91,7 @@ IFlowNode（核心节点接口）
 
 ```java
 // 通过工厂创建默认节点
-IFlowNode startNode = NodeFactory.getInstance().createNode(NodeType.StartNode);
+IFlowNode startNode = NodeFactory.getInstance().createNode(NodeType.START);
 
 // 从 Map 反序列化节点
 Map<String, Object> nodeData = ...;

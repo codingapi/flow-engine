@@ -15,6 +15,7 @@ public class FlowService {
     void revoke(FlowRevokeRequest request);                              // 撤销
     void delete(FlowDeleteRequest request);                              // 删除（仅未流转实例）
     void urge(FlowUrgeRequest request);                                  // 催办
+    void resetSubProcess(FlowSubProcessResetRequest request);            // 子流程数据重置（独立接口）
 }
 ```
 
@@ -66,6 +67,8 @@ void saveWorkflowRuntime(WorkflowRuntime workflowRuntime);
 WorkflowRuntime getOrCreateWorkflowRuntime(Workflow workflow);   // @Transactional(REQUIRES_NEW) + lockById
 WorkflowRuntime getWorkflowRuntime(String workId, long workVersion);
 String importWorkflow(String body, IFlowOperator createOperator);  // 导入流程 JSON，返回 workId
+String importWorkflow(String body, IFlowOperator createOperator, WorkflowImportMode mode);  // 指定导入模式（增量/覆盖）
+String exportWorkflow(String workId);                              // 导出流程及其全部版本和脚本
 ```
 
 - `saveWorkflowVersion(version, creatable, enable)`：保存版本（`creatable=true` 时创建新版本并切为当前；`enable` 控制是否启用），内部会固化脚本（`WorkflowGroovyScriptUtils.saveScripts`）。

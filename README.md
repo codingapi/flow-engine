@@ -29,7 +29,7 @@ Flow Engine 是一个基于 Java 17 和 Spring Boot 3.5.9 构建的企业级工�
 flow-engine
 ├── flow-engine-framework      # 核心流程引擎框架
 ├── flow-engine-starter        # Spring Boot 自动配置入口
-├── flow-engine-starter-api    # REST API 层（命令操作：create / action / revoke / delete / urge / detail）
+├── flow-engine-starter-api    # REST API 层（命令操作：create / action / revoke / delete / urge / detail / processNodes / subProcess/reset，含节点视图脚本接口）
 ├── flow-engine-starter-infra  # 持久化层（JPA 实体、11 个仓储实现、含达梦方言）
 ├── flow-engine-starter-query  # 查询层（流程记录与流程定义只读 API）
 ├── flow-engine-example        # 示例应用（H2/达梦数据库、JWT 认证、端口 8090）
