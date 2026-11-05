@@ -1,5 +1,6 @@
 package com.codingapi.flow.pojo.response;
 
+import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.domain.SubProcessRecord;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.StartNode;
@@ -68,6 +69,22 @@ public class ProcessNode {
     private boolean parentProcessRecord;
 
     /**
+     * 是否为拒绝动作产生的记录（审批拒绝）。
+     *
+     * <p>拒绝记录与通过记录同为「已办」，仅通过 {@link ApproveState} 无法区分，
+     * 因此单独标记，供前端展示「已拒绝」。新增字段不影响历史数据与旧版前端。
+     */
+    private boolean rejected;
+
+    /**
+     * 流程是否非正常结束（如拒绝终止流程）。
+     *
+     * <p>仅结束节点有效：{@code flowState} 为 {@code SATE_FLOW_FINISH} 表示正常结束，
+     * 其余终态（终止、异常）视为非正常结束，供前端展示「已终止」。
+     */
+    private boolean terminated;
+
+    /**
      * 子流程节点执行信息，仅 SUB_PROCESS 节点产生执行记录后返回。
      */
     private SubProcessBody subProcess;
@@ -113,6 +130,8 @@ public class ProcessNode {
     private void resetApproveState(FlowRecord flowRecord) {
         if (flowRecord.isDone()) {
             this.approveState = ApproveState.PASS;
+            // 拒绝动作产生的记录同样为已办，需要额外标记，避免与审批通过混淆
+            this.rejected = ActionType.REJECT.name().equals(flowRecord.getActionType());
         }
 
         if (flowRecord.isError()) {
@@ -206,12 +225,25 @@ public class ProcessNode {
 
 
     public static ProcessNode createByEndNode(IFlowNode flowNode, boolean finish) {
+        return createByEndNode(flowNode, finish, false);
+    }
+
+    /**
+     * 构建结束节点。
+     *
+     * @param flowNode   结束节点
+     * @param finish     流程是否已结束
+     * @param terminated 是否为非正常结束（拒绝终止、异常结束等）
+     * @return 结束节点展示对象
+     */
+    public static ProcessNode createByEndNode(IFlowNode flowNode, boolean finish, boolean terminated) {
         ProcessNode processNode = new ProcessNode();
         processNode.setId(flowNode.getId());
         processNode.setNodeId(flowNode.getId());
         processNode.setNodeName(flowNode.getName());
         processNode.setNodeType(flowNode.getType());
         processNode.setApproveState(finish ? ApproveState.PASS : ApproveState.PENDING);
+        processNode.setTerminated(finish && terminated);
         processNode.setApproveStrategy(MultiOperatorAuditStrategy.Type.SEQUENCE);
         processNode.setOperatorStrategy(OperatorStrategy.OPERATOR_LIST);
         return processNode;

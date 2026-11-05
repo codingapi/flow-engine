@@ -1,5 +1,6 @@
 package com.codingapi.flow.service;
 
+import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.PassAction;
 import com.codingapi.flow.action.actions.RejectAction;
@@ -18,6 +19,8 @@ import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
+import com.codingapi.flow.pojo.request.FlowProcessNodeRequest;
+import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
 import com.codingapi.flow.strategy.node.FormFieldPermissionStrategy;
@@ -32,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -81,6 +85,57 @@ class FlowRejectTerminateTest {
         List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(startDone.getProcessId());
         assertEquals(0, factory.flowRecordRepository.findTodoByOperator(boss.getUserId()).size());
         assertTrue(records.stream().allMatch(FlowRecord::isFinish));
+
+        // 流程视图需要区分「拒绝终止」与「审批通过」
+        List<ProcessNode> nodes = factory.flowService.processNodes(
+                new FlowProcessNodeRequest(bossTodo.getId(), boss.getUserId(), DATA));
+
+        ProcessNode approvalNode = nodes.stream()
+                .filter(node -> node.getNodeId().equals(bossTodo.getNodeId()))
+                .findFirst().orElseThrow();
+        assertTrue(approvalNode.isRejected(), "拒绝产生的记录应标记为 rejected");
+        assertEquals(ProcessNode.ApproveState.PASS, approvalNode.getApproveState());
+
+        ProcessNode endNode = nodes.stream()
+                .filter(node -> EndNode.NODE_TYPE.equals(node.getNodeType()))
+                .findFirst().orElseThrow();
+        assertTrue(endNode.isTerminated(), "拒绝终止后结束节点应标记为 terminated");
+    }
+
+    /**
+     * 审批通过时，节点与结束节点都不应带拒绝/终止标记
+     */
+    @Test
+    void pass_shouldNotMarkRejectedOrTerminated() {
+        Workflow workflow = buildWorkflow("def run(request){return 'TERMINATE'}");
+        factory.workflowService.saveWorkflow(workflow);
+
+        FlowRecord startDone = submitStartToFirstApproval(workflow, user.getUserId());
+        FlowRecord bossTodo = factory.flowRecordRepository.findTodoByOperator(boss.getUserId()).stream()
+                .filter(record -> record.getProcessId().equals(startDone.getProcessId()))
+                .findFirst().orElseThrow();
+
+        IFlowAction passAction = workflow.getFlowNode(bossTodo.getNodeId()).actionManager()
+                .getActionByType(ActionType.PASS.name());
+        FlowActionRequest passRequest = new FlowActionRequest();
+        passRequest.setFormData(DATA);
+        passRequest.setRecordId(bossTodo.getId());
+        passRequest.setAdvice(new FlowAdviceBody(passAction.id(), "同意", boss.getUserId()));
+        factory.flowService.action(passRequest);
+
+        List<ProcessNode> nodes = factory.flowService.processNodes(
+                new FlowProcessNodeRequest(bossTodo.getId(), boss.getUserId(), DATA));
+
+        ProcessNode approvalNode = nodes.stream()
+                .filter(node -> node.getNodeId().equals(bossTodo.getNodeId()))
+                .findFirst().orElseThrow();
+        assertFalse(approvalNode.isRejected());
+
+        ProcessNode endNode = nodes.stream()
+                .filter(node -> EndNode.NODE_TYPE.equals(node.getNodeType()))
+                .findFirst().orElseThrow();
+        assertFalse(endNode.isTerminated());
+        assertEquals(ProcessNode.ApproveState.PASS, endNode.getApproveState());
     }
 
     /**
