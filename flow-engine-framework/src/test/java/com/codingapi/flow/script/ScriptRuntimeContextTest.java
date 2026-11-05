@@ -4,6 +4,8 @@ import com.codingapi.flow.context.GatewayContext;
 import com.codingapi.flow.gateway.impl.UserGateway;
 import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.script.request.GroovyScriptBind;
+import com.codingapi.flow.script.runtime.FlowScriptContext;
 import com.codingapi.flow.user.User;
 import com.codingapi.springboot.script.GroovyScript;
 import com.codingapi.springboot.script.meta.GroovyMetadata;
@@ -52,12 +54,16 @@ class ScriptRuntimeContextTest {
                 .builder(key)
                 .script(script)
                 .method("run")
-                .returnType(Integer.class)
+                .returnType(IFlowOperator.class)
+                .binds(Map.of("$bind", GroovyScriptBind.class))
                 .requests( Map.of("abc", Integer.class))
                 .build();
 
-        IFlowOperator target = groovyScript.invoke(1);
-        assertEquals(target, user);
+        // $bind 必须显式作为绑定对象传入：脚本运行时按脚本文本缓存 Script 实例，
+        // 绑定属性挂在缓存实例上，若依赖其他用例执行后残留的绑定，测试结果将受执行顺序影响
+        GroovyScriptBind bind = new GroovyScriptBind(FlowScriptContext.getInstance());
+        IFlowOperator target = groovyScript.invoke(Map.of("$bind", bind), 1);
+        assertEquals(user, target);
     }
 
     @Test
