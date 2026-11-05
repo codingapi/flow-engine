@@ -40,6 +40,9 @@ build/
 ### workbuddy ###
 .workbuddy/
 
+### codebuddy ###
+.codebuddy/
+
 ### Worktrees ###
 .worktrees/
 
