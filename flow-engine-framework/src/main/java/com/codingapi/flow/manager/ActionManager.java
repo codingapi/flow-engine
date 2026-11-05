@@ -95,11 +95,7 @@ public class ActionManager {
             session.verifyFormData();
 
             // 是否必须填写审批意见
-            if (nodeStrategyManager.isAdviceRequired()) {
-                if (!StringUtils.hasText(flowAdvice.getAdvice())) {
-                    throw FlowValidationException.required("advice");
-                }
-            }
+            verifyAdviceRequired(nodeStrategyManager, flowAdvice);
 
             // 是否必须签名
             if (nodeStrategyManager.isSignRequired()) {
@@ -109,19 +105,23 @@ public class ActionManager {
             }
         }
 
-        // 通过操作
+        // 拒绝操作
         if (flowAction instanceof RejectAction) {
             // 是否必须填写审批意见
-            if (nodeStrategyManager.isAdviceRequired()) {
-                if (!StringUtils.hasText(flowAdvice.getAdvice())) {
-                    throw FlowValidationException.required("advice");
-                }
+            verifyAdviceRequired(nodeStrategyManager, flowAdvice);
+        }
+
+        // 转办操作、委托操作
+        if (flowAction instanceof TransferAction || flowAction instanceof DelegateAction) {
+            // 是否必须填写审批意见（意见记录在当前办理记录上）
+            verifyAdviceRequired(nodeStrategyManager, flowAdvice);
+            if (flowAdvice.getForwardOperators() == null || flowAdvice.getForwardOperators().isEmpty()) {
+                throw FlowValidationException.required("forwardOperators");
             }
         }
 
-        // 加签操作、转办操作、委托操作
-        if (flowAction instanceof AddAuditAction || flowAction instanceof TransferAction
-                || flowAction instanceof DelegateAction) {
+        // 加签操作（加签意见暂不持久化，因此不校验意见必填）
+        if (flowAction instanceof AddAuditAction) {
             if (flowAdvice.getForwardOperators() == null || flowAdvice.getForwardOperators().isEmpty()) {
                 throw FlowValidationException.required("forwardOperators");
             }
@@ -129,6 +129,8 @@ public class ActionManager {
 
         // 退回操作
         if (flowAction instanceof ReturnAction) {
+            // 是否必须填写审批意见（意见记录在当前办理记录上）
+            verifyAdviceRequired(nodeStrategyManager, flowAdvice);
             if (flowAdvice.getBackNode() == null) {
                 throw FlowValidationException.required("backNode");
             }
@@ -152,6 +154,22 @@ public class ActionManager {
             }
         }
 
+    }
+
+    /**
+     * 校验审批意见是否必填。
+     *
+     * <p>节点开启「隐藏审批意见」时，{@link NodeStrategyManager#isAdviceRequired()} 已放宽为 false，
+     * 避免用户没有输入入口却被服务端拦截。适用于所有会记录审批意见的动作
+     * （通过、拒绝、退回、转办、委派）。
+     *
+     * @param nodeStrategyManager 节点策略
+     * @param flowAdvice          审批意见
+     */
+    private void verifyAdviceRequired(NodeStrategyManager nodeStrategyManager, FlowAdvice flowAdvice) {
+        if (nodeStrategyManager.isAdviceRequired() && !StringUtils.hasText(flowAdvice.getAdvice())) {
+            throw FlowValidationException.required("advice");
+        }
     }
 
     public IFlowAction getAction(Class<? extends IFlowAction> clazz) {
