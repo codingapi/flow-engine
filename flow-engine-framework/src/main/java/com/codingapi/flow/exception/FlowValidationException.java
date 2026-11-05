@@ -89,6 +89,18 @@ public class FlowValidationException extends FlowException {
     }
 
     /**
+     * Field content exceeds the max length
+     *
+     * @param fieldName field name
+     * @param maxLength max length
+     * @return exception
+     */
+    public static FlowValidationException tooLong(String fieldName, int maxLength) {
+        return new FlowValidationException("validation.field.tooLong",
+                String.format("Field %s exceeds the max length %d", fieldName, maxLength));
+    }
+
+    /**
      * Max size must be positive
      *
      * @param fieldName field name

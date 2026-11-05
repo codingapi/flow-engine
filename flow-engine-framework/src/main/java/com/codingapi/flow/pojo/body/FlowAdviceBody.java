@@ -5,6 +5,7 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.session.FlowSession;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,11 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 public class FlowAdviceBody {
+
+    /**
+     * 审批意见最大长度（与前端默认 maxLength 保持一致）
+     */
+    public static final int ADVICE_MAX_LENGTH = 500;
 
     /**
      * 流程动作
@@ -84,6 +90,10 @@ public class FlowAdviceBody {
         }
         if (operatorId <= 0) {
             throw FlowValidationException.required("operatorId");
+        }
+        // 审批意见长度校验：超长会破坏列表与详情展示，且不同宿主字段长度不一致
+        if (StringUtils.hasText(advice) && advice.trim().length() > ADVICE_MAX_LENGTH) {
+            throw FlowValidationException.tooLong("advice", ADVICE_MAX_LENGTH);
         }
     }
 }
