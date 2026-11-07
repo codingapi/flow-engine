@@ -1,7 +1,7 @@
 ---
 name: workflow/github-issue
 module: workflow
-description: GitHub Issue 标准处理流程 — 定位分析 → 回复 issue → worktree 修复 → 合并 dev → 提交关闭 → 推送 GitHub → 推送后回复
+description: GitHub Issue 标准处理流程 — 定位分析 → 回复 issue → worktree 修复 → 推送特性分支 → 推送后回复
 status: 已实现
 scope: 通用
 source: 项目自有
@@ -24,9 +24,9 @@ source: 项目自有
 
 1. **分析可以不开 worktree，改代码必须开**：定位阶段只读代码即可；一旦确定要修改，必须新建 git worktree + 特性分支。
 2. **先回复，再动手**：定位到问题后，先在对应 issue 回复根因与处理方案。
-3. **只合并到 dev**：特性分支完成后合并至 `dev`；是否推送 `dev` 到 GitHub 由维护者决定，助手不得擅自 `git push`。
+3. **基于 dev 开分支，不直接合并 dev**：每个 issue 都从 `dev` 新建独立特性分支；完成后只把特性分支推送到 GitHub，由维护者评审后合并到 `dev`。助手不得自行合并 `dev`，也不得向 `dev` / `main` 推送。
 4. **提交即关联 issue**：提交信息使用 `Closes #<id>` 关联；是否已真正关闭取决于是否进入默认分支，未自动关闭时由维护者确认后手动关闭。
-5. **推送后再回复**：代码推送到 GitHub（由维护者执行或授权）之后，才在 issue 回复修复内容、提交与验证结果；**未推送前不得发布完成回复**。
+5. **推送后再回复**：特性分支推送到 GitHub 之后，才在 issue 回复修复内容、提交与验证结果；**未推送前不得发布完成回复**。
 
 ## 标准步骤
 
@@ -50,7 +50,7 @@ gh issue view <id> --repo codingapi/flow-engine \
 - 问题原因（引用具体类/文件/方法）；
 - 影响范围（哪些动作、端、版本）；
 - 处理方案（改动点、交互变化、兼容性）；
-- 交付方式（分支名、合并目标 `dev`）。
+- 交付方式（基于 `dev` 的特性分支名，完成后由维护者合并）。
 
 ```bash
 gh issue comment <id> --repo codingapi/flow-engine --body-file /tmp/issue-<id>-analysis.md
@@ -83,17 +83,17 @@ pnpm install --frozen-lockfile --prefer-offline   # worktree 无 node_modules
 - 后端：`./mvnw -pl <module> test`，必要时 `./mvnw clean install`；
 - **修改代码后必须本地编译/测试通过**，失败项如实报告，不得声称已验证。
 
-### 6. 合并到 dev（不推送）
+### 6. 推送特性分支到 GitHub（不合并 dev）
 
 ```bash
-git checkout dev
-git merge --no-ff feature/issue-<id>-<slug>
-# 不执行 git push，由维护者决定
+git push -u origin feature/issue-<id>-<slug>
 ```
 
-- 合并后保留或清理 worktree（`git worktree remove <path>`）；
-- 若前后端均有改动，两个仓库分别合并到各自 `dev`；
-- 不更新主仓库记录的 `flow-frontend` 子模块指针，除非维护者明确要求。
+- 只推送该 issue 的特性分支，`dev` 保持不动，由维护者评审后合并；
+- 禁止推送到 `dev` / `main`，禁止在本地合并 `dev`；
+- 前后端均有改动时，两个仓库各自推送自己的特性分支；
+- 不更新主仓库记录的 `flow-frontend` 子模块指针，除非维护者明确要求；
+- 推送后可清理本地 worktree（`git worktree remove <path>`），分支保留。
 
 ### 7. 提交信息与 issue 关闭
 
@@ -108,28 +108,29 @@ Closes #<id>
 ```
 
 - `Closes #<id>` 只在提交进入**默认分支**（`main`）时由 GitHub 自动关闭；
-- 若先合入 `dev` 且尚未发布到 `main`，issue 保持打开，待 `dev → main` 合并时自动关闭；
+- 推送到特性分支不会关闭 issue；特性分支合并到 `dev` 后仍保持打开，待 `dev → main` 合并时自动关闭；
 - 如需提前关闭，必须由维护者确认后执行 `gh issue close <id>`，不得擅自关闭。
 
-### 8. 推送 GitHub 后回复 issue
+### 8. 推送后回复 issue
 
-**前置条件：代码已推送到 GitHub**（`dev` 或其他目标分支）。推送由维护者执行或明确授权，助手不得自行推送；未推送前只可说明「修复已在本地 `dev` 完成，待推送」，不得发布完成结论。
+**前置条件：特性分支已推送到 GitHub**。未推送前只可说明「修复已提交到本地特性分支，待推送」，不得发布完成结论。
 
 回复内容包含：
 
 - 根因与最终方案（与步骤 3 的差异）；
 - 变更文件/能力（新增公共 API、交互变化）；
 - 验证结果（测试用例数、构建结果）；
-- 合入分支与提交号；
+- 推送分支与提交号、对应 PR/评审状态；
 - 升级/兼容提示（如有行为变更）。
 
 ## 禁止事项
 
-- 未经用户明确要求，不得执行 `git push` / 直接向 `main` 提交；
+- 不得向 `dev` / `main` 推送，不得在本地合并 `dev`（合并由维护者评审完成）；
+- 特性分支推送是标准步骤，但推送前必须确认远程分支名，避免误推；
 - 不得在主工作区（非 worktree）直接修改业务代码；
 - 不得跳过测试与编译验证；
-- 不得在代码推送到 GitHub 前发布完成回复（定位回复不受此限）；
-- 不得在代码未合入前擅自关闭 issue；
+- 不得在特性分支推送前发布完成回复（定位回复不受此限）；
+- 不得在代码未进入默认分支前擅自关闭 issue；
 - 不得用相对路径跨 package 引用（前端规范）。
 
 ## 检查清单
@@ -138,7 +139,6 @@ Closes #<id>
 - [ ] 定位结论已在 issue 回复
 - [ ] worktree + 特性分支已创建（基于 `dev`）
 - [ ] 测试先行且全量通过，构建通过
-- [ ] 已合并到 `dev`（未推送）
+- [ ] 特性分支已推送到 GitHub（`dev` 未改动）
 - [ ] 提交信息包含 `Closes #<id>`
-- [ ] 代码已推送到 GitHub（维护者执行或确认授权）
 - [ ] 推送后已在 issue 回复修复与验证结果
