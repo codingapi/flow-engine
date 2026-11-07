@@ -100,6 +100,18 @@ cd flow-engine-example && mvn spring-boot:run
 - **未经用户明确要求，任何情况下不得执行 `git commit` / `git push` / `git merge` 操作**
 - 所有代码变更需经用户审核后再提交
 
+### GitHub Issue 标准处理流程
+
+处理任何来自 GitHub 的 issue 时，必须遵循 [docs/conventions/workflow/github-issue.md](./docs/conventions/workflow/github-issue.md)：
+
+1. **定位阶段**可只读代码分析，不必创建 worktree；
+2. **定位完成后先回复 issue**，说明根因与处理方案；
+3. **实际改代码必须使用 git worktree + 特性分支**（基于 `dev`），不得在主工作区直接修改；
+4. 修复需测试先行并完成本地编译/测试验证；
+5. 完成后**只合并到 `dev` 分支，不执行 `git push`**，是否推送到 GitHub 由用户决定；
+6. 提交信息使用 `Closes #<issue编号>` 关联 issue；进入默认分支后自动关闭，未自动关闭时需用户确认后手动关闭；
+7. **代码合入后再次回复 issue**，说明修复内容、验证结果与合入分支。
+
 ### 基本规范
 
 - **与用户沟通及编写文档时，所有内容必须使用中文表述**
