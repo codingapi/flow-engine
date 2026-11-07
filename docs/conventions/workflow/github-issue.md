@@ -24,7 +24,7 @@ source: 项目自有
 
 1. **分析可以不开 worktree，改代码必须开**：定位阶段只读代码即可；一旦确定要修改，必须新建 git worktree + 特性分支。
 2. **先回复，再动手**：定位到问题后，先在对应 issue 回复根因与处理方案。
-3. **基于 dev 开分支，不直接合并 dev**：每个 issue 都从 `dev` 新建独立特性分支；完成后只把特性分支推送到 GitHub，由维护者评审后合并到 `dev`。助手不得自行合并 `dev`，也不得向 `dev` / `main` 推送。
+3. **dev 只作为基线，不参与交付**：worktree 基于 `dev` 代码创建；修复提交、推送与 issue 关联全部发生在该 issue 的特性分支上。完成后**不合并 `dev`**，是否合并由人工决定，助手只在任务完成时提示分支与 PR 链接。
 4. **提交即关联 issue**：提交信息使用 `Closes #<id>` 关联；是否已真正关闭取决于是否进入默认分支，未自动关闭时由维护者确认后手动关闭。
 5. **推送后再回复**：特性分支推送到 GitHub 之后，才在 issue 回复修复内容、提交与验证结果；**未推送前不得发布完成回复**。
 
@@ -76,6 +76,8 @@ pnpm install --frozen-lockfile --prefer-offline   # worktree 无 node_modules
 
 命名约定：`feature/issue-<issue编号>-<简短英文描述>`。
 
+> worktree 仅以 `dev` 代码为**基线**；创建之后的所有提交、推送与 issue 关联都只发生在该特性分支上，`dev` 不参与交付。
+
 ### 5. 修复与验证（TDD）
 
 - 先补测试（红灯），再实现（绿灯），最后重构；
@@ -83,14 +85,15 @@ pnpm install --frozen-lockfile --prefer-offline   # worktree 无 node_modules
 - 后端：`./mvnw -pl <module> test`，必要时 `./mvnw clean install`；
 - **修改代码后必须本地编译/测试通过**，失败项如实报告，不得声称已验证。
 
-### 6. 推送特性分支到 GitHub（不合并 dev）
+### 6. 推送特性分支到 GitHub（任务到此结束）
 
 ```bash
 git push -u origin feature/issue-<id>-<slug>
 ```
 
-- 只推送该 issue 的特性分支，`dev` 保持不动，由维护者评审后合并；
+- 只推送该 issue 的特性分支，`dev` 保持不动，是否合并由人工决定；
 - 禁止推送到 `dev` / `main`，禁止在本地合并 `dev`；
+- 任务完成提示中给出分支地址与 PR 链接即可，不代为合并；
 - 前后端均有改动时，两个仓库各自推送自己的特性分支；
 - 不更新主仓库记录的 `flow-frontend` 子模块指针，除非维护者明确要求；
 - 推送后可清理本地 worktree（`git worktree remove <path>`），分支保留。
@@ -125,7 +128,7 @@ Closes #<id>
 
 ## 禁止事项
 
-- 不得向 `dev` / `main` 推送，不得在本地合并 `dev`（合并由维护者评审完成）；
+- 不得向 `dev` / `main` 推送，不得在本地合并 `dev`（是否合并由人工决定）；
 - 特性分支推送是标准步骤，但推送前必须确认远程分支名，避免误推；
 - 不得在主工作区（非 worktree）直接修改业务代码；
 - 不得跳过测试与编译验证；
