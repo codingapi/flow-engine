@@ -1,6 +1,7 @@
 package com.codingapi.flow.action;
 
 import com.codingapi.flow.common.IMapConvertor;
+import com.codingapi.flow.event.FlowRecordDoneEvent;
 import com.codingapi.flow.event.FlowRecordTodoEvent;
 import com.codingapi.flow.event.IFlowEvent;
 import com.codingapi.flow.node.IFlowNode;
@@ -118,6 +119,42 @@ public abstract class BaseAction implements IFlowAction {
     protected boolean isEndNodeTodoEvent(IFlowEvent event) {
         return event instanceof FlowRecordTodoEvent todoEvent
                 && !todoEvent.getFlowRecord().isNotEndNode();
+    }
+
+    /**
+     * 将当前节点实例中其他未办理的待办记录自动办结。
+     *
+     * <p>退回（{@link com.codingapi.flow.action.actions.ReturnAction}）、拒绝
+     * （{@link com.codingapi.flow.action.actions.RejectAction}）意味着当前节点就此结束，
+     * 同节点其他审批人（或签/并签的候选审批人）的待办不能继续办理：否则会遗留待办，
+     * 流程视图仍停留在当前节点，发起人重新提交后还会出现同流程的重复待办（issue #235 / #255）。
+     *
+     * <p>自动办结采用 {@link FlowRecord#autoDone()}：记录置为已办但不带审批动作，
+     * 展示层标记为「自动跳过」，与或签/并签节点完成后遗留待办的处理口径一致。
+     * 仅处理同一流程实例内的记录，避免仓储按 {@code (fromId, nodeId)} 查询时误伤其他流程实例。
+     *
+     * @param flowSession 当前会话，同节点记录取自 {@link FlowSession#getCurrentNodeRecords()}
+     * @param recordList  待保存的记录集合，自动办结的记录会追加其中
+     * @param flowEvents  待推送的事件集合，每条自动办结记录都会追加一条已办事件
+     */
+    protected void autoDoneSiblingTodos(FlowSession flowSession,
+                                       List<FlowRecord> recordList,
+                                       List<IFlowEvent> flowEvents) {
+        FlowRecord currentRecord = flowSession.getCurrentRecord();
+        for (FlowRecord record : flowSession.getCurrentNodeRecords()) {
+            if (record.getId() == currentRecord.getId()) {
+                continue;
+            }
+            if (!record.isTodo()) {
+                continue;
+            }
+            if (!currentRecord.getProcessId().equals(record.getProcessId())) {
+                continue;
+            }
+            record.autoDone();
+            recordList.add(record);
+            flowEvents.add(new FlowRecordDoneEvent(record, flowSession.isMock()));
+        }
     }
 
     /**

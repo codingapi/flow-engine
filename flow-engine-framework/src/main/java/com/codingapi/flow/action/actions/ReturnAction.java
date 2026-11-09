@@ -58,6 +58,15 @@ public class ReturnAction extends BaseAction {
 
         flowEvents.add(new FlowRecordDoneEvent(currentRecord,flowSession.isMock()));
 
+        // 退回即结束当前节点：同节点其他未办理的待办（或签/并签的其他审批人）一并自动置为已办。
+        // 否则退回后仍会遗留待办，发起人重新提交到该节点时会出现同流程的重复待办（issue #255）。
+        this.autoDoneSiblingTodos(flowSession, recordList, flowEvents);
+
+        // 先保存当前记录与同节点待办的自动办结状态，再生成退回目标节点的记录，
+        // 与拒绝动作一致，避免退回目标节点的生成过程覆盖本会话中的记录状态（issue #235）
+        repositoryHolder.saveRecords(recordList);
+        recordList.clear();
+
         List<FlowRecord> flowRecords = backNode.generateCurrentRecords(flowSession.updateSession(backNode));
         recordList.addAll(flowRecords);
 
