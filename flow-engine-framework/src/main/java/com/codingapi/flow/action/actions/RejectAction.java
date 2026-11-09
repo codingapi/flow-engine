@@ -107,13 +107,7 @@ public class RejectAction extends BaseAction {
 
         // 拒绝即结束当前节点：将同节点其他未办理的待办（或签/并签的其他审批人）自动置为已办。
         // 否则节点被退回后仍会遗留待办，审批人可继续办理，流程视图也会停留在当前节点（issue #235）。
-        for (FlowRecord record : flowSession.getCurrentNodeRecords()) {
-            if (record.getId() != flowRecord.getId() && record.isTodo()) {
-                record.autoDone();
-                recordList.add(record);
-                flowEvents.add(new FlowRecordDoneEvent(record, flowSession.isMock()));
-            }
-        }
+        this.autoDoneSiblingTodos(flowSession, recordList, flowEvents);
 
         // 先保存当前记录及同节点待办的自动办结状态，再触发退回/终止节点。
         // 终止流程时 EndNode.fillNewRecord 会按数据库中的最新记录统一置为结束状态，
