@@ -95,11 +95,6 @@ cd flow-engine-example && mvn spring-boot:run
 
 ## 开发规范
 
-### 禁止自动提交
-
-- **未经用户明确要求，任何情况下不得执行 `git commit` / `git push` / `git merge` 操作**
-- 所有代码变更需经用户审核后再提交
-
 ### GitHub Issue 标准处理流程
 
 处理任何来自 GitHub 的 issue 时，必须遵循 [docs/conventions/workflow/github-issue.md](./docs/conventions/workflow/github-issue.md)：
