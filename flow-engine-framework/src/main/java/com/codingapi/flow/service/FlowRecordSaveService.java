@@ -137,42 +137,56 @@ class FlowRecordSaveService {
 
     private void removeTodoMergeRecords() {
         for (FlowRecord flowRecord : flowRecords) {
-            if (flowRecord.isDone()) {
-                if (flowRecord.isMergeable()) {
-                    FlowTodoRecord todoMargeRecord = flowTodoRecordRepository.getByTodoKey(flowRecord.getTodoKey());
-                    if (todoMargeRecord != null) {
-                        List<FlowTodoMerge> margeRelations = flowTodoMergeRepository.findByTodoId(todoMargeRecord.getId());
-                        if (margeRelations != null && !margeRelations.isEmpty()) {
-                            for (FlowTodoMerge margeRelation : margeRelations) {
-                                if (margeRelation.isRecord(flowRecord.getId())) {
-                                    flowTodoMergeRepository.delete(margeRelation);
-                                    todoMargeRecord.divMergeCount();
-                                    if (todoMargeRecord.hasMergeCount()) {
-                                        // 代表记录可能正是本次办结的记录，需要重新指向组内剩余的待办记录（issue #240）
-                                        refreshTodoMergeRecord(todoMargeRecord, margeRelations, flowRecord.getId());
-                                        flowTodoRecordRepository.save(todoMargeRecord);
-                                    } else {
-                                        flowTodoRecordRepository.delete(todoMargeRecord);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    FlowTodoRecord flowTodoRecord = flowTodoRecordRepository.getByTodoKey(flowRecord.getTodoKey());
-                    if (flowTodoRecord != null) {
-                        flowTodoRecordRepository.delete(flowTodoRecord);
-                    }
-                }
-            }else {
-                if(flowRecord.isRevoked()){
-                    FlowTodoRecord flowTodoRecord = flowTodoRecordRepository.getByTodoKey(flowRecord.getTodoKey());
-                    if (flowTodoRecord != null) {
-                        flowTodoRecordRepository.delete(flowTodoRecord);
-                    }
-                }
+            // 已办结与已撤销都要把该记录从待办中摘除。
+            // 合并待办按「合并依据 + 工作流运行时 + 节点」聚合，组内一条流程记录办结或撤销时，
+            // 只能摘除它自己的合并关系，不能连带删除同组其他流程记录的待办（issue #260）
+            if (flowRecord.isDone() || flowRecord.isRevoked()) {
+                removeTodoRecord(flowRecord);
             }
         }
+    }
+
+    private void removeTodoRecord(FlowRecord flowRecord) {
+        FlowTodoRecord flowTodoRecord = flowTodoRecordRepository.getByTodoKey(flowRecord.getTodoKey());
+        if (flowTodoRecord == null) {
+            return;
+        }
+        if (!flowRecord.isMergeable()) {
+            flowTodoRecordRepository.delete(flowTodoRecord);
+            return;
+        }
+        List<FlowTodoMerge> margeRelations = flowTodoMergeRepository.findByTodoId(flowTodoRecord.getId());
+        if (margeRelations == null || margeRelations.isEmpty()) {
+            return;
+        }
+        for (FlowTodoMerge margeRelation : margeRelations) {
+            if (!margeRelation.isRecord(flowRecord.getId())) {
+                continue;
+            }
+            flowTodoMergeRepository.delete(margeRelation);
+            flowTodoRecord.divMergeCount();
+            if (flowTodoRecord.hasMergeCount()) {
+                // 代表记录可能正是本次办结/撤销的记录，需要重新指向组内剩余的待办记录（issue #240 / #260）
+                refreshTodoMergeRecord(flowTodoRecord, margeRelations, flowRecord.getId());
+                flowTodoRecordRepository.save(flowTodoRecord);
+            } else {
+                // 组内已无剩余记录：删除待办行，并清理残余合并关系，避免留下指向已删除待办的孤儿数据
+                removeTodoRecordWithRelations(flowTodoRecord);
+            }
+        }
+    }
+
+    /**
+     * 删除合并待办行及其全部残余合并关系。
+     */
+    private void removeTodoRecordWithRelations(FlowTodoRecord flowTodoRecord) {
+        List<FlowTodoMerge> margeRelations = flowTodoMergeRepository.findByTodoId(flowTodoRecord.getId());
+        if (margeRelations != null) {
+            for (FlowTodoMerge margeRelation : margeRelations) {
+                flowTodoMergeRepository.delete(margeRelation);
+            }
+        }
+        flowTodoRecordRepository.delete(flowTodoRecord);
     }
 
     /**
