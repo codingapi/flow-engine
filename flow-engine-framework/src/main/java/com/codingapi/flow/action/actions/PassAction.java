@@ -115,19 +115,13 @@ public class PassAction extends BaseAction {
         if (currentNode.getType().equalsIgnoreCase(StartNode.NODE_TYPE)) {
             // 发起人设定模式：开始节点提交时，扫描整个工作流中所有 INITIATOR_SELECT 节点
             operatorSelectNodes.addAll(this.loadInitiatorSelectNodes(flowSession));
-            // 开始节点直接下游若为审批人设定（APPROVER_SELECT）节点，由于没有前序审批人可为其指定操作人，
-            // 需由发起人在提交开始节点时指定，否则节点取不到审批人，流程会停滞在开始节点
+            // 开始节点下游若为审批人设定（APPROVER_SELECT）节点，由于没有前序审批人可为其指定操作人，
+            // 需由发起人在提交开始节点时指定，否则节点取不到审批人，流程会停滞在开始节点。
+            // 必须与审批节点走同一套递归收集：人工节点选中分支后，下游实际是分支节点（MANUAL_BRANCH），
+            // 只判断直接下游节点会漏掉分支内的 APPROVER_SELECT 节点（issue #259）
             if (nextNodes != null) {
                 for (IFlowNode nextNode : nextNodes) {
-                    if (nextNode.strategyManager().getOperatorSelectType() != OperatorSelectType.APPROVER_SELECT) {
-                        continue;
-                    }
-                    if (operatorSelectMap == null || !operatorSelectMap.containsKey(nextNode.getId())
-                            || operatorSelectMap.get(nextNode.getId()).isEmpty()) {
-                        List<IFlowOperator> range = nextNode.strategyManager()
-                                .loadOperatorRange(flowSession.updateSession(nextNode));
-                        operatorSelectNodes.add(new NodeOption(nextNode, range));
-                    }
+                    collectApproverSelectNodes(flowSession, nextNode, operatorSelectMap, operatorSelectNodes);
                 }
             }
         } else {
