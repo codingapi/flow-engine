@@ -526,7 +526,7 @@ class FlowSampleServiceTest {
         FlowActionRequest bReturnRequest = new FlowActionRequest();
         bReturnRequest.setFormData(data);
         bReturnRequest.setRecordId(bRecordList.get(0).getId());
-        FlowAdviceBody bReturnAdvice = new FlowAdviceBody(bActions.get(5).id(), "退回修改", bUser.getUserId());
+        FlowAdviceBody bReturnAdvice = new FlowAdviceBody(bNode.actionManager().getActionByType(ActionType.RETURN.name()).id(), "退回修改", bUser.getUserId());
         // 退回节点设置为 a 节点
         bReturnAdvice.setBackNodeId(aNode.getId());
         bReturnRequest.setAdvice(bReturnAdvice);
@@ -2670,7 +2670,7 @@ class FlowSampleServiceTest {
         transferRequest.setFormData(data);
         transferRequest.setRecordId(bossRecordList.get(0).getId());
 
-        FlowAdviceBody transferAdviceBody = new FlowAdviceBody(bossActions.get(4).id(), boss.getUserId());
+        FlowAdviceBody transferAdviceBody = new FlowAdviceBody(bossNode.actionManager().getActionByType(ActionType.TRANSFER.name()).id(), boss.getUserId());
         transferAdviceBody.setForwardOperatorIds(List.of(3L));
         transferRequest.setAdvice(transferAdviceBody);
         factory.flowService.action(transferRequest);
@@ -2785,7 +2785,7 @@ class FlowSampleServiceTest {
         returnRequest.setFormData(data);
         returnRequest.setRecordId(bossRecordList.get(0).getId());
 
-        FlowAdviceBody backAdviceBody = new FlowAdviceBody(bossActions.get(5).id(), boss.getUserId());
+        FlowAdviceBody backAdviceBody = new FlowAdviceBody(bossNode.actionManager().getActionByType(ActionType.RETURN.name()).id(), boss.getUserId());
         backAdviceBody.setBackNodeId(startNode.getId());
         returnRequest.setAdvice(backAdviceBody);
         factory.flowService.action(returnRequest);
@@ -2908,7 +2908,7 @@ class FlowSampleServiceTest {
         delegateRequest.setFormData(data);
         delegateRequest.setRecordId(bossRecordList.get(0).getId());
 
-        FlowAdviceBody delegateAdviceBody = new FlowAdviceBody(bossActions.get(6).id(), boss.getUserId());
+        FlowAdviceBody delegateAdviceBody = new FlowAdviceBody(bossNode.actionManager().getActionByType(ActionType.DELEGATE.name()).id(), boss.getUserId());
         delegateAdviceBody.setForwardOperatorIds(List.of(lorne.getUserId()));
         delegateRequest.setAdvice(delegateAdviceBody);
         factory.flowService.action(delegateRequest);
