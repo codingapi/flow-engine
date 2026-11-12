@@ -192,7 +192,8 @@ resetSubProcess（子流程重置能力标识：当前待办位于开启重置�
 
 - `currentNodeOperators`：当前记录所属**节点实例**中仍待审批的人员（`id` / `name`，按人去重，排除当前操作人，含顺序审批尚未激活的隐藏记录）。减签等只能作用于当前节点其他待审批人的动作应以此字段作为候选来源，不要使用宿主的全局用户列表。
 - 该字段按单条流程记录计算；合并审批（`mergeable = true`）下多条流程实例的待审批人集合可能不同，不能跨流程合并候选人。
-- `actions` / `actionList` 中每个动作额外带有 `batchable` 标记：`true` 表示支持合并批量提交，`false` 表示只能单条记录提交（当前为 `REDUCE_AUDIT`、`CUSTOM`）。该标记只在响应中附加，不写入流程设计持久化数据；旧版本服务端无此字段时前端按 `true` 处理。
+- `actions` / `actionList` 中每个动作额外带有 `batchable` 标记：`true` 表示支持合并批量提交，`false` 表示只能单条记录提交（当前为 `REDUCE_AUDIT`）。该标记只在响应中附加，不写入流程设计持久化数据；旧版本服务端无此字段时前端按 `true` 处理。
+- 合并审批（`mergeable = true`）时前端不展示 `batchable = false` 的动作；从合并列表进入**单条流程**后，按该条记录自己的 `actions` / `currentNodeOperators` 展示并提交（提交目标固定为该记录）。
 
 ### `FlowRecordContent`（列表响应，字段摘要）
 

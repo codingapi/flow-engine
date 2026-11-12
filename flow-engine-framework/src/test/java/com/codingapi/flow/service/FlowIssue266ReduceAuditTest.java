@@ -275,6 +275,36 @@ class FlowIssue266ReduceAuditTest {
     }
 
     /**
+     * 测试目标：合并审批时，合并组内每条流程记录都应单独计算减签按钮与候选人。
+     * 前置条件：B 为并签节点（b1/b2），开启记录合并，并发起两条流程实例。
+     * 执行步骤：分别用 b1 在两条流程里的记录查询 detail。
+     * 期望断言：两条记录都展示减签按钮，候选人均只有 b2；前端进入单条流程时即可据此切换按钮。
+     */
+    @Test
+    void mergedDetailShouldExposeReduceActionForEachRecord() {
+        // given
+        Workflow workflow = saveWorkflow("issue-merge-multi", MultiOperatorAuditStrategy.Type.MERGE,
+                1f, List.of(2L, 3L), true);
+        String bNodeId = nodeIdByName(workflow, "B审批");
+        createAndSubmit(workflow);
+        createAndSubmit(workflow);
+
+        List<FlowRecord> b1Todos = todoRecordsOf(b1, bNodeId);
+        assertEquals(2, b1Todos.size(), "两条流程的记录应合并到同一个待办分组");
+
+        // when/then
+        for (FlowRecord record : b1Todos) {
+            FlowContent detail = factory.flowService.detail(new FlowDetailRequest(record.getId(), b1.getUserId()));
+            assertTrue(detail.isMergeable(), "合并组内的记录应标记为可合并审批");
+            assertTrue(containsAction(detail.getActions(), ActionType.REDUCE_AUDIT),
+                    "合并组内每条记录都应展示减签按钮");
+            assertEquals(List.of(b2.getUserId()),
+                    detail.getCurrentNodeOperators().stream().map(FlowOperator::getId).toList(),
+                    "减签候选人应按记录所属流程实例计算");
+        }
+    }
+
+    /**
      * 测试目标：加签不允许把已经在当前节点待办队列中的人员重复加入。
      * 前置条件：B 为并签节点，b1、b2 均为待审批人。
      * 执行步骤：b1 分别加签 b2（他人）与 b1（自己）。

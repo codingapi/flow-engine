@@ -27,15 +27,6 @@ public class CustomAction extends BaseAction {
     public static final String DEFAULT_TITLE = "自定义";
 
     /**
-     * 自定义动作的行为由脚本决定，可能依赖当前记录的表单/选人数据，
-     * 无法保证多条流程合并提交语义正确，因此不支持批量。
-     */
-    @Override
-    public boolean batchable() {
-        return false;
-    }
-
-    /**
      * 后端处理脚本
      */
     private ActionCustomScript script;
