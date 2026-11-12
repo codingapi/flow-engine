@@ -24,6 +24,7 @@ public class FlowActionFactory {
     private void initNodes() {
         actionClasses.put(ActionType.REJECT.name(), RejectAction.class);
         actionClasses.put(ActionType.ADD_AUDIT.name(), AddAuditAction.class);
+        actionClasses.put(ActionType.REDUCE_AUDIT.name(), ReduceAuditAction.class);
         actionClasses.put(ActionType.PASS.name(), PassAction.class);
         actionClasses.put(ActionType.TRANSFER.name(), TransferAction.class);
         actionClasses.put(ActionType.RETURN.name(), ReturnAction.class);

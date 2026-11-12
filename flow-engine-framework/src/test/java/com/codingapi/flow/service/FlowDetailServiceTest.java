@@ -146,7 +146,8 @@ public class FlowDetailServiceTest {
 
         detail = factory.flowService.detail(new FlowDetailRequest(bossRecordList.get(0).getId(),boss.getUserId()));
         assertEquals(detail.getForm().getCode(), form.getCode());
-        assertEquals(detail.getActions().size(), bossNode.actionManager().getActions().size());
+        // 单审批人节点不展示「减签」，可见动作数少于节点配置的动作数，按全部动作比较（issue #266）
+        assertEquals(detail.getActionList().size(), bossNode.actionManager().getActions().size());
         assertEquals(1, detail.getTodos().size());
         assertEquals(1, detail.getHistories().size());
         assertEquals(data, detail.getTodos().get(0).getData());

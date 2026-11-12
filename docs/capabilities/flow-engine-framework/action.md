@@ -1,7 +1,7 @@
 ---
 name: flow-engine-framework/action
 module: flow-engine-framework
-description: 流程动作体系，包含 8 种动作类型、动作接口和动作工厂
+description: 流程动作体系，包含 9 种动作类型、动作接口和动作工厂
 status: 已实现
 scope: 后端
 source: 项目自有
@@ -18,6 +18,7 @@ symbols:
   - ReturnAction
   - DelegateAction
   - AddAuditAction
+  - ReduceAuditAction
   - CustomAction
   - SaveAction
   - InitiatorSelectNodeService
@@ -28,7 +29,7 @@ content_hash: 0ec57b5fb719f4df594be65eda1e92ba172dad9dfb2aa8f9ec272b275e0a8321
 
 提供流程节点上可执行动作的标准化体系，解决以下问题：
 
-- **动作类型标准化**：8 种标准动作覆盖审批、驳回、转办、退回、委派、加签、自定义、暂存场景
+- **动作类型标准化**：9 种标准动作覆盖审批、驳回、转办、退回、委派、加签、减签、自定义、暂存场景
 - **动作执行入口**：`IFlowAction.run()` 和 `generateRecords()` 分别对应动作触发和记录生成
 - **动作可用性控制**：`enable()` 控制动作在当前节点是否可用
 - **动作创建统一化**：`FlowActionFactory` 通过反射从 Map 数据统一反序列化动作实例
@@ -45,6 +46,7 @@ content_hash: 0ec57b5fb719f4df594be65eda1e92ba172dad9dfb2aa8f9ec272b275e0a8321
 | `ReturnAction` | RETURN | 退回，退回至上一节点 |
 | `DelegateAction` | DELEGATE | 委派，临时委派给其他操作者 |
 | `AddAuditAction` | ADD_AUDIT | 加签，增加审批人 |
+| `ReduceAuditAction` | REDUCE_AUDIT | 减签，由当前审批人把指定审批人从当前节点撤下（仅循序/并签） |
 | `CustomAction` | CUSTOM | 自定义动作，通过脚本定义行为 |
 | `SaveAction` | SAVE | 暂存，保存当前状态 |
 

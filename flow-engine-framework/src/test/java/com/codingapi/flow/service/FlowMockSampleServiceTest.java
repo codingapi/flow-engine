@@ -1,5 +1,6 @@
 package com.codingapi.flow.service;
 
+import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.builder.ActionBuilder;
@@ -2187,7 +2188,11 @@ class FlowMockSampleServiceTest {
         FlowActionRequest bossRequest = new FlowActionRequest();
         bossRequest.setFormData(data);
         bossRequest.setRecordId(bossRecordList.get(0).getId());
-        bossRequest.setAdvice(new FlowAdviceBody(bossActions.get(7).id(), boss.getUserId()));
+        // 按类型取自定义动作：动作列表会随默认动作增加而变化（issue #266）
+        IFlowAction customAction = bossActions.stream()
+                .filter(action -> ActionType.CUSTOM.name().equals(action.type()))
+                .findFirst().orElseThrow();
+        bossRequest.setAdvice(new FlowAdviceBody(customAction.id(), boss.getUserId()));
         factory.flowService.action(bossRequest);
 
         List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());
