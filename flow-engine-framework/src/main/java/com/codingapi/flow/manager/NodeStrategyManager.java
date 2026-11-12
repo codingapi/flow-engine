@@ -160,15 +160,26 @@ public class NodeStrategyManager {
 
     /**
      * 多操作者审批并签比例
+     *
+     * <p>比例语义为「通过人数占审批席位数的比例」，有效区间为 (0, 1]。
+     * 未配置（0 或负数）或超过 1 时按 1（全部通过）返回：比例为 0 会让并签退化成或签
+     * （首个审批人通过即完成节点、其他审批人待办被自动办结），与并签「全部通过才算完成」
+     * 的配置意图不符，因此按需全部通过处理（issue #265）。
+     *
+     * @return 归一化后的并签比例，取值区间 (0, 1]
      */
     public float getMultiOperatorAuditMergePercent() {
         List<INodeStrategy> strategies = this.strategies;
         for (INodeStrategy strategy : strategies) {
             if (strategy instanceof MultiOperatorAuditStrategy) {
-                return ((MultiOperatorAuditStrategy) strategy).getPercent();
+                float percent = ((MultiOperatorAuditStrategy) strategy).getPercent();
+                if (percent <= 0) {
+                    return 1f;
+                }
+                return Math.min(percent, 1f);
             }
         }
-        return 0;
+        return 1f;
     }
 
     /**
