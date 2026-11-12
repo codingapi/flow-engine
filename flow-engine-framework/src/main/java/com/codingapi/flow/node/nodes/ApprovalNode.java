@@ -62,6 +62,8 @@ public class ApprovalNode extends BaseAuditNode implements IDisplayNode {
         actions.add(RejectAction.defaultAction());
         actions.add(SaveAction.defaultAction());
         actions.add(AddAuditAction.defaultAction());
+        // 减签紧跟加签，仅循序/并签且存在其他待审批人时可见（issue #266）
+        actions.add(ReduceAuditAction.defaultAction());
         actions.add(TransferAction.defaultAction());
         actions.add(ReturnAction.defaultAction());
         actions.add(DelegateAction.defaultAction());

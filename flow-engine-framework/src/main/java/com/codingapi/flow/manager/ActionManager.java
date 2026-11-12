@@ -127,6 +127,13 @@ public class ActionManager {
             }
         }
 
+        // 减签操作（意见记录在执行人自己的记录上，不校验意见必填）
+        if (flowAction instanceof ReduceAuditAction) {
+            if (flowAdvice.getForwardOperators() == null || flowAdvice.getForwardOperators().isEmpty()) {
+                throw FlowValidationException.required("forwardOperators");
+            }
+        }
+
         // 退回操作
         if (flowAction instanceof ReturnAction) {
             // 是否必须填写审批意见（意见记录在当前办理记录上）

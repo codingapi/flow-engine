@@ -27,7 +27,7 @@ public interface IAsyncEvent extends IEvent {}        // 异步事件标记 ← 
 
 同步/异步由 `DomainEventContext.push` 的 `instanceof` 判定：`IAsyncEvent` → 异步（线程池执行）；`ISyncEvent`/裸 `IEvent` → 同步（发布线程内联执行）。
 
-### 1.2 八种事件
+### 1.2 九种事件
 
 记录类事件均携带 `FlowRecord`（或当前记录）与 `boolean mock` 标记（Mock 模式为 `true`）。
 
@@ -40,19 +40,17 @@ public interface IAsyncEvent extends IEvent {}        // 异步事件标记 ← 
 | `FlowRecordRevokeEvent` | 撤销（被撤销的后置记录） | `FlowRecord currentRecord, boolean mock` | `getCurrentRecord()` / `isMock()` |
 | `FlowRecordUrgeEvent` | 催办（每条待办） | `FlowRecord, IFlowOperator urgeOperator, boolean mock` | `getFlowRecord()` / `getUrgeOperator()` / `isMock()` |
 | `FlowRecordDeleteEvent` | 删除未流转实例（开始节点） | `FlowRecord, boolean mock` | `getFlowRecord()` / `isMock()` |
+| `FlowRecordReduceAuditEvent` | 减签（每条被撤下的记录） | `FlowRecord, long reduceOperatorId, boolean mock` | `getFlowRecord()` / `getReduceOperatorId()` / `isMock()` |
 | `FlowSubProcessResetEvent` | 子流程数据重置（issue #219） | `SubProcessRecord oldRecord, SubProcessRecord newRecord, long resetRecordId, IFlowOperator resetOperator, boolean mock` | `getOldRecord()` / `getNewRecord()` / `getResetRecordId()` / `getResetOperator()` / `isMock()` |
 
 **子流程重置事件订阅须知**：
 
-- 事件提醒业务方子流程数据已被重置：`oldRecord` 为被取代的旧聚合组快照（含全部旧实例流程id），
-  `newRecord` 为重置后的新聚合组——继承实例沿用原流程id，重建实例为新流程id，
-  重建实例的 `getSourceProcessId()` 记录其替换的旧实例流程id，据此完成旧 → 新流程id映射；
-- 事件经异步线程池分发、到达顺序不保证（重置同时伴随被作废记录的 `RevokeEvent`
-  与重建实例的 `StartEvent`/`TodoEvent`），订阅方应按「同一 `parentRecordId` + 节点维度下
-  **最大聚合组 id 为活跃组**」做幂等覆盖式收敛，禁止增量累加；
-- 事件的 `oldRecord` id 与订阅方当前活跃组 id 不一致时，说明存在丢失的重置事件，
-  应通过节点记录查询（`/api/cmd/record/processNodes`）全量对账；
-- 旧实例记录不会被删除（仅聚合组标记已取代），订阅方收到事件后应自行将旧流程id的数据标记失效。
+| 关注点 | 约定 |
+|---|---|
+| 新旧聚合组 | `oldRecord` 为被取代的旧聚合组快照（含全部旧实例流程id）；`newRecord` 为新聚合组，继承实例沿用原流程id、重建实例为新流程id，重建实例的 `getSourceProcessId()` 指向被替换的旧实例 |
+| 收敛方式 | 事件异步、到达顺序不保证（同时伴随 `RevokeEvent`/`StartEvent`/`TodoEvent`）；按「同一 `parentRecordId` + 节点维度下最大聚合组 id 为活跃组」幂等覆盖，禁止增量累加 |
+| 丢事件对账 | `oldRecord` id 与订阅方当前活跃组不一致时，视为丢事件，调用 `/api/cmd/record/processNodes` 全量对账 |
+| 旧数据 | 旧实例记录不删除（仅标记聚合组已取代），订阅方需自行将旧流程id数据标记失效 |
 
 范例（`FlowRecordUrgeEvent.java`，唯一带三个字段的事件）：
 
@@ -72,7 +70,7 @@ public class FlowRecordUrgeEvent implements IFlowEvent {
 
 - 基本信息：`getId()`、`getProcessId()`、`getWorkTitle()`、`getWorkCode()`、`getNodeId()`、`getNodeType()`、`getNodeName()`、`getTitle()`、`getFormData()`（`Map<String,Object>`）
 - 操作人：`getCurrentOperatorId/Name()`、`getSubmitOperatorId/Name()`、`getCreateOperatorId/Name()`、`getForwardOperatorId/Name()`
-- 状态：`isTodo()`、`isDone()`、`isFinish()`、`isAutoDone()`、`isShow()`、`isNotEndNode()`
+- 状态：`isTodo()`、`isDone()`、`isFinish()`、`isAutoDone()`、`isShow()`、`isNotEndNode()`、`isPendingApproval()`（待审批，含顺序审批未激活的隐藏记录）
 - 抄送标记：`isNotify()`
 - 动作：`getActionId()`、`getActionType()`、`getActionName()`、`getAdvice()`
 - 并行：`getParallelId()`、`getParallelBranchNodeId()`、`getParallelBranchTotal()`
@@ -113,6 +111,7 @@ EventPusher.push(new FlowRecordStartEvent(flowRecord, session.isMock()));
 | `RejectAction.run()` | 当前记录 `DoneEvent` + 回退新记录 `TodoEvent` |
 | `ReturnAction.run()` | 当前记录 `DoneEvent` + 退回节点新记录 `TodoEvent` |
 | `AddAuditAction.run()` | 加签记录 `TodoEvent` |
+| `ReduceAuditAction.run()` | 每条被撤下记录 `ReduceAuditEvent` |
 | `TransferAction.run()` | 当前记录 `DoneEvent` + 转交人新记录 `TodoEvent` |
 | `DelegateAction.run()` | 当前记录 `DoneEvent` + 委托人新记录 `TodoEvent` |
 | `EndNode.fillNewRecord()` | `FinishEvent`（流程正常完成） |

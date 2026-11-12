@@ -284,9 +284,9 @@ spring.jpa.properties.hibernate.dialect=com.codingapi.example.dialect.HydDmDiale
 
 <table>
   <tr><th>扩展点</th><th>说明</th></tr>
-  <tr><td>事件订阅</td><td>实现 <code>IHandler&lt;E&gt;</code> 订阅 8 种事件：Start / Todo / Done / Finish / Urge / Revoke / Delete / SubProcessReset，自动被 Spring 扫描</td></tr>
+  <tr><td>事件订阅</td><td>实现 <code>IHandler&lt;E&gt;</code> 订阅 9 种事件：Start / Todo / Done / Finish / Urge / Revoke / Delete / ReduceAudit / SubProcessReset，自动被 Spring 扫描</td></tr>
   <tr><td>节点策略</td><td>15 种策略（OperatorLoad / RecordMerge / Revoke / Router / FormFieldPermission 等）由 <code>NodeStrategyManager</code> 持有（工厂固定注册，不支持新增策略类型；业务方通过策略配置 + Groovy 脚本表达差异）</td></tr>
-  <tr><td>自定义动作</td><td>8 种内置动作（PASS/REJECT/RETURN/TRANSFER/DELEGATE/ADD_AUDIT/SAVE/CUSTOM）由 <code>FlowActionFactory</code> 固定注册（不支持新增动作类型）；业务方通过 CUSTOM 动作 + Groovy 脚本表达自定义行为</td></tr>
+  <tr><td>自定义动作</td><td>9 种内置动作（PASS/REJECT/RETURN/TRANSFER/DELEGATE/ADD_AUDIT/REDUCE_AUDIT/SAVE/CUSTOM）由 <code>FlowActionFactory</code> 固定注册（不支持新增动作类型）；业务方通过 CUSTOM 动作 + Groovy 脚本表达自定义行为</td></tr>
   <tr><td>自定义脚本注册</td><td><code>ScriptRegistryContext.getInstance().setRegistry(new CustomScriptRegistry())</code> 替换默认 Groovy 脚本</td></tr>
 </table>
 
@@ -452,7 +452,7 @@ spring.jpa.properties.hibernate.dialect=com.codingapi.example.dialect.HydDmDiale
 </table>
 
 <h3>9.2 ActionFactory 动作工厂</h3>
-<p>三端（PC / 移动 / 设计器表单）各有一份 <code>ActionFactory</code> 单例，按 8 种 ActionType 注册并渲染对应 React 组件：</p>
+<p>三端（PC / 移动 / 设计器表单）各有一份 <code>ActionFactory</code> 单例，按 9 种 ActionType 注册并渲染对应 React 组件：</p>
 <pre><code>// PC 端注册（packages/flow-pc/flow-pc-approval/.../action/factory.ts）
 cache.set("PASS", PassAction);
 cache.set("REJECT", RejectAction);
@@ -460,13 +460,14 @@ cache.set("RETURN", ReturnAction);
 cache.set("TRANSFER", TransferAction);
 cache.set("DELEGATE", DelegateAction);
 cache.set("ADD_AUDIT", AddAuditAction);
+cache.set("REDUCE_AUDIT", ReduceAuditAction);
 cache.set("SAVE", SaveAction);
 cache.set("CUSTOM", CustomAction);
 
 // 使用：根据动作渲染按钮
 const Comp = ActionFactory.getInstance().getFlowActionComponent(action);</code></pre>
 
-<div class="tip"><strong>扩展机制</strong>：要增加自定义审批按钮，通过 <code>ActionFactory</code> 注册 <code>CUSTOM</code> 类型组件，并在节点动作配置中启用。PC 与移动端 <code>ActionFactory.render(action)</code> / <code>getFlowActionComponent(action)</code> 各自返回对应平台组件。</div>
+<div class="tip"><strong>扩展机制</strong>：要增加自定义审批按钮，通过 <code>ActionFactory</code> 注册 <code>CUSTOM</code> 类型组件，并在节点动作配置中启用。PC 与移动端 <code>ActionFactory.render(action)</code> / <code>getFlowActionComponent(action)</code> 各自返回对应平台组件。合并审批列表不展示 <code>batchable=false</code> 的动作（当前为减签），进入单条流程按该记录的 <code>actions</code> / <code>currentNodeOperators</code> 渲染并提交。</div>
 
 <h3>9.3 审批面板内部结构</h3>
 <p><code>flow-pc-approval</code> 内置组件：<code>flow-approval-actions</code>（动作按钮区）、<code>flow-approval-content</code>（表单内容）、<code>flow-approval-sider</code>（侧边流程图/节点）、<code>flow-approval-title</code>、<code>flow-node-history</code>（节点历史轨迹）、<code>flow-time-node</code>（时间轴）、<code>form-view-component</code>（表单渲染）。</p>

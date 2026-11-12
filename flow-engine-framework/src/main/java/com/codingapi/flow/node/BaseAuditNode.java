@@ -140,13 +140,13 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
      * 当前正在办理的记录即将通过，按通过计入（委派替办记录除外）。
      *
      * @param currentRecords 当前节点实例的全部记录
-     * @param currentRecord  当前正在办理的记录
+     * @param currentRecord  当前正在办理的记录，可为 null（此时只统计已办记录，见 {@link #requiresAuditToFinish(List)}）
      * @return 已审批的槽位数量
      */
     private long approvedNodeOrderCount(List<FlowRecord> currentRecords, FlowRecord currentRecord) {
         Set<Integer> approvedOrders = new HashSet<>();
         for (FlowRecord record : currentRecords) {
-            if (record.getId() == currentRecord.getId()) {
+            if (currentRecord != null && record.getId() == currentRecord.getId()) {
                 if (!currentRecord.isDelegate()) {
                     approvedOrders.add(record.getNodeOrder());
                 }
@@ -160,6 +160,39 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         return approvedOrders.size();
     }
 
+    /**
+     * 判断节点在给定记录集合下是否仍需至少一次真实审批才能完成（减签前置校验，issue #266）。
+     *
+     * <p>节点的完成判定只在有人提交审批动作时求值（{@link #isFinish(FlowSession)}），
+     * 没有定时重算。因此减签必须保证撤销之后仍然存在一个「未来会被提交的审批动作」，
+     * 否则节点条件即使已经满足也不会向前流转，流程永久卡死：
+     * <ul>
+     *     <li>顺序审批（SEQUENCE）：只要还有待办记录（含尚未激活的隐藏记录），就仍需审批；</li>
+     *     <li>并签（MERGE）：已通过槽位数小于「剩余槽位数 × 比例」时才仍需审批，
+     *     否则减签会让比例立刻达成却无人触发完成。</li>
+     * </ul>
+     *
+     * @param records 减签后仍保留的当前节点实例记录
+     * @return true 表示仍需至少一次审批才能完成
+     */
+    public boolean requiresAuditToFinish(List<FlowRecord> records) {
+        if (records == null || records.isEmpty()) {
+            return false;
+        }
+        MultiOperatorAuditStrategy.Type multiOperatorAuditStrategyType = this.strategyManager().getMultiOperatorAuditStrategyType();
+        if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.SEQUENCE) {
+            return records.stream().anyMatch(FlowRecord::isPendingApproval);
+        }
+        if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.MERGE) {
+            long total = records.stream()
+                    .map(FlowRecord::getNodeOrder)
+                    .distinct()
+                    .count();
+            long approved = approvedNodeOrderCount(records, null);
+            return approved < total * this.strategyManager().getMultiOperatorAuditMergePercent();
+        }
+        return false;
+    }
 
     /**
      * 生成当前节点的记录

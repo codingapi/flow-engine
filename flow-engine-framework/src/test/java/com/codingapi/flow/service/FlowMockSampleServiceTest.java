@@ -1,5 +1,6 @@
 package com.codingapi.flow.service;
 
+import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.CustomAction;
 import com.codingapi.flow.builder.ActionBuilder;
@@ -1830,7 +1831,7 @@ class FlowMockSampleServiceTest {
         transferRequest.setFormData(data);
         transferRequest.setRecordId(bossRecordList.get(0).getId());
 
-        FlowAdviceBody transferAdviceBody = new FlowAdviceBody(bossActions.get(4).id(), boss.getUserId());
+        FlowAdviceBody transferAdviceBody = new FlowAdviceBody(bossNode.actionManager().getActionByType(ActionType.TRANSFER.name()).id(), boss.getUserId());
         transferAdviceBody.setForwardOperatorIds(List.of(3L));
         transferRequest.setAdvice(transferAdviceBody);
         factory.flowService.action(transferRequest);
@@ -1945,7 +1946,7 @@ class FlowMockSampleServiceTest {
         returnRequest.setFormData(data);
         returnRequest.setRecordId(bossRecordList.get(0).getId());
 
-        FlowAdviceBody backAdviceBody = new FlowAdviceBody(bossActions.get(5).id(), boss.getUserId());
+        FlowAdviceBody backAdviceBody = new FlowAdviceBody(bossNode.actionManager().getActionByType(ActionType.RETURN.name()).id(), boss.getUserId());
         backAdviceBody.setBackNodeId(startNode.getId());
         returnRequest.setAdvice(backAdviceBody);
         factory.flowService.action(returnRequest);
@@ -2068,7 +2069,7 @@ class FlowMockSampleServiceTest {
         delegateRequest.setFormData(data);
         delegateRequest.setRecordId(bossRecordList.get(0).getId());
 
-        FlowAdviceBody delegateAdviceBody = new FlowAdviceBody(bossActions.get(6).id(), boss.getUserId());
+        FlowAdviceBody delegateAdviceBody = new FlowAdviceBody(bossNode.actionManager().getActionByType(ActionType.DELEGATE.name()).id(), boss.getUserId());
         delegateAdviceBody.setForwardOperatorIds(List.of(lorne.getUserId()));
         delegateRequest.setAdvice(delegateAdviceBody);
         factory.flowService.action(delegateRequest);
@@ -2187,7 +2188,11 @@ class FlowMockSampleServiceTest {
         FlowActionRequest bossRequest = new FlowActionRequest();
         bossRequest.setFormData(data);
         bossRequest.setRecordId(bossRecordList.get(0).getId());
-        bossRequest.setAdvice(new FlowAdviceBody(bossActions.get(7).id(), boss.getUserId()));
+        // 按类型取自定义动作：动作列表会随默认动作增加而变化（issue #266）
+        IFlowAction customAction = bossActions.stream()
+                .filter(action -> ActionType.CUSTOM.name().equals(action.type()))
+                .findFirst().orElseThrow();
+        bossRequest.setAdvice(new FlowAdviceBody(customAction.id(), boss.getUserId()));
         factory.flowService.action(bossRequest);
 
         List<FlowRecord> records = factory.flowRecordRepository.findProcessRecords(bossRecordList.get(0).getProcessId());

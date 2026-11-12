@@ -49,6 +49,19 @@ public interface IFlowAction extends IMapConvertor, ICopyAbility<IFlowAction> {
      */
     boolean show(FlowSession flowSession);
 
+    /**
+     * 是否支持合并批量提交。
+     *
+     * <p>合并审批时同一审批人会同时持有多条流程实例的待办，前端按勾选的记录逐条提交。
+     * 目标按流程实例隔离的动作（如减签，候选人来自各流程自己的当前节点待办人）不能批量，
+     * 否则会把 A 流程的目标错配到 B 流程。缺省视为支持。
+     *
+     * @return true 表示支持合并批量提交
+     */
+    default boolean batchable() {
+        return true;
+    }
+
 
     /**
      * 执行动作

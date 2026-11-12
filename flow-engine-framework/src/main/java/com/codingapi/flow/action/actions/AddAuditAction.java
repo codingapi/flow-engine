@@ -22,6 +22,9 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 加签
@@ -102,8 +105,9 @@ public class AddAuditAction extends BaseAction {
                 }
             }
         }
+        // 已经在本节点待办队列中的人员不允许再次加签，避免同一审批人在同一节点重复产生待办
+        verifyNotInTodoQueue(flowSession, auditOperators);
 
-        // 要延续流程继续的order序号
         int maxNodeOrder = 0;
         for (FlowRecord record : currentRecords) {
             if (record.getNodeOrder() >= maxNodeOrder) {
@@ -134,6 +138,50 @@ public class AddAuditAction extends BaseAction {
 
         repositoryHolder.saveRecords(flowRecords);
         flowEvents.forEach(EventPusher::push);
+    }
+
+    /**
+     * 校验加签人员不能已经存在于当前节点的待办队列中。
+     *
+     * <p>待办队列指当前节点实例中尚未办理的审批记录：包括顺序审批里尚未激活的隐藏记录
+     * （它们后续会按序号激活为待办），但不包括已办、已撤销以及已结束流程的记录。
+     *
+     * @param flowSession    当前会话
+     * @param auditOperators 本次加签的人员
+     */
+    private void verifyNotInTodoQueue(FlowSession flowSession, List<IFlowOperator> auditOperators) {
+        if (auditOperators == null || auditOperators.isEmpty()) {
+            return;
+        }
+        Set<Long> pendingOperatorIds = pendingOperatorIds(flowSession);
+        if (pendingOperatorIds.isEmpty()) {
+            return;
+        }
+        for (IFlowOperator auditOperator : auditOperators) {
+            if (pendingOperatorIds.contains(auditOperator.getUserId())) {
+                throw FlowExecutionException.addAuditOperatorAlreadyInTodo(auditOperator.getUserId());
+            }
+        }
+    }
+
+    /**
+     * 当前节点实例中仍有待办的人员id集合。
+     *
+     * <p>仓储按 {@code (fromId, nodeId)} 查询节点记录，开始节点（{@code fromId = 0}）等场景可能
+     * 命中其他流程实例的记录，必须按 {@code processId} 限定，避免误判其他流程的待办人员。
+     */
+    private Set<Long> pendingOperatorIds(FlowSession flowSession) {
+        FlowRecord currentRecord = flowSession.getCurrentRecord();
+        List<FlowRecord> currentNodeRecords = flowSession.getCurrentNodeRecords();
+        if (currentRecord == null || currentNodeRecords == null) {
+            return Set.of();
+        }
+        return currentNodeRecords.stream()
+                .filter(Objects::nonNull)
+                .filter(record -> currentRecord.getProcessId().equals(record.getProcessId()))
+                .filter(FlowRecord::isPendingApproval)
+                .map(FlowRecord::getCurrentOperatorId)
+                .collect(Collectors.toSet());
     }
 
     public static AddAuditAction fromMap(Map<String, Object> data) {
