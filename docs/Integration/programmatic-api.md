@@ -184,16 +184,17 @@ workflowService.saveWorkflowVersion(new WorkflowVersion(workflow), true, true); 
 
 引擎内部以不可变 `FlowSession` 传递执行上下文，业务方在脚本/事件处理中可读取：
 
-```java
-session.getCurrentOperator()      // 当前审批人
-session.getCreatedOperator()      // 流程创建者
-session.getSubmitOperator()       // 提交人
-session.getWorkflow()             // 流程设计
-session.getCurrentNode()          // 当前节点
-session.getCurrentAction()        // 当前动作
-session.getCurrentRecord()        // 当前记录
-session.getFormData("fieldCode")  // 表单字段值
-session.isMock()                  // 是否 Mock
-session.matchNextNodes()          // 匹配的下一节点列表
-session.updateSession(node)       // 不可变式切换会话（内部流转用）
-```
+| 方法 | 返回 | 用途 |
+|---|---|---|
+| `getCurrentOperator()` | `IFlowOperator` | 当前审批人 |
+| `getCreatedOperator()` | `IFlowOperator` | 流程创建者 |
+| `getSubmitOperator()` | `IFlowOperator` | 提交人 |
+| `getWorkflow()` | `Workflow` | 流程设计 |
+| `getCurrentNode()` | `IFlowNode` | 当前节点 |
+| `getCurrentAction()` | `IFlowAction` | 当前动作 |
+| `getCurrentRecord()` | `FlowRecord` | 当前记录 |
+| `getCurrentNodeRecords()` | `List<FlowRecord>` | 当前节点实例的全部记录（含隐藏） |
+| `getFormData(code)` | `Object` | 表单字段值 |
+| `isMock()` | `boolean` | 是否 Mock |
+| `matchNextNodes()` | `List<IFlowNode>` | 匹配的下一节点 |
+| `updateSession(node)` | `FlowSession` | 不可变式切换会话（内部流转用） |

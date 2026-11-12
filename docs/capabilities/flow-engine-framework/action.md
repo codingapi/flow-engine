@@ -45,10 +45,25 @@ content_hash: 0ec57b5fb719f4df594be65eda1e92ba172dad9dfb2aa8f9ec272b275e0a8321
 | `TransferAction` | TRANSFER | 转办，将任务转给其他操作者 |
 | `ReturnAction` | RETURN | 退回，退回至上一节点 |
 | `DelegateAction` | DELEGATE | 委派，临时委派给其他操作者 |
-| `AddAuditAction` | ADD_AUDIT | 加签，增加审批人 |
-| `ReduceAuditAction` | REDUCE_AUDIT | 减签，由当前审批人把指定审批人从当前节点撤下（仅循序/并签） |
+| `AddAuditAction` | ADD_AUDIT | 加签，增加审批人（已在本节点待办中的不可重复加签） |
+| `ReduceAuditAction` | REDUCE_AUDIT | 减签，撤下本节点其他待审批人（仅循序/并签，不可合并批量） |
 | `CustomAction` | CUSTOM | 自定义动作，通过脚本定义行为 |
 | `SaveAction` | SAVE | 暂存，保存当前状态 |
+
+### 动作约束
+
+| 动作 | 约束 | 异常 |
+|------|------|------|
+| 加签 | 目标不能在当前节点待办队列中（含顺序审批未激活的隐藏记录）；人数受 `maxOperatorCount` 限制 | `addAuditOperatorAlreadyInTodo`、`operatorCountExceeded`、`operatorNotInScope` |
+| 减签 | 仅 `SEQUENCE`/`MERGE` 节点；当前节点至少 2 名待审批人；目标须为本节点其他待审批人 | `reduceAuditUnsupported`、`reduceAuditSingleApprover`、`reduceAuditOwnRecord`、`reduceAuditTargetNotFound`、`reduceAuditNoRemainingApproval` |
+
+### 批量提交能力
+
+| 项 | 说明 |
+|------|------|
+| 声明 | `IFlowAction.batchable()`，默认 `true` |
+| `false` 的动作 | `ReduceAuditAction`（候选人/目标按流程实例隔离，合并批量会错配） |
+| 下发 | detail 响应 `actions[].batchable`，前端据此决定合并列表是否展示 |
 
 ### 核心接口
 
@@ -62,6 +77,7 @@ content_hash: 0ec57b5fb719f4df594be65eda1e92ba172dad9dfb2aa8f9ec272b275e0a8321
 | `display()` | 返回 `ActionDisplay` 展示配置 |
 | `enable()` | 动作是否可用 |
 | `show(FlowSession)` | 控制动作按钮在当前节点是否展示 |
+| `batchable()` | 是否支持合并批量提交，默认 `true` |
 | `run(FlowSession)` | 执行动作（触发流程流转） |
 | `generateRecords(FlowSession)` | 生成流程记录 |
 

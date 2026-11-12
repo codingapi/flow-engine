@@ -75,7 +75,7 @@
     <li><a href="#todo-pc">待办中心（PC）</a></li>
     <li><a href="#start-flow">发起流程与审批意见填写</a></li>
     <li><a href="#flow-detail">流程中心：流程详情</a></li>
-    <li><a href="#actions">8 种审批动作操作</a></li>
+    <li><a href="#actions">9 种审批动作操作</a></li>
     <li><a href="#user-mgr">用户管理</a></li>
     <li><a href="#mobile">移动端操作</a></li>
     <li><a href="#faq">常见问题</a></li>
@@ -89,7 +89,7 @@
 <div class="capability-grid">
   <div class="card"><h5>流程设计</h5><p>流程列表、基本信息、流程画布编排、节点配置、表单设计、版本管理</p></div>
   <div class="card"><h5>待办中心</h5><p>我的待办、我的已办、全部流程、发起流程，各列表点击进入详情/审批</p></div>
-  <div class="card"><h5>流程中心</h5><p>流程详情、流程记录轨迹、审批意见填写、8 种审批动作</p></div>
+  <div class="card"><h5>流程中心</h5><p>流程详情、流程记录轨迹、审批意见填写、9 种审批动作</p></div>
   <div class="card"><h5>移动审批</h5><p>移动端首页、待办/已办/全部、流程申请与审批、流程详情</p></div>
   <div class="card"><h5>用户管理</h5><p>用户与流程管理员维护</p></div>
   <div class="card"><h5>导入导出</h5><p>流程定义 JSON 导入/导出，跨环境迁移</p></div>
@@ -108,7 +108,7 @@
   <tr><td>其他</td><td>NOTIFY / DELAY / SUB_PROCESS / TRIGGER</td><td>抄送 / 延时 / 子流程 / 触发</td></tr>
 </table>
 
-<h3>1.2 8 种审批动作</h3>
+<h3>1.2 9 种审批动作</h3>
 <table>
   <tr><th>动作</th><th>类型</th><th>操作效果</th></tr>
   <tr><td>通过</td><td>PASS</td><td>流程继续向下流转</td></tr>
@@ -116,7 +116,8 @@
   <tr><td>退回</td><td>RETURN</td><td>退回到指定历史节点</td></tr>
   <tr><td>转办</td><td>TRANSFER</td><td>转给他人审批，自己不再处理</td></tr>
   <tr><td>委派</td><td>DELEGATE</td><td>委派他人审批，其完成回到自己</td></tr>
-  <tr><td>加签</td><td>ADD_AUDIT</td><td>增加会签人</td></tr>
+  <tr><td>加签</td><td>ADD_AUDIT</td><td>增加会签人（已在待办中的不可重复加签）</td></tr>
+  <tr><td>减签</td><td>REDUCE_AUDIT</td><td>撤下本节点其他待审批人（不可合并批量）</td></tr>
   <tr><td>保存</td><td>SAVE</td><td>暂存表单，不触发流转</td></tr>
   <tr><td>自定义</td><td>CUSTOM</td><td>自定义按钮，脚本驱动</td></tr>
 </table>
@@ -245,7 +246,7 @@
   <tr><td>待办标题</td><td>全部</td><td>通过脚本设置待办消息的展示标题</td></tr>
   <tr><td>优先级</td><td>全部</td><td>数字越小优先级越高；当多个分支或节点可同时执行时，按此排序</td></tr>
   <tr><td>视图名称</td><td>APPROVAL/HANDLE</td><td>节点绑定的展示视图，用于自定义该节点的表单或界面展示</td></tr>
-  <tr><td>按钮配置（动作启用）</td><td>APPROVAL/HANDLE</td><td>勾选启用 8 种动作（PASS/REJECT/RETURN/TRANSFER/DELEGATE/ADD_AUDIT/SAVE/CUSTOM）</td></tr>
+  <tr><td>按钮配置（动作启用）</td><td>APPROVAL/HANDLE</td><td>勾选启用 9 种动作（PASS/REJECT/RETURN/TRANSFER/DELEGATE/ADD_AUDIT/REDUCE_AUDIT/SAVE/CUSTOM）</td></tr>
   <tr><td>表单字段权限</td><td>APPROVAL/HANDLE</td><td>每字段必填 / 可编辑 / 只读 / 隐藏</td></tr>
 </table>
 
@@ -416,7 +417,7 @@
 </table>
 <div class="note">保存顺序：saveRecords → saveTodoMargeRecords → removeTodoMergeRecords，保证三者一致；删除顺序：合并关系 → 待办 → 流程记录。</div>
 
-<h2 id="actions">12. 8 种审批动作操作</h2>
+<h2 id="actions">12. 9 种审批动作操作</h2>
 
 <p>审批人在审批页底部看到由节点"按钮配置"决定的可执行动作按钮：</p>
 
@@ -427,7 +428,8 @@
   <tr><td>退回 RETURN</td><td>选择退回目标节点（只能退回历史 START/APPROVAL/HANDLE，不能退回当前/后续/结束节点）→ 填意见 → 退回</td></tr>
   <tr><td>转办 TRANSFER</td><td>选择转办人员 → 流程转给他人，自己不再处理</td></tr>
   <tr><td>委派 DELEGATE</td><td>选择委派人员 → 他人审批通过后流程回到自己</td></tr>
-  <tr><td>加签 ADD_AUDIT</td><td>选择加签人员 → 增加会签人，会签完成后继续</td></tr>
+  <tr><td>加签 ADD_AUDIT</td><td>选择加签人员 → 增加会签人，会签完成后继续；已在本节点待办中的人员不可重复加签</td></tr>
+  <tr><td>减签 REDUCE_AUDIT</td><td>仅循序/并签节点可用：选择本节点其他待审批人 → 撤下其待办；当前节点只剩 1 名待审批人时不可减签，且不支持合并批量操作</td></tr>
   <tr><td>保存 SAVE</td><td>暂存当前表单与意见，不触发流转</td></tr>
   <tr><td>自定义 CUSTOM</td><td>触发节点配置的脚本/前端事件</td></tr>
 </table>

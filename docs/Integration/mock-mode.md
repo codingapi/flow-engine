@@ -34,7 +34,18 @@ public void clear(String key);                     // 注销并 cancel 过期调
 ### 2.3 `MockRepositoryHolder`（`mock/MockRepositoryHolder.java`）
 
 - 实现 `IRepositoryHolder`，构造时 `new` 出 9 个内存仓储（`mock/repository/` 下）：
-  `DelayTaskRepositoryMockImpl`、`FlowRecordRepositoryMockImpl`、`FlowTodoMergeRepositoryMockImpl`、`FlowTodoRecordRepositoryMockImpl`、`ParallelBranchRepositoryMockImpl`、`SubProcessRepositoryMockImpl`、`UrgeIntervalRepositoryMockImpl`、`WorkflowRuntimeRepositoryMockImpl`、`WorkflowVersionRepositoryMockImpl`。
+
+| 仓储实现 | 对应数据 |
+|---|---|
+| `FlowRecordRepositoryMockImpl` | 流程记录 |
+| `FlowTodoRecordRepositoryMockImpl` | 待办记录 |
+| `FlowTodoMergeRepositoryMockImpl` | 待办合并关系 |
+| `WorkflowRuntimeRepositoryMockImpl` | 运行时快照 |
+| `WorkflowVersionRepositoryMockImpl` | 流程版本 |
+| `SubProcessRepositoryMockImpl` | 子流程聚合 |
+| `ParallelBranchRepositoryMockImpl` | 并行分支 |
+| `DelayTaskRepositoryMockImpl` | 延迟任务 |
+| `UrgeIntervalRepositoryMockImpl` | 催办间隔 |
 - 流程设计（`WorkflowRepository`）使用**真实传入**的仓储 —— Mock 模式可复用生产已保存的流程设计。
 - `operatorAssignmentCache`（HashMap，key = `processId:nodeId`）模拟「发起人设定操作人」分配。
 - `createFlowActionService(session)` 传 `allowDisabledAction = true`（Mock 下允许执行停用流程的动作）。

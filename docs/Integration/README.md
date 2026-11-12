@@ -32,12 +32,12 @@
 | [快速开始](./quick-start.md) | 最小集成步骤：引入依赖 → 提供 Bean → 编写流程 → 发起流程 |
 | [流程用户体系](./user-integration.md) | `FlowOperatorGateway` / `IFlowOperator` / `GatewayContext` / 线程缓存 / 当前登录人 |
 | [流程默认脚本](./script-integration.md) | 12 种脚本类型、`GroovyScriptRequest` 完整 API、`$bind`、默认脚本替换、脚本生命周期 |
-| [流程事件机制](./event-integration.md) | 8 种事件、`EventPusher`、`IHandler` 订阅、异步分发管道、事务变体、推送时机 |
+| [流程事件机制](./event-integration.md) | 9 种事件、`EventPusher`、`IHandler` 订阅、异步分发管道、事务变体、推送时机 |
 | [仓储抽象与持久化](./repository-integration.md) | `IRepositoryHolder`、12 个仓储接口（含 11 个 JPA 实现 + 需自行实现的 `NodeViewJavaScriptRepository`）、脚本仓储、锁机制 |
 | [Spring Boot 自动配置](./auto-configuration.md) | `AutoConfiguration` 8 个 Bean、4 个 Register、必选/可选 Bean 清单 |
 | [REST API](./rest-api.md) | 5 个 Controller、`mockKey`/`operatorId` 分流机制、请求/响应结构 |
 | [Mock 模式](./mock-mode.md) | 全内存沙箱 `MockInstance`、15 分钟过期、接入方式 |
-| [节点/动作/策略扩展](./extension-points.md) | 19 种节点 × 8 种动作 × 15 种节点策略 × 2 种流程策略，扩展方式 |
+| [节点/动作/策略扩展](./extension-points.md) | 19 种节点 × 9 种动作 × 15 种节点策略 × 2 种流程策略，扩展方式 |
 | [编程式 API](./programmatic-api.md) | `WorkflowBuilder`/`FlowFormBuilder` 构建流程、`FlowService` 服务编排、查询服务 |
 
 ## 核心架构速览

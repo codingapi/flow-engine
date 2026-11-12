@@ -43,12 +43,23 @@ FlowException（抽象基类，继承 LocaleMessageException）
 
 | 异常类 | 典型工厂方法 |
 |--------|-------------|
-| `FlowExecutionException` | `scriptExecutionError()`, `routerNodeNotFound()`, `createRecordSizeError()`, `operatorNotInScope()` |
+| `FlowExecutionException` | `scriptExecutionError()`, `routerNodeNotFound()`, `createRecordSizeError()`, `operatorNotInScope()`, `addAuditOperatorAlreadyInTodo()`, `reduceAuditSingleApprover()` |
 | `FlowValidationException` | 参数验证相关错误 |
 | `FlowStateException` | `repositoryNotRegistered()`, `recordAlreadyDone()`, `operatorNotMatch()`, `edgeConfigError()`, `recordLimitUrgeError()` |
 | `FlowNotFoundException` | `workflow()`, `record()`, `node()`, `operator()`, `action()` |
 | `FlowPermissionException` | `accessDenied()` |
 | `WorkflowTransferException` | `invalidSchema()`, `unsupportedSchema()`, `scriptNotFound()`, `scriptTypeUnsupported()`, `replaceTargetNotFound()` |
+
+### 加签 / 减签错误码
+
+| 工厂方法 | errCode |
+|----------|---------|
+| `addAuditOperatorAlreadyInTodo(operatorId)` | `execution.addAudit.operatorAlreadyInTodo` |
+| `reduceAuditUnsupported()` | `execution.reduceAudit.unsupported` |
+| `reduceAuditTargetNotFound(operatorId)` | `execution.reduceAudit.targetNotFound` |
+| `reduceAuditOwnRecord()` | `execution.reduceAudit.ownRecord` |
+| `reduceAuditNoRemainingApproval()` | `execution.reduceAudit.noRemainingApproval` |
+| `reduceAuditSingleApprover()` | `execution.reduceAudit.singleApprover` |
 
 ### 扩展新异常
 

@@ -37,25 +37,28 @@ SUB_PROCESS, TRIGGER
 | `TriggerNode` | `TRIGGER` | 触发节点（`TriggerScript` 副作用） |
 | `SubProcessNode` | `SUB_PROCESS` | 子流程节点 |
 
-### 1.2 动作（8 种）
+### 1.2 动作（9 种）
 
 `ActionType` 枚举（`flow-engine-framework/.../action/ActionType.java`）：
 
 ```
-SAVE, PASS, REJECT, ADD_AUDIT, DELEGATE, RETURN, TRANSFER, CUSTOM
-保存   通过   拒绝   加签      委派     退回    转办    自定义
+SAVE, PASS, REJECT, ADD_AUDIT, REDUCE_AUDIT, DELEGATE, RETURN, TRANSFER, CUSTOM
+保存   通过   拒绝   加签      减签          委派     退回    转办    自定义
 ```
 
-| 动作 | 特有配置 | 说明 |
-|---|---|---|
-| `SaveAction` | — | 仅保存表单，不流转 |
-| `PassAction` | — | 通过 → 推进入下一节点；多人审批按策略自动办结/激活 |
-| `RejectAction` | `ActionRejectScript` | 拒绝 → 退回指定节点/退回上级/终止流程（`TERMINATE`） |
-| `AddAuditAction` | `OperatorLoadScript` + `maxOperatorCount` | 加签（追加审批人） |
-| `DelegateAction` | `OperatorLoadScript` + `maxOperatorCount` | 委派（他人代审） |
-| `ReturnAction` | — | 退回（目标由 `FlowAdvice.backNode` 提供） |
-| `TransferAction` | `OperatorLoadScript` + `maxOperatorCount` | 转办 |
-| `CustomAction` | `ActionCustomScript` + `triggerFrontEvent` | 自定义动作（脚本返回动作类型） |
+| 动作 | 特有配置 | 批量提交 | 说明 |
+|---|---|---|---|
+| `SaveAction` | — | 支持 | 仅保存表单，不流转 |
+| `PassAction` | — | 支持 | 通过 → 推进入下一节点；多人审批按策略自动办结/激活 |
+| `RejectAction` | `ActionRejectScript` | 支持 | 拒绝 → 退回指定节点/退回上级/终止流程（`TERMINATE`） |
+| `AddAuditAction` | `OperatorLoadScript` + `maxOperatorCount` | 支持 | 加签；目标已在本节点待办队列时拒绝 |
+| `ReduceAuditAction` | `OperatorLoadScript` | **不支持** | 减签；仅循序/并签节点，仅剩 1 名待审批人时拒绝 |
+| `DelegateAction` | `OperatorLoadScript` + `maxOperatorCount` | 支持 | 委派（他人代审） |
+| `ReturnAction` | — | 支持 | 退回（目标由 `FlowAdvice.backNode` 提供） |
+| `TransferAction` | `OperatorLoadScript` + `maxOperatorCount` | 支持 | 转办 |
+| `CustomAction` | `ActionCustomScript` + `triggerFrontEvent` | 支持 | 自定义动作（脚本返回动作类型） |
+
+> `batchable()` 由 `IFlowAction` 声明，默认 `true`；`ReduceAuditAction` 为 `false`，detail 响应中以 `actions[].batchable` 下发。
 
 ### 1.3 节点策略（15 种）
 
@@ -155,7 +158,7 @@ IFlowAction#run
 | 子类 | 典型工厂方法与错误场景 |
 |---|---|
 | `FlowValidationException` | `fieldReadOnly`（字段只读）、`operatorCountExceeded(nodeId, max)`（超出最大可选人数）、`operatorOutOfRange`（超出可选范围）、`required` 等 |
-| `FlowExecutionException` | `scriptExecutionError`、`routerNodeNotFound`、`operatorCountExceeded`、`invalidJumpTarget(nodeType)`、`errorTriggerLoop`、`subProcessLoop` 等 |
+| `FlowExecutionException` | `scriptExecutionError`、`routerNodeNotFound`、`operatorCountExceeded`、`invalidJumpTarget(nodeType)`、`errorTriggerLoop`、`subProcessLoop`、`addAuditOperatorAlreadyInTodo`、`reduceAuditSingleApprover`、`reduceAuditTargetNotFound` 等 |
 | `FlowStateException` | `repositoryNotRegistered`、`recordAlreadyDone`、`operatorNotMatch`、`workflowAlreadyDisable`、`recordNotSupportRevoke` 等 |
 | `FlowNotFoundException` | `workflow(workCode)`、`record(recordId)`、`node(nodeId)`、`operator(operatorId)`、`action(actionId)` |
 | `FlowPermissionException` | `accessDenied(operation)` |

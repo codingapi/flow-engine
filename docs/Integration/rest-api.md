@@ -26,7 +26,7 @@ operatorId 请求参数 → 存在 → 使用该 id 作为当前操作人
 | GET | `/api/cmd/record/detail` | query `id` | `SingleResponse<FlowContent>` | 流程详情（含当前节点/表单/动作/历史/待办列表） |
 | POST | `/api/cmd/record/processNodes` | `FlowProcessNodeRequest` | `MultiResponse<ProcessNode>` | 流程流转节点预览 |
 | POST | `/api/cmd/record/create` | `FlowCreateRequest` | `SingleResponse<Long>` | 发起流程，返回首条记录 id |
-| POST | `/api/cmd/record/action` | `FlowActionRequest` | `SingleResponse<ActionResponse>` | 执行动作（通过/拒绝/加签/委派/退回/转办/自定义/保存） |
+| POST | `/api/cmd/record/action` | `FlowActionRequest` | `SingleResponse<ActionResponse>` | 执行动作（通过/拒绝/加签/减签/委派/退回/转办/自定义/保存） |
 | POST | `/api/cmd/record/subProcess/reset` | `FlowSubProcessResetRequest` | `Response` | 子流程数据重置（独立接口，需子流程节点开启重置能力） |
 | POST | `/api/cmd/record/urge` | `IdRequest` | `Response` | 催办 |
 | POST | `/api/cmd/record/revoke` | `IdRequest` | `Response` | 撤销 |
@@ -140,9 +140,10 @@ public interface FlowRecordQueryService {
 }
 ```
 
-- `actionId` 决定执行动作（PASS/REJECT/ADD_AUDIT/DELEGATE/RETURN/TRANSFER/CUSTOM/SAVE）。
-- `forwardOperatorIds`：加签/委派/转办的目标操作人。
+- `actionId` 决定执行动作（PASS/REJECT/ADD_AUDIT/REDUCE_AUDIT/DELEGATE/RETURN/TRANSFER/CUSTOM/SAVE）。
+- `forwardOperatorIds`：加签/减签/委派/转办的目标操作人。
 - `backNodeId`：退回动作的目标节点（仅 Start/Approval/Handle 可退回）。
+- 减签每次只能处理一条记录，目标必须是该流程实例当前节点的其他待审批人。
 
 ### `FlowSubProcessResetRequest`（子流程数据重置，独立接口）
 
@@ -177,23 +178,25 @@ public interface FlowRecordQueryService {
 - `MANUAL_NODE_SELECT`：通过后需要选择人工节点分支。
 - `OPERATOR_SELECT`：下一节点为发起人设定操作人（`INITIATOR_SELECT`），需要选择操作人（`operators` = 可选范围，`maxOperatorCount` = 最大可选人数，-1 不限制）。
 
-### `FlowContent`（详情响应，字段摘要）
+### `FlowContent`（详情响应）
 
-```
-recordId / processId / workId / workTitle / workDescription / createTime / workCode
-view / code / viewTitle / nodeName / nodeId / nodeType
-title（节点标题） / adviceRequired / signRequired / adviceHidden
-form（FlowForm 元数据） / fieldPermissions（字段权限）
-todos（当前节点待办 Body 列表） / actions / actionList
-mergeable / createOperator / currentOperator / currentNodeOperators / flowState / recordState
-histories（审批历史） / nodes（NodeOption 可操作节点） / revoke / urge
-resetSubProcess（子流程重置能力标识：当前待办位于开启重置能力、已汇聚完成的子流程的锁定合并节点上时为 true；更深层下游节点为 false）
-```
+| 分组 | 字段 |
+|---|---|
+| 标识 | `recordId` / `processId` / `workId` / `workTitle` / `workDescription` / `workCode` / `createTime` |
+| 节点与视图 | `nodeId` / `nodeType` / `nodeName` / `title` / `view` / `code` / `viewTitle` |
+| 表单 | `form`（FlowForm 元数据） / `fieldPermissions` |
+| 意见与签名 | `adviceRequired` / `signRequired` / `adviceHidden` |
+| 动作 | `actions`（当前可见） / `actionList`（全部） |
+| 人员 | `createOperator` / `currentOperator` / `currentNodeOperators` |
+| 待办与状态 | `todos` / `mergeable` / `flowState` / `recordState` |
+| 其他 | `histories` / `nodes` / `revoke` / `urge` / `resetSubProcess` |
 
-- `currentNodeOperators`：当前记录所属**节点实例**中仍待审批的人员（`id` / `name`，按人去重，排除当前操作人，含顺序审批尚未激活的隐藏记录）。减签等只能作用于当前节点其他待审批人的动作应以此字段作为候选来源，不要使用宿主的全局用户列表。
-- 该字段按单条流程记录计算；合并审批（`mergeable = true`）下多条流程实例的待审批人集合可能不同，不能跨流程合并候选人。
-- `actions` / `actionList` 中每个动作额外带有 `batchable` 标记：`true` 表示支持合并批量提交，`false` 表示只能单条记录提交（当前为 `REDUCE_AUDIT`）。该标记只在响应中附加，不写入流程设计持久化数据；旧版本服务端无此字段时前端按 `true` 处理。
-- 合并审批（`mergeable = true`）时前端不展示 `batchable = false` 的动作；从合并列表进入**单条流程**后，按该条记录自己的 `actions` / `currentNodeOperators` 展示并提交（提交目标固定为该记录）。
+| 字段/标记 | 说明 |
+|---|---|
+| `currentNodeOperators` | 当前节点实例仍待审批的人员（去重、排除当前操作人、含未激活隐藏记录）；减签候选人来源，按单条记录计算，不可跨流程合并 |
+| `actions[].batchable` | 是否支持合并批量提交（当前仅 `REDUCE_AUDIT` 为 `false`）；仅响应附加、不落库；旧服务端缺省按 `true` |
+| `resetSubProcess` | 当前待办位于开启重置能力且已汇聚完成的子流程锁定节点时为 `true` |
+| 合并审批展示 | `mergeable && todos.length > 1` 时隐藏 `batchable=false` 的动作；进入单条流程后按该记录的 `actions` / `currentNodeOperators` 展示并提交 |
 
 ### `FlowRecordContent`（列表响应，字段摘要）
 

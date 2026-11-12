@@ -72,6 +72,9 @@ content_hash: 48847288af1a4551b8327e398d01a8ec4de643dce1c049b90dcdc8ad0134df3b
 | `FlowDelayTriggerService` | 处理延迟触发任务 |
 | `FlowUrgeService` | 处理催办逻辑 |
 | `FlowRecordSaveService` | 保存流程记录和待办合并关系 |
+| `FlowSubProcessResetService` | 子流程数据重置（旧聚合组作废、实例继承/重建） |
+| `FlowSubProcessResultService` | 子流程完成后回写父流程并生成待办/已办 |
+| `SubProcessSessionFactory` | 子流程会话构建（按聚合组/实例定位记录） |
 | `OperatorAssignmentService` | 操作者分配服务 |
 
 ## 使用实例
