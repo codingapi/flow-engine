@@ -305,6 +305,34 @@ class FlowIssue266ReduceAuditTest {
     }
 
     /**
+     * 测试目标：未开启记录合并的多人审批，detail 仍应展示减签按钮与候选人。
+     * 前置条件：B 为并签节点（b1/b2），不开启记录合并。
+     * 执行步骤：用 b1 的待办查询 detail。
+     * 期望断言：mergeable=false、单条 todo，但 actions 中包含减签，候选人为 b2。
+     */
+    @Test
+    void nonMergedDetailShouldExposeReduceAction() {
+        // given
+        Workflow workflow = saveWorkflow("issue266-no-merge", MultiOperatorAuditStrategy.Type.MERGE,
+                1f, List.of(2L, 3L), false);
+        String bNodeId = nodeIdByName(workflow, "B审批");
+        createAndSubmit(workflow);
+
+        FlowRecord b1Record = todoRecordOf(b1, bNodeId);
+
+        // when
+        FlowContent detail = factory.flowService.detail(new FlowDetailRequest(b1Record.getId(), b1.getUserId()));
+
+        // then
+        assertFalse(detail.isMergeable(), "未开启记录合并时不应标记为可合并审批");
+        assertEquals(1, detail.getTodos().size());
+        assertTrue(containsAction(detail.getActions(), ActionType.REDUCE_AUDIT),
+                "未合并的多人审批同样应展示减签按钮");
+        assertEquals(List.of(b2.getUserId()),
+                detail.getCurrentNodeOperators().stream().map(FlowOperator::getId).toList());
+    }
+
+    /**
      * 测试目标：加签不允许把已经在当前节点待办队列中的人员重复加入。
      * 前置条件：B 为并签节点，b1、b2 均为待审批人。
      * 执行步骤：b1 分别加签 b2（他人）与 b1（自己）。
