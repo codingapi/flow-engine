@@ -50,10 +50,12 @@ public class FlowAddAuditServiceTest {
         User user = new User(1, "user");
         User depart = new User(2, "depart");
         User boss = new User(3, "boss");
+        User assistant = new User(4, "assistant");
 
         factory.userGateway.save(user);
         factory.userGateway.save(boss);
         factory.userGateway.save(depart);
+        factory.userGateway.save(assistant);
 
         GatewayContext.getInstance().setFlowOperatorGateway(factory.userGateway);
 
@@ -142,14 +144,15 @@ public class FlowAddAuditServiceTest {
         assertEquals(1, departRecordList.size());
 
 
-        List<IFlowAction> departActions = departNode.actionManager().getActions();
+        IFlowAction departAddAuditAction = departNode.actionManager().getActionByType(ActionType.ADD_AUDIT.name());
+        IFlowAction departPassAction = departNode.actionManager().getActionByType(ActionType.PASS.name());
 
         FlowActionRequest addAuditRequest = new FlowActionRequest();
         addAuditRequest.setFormData(data);
         addAuditRequest.setRecordId(departRecordList.get(0).getId());
 
-        FlowAdviceBody addAuditAdviceBody = new FlowAdviceBody(departActions.get(3).id(), depart.getUserId());
-        addAuditAdviceBody.setForwardOperatorIds(List.of(depart.getUserId()));
+        FlowAdviceBody addAuditAdviceBody = new FlowAdviceBody(departAddAuditAction.id(), depart.getUserId());
+        addAuditAdviceBody.setForwardOperatorIds(List.of(assistant.getUserId()));
         addAuditRequest.setAdvice(addAuditAdviceBody);
         factory.flowService.action(addAuditRequest);
 
@@ -159,17 +162,20 @@ public class FlowAddAuditServiceTest {
         FlowActionRequest departRequest = new FlowActionRequest();
         departRequest.setFormData(data);
         departRequest.setRecordId(departRecordList.get(0).getId());
-        departRequest.setAdvice(new FlowAdviceBody(departActions.get(0).id(), "同意", depart.getUserId()));
+        departRequest.setAdvice(new FlowAdviceBody(departPassAction.id(), "同意", depart.getUserId()));
         factory.flowService.action(departRequest);
 
         departRecordList = factory.flowRecordRepository.findTodoByOperator(depart.getUserId());
-        assertEquals(1, departRecordList.size());
+        assertEquals(0, departRecordList.size());
 
-        departRequest = new FlowActionRequest();
-        departRequest.setFormData(data);
-        departRequest.setRecordId(departRecordList.get(0).getId());
-        departRequest.setAdvice(new FlowAdviceBody(departActions.get(0).id(), "同意", depart.getUserId()));
-        factory.flowService.action(departRequest);
+        List<FlowRecord> assistantRecordList = factory.flowRecordRepository.findTodoByOperator(assistant.getUserId());
+        assertEquals(1, assistantRecordList.size());
+
+        FlowActionRequest assistantRequest = new FlowActionRequest();
+        assistantRequest.setFormData(data);
+        assistantRequest.setRecordId(assistantRecordList.get(0).getId());
+        assistantRequest.setAdvice(new FlowAdviceBody(departPassAction.id(), "同意", assistant.getUserId()));
+        factory.flowService.action(assistantRequest);
 
         List<FlowRecord> bossRecordList = factory.flowRecordRepository.findTodoByOperator(boss.getUserId());
         assertEquals(1, bossRecordList.size());

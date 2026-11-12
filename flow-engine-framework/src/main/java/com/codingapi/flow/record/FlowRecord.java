@@ -508,6 +508,17 @@ public class FlowRecord {
         return recordState == SATE_RECORD_DONE && !hidden && !revoked;
     }
 
+    /**
+     * 是否仍待审批。
+     *
+     * <p>与 {@link #isTodo()} 的区别是不排除隐藏记录：顺序审批中尚未激活后续审批人的记录
+     * 虽然当前不可见，但仍属于该节点的待办队列，后续会按序号激活为待办。
+     * 减签目标解析、加签重复校验、节点待审批人统计都以该口径为准。
+     */
+    public boolean isPendingApproval() {
+        return recordState == SATE_RECORD_TODO && flowState == SATE_FLOW_RUNNING && !revoked;
+    }
+
 
     /**
      * 判断是否已完成

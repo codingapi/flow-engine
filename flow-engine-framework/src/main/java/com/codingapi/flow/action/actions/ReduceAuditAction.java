@@ -71,6 +71,15 @@ public class ReduceAuditAction extends BaseAction {
         return script.execute(flowSession);
     }
 
+    /**
+     * 减签不支持合并批量提交：候选人与目标都是「本流程实例当前节点」的待审批人，
+     * 合并组内各流程的待办人集合不同，批量会把目标错配到其他流程。
+     */
+    @Override
+    public boolean batchable() {
+        return false;
+    }
+
     @Override
     public void copy(IFlowAction action) {
         super.copy(action);
@@ -120,6 +129,10 @@ public class ReduceAuditAction extends BaseAction {
         }
 
         List<FlowRecord> currentNodeRecords = currentNodeRecords(flowSession);
+        // 当前节点只剩一名待审批人时已无其他人可减，直接拒绝
+        if (pendingOperatorCount(currentNodeRecords) <= 1) {
+            throw FlowExecutionException.reduceAuditSingleApprover();
+        }
         List<FlowRecord> targetRecords = resolveTargetRecords(targets, currentNodeRecords, currentRecord);
 
         // 撤销后必须仍需要一次真实审批，否则节点条件即使满足也没有触发点，流程会永久卡死
@@ -161,7 +174,7 @@ public class ReduceAuditAction extends BaseAction {
                 throw FlowExecutionException.reduceAuditOwnRecord();
             }
             List<FlowRecord> matchedRecords = currentNodeRecords.stream()
-                    .filter(this::isPendingApprovalRecord)
+                    .filter(FlowRecord::isPendingApproval)
                     .filter(record -> record.getCurrentOperatorId() == targetOperatorId)
                     .toList();
             if (matchedRecords.isEmpty()) {
@@ -186,7 +199,7 @@ public class ReduceAuditAction extends BaseAction {
             return List.of();
         }
         return currentNodeRecords(flowSession).stream()
-                .filter(this::isPendingApprovalRecord)
+                .filter(FlowRecord::isPendingApproval)
                 .filter(record -> record.getId() != currentRecord.getId())
                 .toList();
     }
@@ -209,10 +222,18 @@ public class ReduceAuditAction extends BaseAction {
                 .toList();
     }
 
-    private boolean isPendingApprovalRecord(FlowRecord record) {
-        return !record.isRevoked()
-                && record.getRecordState() == FlowRecord.SATE_RECORD_TODO
-                && record.getFlowState() == FlowRecord.SATE_FLOW_RUNNING;
+    /**
+     * 当前节点实例中仍有待办的人员数量（按人去重）。
+     *
+     * <p>同一审批人可能持有多条待审批记录（例如加签为其生成多条记录），减签按「人」生效，
+     * 因此只有剩下一名待审批人时才视为「无人可减」。
+     */
+    private long pendingOperatorCount(List<FlowRecord> currentNodeRecords) {
+        return currentNodeRecords.stream()
+                .filter(FlowRecord::isPendingApproval)
+                .map(FlowRecord::getCurrentOperatorId)
+                .distinct()
+                .count();
     }
 
     private boolean isSupportedMode(IFlowNode node) {

@@ -21,6 +21,7 @@ import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.pojo.request.FlowDetailRequest;
 import com.codingapi.flow.pojo.response.FlowContent;
+import com.codingapi.flow.pojo.response.FlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.record.FlowTodoRecord;
 import com.codingapi.flow.script.factory.FlowGroovyScriptFactory;
@@ -273,6 +274,94 @@ class FlowIssue266ReduceAuditTest {
                 "多人并签节点应展示减签按钮");
     }
 
+    /**
+     * 测试目标：加签不允许把已经在当前节点待办队列中的人员重复加入。
+     * 前置条件：B 为并签节点，b1、b2 均为待审批人。
+     * 执行步骤：b1 分别加签 b2（他人）与 b1（自己）。
+     * 期望断言：两次都被拒绝（execution.addAudit.operatorAlreadyInTodo），节点记录数与待办均不变化。
+     */
+    @Test
+    void addAuditToExistingPendingApprover_shouldReject() {
+        // given
+        Workflow workflow = saveWorkflow(MultiOperatorAuditStrategy.Type.MERGE, 1f, List.of(2L, 3L), true);
+        String bNodeId = nodeIdByName(workflow, "B审批");
+        long startRecordId = createAndSubmit(workflow);
+
+        FlowRecord b1Record = todoRecordOf(b1, bNodeId);
+
+        // when/then 加签已在待办中的他人被拒绝
+        FlowExecutionException exception = assertThrows(FlowExecutionException.class,
+                () -> addAudit(workflow, b1, b1Record, b2.getUserId()));
+        assertEquals("execution.addAudit.operatorAlreadyInTodo", exception.getErrCode());
+        assertEquals(2, nodeRecordsOf(startRecordId, bNodeId).size(), "被拒绝的加签不应新增记录");
+        assertEquals(1, todoRecordsOf(b2, bNodeId).size(), "b2 的待办应保持不变");
+
+        // when/then 加签自己同样被拒绝
+        FlowExecutionException selfException = assertThrows(FlowExecutionException.class,
+                () -> addAudit(workflow, b1, b1Record, b1.getUserId()));
+        assertEquals("execution.addAudit.operatorAlreadyInTodo", selfException.getErrCode());
+        assertEquals(2, nodeRecordsOf(startRecordId, bNodeId).size(), "被拒绝的加签不应新增记录");
+        assertEquals(1, todoRecordsOf(b1, bNodeId).size(), "b1 的待办应保持不变");
+    }
+
+    /**
+     * 测试目标：当前节点只剩一名待审批人时不允许减签。
+     * 前置条件：B 为单人审批节点，待审批人只有 b1。
+     * 执行步骤：b1 尝试减签 b2。
+     * 期望断言：被拒绝（execution.reduceAudit.singleApprover），b1 的待办保留。
+     */
+    @Test
+    void reduceWhenOnlyOnePendingApprover_shouldReject() {
+        // given
+        Workflow workflow = saveWorkflow("issue266-single", MultiOperatorAuditStrategy.Type.SEQUENCE,
+                0f, List.of(2L), true);
+        String bNodeId = nodeIdByName(workflow, "B审批");
+        createAndSubmit(workflow);
+
+        FlowRecord b1Record = todoRecordOf(b1, bNodeId);
+
+        // when/then
+        FlowExecutionException exception = assertThrows(FlowExecutionException.class,
+                () -> reduce(workflow, b1, b1Record, b2.getUserId()));
+        assertEquals("execution.reduceAudit.singleApprover", exception.getErrCode());
+        assertEquals(1, todoRecordsOf(b1, bNodeId).size(), "b1 的待办应保留");
+    }
+
+    /**
+     * 测试目标：detail 返回当前节点待审批人员，作为减签选人的数据来源。
+     * 前置条件：B 为顺序审批节点，b1/b2/b3。
+     * 执行步骤：b1 查看 detail；b1 通过后 b2 查看 detail。
+     * 期望断言：b1 看到 b2、b3（含尚未激活的隐藏记录，且不含自己）；b2 只看到 b3（已办的 b1 被排除）。
+     */
+    @Test
+    void detailShouldExposeCurrentNodePendingOperators() {
+        // given
+        Workflow workflow = saveWorkflow(MultiOperatorAuditStrategy.Type.SEQUENCE, 0f, List.of(2L, 3L, 4L), false);
+        String bNodeId = nodeIdByName(workflow, "B审批");
+        createAndSubmit(workflow);
+
+        FlowRecord b1Record = todoRecordOf(b1, bNodeId);
+
+        // when/then b1 视角：b2、b3 均为当前节点待审批人
+        FlowContent b1Detail = factory.flowService.detail(new FlowDetailRequest(b1Record.getId(), b1.getUserId()));
+        assertEquals(List.of(b2.getUserId(), b3.getUserId()),
+                b1Detail.getCurrentNodeOperators().stream().map(FlowOperator::getId).toList());
+
+        // 动作能力标记：减签不支持合并批量，通过等其他动作支持
+        assertEquals(false, actionMap(b1Detail, ActionType.REDUCE_AUDIT).get("batchable"));
+        assertEquals(true, actionMap(b1Detail, ActionType.PASS).get("batchable"));
+
+        // when b1 通过后，b2 成为当前审批人
+        pass(b1Record, workflow, b1);
+
+        // then b2 视角：只剩 b3，b1 已办不再作为候选人
+        FlowContent b2Detail = factory.flowService.detail(
+                new FlowDetailRequest(todoRecordOf(b2, bNodeId).getId(), b2.getUserId()));
+        assertEquals(List.of(b3.getUserId()),
+                b2Detail.getCurrentNodeOperators().stream().map(FlowOperator::getId).toList());
+        assertEquals(b3.getName(), b2Detail.getCurrentNodeOperators().get(0).getName());
+    }
+
     // ------------------------------------------------------------------
     // 辅助方法
     // ------------------------------------------------------------------
@@ -458,5 +547,12 @@ class FlowIssue266ReduceAuditTest {
 
     private boolean containsAction(List<Map<String, Object>> actions, ActionType actionType) {
         return actions.stream().anyMatch(action -> actionType.name().equals(action.get("type")));
+    }
+
+    private Map<String, Object> actionMap(FlowContent detail, ActionType actionType) {
+        return detail.getActions().stream()
+                .filter(action -> actionType.name().equals(action.get("type")))
+                .findFirst()
+                .orElseThrow();
     }
 }

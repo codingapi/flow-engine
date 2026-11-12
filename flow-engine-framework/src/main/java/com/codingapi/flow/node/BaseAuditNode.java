@@ -181,7 +181,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         }
         MultiOperatorAuditStrategy.Type multiOperatorAuditStrategyType = this.strategyManager().getMultiOperatorAuditStrategyType();
         if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.SEQUENCE) {
-            return records.stream().anyMatch(this::isPendingApprovalRecord);
+            return records.stream().anyMatch(FlowRecord::isPendingApproval);
         }
         if (multiOperatorAuditStrategyType == MultiOperatorAuditStrategy.Type.MERGE) {
             long total = records.stream()
@@ -193,16 +193,6 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         }
         return false;
     }
-
-    /**
-     * 是否为待审批记录：含顺序审批中尚未激活的隐藏记录。
-     */
-    private boolean isPendingApprovalRecord(FlowRecord record) {
-        return !record.isRevoked()
-                && record.getRecordState() == FlowRecord.SATE_RECORD_TODO
-                && record.getFlowState() == FlowRecord.SATE_FLOW_RUNNING;
-    }
-
 
     /**
      * 生成当前节点的记录

@@ -185,10 +185,14 @@ view / code / viewTitle / nodeName / nodeId / nodeType
 title（节点标题） / adviceRequired / signRequired / adviceHidden
 form（FlowForm 元数据） / fieldPermissions（字段权限）
 todos（当前节点待办 Body 列表） / actions / actionList
-mergeable / createOperator / currentOperator / flowState / recordState
+mergeable / createOperator / currentOperator / currentNodeOperators / flowState / recordState
 histories（审批历史） / nodes（NodeOption 可操作节点） / revoke / urge
 resetSubProcess（子流程重置能力标识：当前待办位于开启重置能力、已汇聚完成的子流程的锁定合并节点上时为 true；更深层下游节点为 false）
 ```
+
+- `currentNodeOperators`：当前记录所属**节点实例**中仍待审批的人员（`id` / `name`，按人去重，排除当前操作人，含顺序审批尚未激活的隐藏记录）。减签等只能作用于当前节点其他待审批人的动作应以此字段作为候选来源，不要使用宿主的全局用户列表。
+- 该字段按单条流程记录计算；合并审批（`mergeable = true`）下多条流程实例的待审批人集合可能不同，不能跨流程合并候选人。
+- `actions` / `actionList` 中每个动作额外带有 `batchable` 标记：`true` 表示支持合并批量提交，`false` 表示只能单条记录提交（当前为 `REDUCE_AUDIT`、`CUSTOM`）。该标记只在响应中附加，不写入流程设计持久化数据；旧版本服务端无此字段时前端按 `true` 处理。
 
 ### `FlowRecordContent`（列表响应，字段摘要）
 

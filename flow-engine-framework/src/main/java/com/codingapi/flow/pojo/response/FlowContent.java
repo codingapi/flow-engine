@@ -13,6 +13,8 @@ import com.codingapi.flow.workflow.Workflow;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -147,6 +149,14 @@ public class FlowContent {
     private FlowOperator currentOperator;
 
     /**
+     * 当前节点待审批人员（不含当前操作人）
+     *
+     * <p>减签等动作的目标必须来自当前节点实例，不能从宿主用户列表随意选取：合并审批
+     * 场景下每个流程实例的待审批人集合可能不同，候选人按流程实例维度计算。
+     */
+    private List<FlowOperator> currentNodeOperators;
+
+    /**
      * 流程状态 | 运行中、已完成、异常、删除
      */
     private int flowState;
@@ -217,13 +227,14 @@ public class FlowContent {
         if (currentNode != null) {
             ActionManager actionManager = currentNode.actionManager();
             NodeStrategyManager strategyManager = currentNode.strategyManager();
-            this.actions = actionManager.filterActions(flowSession).stream().map(IFlowAction::toMap).toList();
-            this.actionList = actionManager.getActions().stream().map(IFlowAction::toMap).toList();
+            this.actions = toActionMaps(actionManager.filterActions(flowSession));
+            this.actionList = toActionMaps(actionManager.getActions());
             this.adviceRequired = strategyManager.isAdviceRequired();
             this.signRequired = strategyManager.isSignRequired();
             this.adviceHidden = strategyManager.isAdviceHidden();
             this.nodeId = currentNode.getId();
             this.nodeName = currentNode.getName();
+            this.currentNodeOperators = loadCurrentNodeOperators(flowSession);
             this.nodeType = currentNode.getType();
             this.fieldPermissions = strategyManager.getFieldPermissions();
             Map<String, Object> nodeData = currentNode.toMap();
@@ -231,6 +242,50 @@ public class FlowContent {
             this.code = (String) nodeData.get("code");
             this.viewTitle = (String) nodeData.get("viewTitle");
         }
+    }
+
+    /**
+     * 输出动作配置，并附加运行期能力标记。
+     *
+     * <p>{@code batchable} 表示该动作是否支持合并批量提交，由 {@link IFlowAction#batchable()} 声明。
+     * 该标记只在响应中附加，不写入动作的持久化配置（{@link IFlowAction#toMap()}）。
+     */
+    private static List<Map<String, Object>> toActionMaps(List<IFlowAction> actions) {
+        return actions.stream().map(action -> {
+            Map<String, Object> data = new HashMap<>(action.toMap());
+            data.put("batchable", action.batchable());
+            return data;
+        }).toList();
+    }
+
+    /**
+     * 计算当前节点实例中的待审批人员（按人去重，排除当前操作人）。
+     *
+     * <p>口径与减签目标解析一致：仅取仍待审批的记录（含顺序审批中尚未激活的隐藏记录），
+     * 且只取同一流程实例的数据，避免仓储按 {@code (fromId, nodeId)} 查询时混入其他流程实例。
+     *
+     * <p>合并审批是多条流程实例的待办聚合展示，各自的待审批人集合可能不同，
+     * 因此候选人员只能按单条流程记录计算，不能跨流程合并。
+     */
+    private List<FlowOperator> loadCurrentNodeOperators(FlowSession flowSession) {
+        FlowRecord currentRecord = flowSession.getCurrentRecord();
+        List<FlowRecord> currentNodeRecords = flowSession.getCurrentNodeRecords();
+        if (currentRecord == null || currentNodeRecords == null) {
+            return List.of();
+        }
+        long currentOperatorId = currentRecord.getCurrentOperatorId();
+        Map<Long, FlowOperator> operators = new LinkedHashMap<>();
+        for (FlowRecord record : currentNodeRecords) {
+            if (record == null || !currentRecord.getProcessId().equals(record.getProcessId())) {
+                continue;
+            }
+            if (!record.isPendingApproval() || record.getCurrentOperatorId() == currentOperatorId) {
+                continue;
+            }
+            operators.putIfAbsent(record.getCurrentOperatorId(),
+                    new FlowOperator(record.getCurrentOperatorId(), record.getCurrentOperatorName()));
+        }
+        return List.copyOf(operators.values());
     }
 
     public void pushWorkflow(Workflow workflow) {
