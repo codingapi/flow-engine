@@ -13,7 +13,7 @@ Flow Engine 是一个基于 Java 17 和 Spring Boot 3.5.9 构建的企业级工�
 ### 核心特性
 
 - **19 种节点类型** - 开始、结束、审批、办理、通知、人工、条件控制、条件分支、条件Else分支、并行控制、并行分支、路由、包容控制、包容分支、包容Else分支、子流程、延迟、触发节点、人工分支
-- **8 种动作类型** - 通过、拒绝、保存、加签、委派、退回、转办、自定义
+- **9 种动作类型** - 通过、拒绝、保存、加签、减签、委派、退回、转办、自定义
 - **策略驱动配置** - 所有关键配置通过策略实现，支持动态扩展
 - **Groovy 脚本扩展** - 支持发起人动态匹配、审批人加载、条件判断、自定义操作等
 - **多人审批模式** - 顺序审批、会签审批（可配置比例）、或签审批、随机审批
@@ -44,7 +44,7 @@ flow-engine
 |------|------|
 | `workflow` | 流程定义：Workflow、WorkflowVersion、运行时快照（runtime） |
 | `node` | 19 种流程节点、节点工厂与节点助手 |
-| `action` | 8 种流程动作与动作工厂 |
+| `action` | 9 种流程动作与动作工厂 |
 | `strategy` | 策略层：15 种节点策略 + 2 种工作流策略 |
 | `script` | Groovy 脚本系统：9 种节点脚本、3 种动作脚本、运行时、注册表、工厂 |
 | `transfer` | 流程定义导入导出（旧版 Schema 兼容、脚本迁移） |
@@ -54,7 +54,7 @@ flow-engine
 | `session` | 执行上下文：FlowSession、FlowAdvice、IRepositoryHolder |
 | `record` | 流程记录：FlowRecord、FlowTodoRecord、FlowTodoMerge |
 | `repository` | 12 个仓储接口（持久化抽象，由 infra 模块实现） |
-| `event` | 8 种流程事件：开始 / 待办 / 已办 / 完成 / 催办 / 撤销 / 删除 / 子流程重置 |
+| `event` | 9 种流程事件：开始 / 待办 / 已办 / 完成 / 催办 / 撤销 / 删除 / 减签 / 子流程重置 |
 | `exception` | 框架异常体系：异常基类 + 6 种具体异常（验证 / 未找到 / 状态 / 权限 / 执行 / 导入导出） |
 | `form` | 表单系统：字段定义、数据校验、字段权限、值转换 |
 | `builder` | 6 种构建器（流程、节点、动作、策略、字段权限、节点映射） |
@@ -220,7 +220,7 @@ pnpm run dev:app-mobile
 
 1. **流程层** (Workflow Layer) - 流程定义层
 2. **节点层** (Node Layer) - 节点层（19种节点类型）
-3. **动作层** (Action Layer) - 动作层（8种动作类型）
+3. **动作层** (Action Layer) - 动作层（9种动作类型）
 4. **记录层** (Record Layer) - 记录层
 5. **会话层** (Session Layer) - 会话层
 6. **管理器层** (Manager Layer) - 管理器层
@@ -282,6 +282,7 @@ pnpm run dev:app-mobile
 | ReturnAction | 退回 | `RETURN` |
 | TransferAction | 转办 | `TRANSFER` |
 | AddAuditAction | 加签 | `ADD_AUDIT` |
+| ReduceAuditAction | 减签 | `REDUCE_AUDIT` |
 | DelegateAction | 委派 | `DELEGATE` |
 | CustomAction | 自定义 | `CUSTOM` |
 

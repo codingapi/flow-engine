@@ -37,7 +37,7 @@
 | `OperatorMatchScript` | 校验发起人是否允许发起流程 | `Workflow.matchCreatedOperator` |
 | `ErrorTriggerScript` | 匹配不到操作人时的兜底（跳节点 / 兜底操作人） | `ErrorTriggerStrategy` |
 | `ActionDisplayScript` | 控制动作是否展示 | `ActionDisplay.show` |
-| `ActionCustomScript` | 自定义动作类型（返回 `SAVE/PASS/REJECT/ADD_AUDIT/DELEGATE/RETURN/TRANSFER`） | `CustomAction` |
+| `ActionCustomScript` | 自定义动作类型（返回 `SAVE/PASS/REJECT/ADD_AUDIT/REDUCE_AUDIT/DELEGATE/RETURN/TRANSFER`；返回 `REDUCE_AUDIT` 时需同时提供 `advice.forwardOperatorIds`） | `CustomAction` |
 | `ActionRejectScript` | 拒绝动作的目标（返回节点 id 或 `TERMINATE`） | `RejectAction` |
 
 ## 2. 脚本执行上下文
