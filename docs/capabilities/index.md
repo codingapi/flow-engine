@@ -7,7 +7,7 @@
 | 名称 | 模块 | 描述 | 范围 | 来源 |
 |------|------|------|------|------|
 | [commons/lang3](./commons/lang3.md) | commons | Apache Commons 工具库，提供字符串、集合、IO 等通用工具方法 | 后端 | 框架:Apache Commons |
-| [flow-engine-framework/action](./flow-engine-framework/action.md) | flow-engine-framework | 流程动作体系，包含 8 种动作类型、动作接口和动作工厂 | 后端 | 项目自有 |
+| [flow-engine-framework/action](./flow-engine-framework/action.md) | flow-engine-framework | 流程动作体系，包含 9 种动作类型、动作接口和动作工厂 | 后端 | 项目自有 |
 | [flow-engine-framework/delay](./flow-engine-framework/delay.md) | flow-engine-framework | 延迟任务调度能力，支持延迟节点的定时触发、任务持久化与共享调度线程 | 后端 | 项目自有 |
 | [flow-engine-framework/exception](./flow-engine-framework/exception.md) | flow-engine-framework | 流程异常体系，包含异常基类和 6 种业务异常子类 | 后端 | 项目自有 |
 | [flow-engine-framework/flow-service](./flow-engine-framework/flow-service.md) | flow-engine-framework | 流程服务层，封装流程的创建、审批、撤销、催办等核心业务操作 | 后端 | 项目自有 |

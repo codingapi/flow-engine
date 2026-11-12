@@ -183,4 +183,53 @@ public class FlowExecutionException extends FlowException {
         return new FlowExecutionException("execution.node.loopDepth",
                 String.format("Node execution count exceeds the loop guard limit: %d", maxDepth));
     }
+
+    /**
+     * Reduce audit is not supported by the current multi operator audit strategy
+     * <p>
+     * Only sequence (SEQUENCE) and merge (MERGE) multi operator audit nodes need to
+     * reduce approvers; ANY and RANDOM_ONE complete with a single approval, so
+     * removing an approver has no business meaning.
+     *
+     * @return exception
+     */
+    public static FlowExecutionException reduceAuditUnsupported() {
+        return new FlowExecutionException("execution.reduceAudit.unsupported",
+                "Reduce audit is only supported by sequence or merge multi-operator audit strategy");
+    }
+
+    /**
+     * Reduce audit target is not a pending approver of the current node instance
+     *
+     * @param operatorId target operator id
+     * @return exception
+     */
+    public static FlowExecutionException reduceAuditTargetNotFound(long operatorId) {
+        return new FlowExecutionException("execution.reduceAudit.targetNotFound",
+                String.format("Operator %d is not a pending approver of the current node", operatorId));
+    }
+
+    /**
+     * Reduce audit is not allowed to remove the operator who is executing the action
+     *
+     * @return exception
+     */
+    public static FlowExecutionException reduceAuditOwnRecord() {
+        return new FlowExecutionException("execution.reduceAudit.ownRecord",
+                "Reduce audit is not allowed to remove the current operator, use pass, reject or transfer instead");
+    }
+
+    /**
+     * Reduce audit would leave the node without any pending approval
+     * <p>
+     * Node completion is only evaluated when an approval action is submitted. If the
+     * node is already satisfied (or has no pending approvers) after the removal, no
+     * action will ever trigger the completion and the flow stalls forever.
+     *
+     * @return exception
+     */
+    public static FlowExecutionException reduceAuditNoRemainingApproval() {
+        return new FlowExecutionException("execution.reduceAudit.noRemainingApproval",
+                "Reduce audit rejected: the node still requires at least one pending approval to finish");
+    }
 }

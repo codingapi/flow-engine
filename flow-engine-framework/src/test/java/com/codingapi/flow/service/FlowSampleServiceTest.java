@@ -95,7 +95,8 @@ class FlowSampleServiceTest {
 
         List<String> keys = GroovyScriptAnnotationScannerUtils.findGroovyScriptFields(workflow).getKeys();
         System.out.println(keys);
-        assertEquals(15,keys.size());
+        // 审批节点默认动作新增「减签」，其人员范围脚本字段一并计入（issue #266）
+        assertEquals(16,keys.size());
 
         factory.workflowService.saveWorkflow(workflow);
 

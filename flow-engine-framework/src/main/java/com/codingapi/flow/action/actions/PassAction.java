@@ -147,14 +147,24 @@ public class PassAction extends BaseAction {
         // 激活下一个按顺序审批的记录数据。
         // 委派记录只是临时办理人，原审批人尚未确认，不能提前激活后续顺序的审批人（issue #239）；
         // 只激活尚未展示过的记录，避免委派返回后重复激活已显示/已办理的人员。
+        // 按「最近一条更大 nodeOrder」激活而不是固定的 nodeOrder + 1：减签撤销中间的隐藏审批人后
+        // 序号会出现空洞，按 +1 查找会永远找不到下一位，导致后续审批人永不激活（issue #266）
         NodeStrategyManager nodeStrategyManager = currentNode.strategyManager();
         if (!currentRecord.isDelegate() && nodeStrategyManager.isSequenceMultiOperatorType()) {
             List<FlowRecord> currentRecords = flowSession.getCurrentNodeRecords();
-            for (FlowRecord record : currentRecords) {
-                if (record.getNodeOrder() == currentRecord.getNodeOrder() + 1 && record.isHidden()) {
-                    record.show();
-                    recordList.add(record);
-                    flowEvents.add(new FlowRecordTodoEvent(record, flowSession.isMock()));
+            int nextNodeOrder = currentRecords.stream()
+                    .filter(FlowRecord::isHidden)
+                    .filter(record -> record.getNodeOrder() > currentRecord.getNodeOrder())
+                    .mapToInt(FlowRecord::getNodeOrder)
+                    .min()
+                    .orElse(-1);
+            if (nextNodeOrder >= 0) {
+                for (FlowRecord record : currentRecords) {
+                    if (record.getNodeOrder() == nextNodeOrder && record.isHidden()) {
+                        record.show();
+                        recordList.add(record);
+                        flowEvents.add(new FlowRecordTodoEvent(record, flowSession.isMock()));
+                    }
                 }
             }
         }

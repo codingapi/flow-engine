@@ -22,7 +22,7 @@ Flow Engine 是一个企业级工作流引擎，基于 Java 17 和 Spring Boot 3
 | 包路径 | 职责 |
 |--------|------|
 | `com.codingapi.flow.node` | 19 种流程节点类型 |
-| `com.codingapi.flow.action` | 8 种动作类型 |
+| `com.codingapi.flow.action` | 9 种动作类型 |
 | `com.codingapi.flow.strategy` | 节点策略和工作流策略 |
 | `com.codingapi.flow.script` | Groovy 脚本运行时 |
 | `com.codingapi.flow.repository` | 仓储接口定义 |
@@ -57,14 +57,14 @@ REST 层通过请求参数 `mockKey` 分流到 Mock 实例（见 `FlowRecordCont
 
 ### 节点 / 动作 / 策略三元组
 
-19 种节点（`node/nodes/`）× 8 种动作（`action/actions/`），行为由策略（`strategy/node/`、`strategy/workflow/`）驱动而非继承扩展：
+19 种节点（`node/nodes/`）× 9 种动作（`action/actions/`），行为由策略（`strategy/node/`、`strategy/workflow/`）驱动而非继承扩展：
 - `NodeStrategyManager` 持有节点策略（如 `RevokeStrategy`、`OperatorLoadStrategy`、`RecordMergeStrategy`）
 - `ActionManager` 持有节点动作
 - 节点类型常量见 `StartNode.NODE_TYPE`（= `NodeType.START.name()`），`FlowRecord.isNodeType(String)` 用于按类型判定
 
 ### 事件（IFlowEvent + EventPusher）
 
-8 种事件：开始 / 待办 / 已办 / 完成 / 催办 / 撤销（`FlowRecordRevokeEvent`）/ 删除（`FlowRecordDeleteEvent`）/ 子流程重置（`FlowSubProcessResetEvent`）。操作完成后用 `EventPusher.push(event)` 推送；记录类事件携带 `FlowRecord` + `mock` 标记，重置事件携带新旧聚合组快照。外部可用 Spring `@EventListener` 订阅。
+9 种事件：开始 / 待办 / 已办 / 完成 / 催办 / 撤销（`FlowRecordRevokeEvent`）/ 删除（`FlowRecordDeleteEvent`）/ 子流程重置（`FlowSubProcessResetEvent`）/ 减签（`FlowRecordReduceAuditEvent`）。操作完成后用 `EventPusher.push(event)` 推送；记录类事件携带 `FlowRecord` + `mock` 标记，重置事件携带新旧聚合组快照。外部可用 Spring `@EventListener` 订阅。
 
 ### API 模块划分
 
