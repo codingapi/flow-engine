@@ -4,7 +4,10 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.domain.FlowReissueRecord;
+import com.codingapi.flow.event.FlowEventPublisher;
 import com.codingapi.flow.event.FlowRecordReissueEvent;
+import com.codingapi.flow.event.IFlowEvent;
+import com.codingapi.flow.event.IFlowEventPublisher;
 import com.codingapi.flow.exception.FlowPermissionException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.factory.MyFlowServiceFactory;
@@ -292,6 +295,38 @@ class FlowReissueServiceTest {
         assertAll("详情接口的二次发起标识",
                 () -> assertTrue(managerView.isReissue()),
                 () -> assertFalse(initiatorView.isReissue()));
+    }
+
+    /**
+     * 测试目标：二次发起产生的事件必须走 {@link FlowEventPublisher}，不得绕过发布器直接推送到事件框架。
+     * 前置条件：注册一个记录型事件发布器（模拟 starter 的 SpringFlowEventPublisher）。
+     * 执行步骤：对已完成流程执行二次发起 → 查看发布器收到的事件。
+     * 期望断言：新流程的事件（开始/待办/二次发起）全部经由发布器投递，且二次发起事件的分区键为新流程id。
+     */
+    @Test
+    void shouldPublishReissueEventThroughFlowEventPublisher() {
+        long sourceRecordId = finishFlow("原始数据");
+        List<IFlowEvent> published = new ArrayList<>();
+        IFlowEventPublisher publisher = published::add;
+        FlowEventPublisher.register(publisher);
+        try {
+            long newRecordId = reissue(sourceRecordId, manager, null);
+            FlowRecord newRecord = factory.flowRecordRepository.get(newRecordId);
+
+            FlowRecordReissueEvent reissueEvent = published.stream()
+                    .filter(FlowRecordReissueEvent.class::isInstance)
+                    .map(FlowRecordReissueEvent.class::cast)
+                    .findFirst()
+                    .orElseThrow(() -> new AssertionError("二次发起事件应经由 FlowEventPublisher 投递"));
+            assertAll("事件走发布器与分区键",
+                    () -> assertTrue(published.stream().allMatch(event -> event.eventKey() != null),
+                            "所有事件都应带有分区键"),
+                    () -> assertEquals(newRecord.getProcessId(), reissueEvent.eventKey(),
+                            "二次发起事件应按新流程id分区"),
+                    () -> assertEquals(newRecordId, reissueEvent.getNewRecord().getId()));
+        } finally {
+            FlowEventPublisher.unregister(publisher);
+        }
     }
 
     /**
