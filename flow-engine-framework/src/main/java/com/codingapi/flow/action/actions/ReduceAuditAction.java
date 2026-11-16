@@ -18,7 +18,7 @@ import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.MultiOperatorAuditStrategy;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -155,7 +155,7 @@ public class ReduceAuditAction extends BaseAction {
 
         // 循序审批的链路由通过时的「最近一条更大 nodeOrder」激活保证，撤销中间记录不需要额外补链
         repositoryHolder.saveRecords(saveRecords);
-        flowEvents.forEach(EventPusher::push);
+        flowEvents.forEach(FlowEventPublisher::push);
     }
 
     /**

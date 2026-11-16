@@ -109,6 +109,27 @@ public class FlowStateException extends FlowException {
         return new FlowStateException("node.notSupportRevoke", "Node not support revoke");
     }
 
+
+    /**
+     * Node not support return (start node has no history node to return)
+     *
+     * @return exception
+     */
+    public static FlowStateException nodeNotSupportReturn() {
+        return new FlowStateException("node.notSupportReturn", "Node not support return");
+    }
+
+    /**
+     * Return target node is not executed in current process
+     *
+     * @param nodeId node id
+     * @return exception
+     */
+    public static FlowStateException backNodeNotInHistory(String nodeId) {
+        return new FlowStateException("node.backNode.notInHistory",
+                String.format("Return target node %s is not in the executed history", nodeId));
+    }
+
     /**
      * Record not support urge
      *
@@ -186,6 +207,16 @@ public class FlowStateException extends FlowException {
         return new FlowStateException("state.subProcess.resetScriptMismatch",
                 String.format("Sub process reset creation script returned %d create requests, "
                         + "but the original group has %d instances", actual, expected));
+    }
+
+    /**
+     * Record not support reissue (only a normally finished record can be reissued)
+     *
+     * @return exception
+     */
+    public static FlowStateException recordNotSupportReissue() {
+        return new FlowStateException("state.record.notSupportReissue",
+                "Flow record is not finished normally, reissue not allowed");
     }
 
     /**

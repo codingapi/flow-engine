@@ -24,7 +24,7 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.MultiOperatorAuditStrategy;
 import com.codingapi.flow.strategy.node.OperatorSelectType;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -246,7 +246,7 @@ public class PassAction extends BaseAction {
         // 其 Todo 事件在引擎内虽会生成，但推送业务订阅方前需拦截，避免下游收到"已完成流程的待办"。
         flowEvents.stream()
                 .filter(event -> !isEndNodeTodoEvent(event))
-                .forEach(EventPusher::push);
+                .forEach(FlowEventPublisher::push);
     }
 
     /**

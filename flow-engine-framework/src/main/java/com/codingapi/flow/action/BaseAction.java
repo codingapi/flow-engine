@@ -48,7 +48,9 @@ public abstract class BaseAction implements IFlowAction {
 
     @Override
     public boolean show(FlowSession flowSession) {
-        return this.display.show(flowSession);
+        // 兼容早期设计/导入的流程数据：动作缺少 display 配置时按默认展示处理，
+        // 与 ActionDisplay 未配置展示脚本即展示的口径一致，避免详情接口空指针
+        return this.display == null || this.display.show(flowSession);
     }
 
     @Override

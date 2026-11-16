@@ -19,7 +19,7 @@ import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.workflow.UrgeStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +91,6 @@ public class FlowUrgeService {
             flowEvents.add(new FlowRecordUrgeEvent(todoRecord, currentOperator,repositoryHolder instanceof MockRepositoryHolder));
         }
 
-        flowEvents.forEach(EventPusher::push);
+        flowEvents.forEach(FlowEventPublisher::push);
     }
 }

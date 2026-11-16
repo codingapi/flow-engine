@@ -2,6 +2,7 @@ package com.codingapi.flow.manager;
 
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.action.actions.*;
+import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.node.IFlowNode;
@@ -9,6 +10,7 @@ import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.HandleNode;
 import com.codingapi.flow.node.nodes.StartNode;
+import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
@@ -146,6 +148,10 @@ public class ActionManager {
             }
             IFlowNode backNode = flowAdvice.getBackNode();
             IFlowNode currentNode = session.getCurrentNode();
+            // 开始节点没有任何历史节点，不存在可退回目标，直接拒绝（issue #270）
+            if (StartNode.NODE_TYPE.equals(currentNode.getType())) {
+                throw FlowStateException.nodeNotSupportReturn();
+            }
             if (currentNode.equals(backNode)) {
                 throw FlowValidationException.required("backNode");
             }
@@ -159,8 +165,36 @@ public class ActionManager {
                     || backNode.getType().equals(HandleNode.NODE_TYPE))) {
                 throw FlowValidationException.required("backNode");
             }
+            // 退回目标必须是当前记录真实执行过的历史节点：
+            // 并行、条件分支中"结构上不是下游但实际没走过"的节点同样不可退回（issue #270）
+            verifyBackNodeExecuted(session, backNode);
         }
 
+    }
+
+    /**
+     * 校验退回目标是否为当前记录真实执行过的历史节点。
+     *
+     * <p>仅靠“目标不是当前节点的下游”不足以约束退回：并行、条件分支里存在“不是下游但从未执行”的节点，
+     * 跳转到此类节点会让流程进入未走过的路径。这里以当前记录之前的历史记录为唯一依据，
+     * 与详情接口输出的可退回节点（{@code FlowContent.backNodes}）保持同一口径（issue #270）。</p>
+     *
+     * @param session  当前会话
+     * @param backNode 退回目标节点
+     */
+    private void verifyBackNodeExecuted(FlowSession session, IFlowNode backNode) {
+        FlowRecord currentRecord = session.getCurrentRecord();
+        if (currentRecord == null) {
+            throw FlowValidationException.required("backNode");
+        }
+        boolean executed = session.getRepositoryHolder()
+                .getFlowRecordService()
+                .findFlowRecordBeforeRecords(currentRecord.getProcessId(), currentRecord.getId())
+                .stream()
+                .anyMatch(record -> backNode.getId().equals(record.getNodeId()));
+        if (!executed) {
+            throw FlowStateException.backNodeNotInHistory(backNode.getId());
+        }
     }
 
     /**

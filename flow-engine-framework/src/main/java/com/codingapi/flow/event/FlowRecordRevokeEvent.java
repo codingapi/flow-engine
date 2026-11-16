@@ -22,4 +22,12 @@ public class FlowRecordRevokeEvent implements IFlowEvent {
      * 是否为模拟环境
      */
     private final boolean mock;
+
+    /**
+     * 事件分区键：同一流程内的事件按顺序投递
+     */
+    @Override
+    public String eventKey() {
+        return currentRecord.getProcessId();
+    }
 }

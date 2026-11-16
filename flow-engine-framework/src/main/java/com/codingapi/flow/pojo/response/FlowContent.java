@@ -1,5 +1,6 @@
 package com.codingapi.flow.pojo.response;
 
+import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.permission.FormFieldPermission;
@@ -177,6 +178,15 @@ public class FlowContent {
     private List<NodeOption> nodes;
 
     /**
+     * 可退回节点。
+     *
+     * <p>只包含当前记录真实执行过的历史节点（剔除当前节点），并按“最近经过的节点”优先排序，
+     * 供退回弹框直接渲染候选列表；为空表示当前记录没有可退回的节点（如开始节点）。
+     * 与 {@link #nodes} 的全量流程定义节点区分，避免前端从定义节点中截取导致越界选择（issue #270）。</p>
+     */
+    private List<NodeOption> backNodes;
+
+    /**
      * 支持撤销
      */
     private boolean revoke;
@@ -192,6 +202,13 @@ public class FlowContent {
      * 前端可据此标识自行决定交互呈现方式，调用 {@code /api/cmd/record/subProcess/reset} 接口。</p>
      */
     private boolean resetSubProcess;
+
+    /**
+     * 支持二次发起（独立能力标识，非审批动作）。
+     * <p>仅当当前记录已正常完成且操作人为流程管理员时为 true；前端可据此在已办详情中
+     * 展示「重新发起」入口，调用 {@code /api/cmd/record/reissue} 接口。</p>
+     */
+    private boolean reissue;
 
     /**
      * 设置操作动作按钮
@@ -227,7 +244,7 @@ public class FlowContent {
         if (currentNode != null) {
             ActionManager actionManager = currentNode.actionManager();
             NodeStrategyManager strategyManager = currentNode.strategyManager();
-            this.actions = toActionMaps(actionManager.filterActions(flowSession));
+            this.actions = filterUnsupportedActions(toActionMaps(actionManager.filterActions(flowSession)));
             this.actionList = toActionMaps(actionManager.getActions());
             this.adviceRequired = strategyManager.isAdviceRequired();
             this.signRequired = strategyManager.isSignRequired();
@@ -242,6 +259,25 @@ public class FlowContent {
             this.code = (String) nodeData.get("code");
             this.viewTitle = (String) nodeData.get("viewTitle");
         }
+    }
+
+    /**
+     * 过滤当前不可执行的按钮。
+     *
+     * <p>没有任何可退回节点时（开始节点或流程首个节点），退回动作不应出现在展示按钮集合中，
+     * 否则会出现“按钮可点但提交必然失败”的错误交互（issue #270）。
+     * {@link #actionList} 仍保留节点配置的全部按钮，前端按展示集合自行隐藏。</p>
+     *
+     * @param actions 节点过滤后的展示动作
+     * @return 过滤后的展示动作
+     */
+    private List<Map<String, Object>> filterUnsupportedActions(List<Map<String, Object>> actions) {
+        if (this.backNodes != null && !this.backNodes.isEmpty()) {
+            return actions;
+        }
+        return actions.stream()
+                .filter(action -> !ActionType.RETURN.name().equals(action.get("type")))
+                .toList();
     }
 
     /**

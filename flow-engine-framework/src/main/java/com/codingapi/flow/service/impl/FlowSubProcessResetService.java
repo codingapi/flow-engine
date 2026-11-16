@@ -25,7 +25,7 @@ import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.SubProcessStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -183,9 +183,9 @@ public class FlowSubProcessResetService {
         boolean mock = repositoryHolder instanceof MockRepositoryHolder;
         IFlowOperator resetOperator = repositoryHolder.getOperatorById(request.getOperatorId());
         for (FlowRecord invalidatedRecord : invalidatedRecords) {
-            EventPusher.push(new FlowRecordRevokeEvent(invalidatedRecord, mock));
+            FlowEventPublisher.push(new FlowRecordRevokeEvent(invalidatedRecord, mock));
         }
-        EventPusher.push(new FlowSubProcessResetEvent(
+        FlowEventPublisher.push(new FlowSubProcessResetEvent(
                 currentGroup.snapshot(),
                 newGroup.snapshot(),
                 currentRecord.getId(),
