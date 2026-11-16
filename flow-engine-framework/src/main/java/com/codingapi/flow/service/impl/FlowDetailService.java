@@ -6,9 +6,11 @@ import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.form.FlowForm;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.node.helper.BackNodeHelper;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowDetailRequest;
 import com.codingapi.flow.pojo.response.FlowContent;
+import com.codingapi.flow.pojo.response.NodeOption;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.WorkflowService;
@@ -145,9 +147,29 @@ public class FlowDetailService {
             this.flowContent.pushCurrentNode(this.flowSession);
         }
 
+        /**
+         * 加载可退回节点。
+         *
+         * <p>候选来自当前记录真实执行过的历史记录（而不是流程定义的全量节点），
+         * 由 {@link BackNodeHelper#historyBackNodes} 按最近优先输出，供前端直接渲染退回候选列表。
+         * 必须在 {@link #loadCurrentNode()} 之前执行：没有可退回节点时，退回按钮不会下发到展示按钮集合。</p>
+         */
+        private void loadBackNodes() {
+            if (this.flowRecord == null) {
+                this.flowContent.setBackNodes(List.of());
+                return;
+            }
+            List<FlowRecord> beforeRecords = flowRecordService.findFlowRecordBeforeRecords(
+                    this.flowRecord.getProcessId(), this.flowRecord.getId());
+            List<IFlowNode> backNodes = BackNodeHelper.historyBackNodes(
+                    this.workflow, beforeRecords, this.flowRecord.getNodeId());
+            this.flowContent.setBackNodes(backNodes.stream().map(NodeOption::new).toList());
+        }
+
         public FlowContent create() {
             this.loadCurrentOperator();
             this.loadWorkflow();
+            this.loadBackNodes();
             this.loadCurrentNode();
             this.loadTodoFlowRecords();
             this.loadHistoryRecords();
