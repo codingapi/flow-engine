@@ -27,7 +27,7 @@ public interface IAsyncEvent extends IEvent {}        // 异步事件标记 ← 
 
 同步/异步由 `DomainEventContext.push` 的 `instanceof` 判定：`IAsyncEvent` → 异步（线程池执行）；`ISyncEvent`/裸 `IEvent` → 同步（发布线程内联执行）。
 
-### 1.2 九种事件
+### 1.2 十种事件
 
 记录类事件均携带 `FlowRecord`（或当前记录）与 `boolean mock` 标记（Mock 模式为 `true`）。
 
@@ -42,13 +42,14 @@ public interface IAsyncEvent extends IEvent {}        // 异步事件标记 ← 
 | `FlowRecordDeleteEvent` | 删除未流转实例（开始节点） | `FlowRecord, boolean mock` | `getFlowRecord()` / `isMock()` |
 | `FlowRecordReduceAuditEvent` | 减签（每条被撤下的记录） | `FlowRecord, long reduceOperatorId, boolean mock` | `getFlowRecord()` / `getReduceOperatorId()` / `isMock()` |
 | `FlowSubProcessResetEvent` | 子流程数据重置（issue #219） | `SubProcessRecord oldRecord, SubProcessRecord newRecord, long resetRecordId, IFlowOperator resetOperator, boolean mock` | `getOldRecord()` / `getNewRecord()` / `getResetRecordId()` / `getResetOperator()` / `isMock()` |
+| `FlowRecordReissueEvent` | 已完成流程二次发起（issue #272） | `FlowRecord sourceRecord, FlowRecord newRecord, IFlowOperator operator, boolean mock` | `getSourceRecord()` / `getNewRecord()` / `getOperator()` / `isMock()` |
 
 **子流程重置事件订阅须知**：
 
 | 关注点 | 约定 |
 |---|---|
 | 新旧聚合组 | `oldRecord` 为被取代的旧聚合组快照（含全部旧实例流程id）；`newRecord` 为新聚合组，继承实例沿用原流程id、重建实例为新流程id，重建实例的 `getSourceProcessId()` 指向被替换的旧实例 |
-| 收敛方式 | 事件异步、到达顺序不保证（同时伴随 `RevokeEvent`/`StartEvent`/`TodoEvent`）；按「同一 `parentRecordId` + 节点维度下最大聚合组 id 为活跃组」幂等覆盖，禁止增量累加 |
+| 收敛方式 | 引入 starter 时同一主流程的事件按产生顺序串行到达（同时伴随 `RevokeEvent`/`StartEvent`/`TodoEvent`）；仍建议按「同一 `parentRecordId` + 节点维度下最大聚合组 id 为活跃组」幂等覆盖，禁止增量累加 |
 | 丢事件对账 | `oldRecord` id 与订阅方当前活跃组不一致时，视为丢事件，调用 `/api/cmd/record/processNodes` 全量对账 |
 | 旧数据 | 旧实例记录不删除（仅标记聚合组已取代），订阅方需自行将旧流程id数据标记失效 |
 
@@ -130,8 +131,9 @@ public class EventPusher {
 | `FlowRevokeService.revoke()` | 当前记录恢复待办 `TodoEvent` + 被撤销后置记录 `RevokeEvent` |
 | `FlowDeleteService.delete()` | `DeleteEvent` |
 | `FlowSubProcessResetService.reset()` | 被作废记录链逐条 `RevokeEvent` + 子流程重置 `SubProcessResetEvent`；重建实例经 `FlowCreateService` 推送各自的 `StartEvent` + `TodoEvent` |
+| `FlowReissueService.reissue()` | 二次发起 `ReissueEvent` + 新流程经 `FlowCreateService` 推送的 `StartEvent` + `TodoEvent` |
 
-> 事件在 `repositoryHolder.saveRecords(...)` **落库之后**推送，保证订阅方看到的记录已持久化。
+> 事件在业务数据保存之后推送，且引入 starter 时会在**事务提交后**才投递给订阅方（见 4.5），保证订阅方回查到的记录已持久化。
 
 ### 结束节点虚拟记录拦截
 
@@ -140,7 +142,7 @@ public class EventPusher {
 ```java
 flowEvents.stream()
         .filter(event -> !isEndNodeTodoEvent(event))
-        .forEach(EventPusher::push);
+        .forEach(FlowEventPublisher::push);
 
 private boolean isEndNodeTodoEvent(IFlowEvent event) {
     return event instanceof FlowRecordTodoEvent todoEvent

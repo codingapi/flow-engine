@@ -31,4 +31,12 @@ public class FlowRecordReissueEvent implements IFlowEvent {
     private final IFlowOperator operator;
 
     private final boolean mock;
+
+    /**
+     * 事件分区键：按二次发起后新流程的流程id串行投递
+     */
+    @Override
+    public String eventKey() {
+        return newRecord == null ? null : newRecord.getProcessId();
+    }
 }

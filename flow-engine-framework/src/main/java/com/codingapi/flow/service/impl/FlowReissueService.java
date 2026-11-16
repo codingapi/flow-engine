@@ -3,6 +3,7 @@ package com.codingapi.flow.service.impl;
 import com.codingapi.flow.action.ActionType;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.domain.FlowReissueRecord;
+import com.codingapi.flow.event.FlowEventPublisher;
 import com.codingapi.flow.event.FlowRecordReissueEvent;
 import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowPermissionException;
@@ -22,7 +23,6 @@ import com.codingapi.flow.strategy.node.OperatorLoadStrategy;
 import com.codingapi.flow.strategy.node.OperatorSelectType;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
-import com.codingapi.springboot.framework.event.EventPusher;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
@@ -130,7 +130,7 @@ public class FlowReissueService {
         reissueRepository.save(reissueRecord);
 
         boolean mock = repositoryHolder instanceof MockRepositoryHolder;
-        EventPusher.push(new FlowRecordReissueEvent(sourceRecord, newRecord, operator, mock));
+        FlowEventPublisher.push(new FlowRecordReissueEvent(sourceRecord, newRecord, operator, mock));
         return newRecordId;
     }
 
