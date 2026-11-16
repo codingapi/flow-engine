@@ -18,7 +18,7 @@
 | `NodeViewJavaScriptCacheContextRegister` | **`NodeViewJavaScriptRepository`** | 构造器内执行 `NodeViewJavaScriptCacheContext.getInstance().setNodeViewJavaScriptRepository(repo)`（15 分钟缓存上下文） |
 | `GatewayContextRegister` | **`FlowOperatorGateway`** | 把操作人网关灌入 `GatewayContext` 单例（`InitializingBean`） |
 | `FlowScriptContextRegister` | `ApplicationContext` + **`FlowOperatorGateway`** + `FlowRecordRepository` | 给 `FlowScriptContext` 单例设置 `IBeanFactory`（转发 Spring 容器，脚本 `$bind` 依赖） |
-| `RepositoryHolderContextRegister` | `WorkflowService` + `FlowRecordService` + 5 个仓储 + `GatewayContextRegister` | 把 7 个依赖灌入 `RepositoryHolderContext` 单例（`InitializingBean`） |
+| `RepositoryHolderContextRegister` | `WorkflowService` + `FlowRecordService` + 6 个仓储 + `GatewayContextRegister` | 把 8 个依赖灌入 `RepositoryHolderContext` 单例（`InitializingBean`） |
 | `FlowRecordService` | `FlowTodoRecordRepository` + `FlowTodoMergeRepository` + `FlowRecordRepository` | 记录服务 Bean |
 | `WorkflowService` | `WorkflowVersionRepository` + `WorkflowRepository` + `WorkflowRuntimeRepository` | 流程设计服务 Bean |
 | `FlowService` | `RepositoryHolderContextRegister`（仅保证顺序） | `new FlowService(RepositoryHolderContext.getInstance())`，业务入口 |
@@ -42,7 +42,7 @@ public void afterPropertiesSet() {
             workflowService, flowRecordService,
             parallelBranchRepository, delayTaskRepository,
             urgeIntervalRepository, flowOperatorAssignmentRepository,
-            subProcessRepository);
+            subProcessRepository, flowReissueRepository);
 }
 
 // FlowScriptContextRegister

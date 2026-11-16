@@ -22,7 +22,8 @@ public class CopyOnReadFlowServiceFactory extends MyFlowServiceFactory {
         flowRecordRepository = new CopyOnReadFlowRecordRepository();
         flowRecordService = new FlowRecordService(flowTodoRecordRepository, flowTodoMergeRepository, flowRecordRepository);
         RepositoryHolderContext.getInstance().register(workflowService, flowRecordService, parallelBranchRepository,
-                delayTaskRepository, urgeIntervalRepository, flowOperatorAssignmentRepository, subProcessRepository);
+                delayTaskRepository, urgeIntervalRepository, flowOperatorAssignmentRepository, subProcessRepository,
+                reissueRepository);
         repositoryHolder = RepositoryHolderContext.getInstance();
         this.flowService = new FlowService(this.repositoryHolder);
     }

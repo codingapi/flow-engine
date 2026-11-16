@@ -53,6 +53,7 @@ public class AutoConfiguration {
             UrgeIntervalRepository urgeIntervalRepository,
             FlowOperatorAssignmentRepository flowOperatorAssignmentRepository,
             SubProcessRepository subProcessRepository,
+            FlowReissueRepository flowReissueRepository,
             GatewayContextRegister gatewayContextRegister
     ) {
         return new RepositoryHolderContextRegister(
@@ -63,6 +64,7 @@ public class AutoConfiguration {
                 urgeIntervalRepository,
                 flowOperatorAssignmentRepository,
                 subProcessRepository,
+                flowReissueRepository,
                 gatewayContextRegister
         );
     }

@@ -23,6 +23,7 @@ public class MyFlowServiceFactory {
     public UrgeIntervalRepository urgeIntervalRepository;
     public FlowOperatorAssignmentRepository flowOperatorAssignmentRepository;
     public SubProcessRepository subProcessRepository;
+    public FlowReissueRepository reissueRepository;
     public WorkflowService workflowService;
     public FlowRecordService flowRecordService;
     public FlowService flowService;
@@ -41,11 +42,13 @@ public class MyFlowServiceFactory {
         urgeIntervalRepository = new UrgeIntervalRepositoryImpl();
         flowOperatorAssignmentRepository = new FlowOperatorAssignmentRepositoryImpl();
         subProcessRepository = new com.codingapi.flow.mock.repository.SubProcessRepositoryMockImpl();
+        reissueRepository = new com.codingapi.flow.mock.repository.FlowReissueRepositoryMockImpl();
         workflowService = new WorkflowService(workflowVersionRepository, workflowRepository, workflowRuntimeRepository);
         flowRecordService = new FlowRecordService(flowTodoRecordRepository, flowTodoMergeRepository, flowRecordRepository);
 
         RepositoryHolderContext.getInstance().register(workflowService, flowRecordService, parallelBranchRepository,
-                delayTaskRepository, urgeIntervalRepository, flowOperatorAssignmentRepository, subProcessRepository);
+                delayTaskRepository, urgeIntervalRepository, flowOperatorAssignmentRepository, subProcessRepository,
+                reissueRepository);
         repositoryHolder = RepositoryHolderContext.getInstance();
         this.flowService = new FlowService(this.repositoryHolder);
 

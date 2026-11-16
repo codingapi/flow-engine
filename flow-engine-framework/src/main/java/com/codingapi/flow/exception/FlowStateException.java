@@ -210,6 +210,16 @@ public class FlowStateException extends FlowException {
     }
 
     /**
+     * Record not support reissue (only a normally finished record can be reissued)
+     *
+     * @return exception
+     */
+    public static FlowStateException recordNotSupportReissue() {
+        return new FlowStateException("state.record.notSupportReissue",
+                "Flow record is not finished normally, reissue not allowed");
+    }
+
+    /**
      * Workflow script not found when executing a node or action
      *
      * @param key script key

@@ -6,6 +6,7 @@
 --   t_flow_todo_record       -> t_flow_todo_record_seq
 --   t_flow_todo_marge        -> t_flow_todo_marge_seq
 --   t_flow_sub_process_record-> t_flow_sub_process_record_seq
+--   t_flow_record_reissue    -> t_flow_record_reissue_seq
 --
 -- 序列名 / 步长 与实体 @SequenceGenerator(sequenceName=..., allocationSize=50) 严格一致，
 -- 请勿修改，否则 hibernate 会在 insert 时报“无法解析的成员访问表达式[...NEXTVAL]”或出现主键重复。
@@ -69,6 +70,18 @@ BEGIN
             v_start := 1;
         END;
         EXECUTE IMMEDIATE 'CREATE SEQUENCE t_flow_sub_process_record_seq INCREMENT BY 50 START WITH ' || v_start;
+    END IF;
+
+    -- ---------- 5. t_flow_record_reissue_seq ----------
+    SELECT COUNT(*) INTO v_cnt FROM all_sequences
+     WHERE sequence_name = 'T_FLOW_RECORD_REISSUE_SEQ' AND sequence_owner = USER;
+    IF v_cnt = 0 THEN
+        BEGIN
+            SELECT NVL(MAX(id), 0) + 1 INTO v_start FROM t_flow_record_reissue;
+        EXCEPTION WHEN OTHERS THEN
+            v_start := 1;
+        END;
+        EXECUTE IMMEDIATE 'CREATE SEQUENCE t_flow_record_reissue_seq INCREMENT BY 50 START WITH ' || v_start;
     END IF;
 END;
 /
