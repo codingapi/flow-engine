@@ -21,7 +21,7 @@ import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -108,7 +108,7 @@ public class FlowCreateService {
 
         // 推送事件
         for (IFlowEvent event : events) {
-            EventPusher.push(event);
+            FlowEventPublisher.push(event);
         }
 
         FlowRecord currentRecord = flowRecords.get(0);

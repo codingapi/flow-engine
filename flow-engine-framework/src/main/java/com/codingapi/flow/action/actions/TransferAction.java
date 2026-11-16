@@ -15,7 +15,7 @@ import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -107,7 +107,7 @@ public class TransferAction extends BaseAction {
         }
 
         repositoryHolder.saveRecords(recordList);
-        flowEvents.forEach(EventPusher::push);
+        flowEvents.forEach(FlowEventPublisher::push);
     }
 
     @Override

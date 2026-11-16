@@ -12,7 +12,7 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +78,7 @@ public class ReturnAction extends BaseAction {
 
         repositoryHolder.saveRecords(recordList);
 
-        flowEvents.forEach(EventPusher::push);
+        flowEvents.forEach(FlowEventPublisher::push);
 
     }
 }

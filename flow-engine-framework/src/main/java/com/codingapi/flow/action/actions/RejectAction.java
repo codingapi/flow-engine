@@ -15,7 +15,7 @@ import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.action.ActionRejectScript;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -129,7 +129,7 @@ public class RejectAction extends BaseAction {
         // 结束节点的虚拟记录不是真实业务待办，其 Todo 事件推送业务订阅方前需拦截
         flowEvents.stream()
                 .filter(event -> !isEndNodeTodoEvent(event))
-                .forEach(EventPusher::push);
+                .forEach(FlowEventPublisher::push);
 
     }
 }

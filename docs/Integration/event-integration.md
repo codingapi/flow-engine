@@ -76,7 +76,23 @@ public class FlowRecordUrgeEvent implements IFlowEvent {
 - 并行：`getParallelId()`、`getParallelBranchNodeId()`、`getParallelBranchTotal()`
 - 时间：`getCreateTime()`、`getUpdateTime()`、`getFinishTime()`、`getTimeoutTime()`
 
-## 2. 推送：`EventPusher`
+## 2. 推送：`FlowEventPublisher`（引擎内统一入口）
+
+引擎内部**不再直接调用** `EventPusher`，统一走 `com.codingapi.flow.event.FlowEventPublisher`：
+
+```java
+FlowEventPublisher.push(new FlowRecordStartEvent(flowRecord, session.isMock()));
+```
+
+`FlowEventPublisher` 是门面，行为取决于是否注册了发布器实现（`IFlowEventPublisher`）：
+
+| 场景 | 行为 |
+|---|---|
+| 引入 `flow-engine-starter`（默认） | 由 `SpringFlowEventPublisher` 投递：**事务提交后**才投递、按 `IFlowEvent.eventKey()`（默认流程id）分区**串行**，见 4.5 |
+| 仅使用 framework / 单元测试 | **回退**为 `EventPusher.push`，与旧版本行为一致 |
+| 配置 `codingapi.flow.event.ordered=false` | 不注册实现，回退为 `EventPusher.push` |
+
+底层 `EventPusher`（回退路径）语义：
 
 ```java
 package com.codingapi.springboot.framework.event;
@@ -94,12 +110,6 @@ public class EventPusher {
         DomainEventContext.getInstance().push(event, hasLoopEvent);
     }
 }
-```
-
-调用方式（引擎内部统一使用单参形式）：
-
-```java
-EventPusher.push(new FlowRecordStartEvent(flowRecord, session.isMock()));
 ```
 
 ### 引擎内推送事件的位置
@@ -184,16 +194,21 @@ public class MyFlowRecordUrgeEventHandler implements IHandler<FlowRecordUrgeEven
 
 ## 4. 完整分发管道
 
+引入 starter 时（默认）：
+
 ```
-业务代码 → EventPusher.push(event)
-  → DomainEventContext.push   （IAsyncEvent → 异步）
-    → EventTraceContext 记录 trace + 循环事件检测（命中抛 EventLoopException）
-    → Spring ApplicationContext.publishEvent(new DomainEvent(event, sync, traceId))
-      → SpringDefaultEventHandler.@EventListener dispatch
-        → 异步：executorService.execute(() -> ApplicationHandlerUtils.handler(event))
-          同步：内联执行
-          → 按 order() 排序，按泛型匹配执行所有 IHandler
+业务代码 → FlowEventPublisher.push(event)
+  → SpringFlowEventPublisher.push
+     → 有事务：登记 TransactionSynchronization#afterCommit（提交后才投递；回滚不投递）
+     → 无事务：立即投递
+        → 按 eventKey（默认 processId）散列到单线程分区（同流程串行、跨流程并行）
+          → ApplicationContext.publishEvent(new DomainEvent(event, sync=true, traceId))
+            → SpringDefaultEventHandler.dispatch（同步分支）
+              → 在分区线程内按 order() 排序，按泛型匹配执行所有 IHandler
+              → handler 异常仅记录日志，不阻塞同分区后续事件
 ```
+
+回退路径（未注册发布器）：`EventPusher.push → DomainEventContext.push → ...` 与旧版本一致。
 
 ### 4.1 循环事件检测
 
@@ -213,6 +228,19 @@ public class MyFlowRecordUrgeEventHandler implements IHandler<FlowRecordUrgeEven
 ### 4.4 无 Spring 上下文时的行为
 
 `DomainEventContext` 在 `ApplicationContext` 未初始化时（如纯单元测试）**静默丢弃事件**。
+
+### 4.5 顺序与事务可见性保障（`SpringFlowEventPublisher`）
+
+为解决「订阅方在事务提交前消费、同流程事件乱序」的问题（issue #274），starter 默认装配 `SpringFlowEventPublisher`：
+
+- **提交后投递**：有活动事务时通过 `TransactionSynchronization#afterCommit` 投递，订阅方回查数据库一定能读到流程记录/待办/关系数据；事务回滚不投递。
+- **按流程串行**：`IFlowEvent.eventKey()` 默认取 `processId`（子流程重置事件取主流程id），散列到固定的单线程分区（默认 4 个分区），同一流程严格按产生顺序执行，不同流程并行。
+- **同步执行**：投递时使用 `DomainEvent(sync=true)`，handler 在分区线程内执行完毕，避免再次落入 20 线程池导致乱序。
+- **异常隔离**：单个 handler 异常只记录日志，不阻塞同分区后续事件；**注意**：异常不会再回传给业务线程（旧版本异步路径同样不会）。
+- **线程模型**：`flow-event-dispatch-{分区}-{序号}` 守护线程；应用关闭时 `destroy()` 注销发布器并停止分区线程。
+- **配置**：`codingapi.flow.event.ordered=false` 可整体关闭（回退为直接 `EventPusher.push`）。
+
+**尚未覆盖（见 issue #274 阶段二）**：事件未持久化，进程崩溃或停机瞬间尚未投递的事件会丢失；重试目前仅有单次执行 + 日志。后续将引入 `t_flow_event_outbox`（与业务同事务落库 + 定时补偿重试 + 死信），实现「至少一次」，届时订阅方需按 `processId + eventType + recordId` 做幂等。
 
 ## 5. 通知/消息扩展点
 

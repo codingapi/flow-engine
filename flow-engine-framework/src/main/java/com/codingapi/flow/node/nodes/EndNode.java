@@ -12,7 +12,7 @@ import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.service.impl.FlowSubProcessResultService;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +72,7 @@ public class EndNode extends BaseFlowNode implements IDisplayNode {
         // 子流程结束后同步执行主流程结果确认，保证 Mock 与生产环境行为一致。
         new FlowSubProcessResultService(latestRecord, repositoryHolder).complete();
         // 流程是否正常结束
-        EventPusher.push(new FlowRecordFinishEvent(latestRecord, session.isMock()));
+        FlowEventPublisher.push(new FlowRecordFinishEvent(latestRecord, session.isMock()));
     }
 
 
