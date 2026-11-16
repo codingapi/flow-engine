@@ -19,7 +19,7 @@ import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.RevokeStrategy;
 import com.codingapi.flow.workflow.Workflow;
 import com.codingapi.flow.workflow.runtime.WorkflowRuntime;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -143,7 +143,7 @@ public class FlowRevokeService {
         }
 
         repositoryHolder.saveRecords(recordList);
-        flowEvents.forEach(EventPusher::push);
+        flowEvents.forEach(FlowEventPublisher::push);
 
     }
 }

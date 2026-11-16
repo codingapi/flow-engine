@@ -44,4 +44,12 @@ public class FlowSubProcessResetEvent implements IFlowEvent {
      * 是否模拟环境
      */
     private final boolean mock;
+
+    /**
+     * 事件分区键：按主流程id串行投递
+     */
+    @Override
+    public String eventKey() {
+        return oldRecord == null ? null : oldRecord.getParentProcessId();
+    }
 }

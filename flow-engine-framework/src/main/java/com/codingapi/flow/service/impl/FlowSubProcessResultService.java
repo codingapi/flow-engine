@@ -16,7 +16,7 @@ import com.codingapi.flow.repository.SubProcessRepository;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.SubProcessStrategy;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,6 +120,6 @@ public class FlowSubProcessResultService {
         if (!records.isEmpty()) {
             repositoryHolder.saveRecords(records);
         }
-        events.forEach(EventPusher::push);
+        events.forEach(FlowEventPublisher::push);
     }
 }

@@ -10,7 +10,7 @@ import com.codingapi.flow.pojo.request.FlowDeleteRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.session.IRepositoryHolder;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 
 import java.util.List;
 
@@ -67,6 +67,6 @@ public class FlowDeleteService {
         // 删除流程记录及其关联待办
         flowRecordService.deleteFlowRecord(currentRecord);
         // 推送删除事件
-        EventPusher.push(new FlowRecordDeleteEvent(currentRecord, repositoryHolder instanceof MockRepositoryHolder));
+        FlowEventPublisher.push(new FlowRecordDeleteEvent(currentRecord, repositoryHolder instanceof MockRepositoryHolder));
     }
 }

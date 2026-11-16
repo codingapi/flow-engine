@@ -14,7 +14,7 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.MultiOperatorAuditStrategy;
-import com.codingapi.springboot.framework.event.EventPusher;
+import com.codingapi.flow.event.FlowEventPublisher;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -350,7 +350,7 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         // 本记录作为后续节点记录的前驱，fromId 链经过当前节点
         session.setCurrentRecord(autoPassRecord);
         records.addAll(this.generateNextNodeRecords(session));
-        EventPusher.push(new FlowRecordDoneEvent(autoPassRecord, session.isMock()));
+        FlowEventPublisher.push(new FlowRecordDoneEvent(autoPassRecord, session.isMock()));
         return records;
     }
 
