@@ -204,6 +204,13 @@ public class FlowContent {
     private boolean resetSubProcess;
 
     /**
+     * 支持二次发起（独立能力标识，非审批动作）。
+     * <p>仅当当前记录已正常完成且操作人为流程管理员时为 true；前端可据此在已办详情中
+     * 展示「重新发起」入口，调用 {@code /api/cmd/record/reissue} 接口。</p>
+     */
+    private boolean reissue;
+
+    /**
      * 设置操作动作按钮
      *
      */

@@ -38,6 +38,7 @@ public class MockRepositoryHolder implements IRepositoryHolder {
     private final WorkflowService workflowService;
     private final FlowOperatorGateway flowOperatorGateway;
     private final SubProcessRepository subProcessRepository;
+    private final FlowReissueRepository flowReissueRepository;
     private final Map<String, List<Long>> operatorAssignmentCache = new HashMap<>();
 
     public MockRepositoryHolder(FlowOperatorGateway flowOperatorGateway,
@@ -50,6 +51,7 @@ public class MockRepositoryHolder implements IRepositoryHolder {
         this.parallelBranchRepository = new ParallelBranchRepositoryMockImpl();
         this.urgeIntervalRepository = new UrgeIntervalRepositoryMockImpl();
         this.subProcessRepository = new SubProcessRepositoryMockImpl();
+        this.flowReissueRepository = new FlowReissueRepositoryMockImpl();
         this.workflowRepository = workflowRepository;
         this.workflowRuntimeRepository = new WorkflowRuntimeRepositoryMockImpl();
         this.workflowVersionRepository = new WorkflowVersionRepositoryMockImpl();

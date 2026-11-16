@@ -92,6 +92,8 @@ public class FlowDetailService {
             // 子流程重置为独立能力（非审批动作）：仅当当前待办位于已开启重置能力、
             // 且已汇聚完成的子流程下游时携带标识，由前端自行决定交互呈现
             flowContent.setResetSubProcess(FlowSubProcessResetService.canReset(flowRecord, repositoryHolder));
+            // 二次发起为独立能力（非审批动作）：仅当记录已正常完成且当前操作人为流程管理员时携带标识
+            flowContent.setReissue(FlowReissueService.canReissue(flowRecord, currentOperator));
             return flowContent;
         }
     }

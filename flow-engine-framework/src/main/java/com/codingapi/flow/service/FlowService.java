@@ -130,4 +130,20 @@ public class FlowService {
                 new FlowSubProcessResetService(request, this.repositoryHolder);
         flowSubProcessResetService.reset();
     }
+
+    /**
+     * 已完成流程二次发起（独立接口，不属于常规审批动作）。
+     * <p>
+     * 复制已正常完成的流程记录的表单数据重新创建一条流程，新流程停在开始节点成为发起人的待办，
+     * 由发起人调整数据后重新提交执行；源流程记录不做任何改写。仅流程管理员可执行。
+     *
+     * @param request 二次发起请求
+     * @return 新流程的开始节点记录id
+     */
+    public long reissue(FlowReissueRequest request) {
+        FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowRuntimeScriptLocalCache.getInstance().clear();
+        FlowReissueService flowReissueService = new FlowReissueService(request, this.repositoryHolder);
+        return flowReissueService.reissue();
+    }
 }

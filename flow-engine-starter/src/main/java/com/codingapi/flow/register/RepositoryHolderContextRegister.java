@@ -18,6 +18,7 @@ public class RepositoryHolderContextRegister implements InitializingBean {
     private final UrgeIntervalRepository urgeIntervalRepository;
     private final FlowOperatorAssignmentRepository flowOperatorAssignmentRepository;
     private final SubProcessRepository subProcessRepository;
+    private final FlowReissueRepository flowReissueRepository;
     private final GatewayContextRegister gatewayContextRegister;
 
     @Override
@@ -30,7 +31,8 @@ public class RepositoryHolderContextRegister implements InitializingBean {
                 delayTaskRepository,
                 urgeIntervalRepository,
                 flowOperatorAssignmentRepository,
-                subProcessRepository
+                subProcessRepository,
+                flowReissueRepository
         );
     }
 }

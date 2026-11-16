@@ -194,6 +194,7 @@ public interface UrgeIntervalRepository {
 | `UrgeIntervalEntity` | `t_flow_urge_interval` |
 | `FlowOperatorAssignmentEntity` | `t_flow_operator_assignment` |
 | `SubProcessRecordEntity` | `t_flow_sub_process_record` |
+| `FlowReissueRecordEntity` | `t_flow_record_reissue`（已完成流程二次发起关系） |
 
 Spring Data 仓储接口位于 `jpa/` 包，全部继承外部 `FastRepository`（来自 `springboot-starter-data-fast`）。
 
@@ -233,7 +234,7 @@ public class GroovyScriptRepositoryImpl implements GroovyScriptRepository, Initi
 ## 6. 替换存储
 
 - **引入 `flow-engine-starter-infra`**：开箱即用（推荐）。
-- **不引入 infra**：自行实现 11 个仓储接口 + `NodeViewJavaScriptRepository` 为 Spring Bean 即可。starter 的 `RepositoryHolderContextRegister` 会自动注入。framework 测试包（`src/test/java/com/codingapi/flow/repository/`）提供了一套内存实现可作参考。
+- **不引入 infra**：自行实现 12 个仓储接口 + `NodeViewJavaScriptRepository` 为 Spring Bean 即可。starter 的 `RepositoryHolderContextRegister` 会自动注入。framework 测试包（`src/test/java/com/codingapi/flow/repository/`）提供了一套内存实现可作参考。
 
 ## 7. 离线/最小装配（脱离 Spring）
 
@@ -245,7 +246,7 @@ RepositoryHolderContext.getInstance().register(
         workflowService, flowRecordService,
         parallelBranchRepository, delayTaskRepository,
         urgeIntervalRepository, flowOperatorAssignmentRepository,
-        subProcessRepository);
+        subProcessRepository, flowReissueRepository);
 // 2. 注册操作人网关
 GatewayContext.getInstance().setFlowOperatorGateway(userGateway);
 ```

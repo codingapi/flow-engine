@@ -68,4 +68,9 @@ public class AutoConfiguration {
         return new SubProcessRepositoryImpl(repository);
     }
 
+    @Bean
+    public FlowReissueRepository flowReissueRepository(FlowReissueRecordEntityRepository repository) {
+        return new FlowReissueRepositoryImpl(repository);
+    }
+
 }

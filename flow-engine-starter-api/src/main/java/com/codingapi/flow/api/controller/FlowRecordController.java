@@ -126,4 +126,17 @@ public class FlowRecordController {
         return Response.buildSuccess();
     }
 
+    /**
+     * 已完成流程二次发起（独立接口，不属于常规审批动作）。
+     * <p>仅流程管理员可对已正常完成的流程记录执行，详情数据中的 {@code reissue} 标识字段
+     * 表明当前记录是否具备该能力。新流程停在开始节点成为发起人的待办，源流程记录不做改写。</p>
+     */
+    @PostMapping("/reissue")
+    public SingleResponse<Long> reissue(@RequestBody FlowReissueRequest request) {
+        FlowService flowService = this.loadFlowService();
+        long operatorId = loadCurrentOperatorId();
+        request.setOperatorId(operatorId);
+        return SingleResponse.of(flowService.reissue(request));
+    }
+
 }

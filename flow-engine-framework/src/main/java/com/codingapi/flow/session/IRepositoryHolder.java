@@ -5,6 +5,7 @@ import com.codingapi.flow.domain.UrgeInterval;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.repository.FlowReissueRepository;
 import com.codingapi.flow.repository.SubProcessRepository;
 import com.codingapi.flow.service.FlowRecordService;
 import com.codingapi.flow.service.FlowService;
@@ -23,6 +24,11 @@ public interface IRepositoryHolder {
      * 获取子流程执行记录仓库。
      */
     SubProcessRepository getSubProcessRepository();
+
+    /**
+     * 获取已完成流程二次发起关系仓库。
+     */
+    FlowReissueRepository getFlowReissueRepository();
 
     /**
      * 获取流程设计服务
