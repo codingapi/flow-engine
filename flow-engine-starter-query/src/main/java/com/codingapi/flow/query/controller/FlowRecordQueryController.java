@@ -1,10 +1,12 @@
 package com.codingapi.flow.query.controller;
 
+import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.mock.MockInstance;
 import com.codingapi.flow.mock.MockInstanceFactory;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.response.FlowRecordContent;
 import com.codingapi.flow.query.FlowRecordQueryService;
+import com.codingapi.flow.query.pojo.FlowInstanceQueryRequest;
 import com.codingapi.springboot.framework.dto.request.SearchRequest;
 import com.codingapi.springboot.framework.dto.response.MultiResponse;
 import com.codingapi.springboot.framework.user.UserContext;
@@ -95,5 +97,19 @@ public class FlowRecordQueryController {
         FlowRecordQueryService flowRecordQueryService = loadFlowService();
         PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize()).withSort(Sort.by("id").descending());
         return MultiResponse.of(flowRecordQueryService.findDoneRecordPage(operatorId,pageRequest));
+    }
+
+    /**
+     * 指定流程编码下运行中的流程实例（用于强制同步时选择范围，issue #281）
+     */
+    @GetMapping("/running")
+    public MultiResponse<FlowRecordContent> running(FlowInstanceQueryRequest request) {
+        if (!StringUtils.hasText(request.getWorkCode())) {
+            throw FlowValidationException.required("workCode");
+        }
+        FlowRecordQueryService flowRecordQueryService = loadFlowService();
+        PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize());
+        return MultiResponse.of(flowRecordQueryService.findRunningInstancePage(
+                request.getWorkCode(), request.getTitle(), pageRequest));
     }
 }

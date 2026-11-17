@@ -6,6 +6,7 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.*;
 import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.pojo.response.FlowContent;
+import com.codingapi.flow.pojo.response.FlowForceSyncResult;
 import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.service.FlowService;
 import com.codingapi.springboot.framework.dto.request.IdRequest;
@@ -137,6 +138,19 @@ public class FlowRecordController {
         long operatorId = loadCurrentOperatorId();
         request.setOperatorId(operatorId);
         return SingleResponse.of(flowService.reissue(request));
+    }
+
+    /**
+     * 运行中流程实例强制同步最新流程设计（独立接口，不属于常规审批动作）。
+     * <p>只对请求中选中的实例生效，未选中的实例继续使用原运行时快照；
+     * 同步前会校验结构一致性（不允许新增/删除节点、改变节点类型/层级/顺序，旧按钮动作必须保留）。</p>
+     */
+    @PostMapping("/forceSync")
+    public SingleResponse<FlowForceSyncResult> forceSync(@RequestBody FlowForceSyncRequest request) {
+        FlowService flowService = this.loadFlowService();
+        long operatorId = loadCurrentOperatorId();
+        request.setOperatorId(operatorId);
+        return SingleResponse.of(flowService.forceSync(request));
     }
 
 }
