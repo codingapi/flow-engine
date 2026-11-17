@@ -70,6 +70,20 @@ class SpringFlowEventPublisherIntegrationTest {
         }
     }
 
+    /**
+     * 具名 Handler：framework 17.3.4 起要求 Handler 的订阅事件类型可解析，
+     * lambda 实现会被判定为「类型无法解析」并跳过（不再退化为订阅所有事件），
+     * 因此这里不能使用 lambda。
+     */
+    static class RecEventHandler implements IHandler<RecEvent> {
+
+        @Override
+        public void handler(RecEvent event) {
+            HANDLED.add(event.id);
+            HANDLED_THREADS.add(Thread.currentThread().getName());
+        }
+    }
+
     @Configuration
     static class TestConfig {
 
@@ -80,10 +94,7 @@ class SpringFlowEventPublisherIntegrationTest {
 
         @Bean
         public IHandler<RecEvent> recEventHandler() {
-            return event -> {
-                HANDLED.add(event.id);
-                HANDLED_THREADS.add(Thread.currentThread().getName());
-            };
+            return new RecEventHandler();
         }
 
         @Bean
