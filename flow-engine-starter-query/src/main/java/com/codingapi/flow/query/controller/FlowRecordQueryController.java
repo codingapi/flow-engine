@@ -108,7 +108,7 @@ public class FlowRecordQueryController {
             throw FlowValidationException.required("workCode");
         }
         FlowRecordQueryService flowRecordQueryService = loadFlowService();
-        PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize());
+        PageRequest pageRequest = PageRequest.of(Math.max(request.getCurrent() - 1, 0), request.getPageSize());
         return MultiResponse.of(flowRecordQueryService.findRunningInstancePage(
                 request.getWorkCode(), request.getTitle(), pageRequest));
     }

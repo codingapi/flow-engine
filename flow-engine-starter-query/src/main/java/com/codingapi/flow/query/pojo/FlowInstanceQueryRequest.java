@@ -21,9 +21,9 @@ public class FlowInstanceQueryRequest {
     private String title;
 
     /**
-     * 页码（从0开始）
+     * 页码（从1开始，与前端分页组件保持一致）
      */
-    private int current;
+    private int current = 1;
 
     /**
      * 每页数量
