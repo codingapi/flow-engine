@@ -64,7 +64,7 @@ REST 层通过请求参数 `mockKey` 分流到 Mock 实例（见 `FlowRecordCont
 
 ### 事件（IFlowEvent + EventPusher）
 
-10 种事件：开始 / 待办 / 已办 / 完成 / 催办 / 撤销（`FlowRecordRevokeEvent`）/ 删除（`FlowRecordDeleteEvent`）/ 子流程重置（`FlowSubProcessResetEvent`）/ 减签（`FlowRecordReduceAuditEvent`）/ 二次发起（`FlowRecordReissueEvent`）。操作完成后用 `FlowEventPublisher.push(event)` 推送（**禁止**直接调用 `EventPusher`）；引入 starter 时由 `SpringFlowEventPublisher` 保证「事务提交后投递 + 按 `eventKey()`（默认 processId）分区串行」，未注册实现时自动回退 `EventPusher`。记录类事件携带 `FlowRecord` + `mock` 标记，重置事件携带新旧聚合组快照。外部可用 Spring `@EventListener` 订阅。
+11 种事件：开始 / 待办 / 已办 / 完成 / 催办 / 撤销（`FlowRecordRevokeEvent`）/ 删除（`FlowRecordDeleteEvent`）/ 子流程重置（`FlowSubProcessResetEvent`）/ 减签（`FlowRecordReduceAuditEvent`）/ 二次发起（`FlowRecordReissueEvent`）/ 保存（`FlowRecordSaveEvent`，由 `FlowRecordSaveService.saveAll()` 按实际落库记录逐条推送）。操作完成后用 `FlowEventPublisher.push(event)` 推送（**禁止**直接调用 `EventPusher`）；引入 starter 时由 `SpringFlowEventPublisher` 保证「事务提交后投递 + 按 `eventKey()`（默认 processId）分区串行」，未注册实现时自动回退 `EventPusher`。记录类事件携带 `FlowRecord` + `mock` 标记，重置事件携带新旧聚合组快照。外部可用 Spring `@EventListener` 订阅。
 
 ### API 模块划分
 

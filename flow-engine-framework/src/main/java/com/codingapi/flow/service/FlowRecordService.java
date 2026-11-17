@@ -6,19 +6,38 @@ import com.codingapi.flow.record.FlowTodoRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.repository.FlowTodoMergeRepository;
 import com.codingapi.flow.repository.FlowTodoRecordRepository;
-import lombok.AllArgsConstructor;
 
 import java.util.List;
 
 /**
  *  流程记录服务对象
  */
-@AllArgsConstructor
 public class FlowRecordService {
 
     private final FlowTodoRecordRepository flowTodoRecordRepository;
     private final FlowTodoMergeRepository flowTodoMergeRepository;
     private final FlowRecordRepository flowRecordRepository;
+
+    /**
+     * 是否为 Mock 模式，用于标记保存事件的 mock 属性
+     */
+    private final boolean mock;
+
+    public FlowRecordService(FlowTodoRecordRepository flowTodoRecordRepository,
+                             FlowTodoMergeRepository flowTodoMergeRepository,
+                             FlowRecordRepository flowRecordRepository) {
+        this(flowTodoRecordRepository, flowTodoMergeRepository, flowRecordRepository, false);
+    }
+
+    public FlowRecordService(FlowTodoRecordRepository flowTodoRecordRepository,
+                             FlowTodoMergeRepository flowTodoMergeRepository,
+                             FlowRecordRepository flowRecordRepository,
+                             boolean mock) {
+        this.flowTodoRecordRepository = flowTodoRecordRepository;
+        this.flowTodoMergeRepository = flowTodoMergeRepository;
+        this.flowRecordRepository = flowRecordRepository;
+        this.mock = mock;
+    }
 
 
     /**
@@ -26,7 +45,7 @@ public class FlowRecordService {
      * @param flowRecords 流程记录列表
      */
     public void saveFlowRecords(List<FlowRecord> flowRecords){
-        FlowRecordSaveService flowRecordSaveService = new FlowRecordSaveService(flowRecords);
+        FlowRecordSaveService flowRecordSaveService = new FlowRecordSaveService(flowRecords, this.mock);
         flowRecordSaveService.registerRepositories(this.flowTodoRecordRepository,this.flowTodoMergeRepository,this.flowRecordRepository);
         flowRecordSaveService.saveAll();
     }
@@ -36,7 +55,7 @@ public class FlowRecordService {
      * @param flowRecord 流程记录
      */
     public void saveFlowRecord(FlowRecord flowRecord) {
-        FlowRecordSaveService flowRecordSaveService = new FlowRecordSaveService(flowRecord);
+        FlowRecordSaveService flowRecordSaveService = new FlowRecordSaveService(flowRecord, this.mock);
         flowRecordSaveService.registerRepositories(this.flowTodoRecordRepository,this.flowTodoMergeRepository,this.flowRecordRepository);
         flowRecordSaveService.saveAll();
     }
