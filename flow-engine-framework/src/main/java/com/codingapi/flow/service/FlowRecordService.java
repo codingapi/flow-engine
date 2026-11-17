@@ -62,6 +62,20 @@ public class FlowRecordService {
 
 
     /**
+     * 从待办合并组中摘除指定流程记录（issue #281）。
+     *
+     * <p>运行实例换绑运行时快照前，需要先解除其记录与旧快照合并待办的关联，
+     * 换绑后重新保存记录即可按新的合并键重建待办组。</p>
+     *
+     * @param flowRecords 待摘除的流程记录（须仍指向旧快照的合并键）
+     */
+    public void detachTodoMergeRecords(List<FlowRecord> flowRecords) {
+        FlowTodoMigrateService flowTodoMigrateService = new FlowTodoMigrateService(flowRecords);
+        flowTodoMigrateService.registerRepositories(this.flowTodoRecordRepository, this.flowTodoMergeRepository, this.flowRecordRepository);
+        flowTodoMigrateService.detach();
+    }
+
+    /**
      * 获取流程的合并记录
      * @param mergeKey 流程合并key
      * @return 流程合并记录

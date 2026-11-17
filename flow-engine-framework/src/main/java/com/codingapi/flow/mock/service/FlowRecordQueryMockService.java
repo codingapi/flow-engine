@@ -3,12 +3,15 @@ package com.codingapi.flow.mock.service;
 import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.mock.repository.FlowRecordRepositoryMockImpl;
 import com.codingapi.flow.mock.repository.FlowTodoRecordRepositoryMockImpl;
+import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.pojo.response.FlowRecordContent;
 import com.codingapi.flow.query.FlowRecordQueryService;
+import com.codingapi.flow.record.FlowRecord;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,6 +78,21 @@ public class FlowRecordQueryMockService implements FlowRecordQueryService {
     public Page<FlowRecordContent> findDoneRecordPage(long userId, PageRequest request) {
         FlowRecordRepositoryMockImpl flowRecordRepositoryMock = (FlowRecordRepositoryMockImpl) mockRepositoryHolder.getFlowRecordRepository();
         List<FlowRecordContent> recordList = flowRecordRepositoryMock.findDoneByOperator(userId).stream().map(FlowRecordContent::convert).toList();
+        return toPage(recordList, request);
+    }
+
+    @Override
+    public Page<FlowRecordContent> findRunningInstancePage(String workCode, String title, PageRequest request) {
+        FlowRecordRepositoryMockImpl flowRecordRepositoryMock = (FlowRecordRepositoryMockImpl) mockRepositoryHolder.getFlowRecordRepository();
+        List<FlowRecordContent> recordList = flowRecordRepositoryMock.findAll().stream()
+                .filter(record -> workCode.equals(record.getWorkCode()))
+                .filter(record -> record.getFlowState() == FlowRecord.SATE_FLOW_RUNNING)
+                .filter(record -> record.getFromId() == 0 && StartNode.NODE_TYPE.equals(record.getNodeType()))
+                .filter(record -> !record.isHidden())
+                .filter(record -> !StringUtils.hasText(title)
+                        || (record.getTitle() != null && record.getTitle().contains(title)))
+                .map(FlowRecordContent::convert)
+                .toList();
         return toPage(recordList, request);
     }
 

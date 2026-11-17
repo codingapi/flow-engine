@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.StringUtils;
 
 @AllArgsConstructor
 public class FlowRecordQueryServiceImpl implements FlowRecordQueryService {
@@ -42,6 +43,15 @@ public class FlowRecordQueryServiceImpl implements FlowRecordQueryService {
     @Override
     public Page<FlowRecordContent> findDoneRecordPage(long userId, PageRequest request) {
         Page<FlowRecordEntity> page =flowRecordEntityRepository.findDoneRecordPage(userId,request.withSort(Sort.by("id").descending()));
+        return page.map(FlowRecordContentConvertor::convert);
+    }
+
+    @Override
+    public Page<FlowRecordContent> findRunningInstancePage(String workCode, String title, PageRequest request) {
+        PageRequest pageRequest = request.withSort(Sort.by("id").descending());
+        Page<FlowRecordEntity> page = StringUtils.hasText(title)
+                ? flowRecordEntityRepository.findRunningInstancePageByTitle(workCode, "%" + title + "%", pageRequest)
+                : flowRecordEntityRepository.findRunningInstancePage(workCode, pageRequest);
         return page.map(FlowRecordContentConvertor::convert);
     }
 }

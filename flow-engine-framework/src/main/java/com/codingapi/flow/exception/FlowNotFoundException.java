@@ -53,6 +53,17 @@ public class FlowNotFoundException extends FlowException {
     }
 
     /**
+     * Flow instance not found
+     *
+     * @param processId flow instance process id
+     * @return exception
+     */
+    public static FlowNotFoundException process(String processId) {
+        return new FlowNotFoundException("notFound.process.id",
+                String.format("Flow instance not found: %s", processId));
+    }
+
+    /**
      * Node not found
      *
      * @param nodeId node ID

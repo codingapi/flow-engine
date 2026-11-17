@@ -5,6 +5,7 @@ import com.codingapi.flow.cache.FlowRuntimeScriptLocalCache;
 import com.codingapi.flow.pojo.request.*;
 import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.pojo.response.FlowContent;
+import com.codingapi.flow.pojo.response.FlowForceSyncResult;
 import com.codingapi.flow.pojo.response.ProcessNode;
 import com.codingapi.flow.service.impl.*;
 import com.codingapi.flow.session.IRepositoryHolder;
@@ -145,5 +146,22 @@ public class FlowService {
         FlowRuntimeScriptLocalCache.getInstance().clear();
         FlowReissueService flowReissueService = new FlowReissueService(request, this.repositoryHolder);
         return flowReissueService.reissue();
+    }
+
+    /**
+     * 运行中流程实例强制同步最新流程设计（独立接口，不属于常规审批动作）。
+     * <p>
+     * 仅对请求中选中的运行实例生效，把其流程记录的运行时快照引用换绑为最新设计对应的快照；
+     * 未选中的实例保持原快照。同步前会校验结构一致性（不允许新增/删除节点、改变节点类型/层级/顺序，
+     * 旧按钮动作必须保留），表单字段不做校验。
+     *
+     * @param request 强制同步请求
+     * @return 同步结果
+     */
+    public FlowForceSyncResult forceSync(FlowForceSyncRequest request) {
+        FlowOperatorLocalThreadCache.getInstance().clear();
+        FlowRuntimeScriptLocalCache.getInstance().clear();
+        FlowForceSyncService flowForceSyncService = new FlowForceSyncService(request, this.repositoryHolder);
+        return flowForceSyncService.sync();
     }
 }

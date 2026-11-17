@@ -220,6 +220,40 @@ public class FlowStateException extends FlowException {
     }
 
     /**
+     * Force sync rejected because the latest workflow structure does not match the runtime snapshot
+     *
+     * @param processId flow instance process id
+     * @param detail    structure differences
+     * @return exception
+     */
+    public static FlowStateException forceSyncStructureInconsistent(String processId, String detail) {
+        return new FlowStateException("state.forceSync.structureInconsistent",
+                String.format("Flow instance %s cannot force sync, workflow structure changed: %s", processId, detail));
+    }
+
+    /**
+     * Force sync only supports running flow instances
+     *
+     * @param processId flow instance process id
+     * @return exception
+     */
+    public static FlowStateException forceSyncInstanceNotRunning(String processId) {
+        return new FlowStateException("state.forceSync.notRunning",
+                String.format("Flow instance %s is not running, force sync not allowed", processId));
+    }
+
+    /**
+     * Records of one flow instance reference different runtime snapshots
+     *
+     * @param processId flow instance process id
+     * @return exception
+     */
+    public static FlowStateException forceSyncRuntimeInconsistent(String processId) {
+        return new FlowStateException("state.forceSync.runtimeInconsistent",
+                String.format("Flow instance %s references different runtime snapshots, force sync not allowed", processId));
+    }
+
+    /**
      * Workflow script not found when executing a node or action
      *
      * @param key script key
