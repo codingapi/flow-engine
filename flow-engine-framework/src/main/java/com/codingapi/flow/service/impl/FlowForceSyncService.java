@@ -3,8 +3,10 @@ package com.codingapi.flow.service.impl;
 import com.codingapi.flow.event.FlowEventPublisher;
 import com.codingapi.flow.event.FlowRecordForceSyncEvent;
 import com.codingapi.flow.exception.FlowNotFoundException;
+import com.codingapi.flow.exception.FlowPermissionException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.mock.MockRepositoryHolder;
+import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.request.FlowForceSyncRequest;
 import com.codingapi.flow.pojo.response.FlowForceSyncResult;
 import com.codingapi.flow.record.FlowRecord;
@@ -60,8 +62,13 @@ public class FlowForceSyncService {
         // 最新设计必须通过校验，避免把不合法的设计同步给运行实例
         latestWorkflow.verify();
 
-        if (repositoryHolder.getOperatorById(request.getOperatorId()) == null) {
+        IFlowOperator operator = repositoryHolder.getOperatorById(request.getOperatorId());
+        if (operator == null) {
             throw FlowNotFoundException.operator(request.getOperatorId());
+        }
+        // 强制同步是流程管理员对运行中实例的高风险干预操作，仅流程管理员可执行
+        if (!operator.isFlowManager()) {
+            throw FlowPermissionException.accessDenied("force sync flow instance");
         }
 
         Map<String, List<FlowRecord>> recordsByProcess = this.loadRunningInstances();

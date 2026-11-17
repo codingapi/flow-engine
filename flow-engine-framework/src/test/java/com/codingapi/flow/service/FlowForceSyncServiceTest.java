@@ -6,6 +6,7 @@ import com.codingapi.flow.builder.ActionBuilder;
 import com.codingapi.flow.builder.FormFieldPermissionsBuilder;
 import com.codingapi.flow.builder.NodeStrategyBuilder;
 import com.codingapi.flow.context.GatewayContext;
+import com.codingapi.flow.exception.FlowPermissionException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.factory.MyFlowServiceFactory;
 import com.codingapi.flow.form.DataType;
@@ -54,6 +55,11 @@ class FlowForceSyncServiceTest {
 
     private final MyFlowServiceFactory factory = new MyFlowServiceFactory();
 
+    /**
+     * 流程管理员，强制同步仅允许流程管理员操作
+     */
+    private final User admin = new User(99, "admin", true);
+
     private final User a1 = new User(11, "a1");
     private final User a2 = new User(12, "a2");
     private final User a3 = new User(13, "a3");
@@ -77,7 +83,7 @@ class FlowForceSyncServiceTest {
         // when 只同步 process1
         renameBNode(workflow, "B审批-改名后");
         FlowForceSyncResult result = factory.flowService.forceSync(
-                new FlowForceSyncRequest(WORK_CODE, List.of(process1), a1.getUserId()));
+                new FlowForceSyncRequest(WORK_CODE, List.of(process1), admin.getUserId()));
 
         // then 只有选中实例换绑到新快照
         long newRuntimeId = result.getWorkflowRuntimeId();
@@ -121,7 +127,7 @@ class FlowForceSyncServiceTest {
         // when 同步两条实例
         renameBNode(workflow, "B审批-改名后");
         FlowForceSyncResult result = factory.flowService.forceSync(
-                new FlowForceSyncRequest(WORK_CODE, List.of(process1, process2), a1.getUserId()));
+                new FlowForceSyncRequest(WORK_CODE, List.of(process1, process2), admin.getUserId()));
 
         // then 两条实例共享同一份新快照，并合并为一条待办组
         long newRuntimeId = result.getWorkflowRuntimeId();
@@ -138,11 +144,11 @@ class FlowForceSyncServiceTest {
         String process1 = createAndSubmit(a1, workflow);
         renameBNode(workflow, "B审批-改名后");
         FlowForceSyncResult first = factory.flowService.forceSync(
-                new FlowForceSyncRequest(WORK_CODE, List.of(process1), a1.getUserId()));
+                new FlowForceSyncRequest(WORK_CODE, List.of(process1), admin.getUserId()));
 
         // when 再次同步同一实例
         FlowForceSyncResult second = factory.flowService.forceSync(
-                new FlowForceSyncRequest(WORK_CODE, List.of(process1), a1.getUserId()));
+                new FlowForceSyncRequest(WORK_CODE, List.of(process1), admin.getUserId()));
 
         // then 幂等跳过
         assertEquals(first.getWorkflowRuntimeId(), second.getWorkflowRuntimeId());
@@ -164,7 +170,7 @@ class FlowForceSyncServiceTest {
 
         // when / then 拒绝同步，且实例未被改写
         assertThrows(FlowStateException.class, () -> factory.flowService.forceSync(
-                new FlowForceSyncRequest(WORK_CODE, List.of(process1), a1.getUserId())));
+                new FlowForceSyncRequest(WORK_CODE, List.of(process1), admin.getUserId())));
         assertEquals(oldRuntimeId, runtimeIdOf(process1), "校验失败时不应改写实例引用");
     }
 
@@ -178,7 +184,7 @@ class FlowForceSyncServiceTest {
 
         // when / then
         assertThrows(FlowStateException.class, () -> factory.flowService.forceSync(
-                new FlowForceSyncRequest(WORK_CODE, List.of(process1), a1.getUserId())));
+                new FlowForceSyncRequest(WORK_CODE, List.of(process1), admin.getUserId())));
     }
 
     @Test
@@ -191,7 +197,7 @@ class FlowForceSyncServiceTest {
 
         // when / then
         assertThrows(FlowStateException.class, () -> factory.flowService.forceSync(
-                new FlowForceSyncRequest(WORK_CODE, List.of(process1), a1.getUserId())));
+                new FlowForceSyncRequest(WORK_CODE, List.of(process1), admin.getUserId())));
     }
 
     @Test
@@ -208,12 +214,25 @@ class FlowForceSyncServiceTest {
 
         // when / then
         assertThrows(FlowStateException.class, () -> factory.flowService.forceSync(
+                new FlowForceSyncRequest(WORK_CODE, List.of(process1), admin.getUserId())));
+    }
+
+    @Test
+    void should_reject_when_operator_not_flow_manager() {
+        // given 非流程管理员发起同步
+        Workflow workflow = prepareWorkflow();
+        String process1 = createAndSubmit(a1, workflow);
+        renameBNode(workflow, "B审批-改名后");
+
+        // when / then
+        assertThrows(FlowPermissionException.class, () -> factory.flowService.forceSync(
                 new FlowForceSyncRequest(WORK_CODE, List.of(process1), a1.getUserId())));
     }
 
     // ─── 辅助方法 ───
 
     private Workflow prepareWorkflow() {
+        factory.userGateway.save(admin);
         factory.userGateway.save(a1);
         factory.userGateway.save(a2);
         factory.userGateway.save(a3);
