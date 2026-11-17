@@ -6,19 +6,38 @@ import com.codingapi.flow.record.FlowTodoRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
 import com.codingapi.flow.repository.FlowTodoMergeRepository;
 import com.codingapi.flow.repository.FlowTodoRecordRepository;
-import lombok.AllArgsConstructor;
 
 import java.util.List;
 
 /**
  *  流程记录服务对象
  */
-@AllArgsConstructor
 public class FlowRecordService {
 
     private final FlowTodoRecordRepository flowTodoRecordRepository;
     private final FlowTodoMergeRepository flowTodoMergeRepository;
     private final FlowRecordRepository flowRecordRepository;
+
+    /**
+     * 是否为 Mock 模式，用于标记保存事件的 mock 属性
+     */
+    private final boolean mock;
+
+    public FlowRecordService(FlowTodoRecordRepository flowTodoRecordRepository,
+                             FlowTodoMergeRepository flowTodoMergeRepository,
+                             FlowRecordRepository flowRecordRepository) {
+        this(flowTodoRecordRepository, flowTodoMergeRepository, flowRecordRepository, false);
+    }
+
+    public FlowRecordService(FlowTodoRecordRepository flowTodoRecordRepository,
+                             FlowTodoMergeRepository flowTodoMergeRepository,
+                             FlowRecordRepository flowRecordRepository,
+                             boolean mock) {
+        this.flowTodoRecordRepository = flowTodoRecordRepository;
+        this.flowTodoMergeRepository = flowTodoMergeRepository;
+        this.flowRecordRepository = flowRecordRepository;
+        this.mock = mock;
+    }
 
 
     /**
@@ -26,7 +45,7 @@ public class FlowRecordService {
      * @param flowRecords 流程记录列表
      */
     public void saveFlowRecords(List<FlowRecord> flowRecords){
-        FlowRecordSaveService flowRecordSaveService = new FlowRecordSaveService(flowRecords);
+        FlowRecordSaveService flowRecordSaveService = new FlowRecordSaveService(flowRecords, this.mock);
         flowRecordSaveService.registerRepositories(this.flowTodoRecordRepository,this.flowTodoMergeRepository,this.flowRecordRepository);
         flowRecordSaveService.saveAll();
     }
@@ -36,11 +55,25 @@ public class FlowRecordService {
      * @param flowRecord 流程记录
      */
     public void saveFlowRecord(FlowRecord flowRecord) {
-        FlowRecordSaveService flowRecordSaveService = new FlowRecordSaveService(flowRecord);
+        FlowRecordSaveService flowRecordSaveService = new FlowRecordSaveService(flowRecord, this.mock);
         flowRecordSaveService.registerRepositories(this.flowTodoRecordRepository,this.flowTodoMergeRepository,this.flowRecordRepository);
         flowRecordSaveService.saveAll();
     }
 
+
+    /**
+     * 从待办合并组中摘除指定流程记录（issue #281）。
+     *
+     * <p>运行实例换绑运行时快照前，需要先解除其记录与旧快照合并待办的关联，
+     * 换绑后重新保存记录即可按新的合并键重建待办组。</p>
+     *
+     * @param flowRecords 待摘除的流程记录（须仍指向旧快照的合并键）
+     */
+    public void detachTodoMergeRecords(List<FlowRecord> flowRecords) {
+        FlowTodoMigrateService flowTodoMigrateService = new FlowTodoMigrateService(flowRecords);
+        flowTodoMigrateService.registerRepositories(this.flowTodoRecordRepository, this.flowTodoMergeRepository, this.flowRecordRepository);
+        flowTodoMigrateService.detach();
+    }
 
     /**
      * 获取流程的合并记录

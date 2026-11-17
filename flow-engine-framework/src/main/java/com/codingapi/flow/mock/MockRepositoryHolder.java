@@ -55,7 +55,7 @@ public class MockRepositoryHolder implements IRepositoryHolder {
         this.workflowRepository = workflowRepository;
         this.workflowRuntimeRepository = new WorkflowRuntimeRepositoryMockImpl();
         this.workflowVersionRepository = new WorkflowVersionRepositoryMockImpl();
-        this.flowRecordService = new FlowRecordService(flowTodoRecordRepository, flowTodoMergeRepository, flowRecordRepository);
+        this.flowRecordService = new FlowRecordService(flowTodoRecordRepository, flowTodoMergeRepository, flowRecordRepository, true);
         this.workflowService = new WorkflowService(workflowVersionRepository, workflowRepository, workflowRuntimeRepository);
     }
 

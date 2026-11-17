@@ -1,5 +1,7 @@
 package com.codingapi.flow.service;
 
+import com.codingapi.flow.event.FlowEventPublisher;
+import com.codingapi.flow.event.FlowRecordSaveEvent;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.record.FlowTodoMerge;
 import com.codingapi.flow.record.FlowTodoRecord;
@@ -28,18 +30,30 @@ class FlowRecordSaveService {
 
     private final List<FlowRecord> flowRecords;
 
+    /**
+     * 是否为 Mock 模式，用于标记保存事件
+     */
+    private final boolean mock;
+
+    /**
+     * 本次实际落库的流程记录（结束节点虚拟记录不落库，不推送保存事件）
+     */
+    private List<FlowRecord> savedRecords = List.of();
+
     private FlowTodoRecordRepository flowTodoRecordRepository;
     private FlowTodoMergeRepository flowTodoMergeRepository;
     private FlowRecordRepository flowRecordRepository;
 
 
-    public FlowRecordSaveService(List<FlowRecord> flowRecords) {
+    public FlowRecordSaveService(List<FlowRecord> flowRecords, boolean mock) {
         this.flowRecords = flowRecords;
+        this.mock = mock;
     }
 
-    public FlowRecordSaveService(FlowRecord flowRecord) {
+    public FlowRecordSaveService(FlowRecord flowRecord, boolean mock) {
         this.flowRecords = new ArrayList<>();
         this.flowRecords.add(flowRecord);
+        this.mock = mock;
     }
 
     public void registerRepositories(FlowTodoRecordRepository flowTodoRecordRepository,
@@ -132,6 +146,8 @@ class FlowRecordSaveService {
             // 只保存非结束节点的记录,结束节点的记录由流程引擎自动生成,不允许外部修改
             List<FlowRecord> flowRecordList = flowRecords.stream().filter(FlowRecord::isNotEndNode).toList();
             flowRecordRepository.saveAll(flowRecordList);
+            // 记录实际落库的记录,用于推送保存事件（结束节点虚拟记录不落库,不推送）
+            this.savedRecords = flowRecordList;
         }
     }
 
@@ -232,5 +248,18 @@ class FlowRecordSaveService {
         this.saveRecords();
         this.saveTodoMargeRecords();
         this.removeTodoMergeRecords();
+        this.pushSaveEvents();
+    }
+
+    /**
+     * 推送流程记录保存事件（issue #280）
+     * <p>
+     * 在记录、待办与合并关系全部保存完成后按记录逐条推送,保证订阅方回查时数据已一致;
+     * 引入 starter 时由 {@code SpringFlowEventPublisher} 保证事务提交后投递、按流程串行。
+     */
+    private void pushSaveEvents() {
+        for (FlowRecord flowRecord : savedRecords) {
+            FlowEventPublisher.push(new FlowRecordSaveEvent(flowRecord, mock));
+        }
     }
 }

@@ -27,7 +27,7 @@ public interface IAsyncEvent extends IEvent {}        // 异步事件标记 ← 
 
 同步/异步由 `DomainEventContext.push` 的 `instanceof` 判定：`IAsyncEvent` → 异步（线程池执行）；`ISyncEvent`/裸 `IEvent` → 同步（发布线程内联执行）。
 
-### 1.2 十种事件
+### 1.2 十一种事件
 
 记录类事件均携带 `FlowRecord`（或当前记录）与 `boolean mock` 标记（Mock 模式为 `true`）。
 
@@ -43,6 +43,7 @@ public interface IAsyncEvent extends IEvent {}        // 异步事件标记 ← 
 | `FlowRecordReduceAuditEvent` | 减签（每条被撤下的记录） | `FlowRecord, long reduceOperatorId, boolean mock` | `getFlowRecord()` / `getReduceOperatorId()` / `isMock()` |
 | `FlowSubProcessResetEvent` | 子流程数据重置（issue #219） | `SubProcessRecord oldRecord, SubProcessRecord newRecord, long resetRecordId, IFlowOperator resetOperator, boolean mock` | `getOldRecord()` / `getNewRecord()` / `getResetRecordId()` / `getResetOperator()` / `isMock()` |
 | `FlowRecordReissueEvent` | 已完成流程二次发起（issue #272） | `FlowRecord sourceRecord, FlowRecord newRecord, IFlowOperator operator, boolean mock` | `getSourceRecord()` / `getNewRecord()` / `getOperator()` / `isMock()` |
+| `FlowRecordSaveEvent` | 流程记录保存（每条实际落库记录，issue #280） | `FlowRecord, boolean mock` | `getFlowRecord()` / `isMock()` |
 
 **子流程重置事件订阅须知**：
 
@@ -132,8 +133,19 @@ public class EventPusher {
 | `FlowDeleteService.delete()` | `DeleteEvent` |
 | `FlowSubProcessResetService.reset()` | 被作废记录链逐条 `RevokeEvent` + 子流程重置 `SubProcessResetEvent`；重建实例经 `FlowCreateService` 推送各自的 `StartEvent` + `TodoEvent` |
 | `FlowReissueService.reissue()` | 二次发起 `ReissueEvent` + 新流程经 `FlowCreateService` 推送的 `StartEvent` + `TodoEvent` |
+| `FlowRecordSaveService.saveAll()` | 本次实际落库的每条记录 `SaveEvent`（结束节点虚拟记录不落库，不推送） |
 
 > 事件在业务数据保存之后推送，且引入 starter 时会在**事务提交后**才投递给订阅方（见 4.5），保证订阅方回查到的记录已持久化。
+
+### 保存事件订阅须知（issue #280）
+
+`FlowRecordSaveEvent` 覆盖全部保存路径（`IRepositoryHolder.saveRecords` / `saveRecord` → `FlowRecordService` → `FlowRecordSaveService.saveAll()`），订阅方需注意：
+
+- **粒度**：每条实际落库记录一个事件，与 `StartEvent` / `TodoEvent` 等保持一致；分区键为 `processId`；
+- **频次**：一次业务操作可能多次保存（如审批通过时多次 `saveRecords`），同一流程会收到多条保存事件，建议按 `processId + recordId` 幂等；
+- **已读回写**：首次查看流程详情时 `FlowDetailService` 会回写已读状态，同样会触发保存事件；
+- **不区分操作类型**：保存事件不标明发起/审批/撤销等业务动作，需要区分时请结合 `StartEvent` / `DoneEvent` / `RevokeEvent` 等事件；
+- **回滚不投递**：引入 starter 时由 `SpringFlowEventPublisher` 的 `afterCommit` 保证事务回滚不投递。
 
 ### 结束节点虚拟记录拦截
 
