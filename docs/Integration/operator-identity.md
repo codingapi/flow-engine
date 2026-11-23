@@ -135,6 +135,15 @@ def run(request) {
 }
 ```
 
+需要「让某人以指定身份参与」时，用 `$bind.getOperatorByIdentity(id, identity)` 拿到带身份的操作者：
+
+```groovy
+def run(request) {
+    // 让 user2 以 department1 的身份成为审批人（记录里落的就是 department1）
+    return [$bind.getOperatorByIdentity(2, 'department1')]
+}
+```
+
 ## 4. 引擎侧行为
 
 ### 4.1 记录与待办落库

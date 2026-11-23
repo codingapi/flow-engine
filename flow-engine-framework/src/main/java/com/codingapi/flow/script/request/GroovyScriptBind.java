@@ -59,6 +59,14 @@ public class GroovyScriptBind {
     }
 
     @ScriptFunction(
+            name = "getOperatorByIdentity",
+            description = "根据用户id与身份标识获取流程用户对象（issue #288），身份为空表示默认身份")
+    public IFlowOperator getOperatorByIdentity(@ScriptParameter(description = "用户id") long userId,
+                                               @ScriptParameter(description = "身份标识") String identity) {
+        return context.getOperatorById(userId, identity);
+    }
+
+    @ScriptFunction(
             name = "findOperatorsByIds",
             description = "根据用户id获取流程用户列表"
     )

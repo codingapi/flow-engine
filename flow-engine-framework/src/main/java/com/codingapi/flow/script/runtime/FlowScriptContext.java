@@ -44,6 +44,13 @@ public class FlowScriptContext {
         return beanFactory.getOperatorById(userId);
     }
 
+    /**
+     * 按 {@code (userId, identity)} 获取操作者（issue #288）
+     */
+    public IFlowOperator getOperatorById(long userId, String identity) {
+        return beanFactory.getOperatorById(userId, identity);
+    }
+
     public List<IFlowOperator> findOperatorsByIds(List<Long> ids) {
         return beanFactory.findOperatorsByIds(ids);
     }
