@@ -32,6 +32,11 @@ public class FlowForceSyncRequest {
      */
     private long operatorId;
 
+    /**
+     * 操作者身份标识（issue #288），为空表示默认身份
+     */
+    private String operatorIdentity;
+
     public FlowForceSyncRequest(String workCode, List<String> processIds, long operatorId) {
         this.workCode = workCode;
         this.processIds = processIds;

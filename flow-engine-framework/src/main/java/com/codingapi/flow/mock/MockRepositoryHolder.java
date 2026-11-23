@@ -78,6 +78,11 @@ public class MockRepositoryHolder implements IRepositoryHolder {
             }
 
             @Override
+            public IFlowOperator get(long id, String identity) {
+                return GatewayContext.getInstance().getFlowOperator(id, identity);
+            }
+
+            @Override
             public List<IFlowOperator> findByIds(List<Long> ids) {
                 return GatewayContext.getInstance().findByIds(ids);
             }
@@ -112,6 +117,11 @@ public class MockRepositoryHolder implements IRepositoryHolder {
     @Override
     public IFlowOperator getOperatorById(long id) {
         return this.flowOperatorGateway.get(id);
+    }
+
+    @Override
+    public IFlowOperator getOperatorById(long id, String identity) {
+        return this.flowOperatorGateway.get(id, identity);
     }
 
     @Override

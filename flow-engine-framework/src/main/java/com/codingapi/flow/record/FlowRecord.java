@@ -45,6 +45,12 @@ public class FlowRecord {
     public static int SATE_FLOW_DELETE = 4;
 
     /**
+     * 待办合并键中身份后缀的分隔符（issue #288）。
+     * <p>仅在身份非空时追加，默认身份不使用，保证存量键格式不变。
+     */
+    private static final String IDENTITY_KEY_SUFFIX = "#";
+
+    /**
      * 记录id
      */
     @Setter
@@ -304,16 +310,40 @@ public class FlowRecord {
      *     <li>SUBMITTER — 提交人合并，按 {@link FlowRecord#submitOperatorId}</li>
      * </ul>
      * 相同依据字段 + {@link FlowRecord#workRuntimeId} + {@link FlowRecord#nodeId} 的数据合并到一条记录上。
+     *
+     * <p>多身份场景（issue #288）：同一人员的两个身份是不同的参与人，合并键必须带上身份，
+     * 否则两个身份的待办会被合并成一条。为避免破坏存量数据，采用**兼容追加**策略：
+     * <ul>
+     *     <li>默认身份（空）— 键格式保持历史原样 {@code {operatorId}-{workRuntimeId}-{nodeId}}，
+     *     升级瞬间仍在运行的流程，其待办行仍是旧格式键，合并关系不会断裂；</li>
+     *     <li>非空身份 — 追加 {@code #identity} 后缀，与默认身份、其他身份天然隔离。</li>
+     * </ul>
      */
     public String getTodoKey() {
         if (mergeable) {
             long mergeOperatorId;
+            String mergeOperatorIdentity;
             switch (mergeType) {
-                case CREATOR -> mergeOperatorId = createOperatorId;
-                case SUBMITTER -> mergeOperatorId = submitOperatorId;
-                default -> mergeOperatorId = currentOperatorId;
+                case CREATOR -> {
+                    mergeOperatorId = createOperatorId;
+                    mergeOperatorIdentity = createOperatorIdentity;
+                }
+                case SUBMITTER -> {
+                    mergeOperatorId = submitOperatorId;
+                    mergeOperatorIdentity = submitOperatorIdentity;
+                }
+                default -> {
+                    mergeOperatorId = currentOperatorId;
+                    mergeOperatorIdentity = currentOperatorIdentity;
+                }
             }
-            return String.format("%s-%s-%s", mergeOperatorId, workRuntimeId, nodeId);
+            String todoKey = String.format("%s-%s-%s", mergeOperatorId, workRuntimeId, nodeId);
+            String identity = OperatorIdentity.normalize(mergeOperatorIdentity);
+            // 默认身份保持历史键格式，保证升级过程中存量待办的合并关系不断裂
+            if (identity.isEmpty()) {
+                return todoKey;
+            }
+            return todoKey + IDENTITY_KEY_SUFFIX + identity;
         } else {
             return String.valueOf(id);
         }
@@ -591,8 +621,10 @@ public class FlowRecord {
         this.updateTime = System.currentTimeMillis();
         this.recordState = pass ? SATE_RECORD_DONE : SATE_RECORD_TODO;
 
-        // 设置流程干预人信息，流程干预只能由流程管理员才能操作
-        if (flowSession.getCurrentOperator().getUserId() != this.currentOperatorId) {
+        // 设置流程干预人信息，流程干预只能由流程管理员才能操作。
+        // 参与人由 (userId, identity) 共同标识：同一人员以另一个身份办理，同样属于干预（issue #288）
+        if (flowSession.getCurrentOperator().getUserId() != this.currentOperatorId
+                || !OperatorIdentity.same(OperatorIdentity.of(flowSession.getCurrentOperator()), this.currentOperatorIdentity)) {
             this.interferedOperatorId = flowSession.getCurrentOperator().getUserId();
             this.interferedOperatorName = flowSession.getCurrentOperator().getName();
             this.interferedOperatorIdentity = OperatorIdentity.of(flowSession.getCurrentOperator());

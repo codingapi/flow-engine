@@ -203,7 +203,8 @@ public class PassAction extends BaseAction {
 
         // 是否转交审批人的流程
         if (isFinish && currentRecord.isForward()) {
-            IFlowOperator forwardOperator = repositoryHolder.getOperatorById(currentRecord.getForwardOperatorId());
+            IFlowOperator forwardOperator = repositoryHolder.getOperatorById(
+                    currentRecord.getForwardOperatorId(), currentRecord.getForwardOperatorIdentity());
             FlowRecord notifyRecord = currentRecord.create(flowSession.updateSession(forwardOperator));
             notifyRecord.notifyRecord(flowSession.updateSession(forwardOperator));
             // 如果不存储这个记录，若下一流程是结束流程时，无法更新流程状态为结束状态。
@@ -215,7 +216,8 @@ public class PassAction extends BaseAction {
         // 多人审批时其他待办可能尚未完成，若只在 isFinish 时返回，委派记录会永久滞留（issue #239）
         if (currentRecord.isDelegate()) {
             FlowRecord delegateRecord = repositoryHolder.getRecordById(currentRecord.getDelegateId());
-            IFlowOperator delegateOperator = repositoryHolder.getOperatorById(delegateRecord.getCurrentOperatorId());
+            IFlowOperator delegateOperator = repositoryHolder.getOperatorById(
+                    delegateRecord.getCurrentOperatorId(), delegateRecord.getCurrentOperatorIdentity());
             FlowRecord rebackRecord = delegateRecord.create(flowSession.updateSession(delegateOperator));
             // 返回记录同样归属原委托记录的节点实例与审批槽位（issue #239）
             rebackRecord.inheritNodeInstance(delegateRecord);

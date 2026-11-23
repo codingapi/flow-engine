@@ -60,9 +60,12 @@ public class FlowDelayTriggerService {
         Workflow workflow = workflowRuntime.toWorkflow();
         IFlowNode currentNode = workflow.getFlowNode(flowRecord.getNodeId());
 
-        IFlowOperator createdOperator = flowOperatorGateway.get(flowRecord.getCreateOperatorId());
-        IFlowOperator submitOperator = flowOperatorGateway.get(flowRecord.getSubmitOperatorId());
-        IFlowOperator currentOperator = flowOperatorGateway.get(flowRecord.getCurrentOperatorId());
+        IFlowOperator createdOperator = flowOperatorGateway.get(
+                flowRecord.getCreateOperatorId(), flowRecord.getCreateOperatorIdentity());
+        IFlowOperator submitOperator = flowOperatorGateway.get(
+                flowRecord.getSubmitOperatorId(), flowRecord.getSubmitOperatorIdentity());
+        IFlowOperator currentOperator = flowOperatorGateway.get(
+                flowRecord.getCurrentOperatorId(), flowRecord.getCurrentOperatorIdentity());
         IFlowAction flowAction = currentNode.actionManager().getActionById(flowRecord.getActionId());
         // 延迟任务固化的前驱记录可能为相同人员自动通过的留痕记录（无审批动作，actionId=null，issue #226）：
         // 以该记录所在审批节点的通过动作兜底恢复流转，避免 NPE 使流程永久停滞在延迟节点

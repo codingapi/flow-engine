@@ -37,6 +37,17 @@ public class FlowActionRequest {
         }
     }
 
+    /**
+     * 覆盖审批人的身份标识（issue #288），由接口层统一注入当前会话声明的身份
+     *
+     * @param operatorIdentity 身份标识，{@code null} 与空串等价（默认身份）
+     */
+    public void updateOperatorIdentity(String operatorIdentity) {
+        if (advice != null) {
+            advice.setOperatorIdentity(operatorIdentity);
+        }
+    }
+
 
     public FlowAdvice toFlowAdvice(Workflow workflow, IFlowAction flowAction) {
         FlowAdvice flowAdvice = new FlowAdvice();

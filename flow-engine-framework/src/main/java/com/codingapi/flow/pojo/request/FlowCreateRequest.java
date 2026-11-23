@@ -34,6 +34,12 @@ public class FlowCreateRequest {
     private long operatorId;
 
     /**
+     * 操作者身份标识（issue #288）
+     * <p>框架不解释身份语义，只透传；为空表示默认身份，与历史行为一致。
+     */
+    private String operatorIdentity;
+
+    /**
      * 父流程id,系统自动赋值
      */
     private long parentRecordId;
@@ -55,6 +61,7 @@ public class FlowCreateRequest {
         flowActionRequest.setFormData(this.getFormData());
         flowActionRequest.setRecordId(recordId);
         FlowAdviceBody adviceBody = new FlowAdviceBody(this.getActionId(), null, this.getOperatorId());
+        adviceBody.setOperatorIdentity(this.getOperatorIdentity());
         adviceBody.setOperatorSelectMap(this.getOperatorSelectMap());
         flowActionRequest.setAdvice(adviceBody);
         flowActionRequest.verify();

@@ -84,7 +84,7 @@ public class FlowReissueService {
             throw FlowNotFoundException.record(request.getSourceRecordId());
         }
 
-        IFlowOperator operator = repositoryHolder.getOperatorById(request.getOperatorId());
+        IFlowOperator operator = repositoryHolder.getOperatorById(request.getOperatorId(), request.getOperatorIdentity());
         if (operator == null) {
             throw FlowNotFoundException.operator(request.getOperatorId());
         }
@@ -104,7 +104,7 @@ public class FlowReissueService {
 
         // 新流程沿用源流程的发起人，二次发起后的待办回到发起人，由发起人调整数据后重新提交
         long initiatorId = sourceRecord.getCreateOperatorId();
-        if (repositoryHolder.getOperatorById(initiatorId) == null) {
+        if (repositoryHolder.getOperatorById(initiatorId, sourceRecord.getCreateOperatorIdentity()) == null) {
             throw FlowNotFoundException.operator(initiatorId);
         }
 
@@ -151,6 +151,8 @@ public class FlowReissueService {
         createRequest.setWorkCode(workflow.getCode());
         createRequest.setActionId(action.id());
         createRequest.setOperatorId(sourceRecord.getCreateOperatorId());
+        // 沿用源流程发起人的身份，保证二次发起后的参与人与源流程一致（issue #288）
+        createRequest.setOperatorIdentity(sourceRecord.getCreateOperatorIdentity());
         createRequest.setFormData(this.loadFormData(sourceRecord));
         // 沿用源流程的自定义标题（如子流程实例区分标题），保持重发前后的业务标识一致
         if (StringUtils.hasText(sourceRecord.getWorkTitle())) {

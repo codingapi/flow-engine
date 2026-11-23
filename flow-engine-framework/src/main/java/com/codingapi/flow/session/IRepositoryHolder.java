@@ -88,12 +88,27 @@ public interface IRepositoryHolder {
 
 
     /**
-     * 获取流程操作人
+     * 获取流程操作人（默认身份）
      *
      * @param id 人员id
      * @return 流程操作人
      */
     IFlowOperator getOperatorById(long id);
+
+    /**
+     * 按身份获取流程操作人（issue #288）
+     *
+     * <p>同一个人员可能以不同身份参与流程，按记录回查操作者时必须带上记录里的身份，
+     * 否则同一 id 的不同身份会拿到同一个操作者实例。
+     * 默认实现忽略身份、退化为 {@link #getOperatorById(long)}，下游存量实现无需改动。
+     *
+     * @param id       人员id
+     * @param identity 身份标识，{@code null} 与空串等价（默认身份）
+     * @return 流程操作人
+     */
+    default IFlowOperator getOperatorById(long id, String identity) {
+        return getOperatorById(id);
+    }
 
 
     /**

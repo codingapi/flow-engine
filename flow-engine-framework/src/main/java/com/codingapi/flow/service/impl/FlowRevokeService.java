@@ -11,6 +11,7 @@ import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.IFlowNode;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.pojo.request.FlowRevokeRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.service.FlowRecordService;
@@ -68,7 +69,9 @@ public class FlowRevokeService {
             throw FlowStateException.recordNotSupportRevoke();
         }
         long currentOperatorId = currentRecord.getCurrentOperatorId();
-        if (currentOperatorId != request.getOperatorId()) {
+        // 同一人的不同身份是不同参与人：身份也必须一致，否则 user1 可以用 department1 的身份撤回 department2 的办理（issue #288）
+        if (currentOperatorId != request.getOperatorId()
+                || !OperatorIdentity.same(currentRecord.getCurrentOperatorIdentity(), request.getOperatorIdentity())) {
             throw FlowStateException.operatorNotMatch();
         }
         WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(currentRecord.getWorkRuntimeId());

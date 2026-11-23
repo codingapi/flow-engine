@@ -139,11 +139,21 @@ public class RepositoryHolderContext implements IRepositoryHolder {
     }
 
     @Override
+    public IFlowOperator getOperatorById(long id, String identity) {
+        return GatewayContext.getInstance().getFlowOperator(id, identity);
+    }
+
+    @Override
     public FlowOperatorGateway getFlowOperatorGateway() {
         return new FlowOperatorGateway() {
             @Override
             public IFlowOperator get(long id) {
                 return GatewayContext.getInstance().getFlowOperator(id);
+            }
+
+            @Override
+            public IFlowOperator get(long id, String identity) {
+                return GatewayContext.getInstance().getFlowOperator(id, identity);
             }
 
             @Override

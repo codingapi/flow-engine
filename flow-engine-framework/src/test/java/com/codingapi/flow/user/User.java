@@ -1,6 +1,7 @@
 package com.codingapi.flow.user;
 
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.script.request.GroovyScriptRequest;
 
 import java.util.Map;
@@ -45,6 +46,13 @@ public class User implements IFlowOperator {
      */
     public static User withIdentity(long userId, String name, String identity) {
         return new User(userId, name, false, null, identity);
+    }
+
+    /**
+     * 返回同一用户以指定身份参与的副本（保留管理员、转交人等属性）
+     */
+    public User asIdentity(String identity) {
+        return new User(userId, name, manager, forwardOperator, OperatorIdentity.normalize(identity));
     }
 
     @Override

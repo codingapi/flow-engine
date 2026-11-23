@@ -57,8 +57,8 @@ public class FlowCreateService {
         // 获取或创建运行时快照
         WorkflowRuntime workflowRuntime = workflowService.getOrCreateWorkflowRuntime(workflow);
         FlowRuntimeScriptLocalCache.getInstance().set(workflowRuntime.getScripts());
-        // 验证当前用户
-        IFlowOperator currentOperator = flowOperatorGateway.get(request.getOperatorId());
+        // 验证当前用户（按请求声明的身份加载，同一人不同身份是不同参与人）
+        IFlowOperator currentOperator = flowOperatorGateway.get(request.getOperatorId(), request.getOperatorIdentity());
         if (!workflow.matchCreatedOperator(currentOperator)) {
             throw FlowPermissionException.accessDenied("create workflow");
         }

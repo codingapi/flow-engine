@@ -1,5 +1,6 @@
 package com.codingapi.flow.pojo.response;
 
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.record.FlowTodoRecord;
 import lombok.Data;
@@ -61,6 +62,11 @@ public class FlowRecordContent {
     private String currentOperatorName;
 
     /**
+     * 当前审批人身份标识（issue #288），空串表示默认身份
+     */
+    private String currentOperatorIdentity;
+
+    /**
      * 提交审批人Id
      */
     private Long submitOperatorId;
@@ -69,6 +75,11 @@ public class FlowRecordContent {
      * 提交审批人名称
      */
     private String submitOperatorName;
+
+    /**
+     * 提交审批人身份标识（issue #288）
+     */
+    private String submitOperatorIdentity;
 
     /**
      * 创建时间
@@ -83,6 +94,11 @@ public class FlowRecordContent {
      * 发起者名称
      */
     private String createOperatorName;
+
+    /**
+     * 发起者身份标识（issue #288）
+     */
+    private String createOperatorIdentity;
 
     /**
      * 合并记录id,当存在合并记录数据时待办记录数量不会增加，内容会更新至最新的待办数据信息。
@@ -137,11 +153,14 @@ public class FlowRecordContent {
         content.setReadTime(record.getReadTime());
         content.setCurrentOperatorId(record.getCurrentOperatorId());
         content.setCurrentOperatorName(record.getCurrentOperatorName());
+        content.setCurrentOperatorIdentity(OperatorIdentity.normalize(record.getCurrentOperatorIdentity()));
         content.setSubmitOperatorId(record.getSubmitOperatorId());
         content.setSubmitOperatorName(record.getSubmitOperatorName());
+        content.setSubmitOperatorIdentity(OperatorIdentity.normalize(record.getSubmitOperatorIdentity()));
         content.setCreateTime(record.getCreateTime());
         content.setCreateOperatorId(record.getCreateOperatorId());
         content.setCreateOperatorName(record.getCreateOperatorName());
+        content.setCreateOperatorIdentity(OperatorIdentity.normalize(record.getCreateOperatorIdentity()));
         content.setMergeable(record.isMergeable());
         content.setRecordId(record.getId());
         content.setTimeoutTime(record.getTimeoutTime());
@@ -164,11 +183,14 @@ public class FlowRecordContent {
         content.setReadTime(todoRecord.getReadTime());
         content.setCurrentOperatorId(todoRecord.getCurrentOperatorId());
         content.setCurrentOperatorName(todoRecord.getCurrentOperatorName());
+        content.setCurrentOperatorIdentity(OperatorIdentity.normalize(todoRecord.getCurrentOperatorIdentity()));
         content.setSubmitOperatorId(todoRecord.getSubmitOperatorId());
         content.setSubmitOperatorName(todoRecord.getSubmitOperatorName());
+        content.setSubmitOperatorIdentity(OperatorIdentity.normalize(todoRecord.getSubmitOperatorIdentity()));
         content.setCreateTime(todoRecord.getCreateTime());
         content.setCreateOperatorId(todoRecord.getCreateOperatorId());
         content.setCreateOperatorName(todoRecord.getCreateOperatorName());
+        content.setCreateOperatorIdentity(OperatorIdentity.normalize(todoRecord.getCreateOperatorIdentity()));
         content.setTodoKey(todoRecord.getTodoKey());
         content.setMargeCount(todoRecord.getMargeCount());
         content.setMergeable(todoRecord.isMergeable());

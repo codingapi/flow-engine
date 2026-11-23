@@ -5,6 +5,7 @@ import com.codingapi.flow.infra.entity.FlowRecordEntity;
 import com.codingapi.flow.infra.entity.FlowTodoRecordEntity;
 import com.codingapi.flow.infra.jpa.FlowRecordEntityRepository;
 import com.codingapi.flow.infra.jpa.FlowTodoRecordEntityRepository;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.pojo.response.FlowRecordContent;
 import com.codingapi.flow.query.FlowRecordQueryService;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,13 @@ public class FlowRecordQueryServiceImpl implements FlowRecordQueryService {
     }
 
     @Override
+    public Page<FlowRecordContent> findTodoRecordPage(long userId, String identity, PageRequest request) {
+        Page<FlowTodoRecordEntity> page = flowTodoRecordEntityRepository.findTodoRecordPageByIdentity(
+                userId, OperatorIdentity.normalize(identity), request.withSort(Sort.by("id").descending()));
+        return page.map(FlowRecordContentConvertor::convert);
+    }
+
+    @Override
     public Page<FlowRecordContent> findNotifyRecordPage(long userId, PageRequest request) {
         Page<FlowRecordEntity> page =flowRecordEntityRepository.findNotifyRecordPage(userId,request.withSort(Sort.by("id").descending()));
         return page.map(FlowRecordContentConvertor::convert);
@@ -41,8 +49,22 @@ public class FlowRecordQueryServiceImpl implements FlowRecordQueryService {
     }
 
     @Override
+    public Page<FlowRecordContent> findNotifyRecordPage(long userId, String identity, PageRequest request) {
+        Page<FlowRecordEntity> page = flowRecordEntityRepository.findNotifyRecordPageByIdentity(
+                userId, OperatorIdentity.normalize(identity), request.withSort(Sort.by("id").descending()));
+        return page.map(FlowRecordContentConvertor::convert);
+    }
+
+    @Override
     public Page<FlowRecordContent> findDoneRecordPage(long userId, PageRequest request) {
         Page<FlowRecordEntity> page =flowRecordEntityRepository.findDoneRecordPage(userId,request.withSort(Sort.by("id").descending()));
+        return page.map(FlowRecordContentConvertor::convert);
+    }
+
+    @Override
+    public Page<FlowRecordContent> findDoneRecordPage(long userId, String identity, PageRequest request) {
+        Page<FlowRecordEntity> page = flowRecordEntityRepository.findDoneRecordPageByIdentity(
+                userId, OperatorIdentity.normalize(identity), request.withSort(Sort.by("id").descending()));
         return page.map(FlowRecordContentConvertor::convert);
     }
 

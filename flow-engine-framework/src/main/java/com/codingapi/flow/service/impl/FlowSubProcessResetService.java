@@ -12,6 +12,7 @@ import com.codingapi.flow.generator.FlowIDGeneratorGatewayContext;
 import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.pojo.request.FlowSubProcessResetRequest;
@@ -73,7 +74,8 @@ public class FlowSubProcessResetService {
         if (!currentRecord.isTodo()) {
             throw FlowStateException.recordAlreadyDone();
         }
-        if (currentRecord.getCurrentOperatorId() != request.getOperatorId()) {
+        if (currentRecord.getCurrentOperatorId() != request.getOperatorId()
+                || !OperatorIdentity.same(currentRecord.getCurrentOperatorIdentity(), request.getOperatorIdentity())) {
             throw FlowStateException.operatorNotMatch();
         }
 
@@ -181,7 +183,7 @@ public class FlowSubProcessResetService {
         }
 
         boolean mock = repositoryHolder instanceof MockRepositoryHolder;
-        IFlowOperator resetOperator = repositoryHolder.getOperatorById(request.getOperatorId());
+        IFlowOperator resetOperator = repositoryHolder.getOperatorById(request.getOperatorId(), request.getOperatorIdentity());
         for (FlowRecord invalidatedRecord : invalidatedRecords) {
             FlowEventPublisher.push(new FlowRecordRevokeEvent(invalidatedRecord, mock));
         }

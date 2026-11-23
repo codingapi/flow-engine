@@ -12,6 +12,7 @@ import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
@@ -153,24 +154,31 @@ public class AddAuditAction extends BaseAction {
         if (auditOperators == null || auditOperators.isEmpty()) {
             return;
         }
-        Set<Long> pendingOperatorIds = pendingOperatorIds(flowSession);
-        if (pendingOperatorIds.isEmpty()) {
+        Set<String> pendingOperators = pendingOperatorKeys(flowSession);
+        if (pendingOperators.isEmpty()) {
             return;
         }
         for (IFlowOperator auditOperator : auditOperators) {
-            if (pendingOperatorIds.contains(auditOperator.getUserId())) {
+            if (pendingOperators.contains(operatorKey(auditOperator.getUserId(), OperatorIdentity.of(auditOperator)))) {
                 throw FlowExecutionException.addAuditOperatorAlreadyInTodo(auditOperator.getUserId());
             }
         }
     }
 
     /**
-     * 当前节点实例中仍有待办的人员id集合。
+     * 参与人键：{@code userId + identity}，同一人员的不同身份是不同参与人（issue #288）
+     */
+    private static String operatorKey(long userId, String identity) {
+        return userId + "\u0001" + OperatorIdentity.normalize(identity);
+    }
+
+    /**
+     * 当前节点实例中仍有待办的参与人键集合（userId + identity）。
      *
      * <p>仓储按 {@code (fromId, nodeId)} 查询节点记录，开始节点（{@code fromId = 0}）等场景可能
      * 命中其他流程实例的记录，必须按 {@code processId} 限定，避免误判其他流程的待办人员。
      */
-    private Set<Long> pendingOperatorIds(FlowSession flowSession) {
+    private Set<String> pendingOperatorKeys(FlowSession flowSession) {
         FlowRecord currentRecord = flowSession.getCurrentRecord();
         List<FlowRecord> currentNodeRecords = flowSession.getCurrentNodeRecords();
         if (currentRecord == null || currentNodeRecords == null) {
@@ -180,7 +188,7 @@ public class AddAuditAction extends BaseAction {
                 .filter(Objects::nonNull)
                 .filter(record -> currentRecord.getProcessId().equals(record.getProcessId()))
                 .filter(FlowRecord::isPendingApproval)
-                .map(FlowRecord::getCurrentOperatorId)
+                .map(record -> operatorKey(record.getCurrentOperatorId(), record.getCurrentOperatorIdentity()))
                 .collect(Collectors.toSet());
     }
 

@@ -37,7 +37,7 @@ public class FlowDetailService {
 
     public FlowDetailService(FlowDetailRequest request, IRepositoryHolder repositoryHolder) {
         this.request = request;
-        this.currentOperator = repositoryHolder.getOperatorById(request.getOperatorId());
+        this.currentOperator = repositoryHolder.getOperatorById(request.getOperatorId(), request.getOperatorIdentity());
         this.flowRecordService = repositoryHolder.getFlowRecordService();
         this.workflowService = repositoryHolder.getWorkflowService();
         this.repositoryHolder = repositoryHolder;
@@ -74,9 +74,11 @@ public class FlowDetailService {
                 repositoryHolder.saveRecord(flowRecord);
             }
 
-            IFlowOperator createOperator = repositoryHolder.getOperatorById(flowRecord.getCreateOperatorId());
+            IFlowOperator createOperator = repositoryHolder.getOperatorById(
+                    flowRecord.getCreateOperatorId(), flowRecord.getCreateOperatorIdentity());
 
-            IFlowOperator submitOperator = repositoryHolder.getOperatorById(flowRecord.getSubmitOperatorId());
+            IFlowOperator submitOperator = repositoryHolder.getOperatorById(
+                    flowRecord.getSubmitOperatorId(), flowRecord.getSubmitOperatorIdentity());
 
             FlowForm flowForm = workflow.getForm();
             FormData formData = new FormData(flowForm);
