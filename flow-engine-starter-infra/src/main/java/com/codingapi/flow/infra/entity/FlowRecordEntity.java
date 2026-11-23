@@ -1,5 +1,6 @@
 package com.codingapi.flow.infra.entity;
 
+import com.codingapi.flow.operator.OperatorIdentity;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -103,6 +104,7 @@ public class FlowRecordEntity {
     /**
      * 当前审批人身份标识（issue #288），空值等价默认身份
      */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
     private String currentOperatorIdentity;
 
     /**
@@ -118,6 +120,7 @@ public class FlowRecordEntity {
     /**
      * 提交审批人身份标识（issue #288），空值等价默认身份
      */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
     private String submitOperatorIdentity;
 
     /**
@@ -133,6 +136,7 @@ public class FlowRecordEntity {
     /**
      * 代替的审批人身份标识（issue #288），空值等价默认身份
      */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
     private String forwardOperatorIdentity;
 
     /**
@@ -198,6 +202,7 @@ public class FlowRecordEntity {
     /**
      * 发起者身份标识（issue #288），空值等价默认身份
      */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
     private String createOperatorIdentity;
 
     /**
@@ -231,6 +236,7 @@ public class FlowRecordEntity {
     /**
      * 被干预的用户身份标识（issue #288），空值等价默认身份
      */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
     private String interferedOperatorIdentity;
 
     /**

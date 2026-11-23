@@ -1,5 +1,6 @@
 package com.codingapi.flow.infra.entity;
 
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.record.FlowRecord;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -71,6 +72,7 @@ public class FlowTodoRecordEntity {
     /**
      * 当前审批人身份标识（issue #288），空值等价默认身份
      */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
     private String currentOperatorIdentity;
 
     /**
@@ -86,6 +88,7 @@ public class FlowTodoRecordEntity {
     /**
      * 提交审批人身份标识（issue #288），空值等价默认身份
      */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
     private String submitOperatorIdentity;
 
     /**
@@ -105,6 +108,7 @@ public class FlowTodoRecordEntity {
     /**
      * 发起者身份标识（issue #288），空值等价默认身份
      */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
     private String createOperatorIdentity;
 
     /**

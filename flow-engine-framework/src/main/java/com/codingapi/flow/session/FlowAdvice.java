@@ -3,6 +3,7 @@ package com.codingapi.flow.session;
 import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorKey;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -48,8 +49,15 @@ public class FlowAdvice {
     /**
      * 操作人手动选择映射（节点ID -> 操作人ID列表）
      * 用于 INITIATOR_SELECT / APPROVER_SELECT 模式
+     * <p>存量字段，仅表达人员 id（默认身份）。
      */
     private Map<String, List<Long>> operatorSelectMap;
+
+    /**
+     * 操作人手动选择映射，携带身份（节点ID -> 选定的操作人列表，issue #288 衍生 / #292）
+     * <p>每项为 {@code (人员id, 身份)}，优先于 {@link #operatorSelectMap}。
+     */
+    private Map<String, List<OperatorKey>> operatorSelectOperators;
 
 
     public FlowAdvice(String advice) {

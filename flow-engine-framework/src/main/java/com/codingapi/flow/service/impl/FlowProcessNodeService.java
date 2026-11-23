@@ -126,26 +126,50 @@ public class FlowProcessNodeService {
     }
 
     private void fetchFlowRecordOperatorList() {
-        List<Long> operatorIds = new ArrayList<>();
+        this.preloadRecordOperators(this.recordList);
+    }
 
-        for (FlowRecord flowRecord : this.recordList) {
-            if (!operatorIds.contains(flowRecord.getCreateOperatorId())) {
-                operatorIds.add(flowRecord.getCreateOperatorId());
-            }
-            if (!operatorIds.contains(flowRecord.getCurrentOperatorId())) {
-                operatorIds.add(flowRecord.getCurrentOperatorId());
-            }
-            if (!operatorIds.contains(flowRecord.getSubmitOperatorId())) {
-                operatorIds.add(flowRecord.getSubmitOperatorId());
-            }
+    /**
+     * 按 {@code (人员id, 记录中的身份)} 分组批量加载操作者（issue #288 衍生 / #293）。
+     *
+     * <p>登记缓存时使用的身份必须与读取端 {@link #loadRecordOperator(long, String)} 一致（都取记录里的身份），
+     * 否则批量结果读不到，会退化成逐条回查网关。按身份分组后，每个身份只发一次批量请求，
+     * 多身份流程树不会产生 N+1。
+     */
+    private void preloadRecordOperators(List<FlowRecord> records) {
+        if (records == null || records.isEmpty()) {
+            return;
         }
-
-        List<IFlowOperator> operatorList = this.repositoryHolder.findOperatorByIds(operatorIds);
-        if (operatorList != null && !operatorList.isEmpty()) {
+        Map<String, Set<Long>> operatorIdsByIdentity = new LinkedHashMap<>();
+        for (FlowRecord record : records) {
+            addOperatorRef(operatorIdsByIdentity, record.getCreateOperatorId(), record.getCreateOperatorIdentity());
+            addOperatorRef(operatorIdsByIdentity, record.getCurrentOperatorId(), record.getCurrentOperatorIdentity());
+            addOperatorRef(operatorIdsByIdentity, record.getSubmitOperatorId(), record.getSubmitOperatorIdentity());
+        }
+        operatorIdsByIdentity.forEach((identity, operatorIds) -> {
+            List<Long> queryIds = operatorIds.stream()
+                    .filter(operatorId -> !this.recordOperatorMap.containsKey(recordOperatorKey(operatorId, identity)))
+                    .toList();
+            if (queryIds.isEmpty()) {
+                return;
+            }
+            List<IFlowOperator> operatorList = this.repositoryHolder.findOperatorByIds(queryIds, identity);
+            if (operatorList == null || operatorList.isEmpty()) {
+                return;
+            }
             for (IFlowOperator operator : operatorList) {
-                this.recordOperatorMap.put(recordOperatorKey(operator.getUserId(), OperatorIdentity.of(operator)), operator);
+                this.recordOperatorMap.put(recordOperatorKey(operator.getUserId(), identity), operator);
             }
+        });
+    }
+
+    private static void addOperatorRef(Map<String, Set<Long>> operatorIdsByIdentity, long operatorId, String identity) {
+        if (operatorId <= 0) {
+            return;
         }
+        operatorIdsByIdentity
+                .computeIfAbsent(OperatorIdentity.normalize(identity), key -> new LinkedHashSet<>())
+                .add(operatorId);
     }
 
     public List<ProcessNode> processNodes() {
@@ -460,23 +484,7 @@ public class FlowProcessNodeService {
     }
 
     private void fetchFlowRecordOperatorList(List<FlowRecord> records) {
-        List<Long> operatorIds = records.stream()
-                .flatMap(record -> java.util.stream.Stream.of(
-                        record.getCreateOperatorId(),
-                        record.getCurrentOperatorId(),
-                        record.getSubmitOperatorId()))
-                .filter(operatorId -> operatorId > 0
-                        && !this.recordOperatorMap.containsKey(recordOperatorKey(operatorId, OperatorIdentity.DEFAULT)))
-                .distinct()
-                .toList();
-        if (operatorIds.isEmpty()) {
-            return;
-        }
-        List<IFlowOperator> operatorList = this.repositoryHolder.findOperatorByIds(operatorIds);
-        if (operatorList != null) {
-            operatorList.forEach(operator -> this.recordOperatorMap.put(
-                    recordOperatorKey(operator.getUserId(), OperatorIdentity.of(operator)), operator));
-        }
+        this.preloadRecordOperators(records);
     }
 
     private record ParentSubProcessContext(FlowRecord parentRecord,

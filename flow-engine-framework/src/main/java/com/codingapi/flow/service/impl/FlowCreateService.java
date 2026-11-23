@@ -91,11 +91,19 @@ public class FlowCreateService {
         }
 
         // 校验并持久化 INITIATOR_SELECT 节点的操作人分配（含可选人员范围校验）
-        if (request.getOperatorSelectMap() != null
-                && !request.getOperatorSelectMap().isEmpty()
-                && !flowRecords.isEmpty()) {
+        boolean hasSelectOperators = request.getOperatorSelectOperators() != null
+                && !request.getOperatorSelectOperators().isEmpty();
+        boolean hasSelectIds = request.getOperatorSelectMap() != null
+                && !request.getOperatorSelectMap().isEmpty();
+        if ((hasSelectOperators || hasSelectIds) && !flowRecords.isEmpty()) {
             String processId = flowRecords.get(0).getProcessId();
-            OperatorAssignmentService.validateAndSave(session, processId, request.getOperatorSelectMap());
+            if (hasSelectOperators) {
+                // 携带身份的分配优先：同一人员的两个身份是两项，不会被合并（issue #288 衍生 / #292）
+                OperatorAssignmentService.validateAndSaveOperators(session, processId,
+                        request.getOperatorSelectOperators());
+            } else {
+                OperatorAssignmentService.validateAndSave(session, processId, request.getOperatorSelectMap());
+            }
         }
 
         repositoryHolder.saveRecords(flowRecords);

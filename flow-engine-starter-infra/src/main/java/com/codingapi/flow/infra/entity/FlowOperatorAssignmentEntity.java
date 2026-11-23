@@ -29,7 +29,11 @@ public class FlowOperatorAssignmentEntity {
     private String nodeId;
 
     /**
-     * 操作人 ID 列表（JSON 格式，如 [1,2,3]）
+     * 操作人分配列表（JSON 格式，issue #288 衍生 / #292）。
+     *
+     * <p>历史格式：{@code [1,2,3]}，全部按默认身份处理；
+     * 含身份格式：{@code [{"operatorId":2,"identity":"department1"}]}。
+     * 两种格式由仓储实现透明兼容，因此本列无需新增身份字段、无需升级 DDL。
      */
     @Lob
     @Column(nullable = false)

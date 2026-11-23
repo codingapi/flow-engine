@@ -40,4 +40,20 @@ public interface FlowOperatorGateway {
      */
     List<IFlowOperator> findByIds(List<Long> ids);
 
+    /**
+     * 按人员 id 与统一身份批量获取操作者（issue #288 衍生 / #293）。
+     *
+     * <p>适用于「同一批人员以同一个身份参与流程」的场景（如同一部门下的多个审批人），
+     * 避免逐条调用 {@link #get(long, String)} 造成 N+1 回查。
+     * 默认实现忽略身份、退化为 {@link #findByIds(List)}，下游存量实现无需改动即可编译；
+     * 需要支持多身份时再覆盖此方法。
+     *
+     * @param ids      人员 id 列表
+     * @param identity 身份标识，{@code null} 与空串等价（默认身份）
+     * @return 操作者列表
+     */
+    default List<IFlowOperator> findByIds(List<Long> ids, String identity) {
+        return findByIds(ids);
+    }
+
 }

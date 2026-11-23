@@ -14,6 +14,7 @@ import com.codingapi.flow.form.permission.PermissionType;
 import com.codingapi.flow.node.nodes.ApprovalNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.StartNode;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.pojo.body.FlowAdviceBody;
 import com.codingapi.flow.pojo.request.FlowActionRequest;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
@@ -190,5 +191,28 @@ class FlowOperatorIdentityRecordTest {
         List<FlowTodoRecord> bossTodoRecords = factory.flowTodoRecordRepository.findByOperatorId(boss.getUserId());
         assertEquals(1, bossTodoRecords.size());
         assertEquals("department2", bossTodoRecords.get(0).getCurrentOperatorIdentity());
+    }
+
+    /**
+     * 场景：抄送记录被复用（clearNotify）时，转交身份必须与转交人 id 一起清零，
+     * 否则旧身份会残留在记录上，被后续流转带出错误的参与人身份（issue #288 衍生 / #294）。
+     */
+    @Test
+    void should_clear_forward_identity_when_notify_is_reset() {
+        User creator = new User(1, "user1");
+        User boss = new User(2, "boss");
+        MyFlowServiceFactory factory = newFactory(creator, boss);
+        Workflow workflow = buildLeaveWorkflow(factory, creator);
+        long recordId = createAtStartNode(factory, workflow, creator);
+
+        FlowRecord record = factory.flowRecordRepository.get(recordId);
+        assertNotNull(record);
+        record.setForwardOperatorId(9);
+        record.setForwardOperatorIdentity("department9");
+
+        record.clearNotify();
+
+        assertEquals(0, record.getForwardOperatorId());
+        assertEquals(OperatorIdentity.DEFAULT, record.getForwardOperatorIdentity());
     }
 }

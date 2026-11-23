@@ -101,6 +101,22 @@ public class FlowOperatorLocalThreadCache {
      * 因此这里固定使用默认身份作为缓存键，与历史行为一致。
      */
     public List<IFlowOperator> find(List<Long> ids, IFlowOperatorFinder flowOperatorFinder) {
+        return this.find(ids, OperatorIdentity.DEFAULT, flowOperatorFinder);
+    }
+
+    /**
+     * 按身份批量读取操作者（issue #288 衍生 / #293）。
+     *
+     * <p>用于「一批人员以同一个身份参与流程」的场景（例如同一部门下的多个审批人）：
+     * 结果登记在 {@code (id, identity)} 键下，按同一身份读取时可直接命中，
+     * 避免同一批人员被逐条回查。
+     *
+     * @param ids             人员 id 列表
+     * @param identity        身份标识，{@code null} 与空串等价
+     * @param operatorFinder  缓存未命中时的批量加载器
+     * @return 操作者列表（按入参 ids 顺序，加载不到的 id 会被跳过）
+     */
+    public List<IFlowOperator> find(List<Long> ids, String identity, IFlowOperatorFinder operatorFinder) {
         if (ids == null || ids.isEmpty()) {
             return null;
         }
@@ -113,20 +129,21 @@ public class FlowOperatorLocalThreadCache {
             return null;
         }
 
+        String normalizedIdentity = OperatorIdentity.normalize(identity);
+
         Map<String, IFlowOperator> operatorCaches = this.getCache();
 
         List<Long> queryIds = ids.stream()
-                .filter((id) -> !operatorCaches.containsKey(cacheKey(id, OperatorIdentity.DEFAULT)))
+                .filter((id) -> !operatorCaches.containsKey(cacheKey(id, normalizedIdentity)))
                 .toList();
 
         if (!queryIds.isEmpty()) {
-            List<IFlowOperator> newOperatorList = flowOperatorFinder.find(queryIds);
+            List<IFlowOperator> newOperatorList = operatorFinder.find(queryIds);
             if (newOperatorList != null && !newOperatorList.isEmpty()) {
                 for (IFlowOperator operator : newOperatorList) {
-                    // 批量加载是「按 id 查询」的标识无关路径：结果统一登记在默认身份键下，
-                    // 与下面按默认身份读取保持一致。否则下游返回自带身份的操作者会被登记到身份键，
-                    // 读取时按默认键取不到，表现为「审批人为空」。
-                    operatorCaches.put(cacheKey(operator.getUserId(), OperatorIdentity.DEFAULT), operator);
+                    // 结果按「请求身份」登记，而不是操作者对象自带身份：
+                    // 调用方是按该身份发起查询的，登记键必须与读取键一致，否则读取时必然落空
+                    operatorCaches.put(cacheKey(operator.getUserId(), normalizedIdentity), operator);
                 }
                 this.cache.set(operatorCaches);
             }
@@ -135,7 +152,7 @@ public class FlowOperatorLocalThreadCache {
         // 按入参 ids 顺序返回，避免缓存命中情况影响结果顺序，保证多人审批顺序稳定
         List<IFlowOperator> operatorList = new ArrayList<>();
         for (long id : ids) {
-            IFlowOperator operator = operatorCaches.get(cacheKey(id, OperatorIdentity.DEFAULT));
+            IFlowOperator operator = operatorCaches.get(cacheKey(id, normalizedIdentity));
             if (operator != null) {
                 operatorList.add(operator);
             }

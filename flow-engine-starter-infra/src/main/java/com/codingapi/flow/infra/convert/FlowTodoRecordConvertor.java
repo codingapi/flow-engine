@@ -71,9 +71,10 @@ public class FlowTodoRecordConvertor {
         entity.setMergeable(record.isMergeable());
         entity.setRecordId(record.getRecordId());
         entity.setTimeoutTime(record.getTimeoutTime());
-        entity.setCurrentOperatorIdentity(OperatorIdentity.normalize(record.getCurrentOperatorIdentity()));
-        entity.setSubmitOperatorIdentity(OperatorIdentity.normalize(record.getSubmitOperatorIdentity()));
-        entity.setCreateOperatorIdentity(OperatorIdentity.normalize(record.getCreateOperatorIdentity()));
+        // 写入前统一校验：长度与 DDL 列宽一致、禁止合并键分隔符与控制字符（issue #288 衍生 / #294）
+        entity.setCurrentOperatorIdentity(OperatorIdentity.validate(record.getCurrentOperatorIdentity()));
+        entity.setSubmitOperatorIdentity(OperatorIdentity.validate(record.getSubmitOperatorIdentity()));
+        entity.setCreateOperatorIdentity(OperatorIdentity.validate(record.getCreateOperatorIdentity()));
         return entity;
     }
 }

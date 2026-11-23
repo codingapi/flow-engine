@@ -1,5 +1,6 @@
 package com.codingapi.flow.mock.repository;
 
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.record.FlowTodoRecord;
 import com.codingapi.flow.repository.FlowTodoRecordRepository;
 
@@ -71,6 +72,20 @@ public class FlowTodoRecordRepositoryMockImpl implements FlowTodoRecordRepositor
 
     public List<FlowTodoRecord> findByOperatorId(long operatorId) {
         return cache.values().stream().filter(record -> record.getCurrentOperatorId() == operatorId).toList();
+    }
+
+    /**
+     * 按 {@code (审批人, 身份)} 查询待办（issue #288 衍生 / #291）。
+     *
+     * <p>口径与 JPA 的 {@code coalesce(currentOperatorIdentity, '') = :identity} 一致：
+     * 历史记录身份为 {@code null} 时按默认身份命中。
+     */
+    public List<FlowTodoRecord> findByOperatorId(long operatorId, String identity) {
+        String normalized = OperatorIdentity.normalize(identity);
+        return cache.values().stream()
+                .filter(record -> record.getCurrentOperatorId() == operatorId
+                        && OperatorIdentity.same(record.getCurrentOperatorIdentity(), normalized))
+                .toList();
     }
 
     public List<FlowTodoRecord> findAll() {

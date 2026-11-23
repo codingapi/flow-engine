@@ -3,6 +3,7 @@ package com.codingapi.flow.pojo.body;
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.operator.OperatorIdentity;
+import com.codingapi.flow.operator.OperatorKey;
 import com.codingapi.flow.session.FlowSession;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -66,8 +67,15 @@ public class FlowAdviceBody {
 
     /**
      * 操作人手动选择映射（节点ID -> 操作人ID列表）
+     * <p>存量字段，仅表达人员 id（默认身份）。
      */
     private Map<String, List<Long>> operatorSelectMap;
+
+    /**
+     * 操作人手动选择映射，携带身份（issue #288 衍生 / #292）
+     * <p>节点ID -> 选定操作人列表，每项为 {@code (人员id, 身份)}，优先于 {@link #operatorSelectMap}。
+     */
+    private Map<String, List<OperatorKey>> operatorSelectOperators;
 
 
     public FlowAdviceBody(String actionId, String advice, long operatorId) {
@@ -87,6 +95,7 @@ public class FlowAdviceBody {
         this.manualNodeId = flowSession.getAdvice().getManualNode() != null ? flowSession.getAdvice().getManualNode().getId() : null;
         this.forwardOperatorIds = flowSession.getAdvice().getForwardOperators() != null ? flowSession.getAdvice().getForwardOperators().stream().map(IFlowOperator::getUserId).toList() : null;
         this.operatorSelectMap = flowSession.getAdvice().getOperatorSelectMap();
+        this.operatorSelectOperators = flowSession.getAdvice().getOperatorSelectOperators();
     }
 
 

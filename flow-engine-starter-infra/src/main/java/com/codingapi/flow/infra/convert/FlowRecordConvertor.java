@@ -127,11 +127,12 @@ public class FlowRecordConvertor {
         entity.setParallelId(record.getParallelId());
         entity.setParallelBranchNodeId(record.getParallelBranchNodeId());
         entity.setParallelBranchTotal(record.getParallelBranchTotal());
-        entity.setCreateOperatorIdentity(OperatorIdentity.normalize(record.getCreateOperatorIdentity()));
-        entity.setSubmitOperatorIdentity(OperatorIdentity.normalize(record.getSubmitOperatorIdentity()));
-        entity.setCurrentOperatorIdentity(OperatorIdentity.normalize(record.getCurrentOperatorIdentity()));
-        entity.setForwardOperatorIdentity(OperatorIdentity.normalize(record.getForwardOperatorIdentity()));
-        entity.setInterferedOperatorIdentity(OperatorIdentity.normalize(record.getInterferedOperatorIdentity()));
+        // 写入前统一校验：长度与 DDL 列宽一致、禁止合并键分隔符与控制字符（issue #288 衍生 / #294）
+        entity.setCreateOperatorIdentity(OperatorIdentity.validate(record.getCreateOperatorIdentity()));
+        entity.setSubmitOperatorIdentity(OperatorIdentity.validate(record.getSubmitOperatorIdentity()));
+        entity.setCurrentOperatorIdentity(OperatorIdentity.validate(record.getCurrentOperatorIdentity()));
+        entity.setForwardOperatorIdentity(OperatorIdentity.validate(record.getForwardOperatorIdentity()));
+        entity.setInterferedOperatorIdentity(OperatorIdentity.validate(record.getInterferedOperatorIdentity()));
         return entity;
     }
 

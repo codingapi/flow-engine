@@ -3,11 +3,16 @@ package com.codingapi.flow.strategy.node;
 import com.codingapi.flow.common.IMapConvertor;
 import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorKey;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
+import com.codingapi.flow.session.IRepositoryHolder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,18 +56,17 @@ public class OperatorLoadStrategy extends BaseStrategy {
     public OperatorManager loadOperators(FlowSession flowSession) {
         if (selectType == OperatorSelectType.INITIATOR_SELECT
                 || selectType == OperatorSelectType.APPROVER_SELECT) {
-            // 从持久化存储中读取预先分配的操作人 ID 列表
+            // 从持久化存储中读取预先分配的操作人（含身份，issue #288 衍生 / #292）
             String processId = flowSession.getCurrentRecord() != null
                     ? flowSession.getCurrentRecord().getProcessId()
                     : null;
             String nodeId = flowSession.getCurrentNode().getId();
             if (processId != null) {
-                List<Long> operatorIds = flowSession.getRepositoryHolder()
-                        .findAssignedOperatorIds(processId, nodeId);
-                if (!operatorIds.isEmpty()) {
-                    List<IFlowOperator> operators = flowSession.getRepositoryHolder()
-                            .findOperatorByIds(operatorIds);
-                    return new OperatorManager(operators);
+                List<OperatorKey> assignedOperators = flowSession.getRepositoryHolder()
+                        .findAssignedOperators(processId, nodeId);
+                if (!assignedOperators.isEmpty()) {
+                    return new OperatorManager(this.loadAssignedOperators(
+                            flowSession.getRepositoryHolder(), assignedOperators));
                 }
             }
             // 未找到分配数据时返回空列表（触发 errorTrigger 逻辑）
@@ -70,6 +74,40 @@ public class OperatorLoadStrategy extends BaseStrategy {
         }
         // 默认 SCRIPT 模式
         return new OperatorManager(operatorLoadScript.execute(flowSession));
+    }
+
+    /**
+     * 按 {@code (人员id, 身份)} 加载已分配的操作人（issue #288 衍生 / #292）。
+     *
+     * <p>按身份分组批量回查，避免逐个 {@code getOperatorById} 造成 N+1；
+     * 返回顺序与分配顺序一致，保证多人审批的执行顺序稳定。
+     */
+    private List<IFlowOperator> loadAssignedOperators(IRepositoryHolder repositoryHolder,
+                                                      List<OperatorKey> assignedOperators) {
+        Map<String, List<Long>> operatorIdsByIdentity = new LinkedHashMap<>();
+        for (OperatorKey operator : assignedOperators) {
+            operatorIdsByIdentity
+                    .computeIfAbsent(operator.identity(), key -> new ArrayList<>())
+                    .add(operator.operatorId());
+        }
+        Map<String, IFlowOperator> operatorMap = new HashMap<>();
+        operatorIdsByIdentity.forEach((identity, operatorIds) -> {
+            List<IFlowOperator> operators = repositoryHolder.findOperatorByIds(operatorIds, identity);
+            if (operators == null) {
+                return;
+            }
+            for (IFlowOperator operator : operators) {
+                operatorMap.put(OperatorKey.of(operator.getUserId(), identity).key(), operator);
+            }
+        });
+        List<IFlowOperator> result = new ArrayList<>(assignedOperators.size());
+        for (OperatorKey operator : assignedOperators) {
+            IFlowOperator flowOperator = operatorMap.get(operator.key());
+            if (flowOperator != null) {
+                result.add(flowOperator);
+            }
+        }
+        return result;
     }
 
     /**

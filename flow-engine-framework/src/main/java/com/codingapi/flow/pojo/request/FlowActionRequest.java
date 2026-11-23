@@ -65,8 +65,9 @@ public class FlowActionRequest {
             flowAdvice.setManualNode(workflow.getFlowNode(advice.getManualNodeId()));
         }
 
-        // 传递操作人手动选择映射
+        // 传递操作人手动选择映射（含身份，issue #288 衍生 / #292）
         flowAdvice.setOperatorSelectMap(advice.getOperatorSelectMap());
+        flowAdvice.setOperatorSelectOperators(advice.getOperatorSelectOperators());
 
         return flowAdvice;
     }

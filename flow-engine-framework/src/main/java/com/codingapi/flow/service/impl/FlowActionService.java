@@ -100,9 +100,15 @@ public class FlowActionService {
         FlowSession session = flowRecord.createFlowSession(this.repositoryHolder,workflow,currentOperator,createdOperator,currentOperator,formData,flowAdvice);
 
         // 校验并持久化 APPROVER_SELECT 节点的操作人分配（含可选人员范围校验）
-        if (flowAdvice.getOperatorSelectMap() != null
+        if (flowAdvice.getOperatorSelectOperators() != null
+                && !flowAdvice.getOperatorSelectOperators().isEmpty()) {
+            // 携带身份的分配优先（issue #288 衍生 / #292）
+            OperatorAssignmentService.validateAndSaveOperators(session, flowRecord.getProcessId(),
+                    flowAdvice.getOperatorSelectOperators());
+        } else if (flowAdvice.getOperatorSelectMap() != null
                 && !flowAdvice.getOperatorSelectMap().isEmpty()) {
-            OperatorAssignmentService.validateAndSave(session, flowRecord.getProcessId(), flowAdvice.getOperatorSelectMap());
+            OperatorAssignmentService.validateAndSave(session, flowRecord.getProcessId(),
+                    flowAdvice.getOperatorSelectMap());
         }
 
         // 验证会话

@@ -39,6 +39,21 @@ public class UserGateway implements FlowOperatorGateway {
                 .toList();
     }
 
+    /**
+     * 按统一身份批量返回用户副本，与 {@link #get(long, String)} 口径一致（issue #288 衍生 / #293）。
+     */
+    @Override
+    public List<IFlowOperator> findByIds(List<Long> ids, String identity) {
+        List<IFlowOperator> operators = this.findByIds(ids);
+        if (OperatorIdentity.isDefault(identity)) {
+            return operators;
+        }
+        return operators.stream()
+                .map(operator -> operator instanceof User user
+                        ? (IFlowOperator) user.asIdentity(identity) : operator)
+                .toList();
+    }
+
 
     public void save(User user) {
         cache.put(user.getUserId(), user);

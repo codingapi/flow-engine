@@ -5,6 +5,7 @@ import com.codingapi.flow.domain.UrgeInterval;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorKey;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.DelayTaskRepository;
 import com.codingapi.flow.repository.FlowOperatorAssignmentRepository;
@@ -133,6 +134,11 @@ public class RepositoryHolderContext implements IRepositoryHolder {
         return GatewayContext.getInstance().findByIds(ids);
     }
 
+    @Override
+    public List<IFlowOperator> findOperatorByIds(List<Long> ids, String identity) {
+        return GatewayContext.getInstance().findByIds(ids, identity);
+    }
+
 
     public IFlowOperator getOperatorById(long id) {
         return GatewayContext.getInstance().getFlowOperator(id);
@@ -159,6 +165,11 @@ public class RepositoryHolderContext implements IRepositoryHolder {
             @Override
             public List<IFlowOperator> findByIds(List<Long> ids) {
                 return GatewayContext.getInstance().findByIds(ids);
+            }
+
+            @Override
+            public List<IFlowOperator> findByIds(List<Long> ids, String identity) {
+                return GatewayContext.getInstance().findByIds(ids, identity);
             }
         };
     }
@@ -224,7 +235,17 @@ public class RepositoryHolderContext implements IRepositoryHolder {
     }
 
     @Override
+    public void saveOperatorAssignments(String processId, String nodeId, List<OperatorKey> operators) {
+        flowOperatorAssignmentRepository.saveOperators(processId, nodeId, operators);
+    }
+
+    @Override
     public List<Long> findAssignedOperatorIds(String processId, String nodeId) {
         return flowOperatorAssignmentRepository.findOperatorIds(processId, nodeId);
+    }
+
+    @Override
+    public List<OperatorKey> findAssignedOperators(String processId, String nodeId) {
+        return flowOperatorAssignmentRepository.findOperators(processId, nodeId);
     }
 }

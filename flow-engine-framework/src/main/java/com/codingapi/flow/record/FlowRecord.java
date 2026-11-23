@@ -643,6 +643,8 @@ public class FlowRecord {
         this.signKey = null;
         this.notify = true;
         this.forwardOperatorId = 0;
+        // 转交身份必须同步清零，否则身份会残留在记录上，被后续复用带出错误的参与人身份（issue #288 衍生 / #294）
+        this.forwardOperatorIdentity = OperatorIdentity.DEFAULT;
     }
 
 

@@ -1,5 +1,7 @@
 package com.codingapi.flow.operator;
 
+import com.codingapi.flow.exception.FlowValidationException;
+
 /**
  * 身份标识归一化工具。
  *
@@ -20,6 +22,20 @@ public final class OperatorIdentity {
      */
     public static final String DEFAULT = "";
 
+    /**
+     * 身份标识最大长度，与 DDL（{@code VARCHAR(64)}）保持一致。
+     *
+     * <p>实体列宽与本常量对齐，避免「自动建表 255 / 手工建表 64」两种环境行为不一致导致截断。
+     */
+    public static final int MAX_LENGTH = 64;
+
+    /**
+     * 待办合并键中用于拼接身份的分隔符。
+     *
+     * <p>身份本身不允许包含该字符，否则「身份」与「合并键后缀」语义无法区分。
+     */
+    public static final String KEY_SEPARATOR = "#";
+
     private OperatorIdentity() {
     }
 
@@ -31,6 +47,37 @@ public final class OperatorIdentity {
      */
     public static String normalize(String identity) {
         return identity == null ? DEFAULT : identity;
+    }
+
+    /**
+     * 校验并归一化身份标识（写入 / 落库前调用）。
+     *
+     * <p>约束：
+     * <ul>
+     *     <li>长度不超过 {@link #MAX_LENGTH}，与 DDL 列宽一致；</li>
+     *     <li>不允许包含 {@link #KEY_SEPARATOR}，否则与待办合并键的后缀语义冲突；</li>
+     *     <li>不允许包含控制字符，避免污染内部以控制字符拼接的缓存键。</li>
+     * </ul>
+     *
+     * @param identity 原始身份标识，{@code null} 与空串等价（默认身份）
+     * @return 归一化后的身份标识
+     * @throws FlowValidationException 身份标识不合法
+     */
+    public static String validate(String identity) {
+        String normalized = normalize(identity);
+        if (normalized.length() > MAX_LENGTH) {
+            throw FlowValidationException.operatorIdentityTooLong(normalized.length(), MAX_LENGTH);
+        }
+        if (normalized.contains(KEY_SEPARATOR)) {
+            throw FlowValidationException.operatorIdentityInvalid(KEY_SEPARATOR);
+        }
+        for (int i = 0; i < normalized.length(); i++) {
+            char c = normalized.charAt(i);
+            if (Character.isISOControl(c)) {
+                throw FlowValidationException.operatorIdentityInvalid("\\u" + Integer.toHexString(c));
+            }
+        }
+        return normalized;
     }
 
     /**

@@ -12,6 +12,7 @@ import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorKey;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.pojo.request.FlowReissueRequest;
 import com.codingapi.flow.record.FlowRecord;
@@ -158,7 +159,7 @@ public class FlowReissueService {
         if (StringUtils.hasText(sourceRecord.getWorkTitle())) {
             createRequest.setWorkTitle(sourceRecord.getWorkTitle());
         }
-        createRequest.setOperatorSelectMap(this.loadOperatorSelectMap(workflow, sourceRecord.getProcessId()));
+        createRequest.setOperatorSelectOperators(this.loadOperatorSelectOperators(workflow, sourceRecord.getProcessId()));
         return createRequest;
     }
 
@@ -175,20 +176,23 @@ public class FlowReissueService {
     }
 
     /**
-     * 复制源流程「发起人设定 / 审批人设定」节点的操作人分配，保证重走时人员设定与首次发起一致。
+     * 复制源流程「发起人设定 / 审批人设定」节点的操作人分配（含身份），保证重走时人员设定与首次发起一致。
+     *
+     * <p>身份必须一起复制：同一人员的两个身份是两项参与人，只复制 id 会让重走后的审批人退化到默认身份
+     * （issue #288 衍生 / #292）。
      */
-    private Map<String, List<Long>> loadOperatorSelectMap(Workflow workflow, String sourceProcessId) {
-        Map<String, List<Long>> operatorSelectMap = new HashMap<>();
+    private Map<String, List<OperatorKey>> loadOperatorSelectOperators(Workflow workflow, String sourceProcessId) {
+        Map<String, List<OperatorKey>> operatorSelectOperators = new HashMap<>();
         for (IFlowNode node : workflow.getNodes()) {
             OperatorLoadStrategy strategy = node.strategyManager().getStrategy(OperatorLoadStrategy.class);
             if (strategy == null || strategy.getSelectType() == OperatorSelectType.SCRIPT) {
                 continue;
             }
-            List<Long> operatorIds = repositoryHolder.findAssignedOperatorIds(sourceProcessId, node.getId());
-            if (operatorIds != null && !operatorIds.isEmpty()) {
-                operatorSelectMap.put(node.getId(), operatorIds);
+            List<OperatorKey> operators = repositoryHolder.findAssignedOperators(sourceProcessId, node.getId());
+            if (operators != null && !operators.isEmpty()) {
+                operatorSelectOperators.put(node.getId(), operators);
             }
         }
-        return operatorSelectMap;
+        return operatorSelectOperators;
     }
 }

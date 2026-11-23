@@ -133,4 +133,27 @@ public class FlowValidationException extends FlowException {
         return new FlowValidationException("validation.operator.countExceeded",
                 String.format("Selected operators for node '%s' exceed the max count %d", nodeId, maxOperatorCount));
     }
+
+    /**
+     * Operator identity exceeds the max length
+     *
+     * @param actualLength actual length
+     * @param maxLength    max length
+     * @return exception
+     */
+    public static FlowValidationException operatorIdentityTooLong(int actualLength, int maxLength) {
+        return new FlowValidationException("validation.operator.identity.tooLong",
+                String.format("Operator identity length %d exceeds the max length %d", actualLength, maxLength));
+    }
+
+    /**
+     * Operator identity contains an illegal character
+     *
+     * @param illegalCharacter illegal character description
+     * @return exception
+     */
+    public static FlowValidationException operatorIdentityInvalid(String illegalCharacter) {
+        return new FlowValidationException("validation.operator.identity.invalid",
+                String.format("Operator identity contains an illegal character: %s", illegalCharacter));
+    }
 }
