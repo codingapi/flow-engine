@@ -319,7 +319,8 @@ public class FlowContent {
                 continue;
             }
             operators.putIfAbsent(record.getCurrentOperatorId(),
-                    new FlowOperator(record.getCurrentOperatorId(), record.getCurrentOperatorName()));
+                    new FlowOperator(record.getCurrentOperatorId(), record.getCurrentOperatorName(),
+                            record.getCurrentOperatorIdentity()));
         }
         return List.copyOf(operators.values());
     }
@@ -336,7 +337,8 @@ public class FlowContent {
     public void pushRecords(FlowRecord record, List<FlowRecord> mergeRecords) {
         this.recordId = record.getId();
         this.processId = record.getProcessId();
-        this.createOperator = new FlowOperator(record.getCreateOperatorId(), record.getCreateOperatorName());
+        this.createOperator = new FlowOperator(record.getCreateOperatorId(), record.getCreateOperatorName(),
+                record.getCreateOperatorIdentity());
         this.mergeable = record.isTodo() && record.isMergeable();
         this.flowState = record.getFlowState();
         this.recordState = record.getRecordState();
@@ -352,8 +354,10 @@ public class FlowContent {
             body.setNodeId(item.getNodeId());
             body.setNodeName(item.getNodeName());
             body.setNodeType(item.getNodeType());
-            body.setSubmitOperator(new FlowOperator(item.getSubmitOperatorId(), item.getSubmitOperatorName()));
-            body.setCreatedOperator(new FlowOperator(item.getCreateOperatorId(), item.getCreateOperatorName()));
+            body.setSubmitOperator(new FlowOperator(item.getSubmitOperatorId(), item.getSubmitOperatorName(),
+                    item.getSubmitOperatorIdentity()));
+            body.setCreatedOperator(new FlowOperator(item.getCreateOperatorId(), item.getCreateOperatorName(),
+                    item.getCreateOperatorIdentity()));
             body.setTitle(item.getTitle());
             body.setData(item.getFormData());
             body.setRecordState(item.getRecordState());
@@ -376,7 +380,8 @@ public class FlowContent {
             history.setNodeId(item.getNodeId());
             history.setNodeType(item.getNodeType());
             history.setUpdateTime(item.getUpdateTime());
-            history.setCurrentOperator(new FlowOperator(item.getCurrentOperatorId(), item.getCurrentOperatorName()));
+            history.setCurrentOperator(new FlowOperator(item.getCurrentOperatorId(), item.getCurrentOperatorName(),
+                    item.getCurrentOperatorIdentity()));
             this.histories.add(history);
         }
     }

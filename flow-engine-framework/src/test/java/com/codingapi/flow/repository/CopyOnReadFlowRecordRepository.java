@@ -142,6 +142,11 @@ public class CopyOnReadFlowRecordRepository implements FlowRecordRepository {
                 record.getDelegateId(),
                 record.getParallelId(),
                 record.getParallelBranchNodeId(),
-                record.getParallelBranchTotal());
+                record.getParallelBranchTotal(),
+                record.getCreateOperatorIdentity(),
+                record.getSubmitOperatorIdentity(),
+                record.getCurrentOperatorIdentity(),
+                record.getForwardOperatorIdentity(),
+                record.getInterferedOperatorIdentity());
     }
 }

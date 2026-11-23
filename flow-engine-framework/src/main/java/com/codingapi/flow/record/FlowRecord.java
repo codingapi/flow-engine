@@ -9,6 +9,7 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.NotifyNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
@@ -267,6 +268,34 @@ public class FlowRecord {
     private int parallelBranchTotal;
 
     /**
+     * 发起者身份标识（issue #288）
+     * <p>框架不解释其语义，空串表示默认身份，与未启用多身份的历史数据完全一致。
+     *
+     * @see com.codingapi.flow.operator.OperatorIdentity
+     */
+    private String createOperatorIdentity;
+
+    /**
+     * 提交审批人身份标识（issue #288）
+     */
+    private String submitOperatorIdentity;
+
+    /**
+     * 当前审批人身份标识（issue #288）
+     */
+    private String currentOperatorIdentity;
+
+    /**
+     * 代替的审批人身份标识（issue #288）
+     */
+    private String forwardOperatorIdentity;
+
+    /**
+     * 被干预的用户身份标识（issue #288）
+     */
+    private String interferedOperatorIdentity;
+
+    /**
      * 数据合并的依据,当开启时值为固定值，否则为随机数据
      * <p>合并依据由 {@link RecordMergeStrategy.MergeType} 决定：
      * <ul>
@@ -326,12 +355,17 @@ public class FlowRecord {
         this.processId = FlowIDGeneratorGatewayContext.getInstance().generateProcessId();
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
         this.createOperatorName = flowSession.getCreatedOperator().getName();
+        this.createOperatorIdentity = OperatorIdentity.of(flowSession.getCreatedOperator());
+        // 身份字段统一以空串兜底，避免出现 null 与空串两种「默认身份」表达
+        this.forwardOperatorIdentity = OperatorIdentity.DEFAULT;
+        this.interferedOperatorIdentity = OperatorIdentity.DEFAULT;
         // 是否转交之后的人来审批的判断
         if (currentOperator.equals(sourceOperator)) {
             this.forwardOperatorId = 0;
         } else {
             this.forwardOperatorId = sourceOperator.getUserId();
             this.forwardOperatorName = sourceOperator.getName();
+            this.forwardOperatorIdentity = OperatorIdentity.of(sourceOperator);
         }
         this.recordState = SATE_RECORD_TODO;
         this.actionId = action.id();
@@ -340,9 +374,11 @@ public class FlowRecord {
 
         this.currentOperatorId = currentOperator.getUserId();
         this.currentOperatorName = currentOperator.getName();
+        this.currentOperatorIdentity = OperatorIdentity.of(currentOperator);
 
         this.submitOperatorId = flowSession.getSubmitOperatorId();
         this.submitOperatorName = flowSession.getSubmitOperatorName();
+        this.submitOperatorIdentity = OperatorIdentity.of(flowSession.getSubmitOperator());
 
         this.advice = flowSession.getAdvice().getAdvice();
         this.signKey = flowSession.getAdvice().getSignKey();
@@ -559,6 +595,7 @@ public class FlowRecord {
         if (flowSession.getCurrentOperator().getUserId() != this.currentOperatorId) {
             this.interferedOperatorId = flowSession.getCurrentOperator().getUserId();
             this.interferedOperatorName = flowSession.getCurrentOperator().getName();
+            this.interferedOperatorIdentity = OperatorIdentity.of(flowSession.getCurrentOperator());
         }
 
         if (flowAdvice != null) {
@@ -694,6 +731,7 @@ public class FlowRecord {
         FlowRecord flowRecord = new FlowRecord(flowSession, 0);
         flowRecord.currentOperatorId = flowSession.getCurrentOperator().getUserId();
         flowRecord.currentOperatorName = flowSession.getCurrentOperator().getName();
+        flowRecord.currentOperatorIdentity = OperatorIdentity.of(flowSession.getCurrentOperator());
         return flowRecord;
     }
 

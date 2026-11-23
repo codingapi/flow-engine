@@ -1,5 +1,6 @@
 package com.codingapi.flow.record;
 
+import com.codingapi.flow.operator.OperatorIdentity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -120,6 +121,24 @@ public class FlowTodoRecord {
      */
     private long timeoutTime;
 
+    /**
+     * 当前审批人身份标识（issue #288）
+     * <p>框架不解释其语义，空串表示默认身份，与未启用多身份的历史数据完全一致。
+     *
+     * @see com.codingapi.flow.operator.OperatorIdentity
+     */
+    private String currentOperatorIdentity;
+
+    /**
+     * 提交审批人身份标识（issue #288）
+     */
+    private String submitOperatorIdentity;
+
+    /**
+     * 发起者身份标识（issue #288）
+     */
+    private String createOperatorIdentity;
+
 
     public FlowTodoRecord(FlowRecord flowRecord) {
         this.update(flowRecord);
@@ -144,6 +163,9 @@ public class FlowTodoRecord {
         this.createTime = flowRecord.getCreateTime();
         this.createOperatorId = flowRecord.getCreateOperatorId();
         this.createOperatorName = flowRecord.getCreateOperatorName();
+        this.currentOperatorIdentity = OperatorIdentity.normalize(flowRecord.getCurrentOperatorIdentity());
+        this.submitOperatorIdentity = OperatorIdentity.normalize(flowRecord.getSubmitOperatorIdentity());
+        this.createOperatorIdentity = OperatorIdentity.normalize(flowRecord.getCreateOperatorIdentity());
         this.todoKey = flowRecord.getTodoKey();
         this.mergeable = flowRecord.isMergeable();
         this.recordId = flowRecord.getId();
