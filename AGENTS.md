@@ -4,7 +4,7 @@
 
 ## 项目概述
 
-Flow Engine 是一个企业级工作流引擎，基于 Java 17 和 Spring Boot 3.5.9 构建（当前版本 0.1.0-SNAPSHOT）。
+Flow Engine 是一个企业级工作流引擎，基于 Java 17 和 Spring Boot 3.5.9 构建（当前版本 0.3.0-SNAPSHOT）。
 
 ### 核心模块
 
