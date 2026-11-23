@@ -87,8 +87,9 @@ public class StartNode extends BaseFlowNode implements IDisplayNode {
             session.setCurrentRecord(flowRecord);
             records.add(flowRecord);
         } else {
-            // 获取流程创建者
-            IFlowOperator creatorOperator = GatewayContext.getInstance().getFlowOperator(currentRecord.getCreateOperatorId());
+            // 获取流程创建者（按记录中的身份回查，issue #288）
+            IFlowOperator creatorOperator = GatewayContext.getInstance()
+                    .getFlowOperator(currentRecord.getCreateOperatorId(), currentRecord.getCreateOperatorIdentity());
             FlowRecord flowRecord = new FlowRecord(session.updateSession(creatorOperator), 0);
             // 异常跳转或退回到开始节点时生成的是一条新的待办，尚未执行任何审批动作，
             // 不能继承触发该跳转的上游审批意见、签名及 PASS/RETURN 等动作信息。

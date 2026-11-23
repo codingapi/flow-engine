@@ -20,6 +20,7 @@ import com.codingapi.flow.operator.IFlowOperator;
 import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.pojo.response.NodeOption;
 import com.codingapi.flow.record.FlowRecord;
+import com.codingapi.flow.service.impl.OperatorAssignmentService;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
 import com.codingapi.flow.strategy.node.MultiOperatorAuditStrategy;
@@ -110,8 +111,8 @@ public class PassAction extends BaseAction {
         }
 
         // 检查操作人选择：若存在需要手动设定操作人的节点且尚未设定，则提示用户
+        // 判定统一交给 OperatorAssignmentService，兼容存量 map / 含身份的新字段 / 已落库的分配
         List<NodeOption> operatorSelectNodes = new ArrayList<>();
-        Map<String, List<Long>> operatorSelectMap = flowSession.getAdvice().getOperatorSelectMap();
         if (currentNode.getType().equalsIgnoreCase(StartNode.NODE_TYPE)) {
             // 发起人设定模式：开始节点提交时，扫描整个工作流中所有 INITIATOR_SELECT 节点
             operatorSelectNodes.addAll(this.loadInitiatorSelectNodes(flowSession));
@@ -121,14 +122,14 @@ public class PassAction extends BaseAction {
             // 只判断直接下游节点会漏掉分支内的 APPROVER_SELECT 节点（issue #259）
             if (nextNodes != null) {
                 for (IFlowNode nextNode : nextNodes) {
-                    collectApproverSelectNodes(flowSession, nextNode, operatorSelectMap, operatorSelectNodes);
+                    collectApproverSelectNodes(flowSession, nextNode, operatorSelectNodes);
                 }
             }
         } else {
             // 审批人设定模式：审批节点提交时，检查下游节点是否有 APPROVER_SELECT
             if (nextNodes != null) {
                 for (IFlowNode nextNode : nextNodes) {
-                    collectApproverSelectNodes(flowSession, nextNode, operatorSelectMap, operatorSelectNodes);
+                    collectApproverSelectNodes(flowSession, nextNode, operatorSelectNodes);
                 }
             }
         }
@@ -203,7 +204,8 @@ public class PassAction extends BaseAction {
 
         // 是否转交审批人的流程
         if (isFinish && currentRecord.isForward()) {
-            IFlowOperator forwardOperator = repositoryHolder.getOperatorById(currentRecord.getForwardOperatorId());
+            IFlowOperator forwardOperator = repositoryHolder.getOperatorById(
+                    currentRecord.getForwardOperatorId(), currentRecord.getForwardOperatorIdentity());
             FlowRecord notifyRecord = currentRecord.create(flowSession.updateSession(forwardOperator));
             notifyRecord.notifyRecord(flowSession.updateSession(forwardOperator));
             // 如果不存储这个记录，若下一流程是结束流程时，无法更新流程状态为结束状态。
@@ -215,7 +217,8 @@ public class PassAction extends BaseAction {
         // 多人审批时其他待办可能尚未完成，若只在 isFinish 时返回，委派记录会永久滞留（issue #239）
         if (currentRecord.isDelegate()) {
             FlowRecord delegateRecord = repositoryHolder.getRecordById(currentRecord.getDelegateId());
-            IFlowOperator delegateOperator = repositoryHolder.getOperatorById(delegateRecord.getCurrentOperatorId());
+            IFlowOperator delegateOperator = repositoryHolder.getOperatorById(
+                    delegateRecord.getCurrentOperatorId(), delegateRecord.getCurrentOperatorIdentity());
             FlowRecord rebackRecord = delegateRecord.create(flowSession.updateSession(delegateOperator));
             // 返回记录同样归属原委托记录的节点实例与审批槽位（issue #239）
             rebackRecord.inheritNodeInstance(delegateRecord);
@@ -259,11 +262,11 @@ public class PassAction extends BaseAction {
      *     分支内的后续节点由该分支上前一个节点提交时再提示</li>
      * </ul>
      */
-    private void collectApproverSelectNodes(FlowSession flowSession, IFlowNode node, Map<String, List<Long>> operatorSelectMap, List<NodeOption> result) {
+    private void collectApproverSelectNodes(FlowSession flowSession, IFlowNode node, List<NodeOption> result) {
         OperatorSelectType selectType = node.strategyManager().getOperatorSelectType();
         if (selectType == OperatorSelectType.APPROVER_SELECT) {
-            if (operatorSelectMap == null || !operatorSelectMap.containsKey(node.getId())
-                    || operatorSelectMap.get(node.getId()).isEmpty()) {
+            // 兼容存量 map、含身份的新字段，以及发起时已落库的分配（issue #288 衍生 / #292）
+            if (!OperatorAssignmentService.hasAssignment(flowSession, node.getId())) {
                 List<IFlowOperator> range = node.strategyManager()
                         .loadOperatorRange(flowSession.updateSession(node));
                 result.add(new NodeOption(node, range));
@@ -281,12 +284,12 @@ public class PassAction extends BaseAction {
                 blocks = blocks.get(0).filterBranches(blocks, flowSession);
             }
             for (IFlowNode block : blocks) {
-                collectApproverSelectNodes(flowSession, block, operatorSelectMap, result);
+                collectApproverSelectNodes(flowSession, block, result);
             }
         } else if (nodeState.isBranchNode()) {
             // 分支节点：仅检查分支的首个节点，分支内后续节点由前序节点提交时再提示（issue #231）
             for (IFlowNode firstNode : nodeState.getFirstBlocks()) {
-                collectApproverSelectNodes(flowSession, firstNode, operatorSelectMap, result);
+                collectApproverSelectNodes(flowSession, firstNode, result);
             }
         }
     }

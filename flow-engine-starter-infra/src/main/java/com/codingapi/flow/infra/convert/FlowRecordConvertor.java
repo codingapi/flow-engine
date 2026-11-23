@@ -2,6 +2,7 @@ package com.codingapi.flow.infra.convert;
 
 import com.codingapi.flow.infra.entity.FlowRecordEntity;
 import com.codingapi.flow.infra.entity.convert.MapConvertor;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.strategy.node.RecordMergeStrategy;
 
@@ -61,7 +62,13 @@ public class FlowRecordConvertor {
                 entity.getDelegateId(),
                 entity.getParallelId(),
                 entity.getParallelBranchNodeId(),
-                entity.getParallelBranchTotal());
+                entity.getParallelBranchTotal(),
+                // issue #288：历史数据 identity 列为 null，读取时统一归一化为默认身份
+                OperatorIdentity.normalize(entity.getCreateOperatorIdentity()),
+                OperatorIdentity.normalize(entity.getSubmitOperatorIdentity()),
+                OperatorIdentity.normalize(entity.getCurrentOperatorIdentity()),
+                OperatorIdentity.normalize(entity.getForwardOperatorIdentity()),
+                OperatorIdentity.normalize(entity.getInterferedOperatorIdentity()));
     }
 
     public static FlowRecordEntity convert(FlowRecord record) {
@@ -120,6 +127,12 @@ public class FlowRecordConvertor {
         entity.setParallelId(record.getParallelId());
         entity.setParallelBranchNodeId(record.getParallelBranchNodeId());
         entity.setParallelBranchTotal(record.getParallelBranchTotal());
+        // 写入前统一校验：长度与 DDL 列宽一致、禁止合并键分隔符与控制字符（issue #288 衍生 / #294）
+        entity.setCreateOperatorIdentity(OperatorIdentity.validate(record.getCreateOperatorIdentity()));
+        entity.setSubmitOperatorIdentity(OperatorIdentity.validate(record.getSubmitOperatorIdentity()));
+        entity.setCurrentOperatorIdentity(OperatorIdentity.validate(record.getCurrentOperatorIdentity()));
+        entity.setForwardOperatorIdentity(OperatorIdentity.validate(record.getForwardOperatorIdentity()));
+        entity.setInterferedOperatorIdentity(OperatorIdentity.validate(record.getInterferedOperatorIdentity()));
         return entity;
     }
 

@@ -28,6 +28,11 @@ public class FlowReissueRequest {
     private long operatorId;
 
     /**
+     * 操作者身份标识（issue #288），为空表示默认身份
+     */
+    private String operatorIdentity;
+
+    /**
      * 二次发起时使用的表单数据；为空时按源流程记录的表单数据复制
      */
     private Map<String, Object> formData;

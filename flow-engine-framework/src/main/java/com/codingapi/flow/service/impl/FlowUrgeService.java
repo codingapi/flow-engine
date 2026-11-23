@@ -11,6 +11,7 @@ import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.manager.WorkflowStrategyManager;
 import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.pojo.request.FlowUrgeRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.service.FlowRecordService;
@@ -61,7 +62,8 @@ public class FlowUrgeService {
         }
 
         long currentOperatorId = currentRecord.getCurrentOperatorId();
-        if (currentOperatorId != request.getOperatorId()) {
+        if (currentOperatorId != request.getOperatorId()
+                || !OperatorIdentity.same(currentRecord.getCurrentOperatorIdentity(), request.getOperatorIdentity())) {
             throw FlowStateException.operatorNotMatch();
         }
 
@@ -79,7 +81,7 @@ public class FlowUrgeService {
             }
         }
 
-        IFlowOperator currentOperator = flowOperatorGateway.get(currentOperatorId);
+        IFlowOperator currentOperator = flowOperatorGateway.get(currentOperatorId, request.getOperatorIdentity());
 
         List<FlowRecord> todoRecords = flowRecordService.findFlowRecordTodoRecords(currentRecord.getProcessId());
         // 保存催办记录

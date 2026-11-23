@@ -4,6 +4,7 @@ import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.mock.MockInstance;
 import com.codingapi.flow.mock.MockInstanceFactory;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.pojo.response.FlowRecordContent;
 import com.codingapi.flow.query.FlowRecordQueryService;
 import com.codingapi.flow.query.pojo.FlowInstanceQueryRequest;
@@ -53,6 +54,23 @@ public class FlowRecordQueryController {
         }
     }
 
+    /**
+     * 当前操作人身份标识（issue #288）。
+     *
+     * <p>优先取请求参数 {@code operatorIdentity}（宿主可通过它声明「我以哪个身份查看」），
+     * 其次取当前登录操作者自身的身份，都为空时表示默认身份。
+     */
+    private String loadCurrentOperatorIdentity(){
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+        String key = request.getParameter("operatorIdentity");
+        if(request.getParameterMap().containsKey("operatorIdentity")) {
+            return OperatorIdentity.normalize(key);
+        }
+        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
+        return current == null ? OperatorIdentity.DEFAULT : OperatorIdentity.of(current);
+    }
+
 
     /**
      * 全部流程记录接口
@@ -71,9 +89,10 @@ public class FlowRecordQueryController {
     @GetMapping("/todo")
     public MultiResponse<FlowRecordContent> todo(SearchRequest request) {
         long operatorId = loadCurrentOperatorId();
+        String operatorIdentity = loadCurrentOperatorIdentity();
         FlowRecordQueryService flowRecordQueryService = loadFlowService();
         PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize()).withSort(Sort.by("id").descending());
-        return MultiResponse.of(flowRecordQueryService.findTodoRecordPage(operatorId,pageRequest));
+        return MultiResponse.of(flowRecordQueryService.findTodoRecordPage(operatorId,operatorIdentity,pageRequest));
     }
 
     /**
@@ -82,9 +101,10 @@ public class FlowRecordQueryController {
     @GetMapping("/notify")
     public MultiResponse<FlowRecordContent> notify(SearchRequest request) {
         long operatorId = loadCurrentOperatorId();
+        String operatorIdentity = loadCurrentOperatorIdentity();
         FlowRecordQueryService flowRecordQueryService = loadFlowService();
         PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize()).withSort(Sort.by("id").descending());
-        return MultiResponse.of(flowRecordQueryService.findNotifyRecordPage(operatorId,pageRequest));
+        return MultiResponse.of(flowRecordQueryService.findNotifyRecordPage(operatorId,operatorIdentity,pageRequest));
     }
 
 
@@ -94,9 +114,10 @@ public class FlowRecordQueryController {
     @GetMapping("/done")
     public MultiResponse<FlowRecordContent> done(SearchRequest request) {
         long operatorId = loadCurrentOperatorId();
+        String operatorIdentity = loadCurrentOperatorIdentity();
         FlowRecordQueryService flowRecordQueryService = loadFlowService();
         PageRequest pageRequest = PageRequest.of(request.getCurrent(), request.getPageSize()).withSort(Sort.by("id").descending());
-        return MultiResponse.of(flowRecordQueryService.findDoneRecordPage(operatorId,pageRequest));
+        return MultiResponse.of(flowRecordQueryService.findDoneRecordPage(operatorId,operatorIdentity,pageRequest));
     }
 
     /**

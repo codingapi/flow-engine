@@ -1,6 +1,7 @@
 package com.codingapi.flow.infra.convert;
 
 import com.codingapi.flow.infra.entity.FlowTodoRecordEntity;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.record.FlowTodoRecord;
 
 public class FlowTodoRecordConvertor {
@@ -31,7 +32,11 @@ public class FlowTodoRecordConvertor {
                 entity.getMargeCount(),
                 entity.getMergeable(),
                 entity.getRecordId(),
-                entity.getTimeoutTime()
+                entity.getTimeoutTime(),
+                // issue #288：历史数据 identity 列为 null，读取时统一归一化为默认身份
+                OperatorIdentity.normalize(entity.getCurrentOperatorIdentity()),
+                OperatorIdentity.normalize(entity.getSubmitOperatorIdentity()),
+                OperatorIdentity.normalize(entity.getCreateOperatorIdentity())
         );
     }
 
@@ -66,6 +71,10 @@ public class FlowTodoRecordConvertor {
         entity.setMergeable(record.isMergeable());
         entity.setRecordId(record.getRecordId());
         entity.setTimeoutTime(record.getTimeoutTime());
+        // 写入前统一校验：长度与 DDL 列宽一致、禁止合并键分隔符与控制字符（issue #288 衍生 / #294）
+        entity.setCurrentOperatorIdentity(OperatorIdentity.validate(record.getCurrentOperatorIdentity()));
+        entity.setSubmitOperatorIdentity(OperatorIdentity.validate(record.getSubmitOperatorIdentity()));
+        entity.setCreateOperatorIdentity(OperatorIdentity.validate(record.getCreateOperatorIdentity()));
         return entity;
     }
 }

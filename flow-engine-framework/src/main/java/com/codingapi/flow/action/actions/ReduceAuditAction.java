@@ -13,6 +13,7 @@ import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.node.BaseAuditNode;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.script.node.OperatorLoadScript;
 import com.codingapi.flow.session.FlowSession;
@@ -170,12 +171,17 @@ public class ReduceAuditAction extends BaseAction {
         List<FlowRecord> targetRecords = new ArrayList<>();
         for (IFlowOperator target : targets) {
             long targetOperatorId = target.getUserId();
-            if (targetOperatorId == currentRecord.getCurrentOperatorId()) {
+            String targetOperatorIdentity = OperatorIdentity.of(target);
+            // 自己不能被自己减签：按 (userId, identity) 判断，避免把另一身份的待办当成自己的
+            if (targetOperatorId == currentRecord.getCurrentOperatorId()
+                    && OperatorIdentity.same(targetOperatorIdentity, currentRecord.getCurrentOperatorIdentity())) {
                 throw FlowExecutionException.reduceAuditOwnRecord();
             }
+            // 减签按「人 + 身份」生效：同一人员的另一个身份仍然是独立参与人，不能被顺带撤销
             List<FlowRecord> matchedRecords = currentNodeRecords.stream()
                     .filter(FlowRecord::isPendingApproval)
-                    .filter(record -> record.getCurrentOperatorId() == targetOperatorId)
+                    .filter(record -> record.getCurrentOperatorId() == targetOperatorId
+                            && OperatorIdentity.same(record.getCurrentOperatorIdentity(), targetOperatorIdentity))
                     .toList();
             if (matchedRecords.isEmpty()) {
                 throw FlowExecutionException.reduceAuditTargetNotFound(targetOperatorId);

@@ -29,6 +29,11 @@ public class FlowSubProcessResetRequest {
     private long operatorId;
 
     /**
+     * 操作者身份标识（issue #288），为空表示默认身份
+     */
+    private String operatorIdentity;
+
+    /**
      * 选中重建的子流程实例流程id列表（须同属一个已完成聚合组，且非空）
      */
     private List<String> resetInstanceProcessIds;

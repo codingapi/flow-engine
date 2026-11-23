@@ -67,6 +67,18 @@ public class FlowRecordQueryMockService implements FlowRecordQueryService {
         return this.toPage(recordList, request);
     }
 
+    /**
+     * 按 {@code (审批人, 身份)} 查询待办（issue #288 衍生 / #291）。
+     *
+     * <p>Mock 链路与真实 JPA 链路必须口径一致，否则带 {@code mockKey} 的前端联调会看到串味数据。
+     */
+    @Override
+    public Page<FlowRecordContent> findTodoRecordPage(long userId, String identity, PageRequest request) {
+        FlowTodoRecordRepositoryMockImpl flowTodoRecordRepositoryMock = (FlowTodoRecordRepositoryMockImpl) mockRepositoryHolder.getFlowTodoRecordRepository();
+        List<FlowRecordContent> recordList = flowTodoRecordRepositoryMock.findByOperatorId(userId, identity).stream().map(FlowRecordContent::convert).toList();
+        return this.toPage(recordList, request);
+    }
+
     @Override
     public Page<FlowRecordContent> findNotifyRecordPage(long userId, PageRequest request) {
         FlowRecordRepositoryMockImpl flowRecordRepositoryMock = (FlowRecordRepositoryMockImpl) mockRepositoryHolder.getFlowRecordRepository();
@@ -74,10 +86,30 @@ public class FlowRecordQueryMockService implements FlowRecordQueryService {
         return toPage(recordList, request);
     }
 
+    /**
+     * 按 {@code (审批人, 身份)} 查询抄送（issue #288 衍生 / #291）。
+     */
+    @Override
+    public Page<FlowRecordContent> findNotifyRecordPage(long userId, String identity, PageRequest request) {
+        FlowRecordRepositoryMockImpl flowRecordRepositoryMock = (FlowRecordRepositoryMockImpl) mockRepositoryHolder.getFlowRecordRepository();
+        List<FlowRecordContent> recordList = flowRecordRepositoryMock.findNotifyByOperator(userId, identity).stream().map(FlowRecordContent::convert).toList();
+        return toPage(recordList, request);
+    }
+
     @Override
     public Page<FlowRecordContent> findDoneRecordPage(long userId, PageRequest request) {
         FlowRecordRepositoryMockImpl flowRecordRepositoryMock = (FlowRecordRepositoryMockImpl) mockRepositoryHolder.getFlowRecordRepository();
         List<FlowRecordContent> recordList = flowRecordRepositoryMock.findDoneByOperator(userId).stream().map(FlowRecordContent::convert).toList();
+        return toPage(recordList, request);
+    }
+
+    /**
+     * 按 {@code (审批人, 身份)} 查询已办（issue #288 衍生 / #291）。
+     */
+    @Override
+    public Page<FlowRecordContent> findDoneRecordPage(long userId, String identity, PageRequest request) {
+        FlowRecordRepositoryMockImpl flowRecordRepositoryMock = (FlowRecordRepositoryMockImpl) mockRepositoryHolder.getFlowRecordRepository();
+        List<FlowRecordContent> recordList = flowRecordRepositoryMock.findDoneByOperator(userId, identity).stream().map(FlowRecordContent::convert).toList();
         return toPage(recordList, request);
     }
 

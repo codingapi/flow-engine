@@ -6,6 +6,7 @@ import com.codingapi.flow.domain.UrgeInterval;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.mock.repository.*;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorKey;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.*;
 import com.codingapi.flow.service.FlowRecordService;
@@ -39,7 +40,7 @@ public class MockRepositoryHolder implements IRepositoryHolder {
     private final FlowOperatorGateway flowOperatorGateway;
     private final SubProcessRepository subProcessRepository;
     private final FlowReissueRepository flowReissueRepository;
-    private final Map<String, List<Long>> operatorAssignmentCache = new HashMap<>();
+    private final Map<String, List<OperatorKey>> operatorAssignmentCache = new HashMap<>();
 
     public MockRepositoryHolder(FlowOperatorGateway flowOperatorGateway,
                                 WorkflowRepository workflowRepository) {
@@ -78,8 +79,18 @@ public class MockRepositoryHolder implements IRepositoryHolder {
             }
 
             @Override
+            public IFlowOperator get(long id, String identity) {
+                return GatewayContext.getInstance().getFlowOperator(id, identity);
+            }
+
+            @Override
             public List<IFlowOperator> findByIds(List<Long> ids) {
                 return GatewayContext.getInstance().findByIds(ids);
+            }
+
+            @Override
+            public List<IFlowOperator> findByIds(List<Long> ids, String identity) {
+                return GatewayContext.getInstance().findByIds(ids, identity);
             }
         };
     }
@@ -110,8 +121,18 @@ public class MockRepositoryHolder implements IRepositoryHolder {
     }
 
     @Override
+    public List<IFlowOperator> findOperatorByIds(List<Long> ids, String identity) {
+        return this.flowOperatorGateway.findByIds(ids, identity);
+    }
+
+    @Override
     public IFlowOperator getOperatorById(long id) {
         return this.flowOperatorGateway.get(id);
+    }
+
+    @Override
+    public IFlowOperator getOperatorById(long id, String identity) {
+        return this.flowOperatorGateway.get(id, identity);
     }
 
     @Override
@@ -181,11 +202,22 @@ public class MockRepositoryHolder implements IRepositoryHolder {
 
     @Override
     public void saveOperatorAssignment(String processId, String nodeId, List<Long> operatorIds) {
-        operatorAssignmentCache.put(processId + ":" + nodeId, new ArrayList<>(operatorIds));
+        this.saveOperatorAssignments(processId, nodeId,
+                operatorIds.stream().map(OperatorKey::ofDefault).toList());
+    }
+
+    @Override
+    public void saveOperatorAssignments(String processId, String nodeId, List<OperatorKey> operators) {
+        operatorAssignmentCache.put(processId + ":" + nodeId, new ArrayList<>(operators));
     }
 
     @Override
     public List<Long> findAssignedOperatorIds(String processId, String nodeId) {
+        return this.findAssignedOperators(processId, nodeId).stream().map(OperatorKey::operatorId).toList();
+    }
+
+    @Override
+    public List<OperatorKey> findAssignedOperators(String processId, String nodeId) {
         return operatorAssignmentCache.getOrDefault(processId + ":" + nodeId, Collections.emptyList());
     }
 }

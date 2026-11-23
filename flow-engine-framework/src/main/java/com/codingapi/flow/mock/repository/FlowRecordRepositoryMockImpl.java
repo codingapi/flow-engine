@@ -1,5 +1,6 @@
 package com.codingapi.flow.mock.repository;
 
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowRecordRepository;
 
@@ -40,6 +41,32 @@ public class FlowRecordRepositoryMockImpl implements FlowRecordRepository {
     public List<FlowRecord> findNotifyByOperator(long operatorId) {
         // 与 JPA 口径一致：抄送列表过滤已作废与隐藏记录
         return cache.values().stream().filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId && flowRecord.isNotify() && !flowRecord.isRevoked() && !flowRecord.isHidden()).toList();
+    }
+
+    /**
+     * 按 {@code (审批人, 身份)} 查询已办（issue #288 衍生 / #291），口径与 JPA 一致。
+     */
+    public List<FlowRecord> findDoneByOperator(long operatorId, String identity) {
+        String normalized = OperatorIdentity.normalize(identity);
+        return cache.values().stream()
+                .filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId
+                        && flowRecord.isDone()
+                        && OperatorIdentity.same(flowRecord.getCurrentOperatorIdentity(), normalized))
+                .toList();
+    }
+
+    /**
+     * 按 {@code (审批人, 身份)} 查询抄送（issue #288 衍生 / #291），口径与 JPA 一致。
+     */
+    public List<FlowRecord> findNotifyByOperator(long operatorId, String identity) {
+        String normalized = OperatorIdentity.normalize(identity);
+        return cache.values().stream()
+                .filter(flowRecord -> flowRecord.getCurrentOperatorId() == operatorId
+                        && flowRecord.isNotify()
+                        && !flowRecord.isRevoked()
+                        && !flowRecord.isHidden()
+                        && OperatorIdentity.same(flowRecord.getCurrentOperatorIdentity(), normalized))
+                .toList();
     }
 
 

@@ -12,6 +12,7 @@ import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.StartNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorKey;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.pojo.request.FlowReissueRequest;
 import com.codingapi.flow.record.FlowRecord;
@@ -84,7 +85,7 @@ public class FlowReissueService {
             throw FlowNotFoundException.record(request.getSourceRecordId());
         }
 
-        IFlowOperator operator = repositoryHolder.getOperatorById(request.getOperatorId());
+        IFlowOperator operator = repositoryHolder.getOperatorById(request.getOperatorId(), request.getOperatorIdentity());
         if (operator == null) {
             throw FlowNotFoundException.operator(request.getOperatorId());
         }
@@ -104,7 +105,7 @@ public class FlowReissueService {
 
         // 新流程沿用源流程的发起人，二次发起后的待办回到发起人，由发起人调整数据后重新提交
         long initiatorId = sourceRecord.getCreateOperatorId();
-        if (repositoryHolder.getOperatorById(initiatorId) == null) {
+        if (repositoryHolder.getOperatorById(initiatorId, sourceRecord.getCreateOperatorIdentity()) == null) {
             throw FlowNotFoundException.operator(initiatorId);
         }
 
@@ -151,12 +152,14 @@ public class FlowReissueService {
         createRequest.setWorkCode(workflow.getCode());
         createRequest.setActionId(action.id());
         createRequest.setOperatorId(sourceRecord.getCreateOperatorId());
+        // 沿用源流程发起人的身份，保证二次发起后的参与人与源流程一致（issue #288）
+        createRequest.setOperatorIdentity(sourceRecord.getCreateOperatorIdentity());
         createRequest.setFormData(this.loadFormData(sourceRecord));
         // 沿用源流程的自定义标题（如子流程实例区分标题），保持重发前后的业务标识一致
         if (StringUtils.hasText(sourceRecord.getWorkTitle())) {
             createRequest.setWorkTitle(sourceRecord.getWorkTitle());
         }
-        createRequest.setOperatorSelectMap(this.loadOperatorSelectMap(workflow, sourceRecord.getProcessId()));
+        createRequest.setOperatorSelectOperators(this.loadOperatorSelectOperators(workflow, sourceRecord.getProcessId()));
         return createRequest;
     }
 
@@ -173,20 +176,23 @@ public class FlowReissueService {
     }
 
     /**
-     * 复制源流程「发起人设定 / 审批人设定」节点的操作人分配，保证重走时人员设定与首次发起一致。
+     * 复制源流程「发起人设定 / 审批人设定」节点的操作人分配（含身份），保证重走时人员设定与首次发起一致。
+     *
+     * <p>身份必须一起复制：同一人员的两个身份是两项参与人，只复制 id 会让重走后的审批人退化到默认身份
+     * （issue #288 衍生 / #292）。
      */
-    private Map<String, List<Long>> loadOperatorSelectMap(Workflow workflow, String sourceProcessId) {
-        Map<String, List<Long>> operatorSelectMap = new HashMap<>();
+    private Map<String, List<OperatorKey>> loadOperatorSelectOperators(Workflow workflow, String sourceProcessId) {
+        Map<String, List<OperatorKey>> operatorSelectOperators = new HashMap<>();
         for (IFlowNode node : workflow.getNodes()) {
             OperatorLoadStrategy strategy = node.strategyManager().getStrategy(OperatorLoadStrategy.class);
             if (strategy == null || strategy.getSelectType() == OperatorSelectType.SCRIPT) {
                 continue;
             }
-            List<Long> operatorIds = repositoryHolder.findAssignedOperatorIds(sourceProcessId, node.getId());
-            if (operatorIds != null && !operatorIds.isEmpty()) {
-                operatorSelectMap.put(node.getId(), operatorIds);
+            List<OperatorKey> operators = repositoryHolder.findAssignedOperators(sourceProcessId, node.getId());
+            if (operators != null && !operators.isEmpty()) {
+                operatorSelectOperators.put(node.getId(), operators);
             }
         }
-        return operatorSelectMap;
+        return operatorSelectOperators;
     }
 }

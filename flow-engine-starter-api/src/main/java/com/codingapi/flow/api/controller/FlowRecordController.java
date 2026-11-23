@@ -3,6 +3,7 @@ package com.codingapi.flow.api.controller;
 import com.codingapi.flow.mock.MockInstance;
 import com.codingapi.flow.mock.MockInstanceFactory;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.pojo.request.*;
 import com.codingapi.flow.pojo.response.ActionResponse;
 import com.codingapi.flow.pojo.response.FlowContent;
@@ -53,27 +54,45 @@ public class FlowRecordController {
         }
     }
 
+    /**
+     * 当前操作人的身份标识（issue #288）。
+     *
+     * <p>与 {@link #loadCurrentOperatorId()} 对称：优先取请求参数 {@code operatorIdentity}，
+     * 其次取当前登录操作者自身的身份。身份是会话级信息，因此统一在这里解析后注入各请求对象，
+     * 避免每个接口各自解析导致行为不一致。
+     */
+    private String loadCurrentOperatorIdentity() {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        HttpServletRequest request = attributes.getRequest();
+        if (request.getParameterMap().containsKey("operatorIdentity")) {
+            return OperatorIdentity.normalize(request.getParameter("operatorIdentity"));
+        }
+        IFlowOperator current = (IFlowOperator) UserContext.getInstance().current();
+        return current == null ? OperatorIdentity.DEFAULT : OperatorIdentity.of(current);
+    }
+
     @GetMapping("/detail")
     public SingleResponse<FlowContent> detail(IdRequest idRequest) {
         FlowService flowService = this.loadFlowService();
         long operatorId = loadCurrentOperatorId();
-        return SingleResponse.of(flowService.detail(new FlowDetailRequest(idRequest.getStringId(), operatorId)));
+        return SingleResponse.of(flowService.detail(
+                new FlowDetailRequest(idRequest.getStringId(), operatorId, loadCurrentOperatorIdentity())));
     }
 
 
     @PostMapping("/processNodes")
     public MultiResponse<ProcessNode> processNodes(@RequestBody FlowProcessNodeRequest request) {
         FlowService flowService = this.loadFlowService();
-        long operatorId = loadCurrentOperatorId();
-        request.setOperatorId(operatorId);
+        request.setOperatorId(loadCurrentOperatorId());
+        request.setOperatorIdentity(loadCurrentOperatorIdentity());
         return MultiResponse.of(flowService.processNodes(request));
     }
 
     @PostMapping("/create")
     public SingleResponse<Long> create(@RequestBody FlowCreateRequest request) {
         FlowService flowService = this.loadFlowService();
-        long operatorId = loadCurrentOperatorId();
-        request.setOperatorId(operatorId);
+        request.setOperatorId(loadCurrentOperatorId());
+        request.setOperatorIdentity(loadCurrentOperatorIdentity());
         return SingleResponse.of(flowService.create(request));
     }
 
@@ -82,7 +101,7 @@ public class FlowRecordController {
     public Response urge(@RequestBody IdRequest request) {
         FlowService flowService = this.loadFlowService();
         long operatorId = loadCurrentOperatorId();
-        flowService.urge(new FlowUrgeRequest(request.getLongId(), operatorId));
+        flowService.urge(new FlowUrgeRequest(request.getLongId(), operatorId, loadCurrentOperatorIdentity()));
         return Response.buildSuccess();
     }
 
@@ -90,7 +109,7 @@ public class FlowRecordController {
     public Response revoke(@RequestBody IdRequest request) {
         FlowService flowService = this.loadFlowService();
         long operatorId = loadCurrentOperatorId();
-        flowService.revoke(new FlowRevokeRequest(request.getLongId(), operatorId));
+        flowService.revoke(new FlowRevokeRequest(request.getLongId(), operatorId, loadCurrentOperatorIdentity()));
         return Response.buildSuccess();
     }
 
@@ -99,7 +118,7 @@ public class FlowRecordController {
     public Response delete(@RequestBody IdRequest request) {
         FlowService flowService = this.loadFlowService();
         long operatorId = loadCurrentOperatorId();
-        flowService.delete(new FlowDeleteRequest(request.getLongId(), operatorId));
+        flowService.delete(new FlowDeleteRequest(request.getLongId(), operatorId, loadCurrentOperatorIdentity()));
         return Response.buildSuccess();
     }
 
@@ -107,8 +126,8 @@ public class FlowRecordController {
     @PostMapping("/action")
     public SingleResponse<ActionResponse> action(@RequestBody FlowActionRequest request) {
         FlowService flowService = this.loadFlowService();
-        long operatorId = loadCurrentOperatorId();
-        request.updateOperatorId(operatorId);
+        request.updateOperatorId(loadCurrentOperatorId());
+        request.updateOperatorIdentity(loadCurrentOperatorIdentity());
         ActionResponse response = flowService.action(request);
         return SingleResponse.of(response);
     }
@@ -121,8 +140,8 @@ public class FlowRecordController {
     @PostMapping("/subProcess/reset")
     public Response resetSubProcess(@RequestBody FlowSubProcessResetRequest request) {
         FlowService flowService = this.loadFlowService();
-        long operatorId = loadCurrentOperatorId();
-        request.setOperatorId(operatorId);
+        request.setOperatorId(loadCurrentOperatorId());
+        request.setOperatorIdentity(loadCurrentOperatorIdentity());
         flowService.resetSubProcess(request);
         return Response.buildSuccess();
     }
@@ -135,8 +154,8 @@ public class FlowRecordController {
     @PostMapping("/reissue")
     public SingleResponse<Long> reissue(@RequestBody FlowReissueRequest request) {
         FlowService flowService = this.loadFlowService();
-        long operatorId = loadCurrentOperatorId();
-        request.setOperatorId(operatorId);
+        request.setOperatorId(loadCurrentOperatorId());
+        request.setOperatorIdentity(loadCurrentOperatorIdentity());
         return SingleResponse.of(flowService.reissue(request));
     }
 
@@ -148,8 +167,8 @@ public class FlowRecordController {
     @PostMapping("/forceSync")
     public SingleResponse<FlowForceSyncResult> forceSync(@RequestBody FlowForceSyncRequest request) {
         FlowService flowService = this.loadFlowService();
-        long operatorId = loadCurrentOperatorId();
-        request.setOperatorId(operatorId);
+        request.setOperatorId(loadCurrentOperatorId());
+        request.setOperatorIdentity(loadCurrentOperatorIdentity());
         return SingleResponse.of(flowService.forceSync(request));
     }
 

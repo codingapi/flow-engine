@@ -1,5 +1,6 @@
 package com.codingapi.flow.infra.entity;
 
+import com.codingapi.flow.operator.OperatorIdentity;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -101,6 +102,12 @@ public class FlowRecordEntity {
     private String currentOperatorName;
 
     /**
+     * 当前审批人身份标识（issue #288），空值等价默认身份
+     */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
+    private String currentOperatorIdentity;
+
+    /**
      * 提交审批人Id
      */
     private Long submitOperatorId;
@@ -111,6 +118,12 @@ public class FlowRecordEntity {
     private String submitOperatorName;
 
     /**
+     * 提交审批人身份标识（issue #288），空值等价默认身份
+     */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
+    private String submitOperatorIdentity;
+
+    /**
      * 代替的审批人
      */
     private Long forwardOperatorId;
@@ -119,6 +132,12 @@ public class FlowRecordEntity {
      * 代替的审批人名称
      */
     private String forwardOperatorName;
+
+    /**
+     * 代替的审批人身份标识（issue #288），空值等价默认身份
+     */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
+    private String forwardOperatorIdentity;
 
     /**
      * 有那个节点退回的
@@ -181,6 +200,12 @@ public class FlowRecordEntity {
     private String createOperatorName;
 
     /**
+     * 发起者身份标识（issue #288），空值等价默认身份
+     */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
+    private String createOperatorIdentity;
+
+    /**
      * 异常信息
      */
     private String errMessage;
@@ -207,6 +232,12 @@ public class FlowRecordEntity {
      * 被干预的用户名称
      */
     private String interferedOperatorName;
+
+    /**
+     * 被干预的用户身份标识（issue #288），空值等价默认身份
+     */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
+    private String interferedOperatorIdentity;
 
     /**
      * 委托记录id

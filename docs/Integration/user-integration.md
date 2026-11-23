@@ -14,11 +14,19 @@ package com.codingapi.flow.gateway;
 /** 流程操作者防腐层 */
 public interface FlowOperatorGateway {
     IFlowOperator get(long id);
+
+    /** 按 (id, identity) 取用户，default 退化为 get(id)；多身份场景需覆盖（见「多身份参与」） */
+    default IFlowOperator get(long id, String identity) {
+        return get(id);
+    }
+
     List<IFlowOperator> findByIds(List<Long> ids);
 }
 ```
 
 引擎所有「按 id 取用户 / 批量取用户」的请求都汇聚到这个接口。**框架不提供默认实现**（`flow-engine-starter-infra` 也不提供），必须由业务方提供一个 Spring Bean。
+
+> 同一人员以多个身份参与流程时（例如同时隶属两个部门），需要覆盖 `get(long, String)`，详见 [多身份参与](./operator-identity.md)。
 
 ### 1.2 `IFlowOperator`（流程操作人）
 

@@ -8,6 +8,7 @@ import com.codingapi.flow.manager.ActionManager;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.workflow.Workflow;
@@ -309,17 +310,40 @@ public class FlowContent {
         if (currentRecord == null || currentNodeRecords == null) {
             return List.of();
         }
+        return resolveCurrentNodeOperators(currentRecord, currentNodeRecords);
+    }
+
+    /**
+     * 计算当前节点实例中的待审批人员（按参与人去重，排除当前操作人）。
+     *
+     * <p>参与人由 {@code (人员id, 身份)} 共同标识：同一人员的两个身份是两个人，去重键必须带身份，
+     * 只按人员 id 去重会把另一个身份吞掉（issue #288 衍生 / #290）。
+     *
+     * @param currentRecord      当前流程记录（用于取当前操作人与其身份）
+     * @param currentNodeRecords 当前节点的流程记录
+     * @return 待审批人员列表（保持记录顺序）
+     */
+    static List<FlowOperator> resolveCurrentNodeOperators(FlowRecord currentRecord, List<FlowRecord> currentNodeRecords) {
         long currentOperatorId = currentRecord.getCurrentOperatorId();
-        Map<Long, FlowOperator> operators = new LinkedHashMap<>();
+        // 同一人员的不同身份是不同参与人，去重键必须是 (人员id, 身份)
+        Map<String, FlowOperator> operators = new LinkedHashMap<>();
         for (FlowRecord record : currentNodeRecords) {
             if (record == null || !currentRecord.getProcessId().equals(record.getProcessId())) {
                 continue;
             }
-            if (!record.isPendingApproval() || record.getCurrentOperatorId() == currentOperatorId) {
+            if (!record.isPendingApproval()) {
                 continue;
             }
-            operators.putIfAbsent(record.getCurrentOperatorId(),
-                    new FlowOperator(record.getCurrentOperatorId(), record.getCurrentOperatorName()));
+            // 排除当前操作人时必须同时比较身份：同一人以另一个身份待审批时仍应出现在列表中
+            if (record.getCurrentOperatorId() == currentOperatorId
+                    && OperatorIdentity.same(record.getCurrentOperatorIdentity(), currentRecord.getCurrentOperatorIdentity())) {
+                continue;
+            }
+            String operatorKey = record.getCurrentOperatorId() + OperatorIdentity.KEY_SEPARATOR
+                    + OperatorIdentity.normalize(record.getCurrentOperatorIdentity());
+            operators.putIfAbsent(operatorKey,
+                    new FlowOperator(record.getCurrentOperatorId(), record.getCurrentOperatorName(),
+                            record.getCurrentOperatorIdentity()));
         }
         return List.copyOf(operators.values());
     }
@@ -336,7 +360,8 @@ public class FlowContent {
     public void pushRecords(FlowRecord record, List<FlowRecord> mergeRecords) {
         this.recordId = record.getId();
         this.processId = record.getProcessId();
-        this.createOperator = new FlowOperator(record.getCreateOperatorId(), record.getCreateOperatorName());
+        this.createOperator = new FlowOperator(record.getCreateOperatorId(), record.getCreateOperatorName(),
+                record.getCreateOperatorIdentity());
         this.mergeable = record.isTodo() && record.isMergeable();
         this.flowState = record.getFlowState();
         this.recordState = record.getRecordState();
@@ -352,8 +377,10 @@ public class FlowContent {
             body.setNodeId(item.getNodeId());
             body.setNodeName(item.getNodeName());
             body.setNodeType(item.getNodeType());
-            body.setSubmitOperator(new FlowOperator(item.getSubmitOperatorId(), item.getSubmitOperatorName()));
-            body.setCreatedOperator(new FlowOperator(item.getCreateOperatorId(), item.getCreateOperatorName()));
+            body.setSubmitOperator(new FlowOperator(item.getSubmitOperatorId(), item.getSubmitOperatorName(),
+                    item.getSubmitOperatorIdentity()));
+            body.setCreatedOperator(new FlowOperator(item.getCreateOperatorId(), item.getCreateOperatorName(),
+                    item.getCreateOperatorIdentity()));
             body.setTitle(item.getTitle());
             body.setData(item.getFormData());
             body.setRecordState(item.getRecordState());
@@ -376,7 +403,8 @@ public class FlowContent {
             history.setNodeId(item.getNodeId());
             history.setNodeType(item.getNodeType());
             history.setUpdateTime(item.getUpdateTime());
-            history.setCurrentOperator(new FlowOperator(item.getCurrentOperatorId(), item.getCurrentOperatorName()));
+            history.setCurrentOperator(new FlowOperator(item.getCurrentOperatorId(), item.getCurrentOperatorName(),
+                    item.getCurrentOperatorIdentity()));
             this.histories.add(history);
         }
     }

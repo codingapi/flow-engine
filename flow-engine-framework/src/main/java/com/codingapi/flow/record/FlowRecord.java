@@ -9,6 +9,7 @@ import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.node.nodes.EndNode;
 import com.codingapi.flow.node.nodes.NotifyNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.session.FlowAdvice;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.session.IRepositoryHolder;
@@ -42,6 +43,12 @@ public class FlowRecord {
     public static int SATE_FLOW_FINISH = 2;
     public static int SATE_FLOW_ERROR = 3;
     public static int SATE_FLOW_DELETE = 4;
+
+    /**
+     * 待办合并键中身份后缀的分隔符（issue #288）。
+     * <p>仅在身份非空时追加，默认身份不使用，保证存量键格式不变。
+     */
+    private static final String IDENTITY_KEY_SUFFIX = "#";
 
     /**
      * 记录id
@@ -267,6 +274,34 @@ public class FlowRecord {
     private int parallelBranchTotal;
 
     /**
+     * 发起者身份标识（issue #288）
+     * <p>框架不解释其语义，空串表示默认身份，与未启用多身份的历史数据完全一致。
+     *
+     * @see com.codingapi.flow.operator.OperatorIdentity
+     */
+    private String createOperatorIdentity;
+
+    /**
+     * 提交审批人身份标识（issue #288）
+     */
+    private String submitOperatorIdentity;
+
+    /**
+     * 当前审批人身份标识（issue #288）
+     */
+    private String currentOperatorIdentity;
+
+    /**
+     * 代替的审批人身份标识（issue #288）
+     */
+    private String forwardOperatorIdentity;
+
+    /**
+     * 被干预的用户身份标识（issue #288）
+     */
+    private String interferedOperatorIdentity;
+
+    /**
      * 数据合并的依据,当开启时值为固定值，否则为随机数据
      * <p>合并依据由 {@link RecordMergeStrategy.MergeType} 决定：
      * <ul>
@@ -275,16 +310,40 @@ public class FlowRecord {
      *     <li>SUBMITTER — 提交人合并，按 {@link FlowRecord#submitOperatorId}</li>
      * </ul>
      * 相同依据字段 + {@link FlowRecord#workRuntimeId} + {@link FlowRecord#nodeId} 的数据合并到一条记录上。
+     *
+     * <p>多身份场景（issue #288）：同一人员的两个身份是不同的参与人，合并键必须带上身份，
+     * 否则两个身份的待办会被合并成一条。为避免破坏存量数据，采用**兼容追加**策略：
+     * <ul>
+     *     <li>默认身份（空）— 键格式保持历史原样 {@code {operatorId}-{workRuntimeId}-{nodeId}}，
+     *     升级瞬间仍在运行的流程，其待办行仍是旧格式键，合并关系不会断裂；</li>
+     *     <li>非空身份 — 追加 {@code #identity} 后缀，与默认身份、其他身份天然隔离。</li>
+     * </ul>
      */
     public String getTodoKey() {
         if (mergeable) {
             long mergeOperatorId;
+            String mergeOperatorIdentity;
             switch (mergeType) {
-                case CREATOR -> mergeOperatorId = createOperatorId;
-                case SUBMITTER -> mergeOperatorId = submitOperatorId;
-                default -> mergeOperatorId = currentOperatorId;
+                case CREATOR -> {
+                    mergeOperatorId = createOperatorId;
+                    mergeOperatorIdentity = createOperatorIdentity;
+                }
+                case SUBMITTER -> {
+                    mergeOperatorId = submitOperatorId;
+                    mergeOperatorIdentity = submitOperatorIdentity;
+                }
+                default -> {
+                    mergeOperatorId = currentOperatorId;
+                    mergeOperatorIdentity = currentOperatorIdentity;
+                }
             }
-            return String.format("%s-%s-%s", mergeOperatorId, workRuntimeId, nodeId);
+            String todoKey = String.format("%s-%s-%s", mergeOperatorId, workRuntimeId, nodeId);
+            String identity = OperatorIdentity.normalize(mergeOperatorIdentity);
+            // 默认身份保持历史键格式，保证升级过程中存量待办的合并关系不断裂
+            if (identity.isEmpty()) {
+                return todoKey;
+            }
+            return todoKey + IDENTITY_KEY_SUFFIX + identity;
         } else {
             return String.valueOf(id);
         }
@@ -326,12 +385,17 @@ public class FlowRecord {
         this.processId = FlowIDGeneratorGatewayContext.getInstance().generateProcessId();
         this.createOperatorId = flowSession.getCreatedOperator().getUserId();
         this.createOperatorName = flowSession.getCreatedOperator().getName();
+        this.createOperatorIdentity = OperatorIdentity.of(flowSession.getCreatedOperator());
+        // 身份字段统一以空串兜底，避免出现 null 与空串两种「默认身份」表达
+        this.forwardOperatorIdentity = OperatorIdentity.DEFAULT;
+        this.interferedOperatorIdentity = OperatorIdentity.DEFAULT;
         // 是否转交之后的人来审批的判断
         if (currentOperator.equals(sourceOperator)) {
             this.forwardOperatorId = 0;
         } else {
             this.forwardOperatorId = sourceOperator.getUserId();
             this.forwardOperatorName = sourceOperator.getName();
+            this.forwardOperatorIdentity = OperatorIdentity.of(sourceOperator);
         }
         this.recordState = SATE_RECORD_TODO;
         this.actionId = action.id();
@@ -340,9 +404,11 @@ public class FlowRecord {
 
         this.currentOperatorId = currentOperator.getUserId();
         this.currentOperatorName = currentOperator.getName();
+        this.currentOperatorIdentity = OperatorIdentity.of(currentOperator);
 
         this.submitOperatorId = flowSession.getSubmitOperatorId();
         this.submitOperatorName = flowSession.getSubmitOperatorName();
+        this.submitOperatorIdentity = OperatorIdentity.of(flowSession.getSubmitOperator());
 
         this.advice = flowSession.getAdvice().getAdvice();
         this.signKey = flowSession.getAdvice().getSignKey();
@@ -555,10 +621,13 @@ public class FlowRecord {
         this.updateTime = System.currentTimeMillis();
         this.recordState = pass ? SATE_RECORD_DONE : SATE_RECORD_TODO;
 
-        // 设置流程干预人信息，流程干预只能由流程管理员才能操作
-        if (flowSession.getCurrentOperator().getUserId() != this.currentOperatorId) {
+        // 设置流程干预人信息，流程干预只能由流程管理员才能操作。
+        // 参与人由 (userId, identity) 共同标识：同一人员以另一个身份办理，同样属于干预（issue #288）
+        if (flowSession.getCurrentOperator().getUserId() != this.currentOperatorId
+                || !OperatorIdentity.same(OperatorIdentity.of(flowSession.getCurrentOperator()), this.currentOperatorIdentity)) {
             this.interferedOperatorId = flowSession.getCurrentOperator().getUserId();
             this.interferedOperatorName = flowSession.getCurrentOperator().getName();
+            this.interferedOperatorIdentity = OperatorIdentity.of(flowSession.getCurrentOperator());
         }
 
         if (flowAdvice != null) {
@@ -574,6 +643,8 @@ public class FlowRecord {
         this.signKey = null;
         this.notify = true;
         this.forwardOperatorId = 0;
+        // 转交身份必须同步清零，否则身份会残留在记录上，被后续复用带出错误的参与人身份（issue #288 衍生 / #294）
+        this.forwardOperatorIdentity = OperatorIdentity.DEFAULT;
     }
 
 
@@ -694,6 +765,7 @@ public class FlowRecord {
         FlowRecord flowRecord = new FlowRecord(flowSession, 0);
         flowRecord.currentOperatorId = flowSession.getCurrentOperator().getUserId();
         flowRecord.currentOperatorName = flowSession.getCurrentOperator().getName();
+        flowRecord.currentOperatorIdentity = OperatorIdentity.of(flowSession.getCurrentOperator());
         return flowRecord;
     }
 

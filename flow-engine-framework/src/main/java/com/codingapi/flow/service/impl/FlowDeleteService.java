@@ -6,6 +6,7 @@ import com.codingapi.flow.exception.FlowNotFoundException;
 import com.codingapi.flow.exception.FlowStateException;
 import com.codingapi.flow.mock.MockRepositoryHolder;
 import com.codingapi.flow.node.nodes.StartNode;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.pojo.request.FlowDeleteRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.service.FlowRecordService;
@@ -60,8 +61,9 @@ public class FlowDeleteService {
         if (afterRecords != null && !afterRecords.isEmpty()) {
             throw FlowStateException.recordAlreadyRunning();
         }
-        // 权限校验:仅允许当前待办处理人删除
-        if (currentRecord.getCurrentOperatorId() != request.getOperatorId()) {
+        // 权限校验:仅允许当前待办处理人删除；同一人的不同身份是不同参与人（issue #288）
+        if (currentRecord.getCurrentOperatorId() != request.getOperatorId()
+                || !OperatorIdentity.same(currentRecord.getCurrentOperatorIdentity(), request.getOperatorIdentity())) {
             throw FlowStateException.operatorNotMatch();
         }
         // 删除流程记录及其关联待办

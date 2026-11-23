@@ -20,8 +20,9 @@
 
     <properties>
         <!-- 统一版本号（CI-Friendly Versions）：发版时必须用 -Drevision=x.y.z 指定正式版本 -->
-        <!-- 默认值 0.1.0-SNAPSHOT 仅用于本地开发构建；若发版时忘传 -Drevision，中央仓库会因 SNAPSHOT 直接拒绝发布 -->
-        <revision>0.1.0-SNAPSHOT</revision>
+        <!-- 默认值 0.3.0-SNAPSHOT 仅用于本地开发构建；若发版时忘传 -Drevision，中央仓库会因 SNAPSHOT 直接拒绝发布 -->
+        <!-- issue #288 为行为变更（身份标识参与记录与判定），按中版本升级：0.2.x → 0.3.0 -->
+        <revision>0.3.0-SNAPSHOT</revision>
 
         <!-- maven properties-->
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>

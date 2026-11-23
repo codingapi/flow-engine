@@ -4,6 +4,7 @@ import com.codingapi.flow.domain.DelayTask;
 import com.codingapi.flow.domain.UrgeInterval;
 import com.codingapi.flow.gateway.FlowOperatorGateway;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorKey;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.repository.FlowReissueRepository;
 import com.codingapi.flow.repository.SubProcessRepository;
@@ -88,12 +89,41 @@ public interface IRepositoryHolder {
 
 
     /**
-     * 获取流程操作人
+     * 获取流程操作人（默认身份）
      *
      * @param id 人员id
      * @return 流程操作人
      */
     IFlowOperator getOperatorById(long id);
+
+    /**
+     * 按身份获取流程操作人（issue #288）
+     *
+     * <p>同一个人员可能以不同身份参与流程，按记录回查操作者时必须带上记录里的身份，
+     * 否则同一 id 的不同身份会拿到同一个操作者实例。
+     * 默认实现忽略身份、退化为 {@link #getOperatorById(long)}，下游存量实现无需改动。
+     *
+     * @param id       人员id
+     * @param identity 身份标识，{@code null} 与空串等价（默认身份）
+     * @return 流程操作人
+     */
+    default IFlowOperator getOperatorById(long id, String identity) {
+        return getOperatorById(id);
+    }
+
+    /**
+     * 按统一身份批量获取流程操作人（issue #288 衍生 / #293）。
+     *
+     * <p>用于一批人员以同一身份参与流程的场景，避免逐条回查。
+     * 默认实现忽略身份、退化为 {@link #findOperatorByIds(List)}，下游存量实现无需改动。
+     *
+     * @param ids      人员 id 列表
+     * @param identity 身份标识，{@code null} 与空串等价（默认身份）
+     * @return 流程操作人列表
+     */
+    default List<IFlowOperator> findOperatorByIds(List<Long> ids, String identity) {
+        return findOperatorByIds(ids);
+    }
 
 
     /**
@@ -215,4 +245,34 @@ public interface IRepositoryHolder {
      * @return 操作人 ID 列表（未分配时返回空列表）
      */
     List<Long> findAssignedOperatorIds(String processId, String nodeId);
+
+    /**
+     * 保存节点操作人手动分配信息，携带身份（issue #288 衍生 / #292）。
+     *
+     * <p>{@link OperatorKey} 与 {@code List<Long>} 泛型擦除后签名相同，
+     * 无法重载，因此单独命名。默认实现忽略身份、退化为
+     * {@link #saveOperatorAssignment(String, String, List)}，下游存量实现无需改动即可编译。
+     *
+     * @param processId 流程实例唯一标识
+     * @param nodeId    节点 ID
+     * @param operators 操作人列表（含身份）
+     */
+    default void saveOperatorAssignments(String processId, String nodeId, List<OperatorKey> operators) {
+        this.saveOperatorAssignment(processId, nodeId, operators.stream()
+                .map(OperatorKey::operatorId).toList());
+    }
+
+    /**
+     * 查询节点已分配的操作人列表，携带身份（issue #288 衍生 / #292）。
+     *
+     * <p>默认实现退化为 {@link #findAssignedOperatorIds(String, String)}，返回的操作人身份均为默认身份。
+     *
+     * @param processId 流程实例唯一标识
+     * @param nodeId    节点 ID
+     * @return 操作人列表（未分配时返回空列表）
+     */
+    default List<OperatorKey> findAssignedOperators(String processId, String nodeId) {
+        return this.findAssignedOperatorIds(processId, nodeId).stream()
+                .map(OperatorKey::ofDefault).toList();
+    }
 }

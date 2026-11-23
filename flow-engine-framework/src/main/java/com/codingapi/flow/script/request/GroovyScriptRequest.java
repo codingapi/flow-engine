@@ -4,6 +4,7 @@ import com.codingapi.flow.action.IFlowAction;
 import com.codingapi.flow.form.FormData;
 import com.codingapi.flow.node.IFlowNode;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.pojo.request.FlowCreateRequest;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
@@ -278,6 +279,39 @@ public class GroovyScriptRequest {
     @ScriptFunction(name = "getSubmitOperatorName", description = "流程审批者名称")
     public String getSubmitOperatorName() {
         return this.submitOperator.getName();
+    }
+
+
+    /**
+     * 流程创建者身份标识（issue #288）
+     * <p>身份标识由下游自定义，框架不做解释；空串表示默认身份。
+     * 可用于按部门、岗位等身份差异决定节点分支。
+     *
+     * @return 创建者身份标识
+     */
+    @ScriptFunction(name = "getCreatedOperatorIdentity", description = "获取流程创建者身份标识")
+    public String getCreatedOperatorIdentity() {
+        return OperatorIdentity.of(this.createdOperator);
+    }
+
+    /**
+     * 流程审批者身份标识（issue #288）
+     *
+     * @return 当前审批者身份标识
+     */
+    @ScriptFunction(name = "getCurrentOperatorIdentity", description = "获取流程审批者身份标识")
+    public String getCurrentOperatorIdentity() {
+        return OperatorIdentity.of(this.currentOperator);
+    }
+
+    /**
+     * 流程提交人身份标识（issue #288）
+     *
+     * @return 提交人身份标识
+     */
+    @ScriptFunction(name = "getSubmitOperatorIdentity", description = "获取流程提交人身份标识")
+    public String getSubmitOperatorIdentity() {
+        return OperatorIdentity.of(this.submitOperator);
     }
 
 

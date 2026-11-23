@@ -8,6 +8,7 @@ import com.codingapi.springboot.script.annotation.ScriptFunction;
 import com.codingapi.springboot.script.annotation.ScriptType;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -36,6 +37,18 @@ public class User implements IFlowOperator {
     @Column(unique = true)
     private String account;
     private String password;
+
+    /**
+     * 当前身份标识（issue #288）。
+     *
+     * <p>同一个人员可能隶属多个部门/岗位，以不同身份参与流程。身份是**运行期选择**而非用户主数据，
+     * 因此不落库；由 {@code FlowOperatorGateway#get(id, identity)} 按身份返回携带该标识的用户副本。
+     * 不参与 {@code equals/hashCode}，避免同一 id 的两个身份副本被判定为不同用户。
+     */
+    @Transient
+    @EqualsAndHashCode.Exclude
+    @ScriptField(name = "identity", description = "当前身份标识")
+    private String identity;
 
 
     public static User admin(PasswordEncoder passwordEncoder) {
@@ -73,6 +86,36 @@ public class User implements IFlowOperator {
     @ScriptFunction(name = "isFlowManager",description = "是否为流程管理员")
     public boolean isFlowManager() {
         return flowManager!=null && flowManager ;
+    }
+
+    /**
+     * 当前身份标识，空串表示默认身份（issue #288）。
+     */
+    @Override
+    @ScriptFunction(name = "getIdentity", description = "获取当前身份标识")
+    public String getIdentity() {
+        return identity;
+    }
+
+    /**
+     * 返回携带指定身份的副本。
+     *
+     * <p>必须复制而不是直接改写实体：JPA 返回的是持久化上下文中的共享实例，
+     * 直接写入 {@code identity} 会让同一 id 的两个身份互相覆盖（缓存串味）。
+     *
+     * @param identity 身份标识
+     * @return 带身份的副本
+     */
+    public User withIdentity(String identity) {
+        User copy = new User();
+        copy.id = this.id;
+        copy.name = this.name;
+        copy.flowManager = this.flowManager;
+        copy.flowOperatorId = this.flowOperatorId;
+        copy.account = this.account;
+        copy.password = this.password;
+        copy.identity = identity;
+        return copy;
     }
 
     @Override

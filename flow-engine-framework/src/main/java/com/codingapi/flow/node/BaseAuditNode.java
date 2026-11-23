@@ -11,6 +11,7 @@ import com.codingapi.flow.javscript.annotation.NodeViewScript;
 import com.codingapi.flow.manager.NodeStrategyManager;
 import com.codingapi.flow.manager.OperatorManager;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.record.FlowRecord;
 import com.codingapi.flow.session.FlowSession;
 import com.codingapi.flow.strategy.node.MultiOperatorAuditStrategy;
@@ -262,11 +263,15 @@ public abstract class BaseAuditNode extends BaseFlowNode implements IFlowNode {
         if (nodeStrategyManager.isSameOperatorAutoPass()
                 && session.getCurrentOperator() != null
                 && session.getCurrentOperator().getUserId() == session.getSubmitOperatorId()
+                && OperatorIdentity.same(OperatorIdentity.of(session.getCurrentOperator()),
+                        OperatorIdentity.of(session.getSubmitOperator()))
                 && session.getCurrentAction() != null
                 && ActionType.PASS.name().equalsIgnoreCase(session.getCurrentAction().type())) {
             long submitOperatorId = session.getSubmitOperatorId();
+            String submitOperatorIdentity = OperatorIdentity.of(session.getSubmitOperator());
             operators = operators.stream()
-                    .filter(operator -> operator.getUserId() != submitOperatorId)
+                    .filter(operator -> operator.getUserId() != submitOperatorId
+                            || !OperatorIdentity.same(OperatorIdentity.of(operator), submitOperatorIdentity))
                     .toList();
             // 全部审批人均与提交人一致，当前节点自动通过：生成留痕记录并继续向后续节点生成记录（issue #226）
             if (operators.isEmpty()) {

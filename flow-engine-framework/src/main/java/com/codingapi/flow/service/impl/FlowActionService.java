@@ -53,8 +53,9 @@ public class FlowActionService {
         ActionResponseContext.getInstance().clear();
         request.verify();
 
-        // 验证当前用户
-        IFlowOperator currentOperator = flowOperatorGateway.get(request.getAdvice().getOperatorId());
+        // 验证当前用户（按请求声明的身份加载，issue #288）
+        IFlowOperator currentOperator = flowOperatorGateway.get(
+                request.getAdvice().getOperatorId(), request.getAdvice().getOperatorIdentity());
         if (currentOperator == null) {
             throw FlowNotFoundException.operator(request.getAdvice().getOperatorId());
         }
@@ -66,7 +67,9 @@ public class FlowActionService {
             throw FlowStateException.recordAlreadyDone();
         }
 
-        IFlowOperator createdOperator = flowOperatorGateway.get(flowRecord.getCreateOperatorId());
+        // 发起人按记录中的身份回查，避免同一 id 的不同身份拿到同一个操作者实例
+        IFlowOperator createdOperator = flowOperatorGateway.get(
+                flowRecord.getCreateOperatorId(), flowRecord.getCreateOperatorIdentity());
 
         WorkflowRuntime workflowRuntime = workflowService.getWorkflowRuntime(flowRecord.getWorkRuntimeId());
         if (workflowRuntime == null) {
@@ -78,7 +81,7 @@ public class FlowActionService {
 
         long recordOperatorId = flowRecord.getCurrentOperatorId();
         WorkflowStrategyManager workflowStrategyManager = workflow.strategyManager();
-        workflowStrategyManager.verifyOperator(currentOperator, recordOperatorId);
+        workflowStrategyManager.verifyOperator(currentOperator, recordOperatorId, flowRecord.getCurrentOperatorIdentity());
 
         IFlowNode currentNode = workflow.getFlowNode(flowRecord.getNodeId());
         if (currentNode == null) {
@@ -97,9 +100,15 @@ public class FlowActionService {
         FlowSession session = flowRecord.createFlowSession(this.repositoryHolder,workflow,currentOperator,createdOperator,currentOperator,formData,flowAdvice);
 
         // 校验并持久化 APPROVER_SELECT 节点的操作人分配（含可选人员范围校验）
-        if (flowAdvice.getOperatorSelectMap() != null
+        if (flowAdvice.getOperatorSelectOperators() != null
+                && !flowAdvice.getOperatorSelectOperators().isEmpty()) {
+            // 携带身份的分配优先（issue #288 衍生 / #292）
+            OperatorAssignmentService.validateAndSaveOperators(session, flowRecord.getProcessId(),
+                    flowAdvice.getOperatorSelectOperators());
+        } else if (flowAdvice.getOperatorSelectMap() != null
                 && !flowAdvice.getOperatorSelectMap().isEmpty()) {
-            OperatorAssignmentService.validateAndSave(session, flowRecord.getProcessId(), flowAdvice.getOperatorSelectMap());
+            OperatorAssignmentService.validateAndSave(session, flowRecord.getProcessId(),
+                    flowAdvice.getOperatorSelectMap());
         }
 
         // 验证会话

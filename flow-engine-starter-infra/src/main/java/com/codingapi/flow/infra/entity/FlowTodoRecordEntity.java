@@ -1,5 +1,6 @@
 package com.codingapi.flow.infra.entity;
 
+import com.codingapi.flow.operator.OperatorIdentity;
 import com.codingapi.flow.record.FlowRecord;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -69,6 +70,12 @@ public class FlowTodoRecordEntity {
     private String currentOperatorName;
 
     /**
+     * 当前审批人身份标识（issue #288），空值等价默认身份
+     */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
+    private String currentOperatorIdentity;
+
+    /**
      * 提交审批人Id
      */
     private Long submitOperatorId;
@@ -77,6 +84,12 @@ public class FlowTodoRecordEntity {
      * 提交审批人名称
      */
     private String submitOperatorName;
+
+    /**
+     * 提交审批人身份标识（issue #288），空值等价默认身份
+     */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
+    private String submitOperatorIdentity;
 
     /**
      * 创建时间
@@ -91,6 +104,12 @@ public class FlowTodoRecordEntity {
      * 发起者名称
      */
     private String createOperatorName;
+
+    /**
+     * 发起者身份标识（issue #288），空值等价默认身份
+     */
+    @Column(length = OperatorIdentity.MAX_LENGTH)
+    private String createOperatorIdentity;
 
     /**
      * 合并记录id,当存在合并记录数据时待办记录数量不会增加，内容会更新至最新的待办数据信息。

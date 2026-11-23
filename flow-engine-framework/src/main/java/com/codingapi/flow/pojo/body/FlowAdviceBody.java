@@ -2,6 +2,8 @@ package com.codingapi.flow.pojo.body;
 
 import com.codingapi.flow.exception.FlowValidationException;
 import com.codingapi.flow.operator.IFlowOperator;
+import com.codingapi.flow.operator.OperatorIdentity;
+import com.codingapi.flow.operator.OperatorKey;
 import com.codingapi.flow.session.FlowSession;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -46,6 +48,14 @@ public class FlowAdviceBody {
     private long operatorId;
 
     /**
+     * 操作者身份标识（issue #288）
+     * <p>同一人员可能以不同身份审批同一流程，框架只透传该标识；为空表示默认身份。
+     *
+     * @see com.codingapi.flow.operator.OperatorIdentity
+     */
+    private String operatorIdentity;
+
+    /**
      * 退回节点
      */
     private String backNodeId;
@@ -57,8 +67,15 @@ public class FlowAdviceBody {
 
     /**
      * 操作人手动选择映射（节点ID -> 操作人ID列表）
+     * <p>存量字段，仅表达人员 id（默认身份）。
      */
     private Map<String, List<Long>> operatorSelectMap;
+
+    /**
+     * 操作人手动选择映射，携带身份（issue #288 衍生 / #292）
+     * <p>节点ID -> 选定操作人列表，每项为 {@code (人员id, 身份)}，优先于 {@link #operatorSelectMap}。
+     */
+    private Map<String, List<OperatorKey>> operatorSelectOperators;
 
 
     public FlowAdviceBody(String actionId, String advice, long operatorId) {
@@ -72,11 +89,13 @@ public class FlowAdviceBody {
         this.actionId = flowSession.getCurrentAction().id();
         this.advice = flowSession.getAdvice().getAdvice();
         this.operatorId = flowSession.getCurrentOperator().getUserId();
+        this.operatorIdentity = OperatorIdentity.of(flowSession.getCurrentOperator());
         this.signKey = flowSession.getAdvice().getSignKey();
         this.backNodeId = flowSession.getAdvice().getBackNode() != null ? flowSession.getAdvice().getBackNode().getId() : null;
         this.manualNodeId = flowSession.getAdvice().getManualNode() != null ? flowSession.getAdvice().getManualNode().getId() : null;
         this.forwardOperatorIds = flowSession.getAdvice().getForwardOperators() != null ? flowSession.getAdvice().getForwardOperators().stream().map(IFlowOperator::getUserId).toList() : null;
         this.operatorSelectMap = flowSession.getAdvice().getOperatorSelectMap();
+        this.operatorSelectOperators = flowSession.getAdvice().getOperatorSelectOperators();
     }
 
 

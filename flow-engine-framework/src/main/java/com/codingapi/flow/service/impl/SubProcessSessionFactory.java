@@ -60,9 +60,12 @@ public class SubProcessSessionFactory {
         if (action == null && parentRecord.isAutoDone()) {
             action = sourceNode.actionManager().getAction(PassAction.class);
         }
-        IFlowOperator currentOperator = repositoryHolder.getOperatorById(parentRecord.getCurrentOperatorId());
-        IFlowOperator createdOperator = repositoryHolder.getOperatorById(parentRecord.getCreateOperatorId());
-        IFlowOperator submitOperator = repositoryHolder.getOperatorById(parentRecord.getSubmitOperatorId());
+        IFlowOperator currentOperator = repositoryHolder.getOperatorById(
+                parentRecord.getCurrentOperatorId(), parentRecord.getCurrentOperatorIdentity());
+        IFlowOperator createdOperator = repositoryHolder.getOperatorById(
+                parentRecord.getCreateOperatorId(), parentRecord.getCreateOperatorIdentity());
+        IFlowOperator submitOperator = repositoryHolder.getOperatorById(
+                parentRecord.getSubmitOperatorId(), parentRecord.getSubmitOperatorIdentity());
         FormData formData = new FormData(workflow.getForm());
         formData.reset(parentRecord.getFormData());
         FlowAdvice advice = parentRecord.toAdvice(workflow);

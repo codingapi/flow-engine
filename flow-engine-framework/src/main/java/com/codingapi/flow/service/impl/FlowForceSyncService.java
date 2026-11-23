@@ -62,7 +62,7 @@ public class FlowForceSyncService {
         // 最新设计必须通过校验，避免把不合法的设计同步给运行实例
         latestWorkflow.verify();
 
-        IFlowOperator operator = repositoryHolder.getOperatorById(request.getOperatorId());
+        IFlowOperator operator = repositoryHolder.getOperatorById(request.getOperatorId(), request.getOperatorIdentity());
         if (operator == null) {
             throw FlowNotFoundException.operator(request.getOperatorId());
         }

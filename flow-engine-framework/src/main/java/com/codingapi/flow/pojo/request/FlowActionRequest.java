@@ -37,6 +37,17 @@ public class FlowActionRequest {
         }
     }
 
+    /**
+     * 覆盖审批人的身份标识（issue #288），由接口层统一注入当前会话声明的身份
+     *
+     * @param operatorIdentity 身份标识，{@code null} 与空串等价（默认身份）
+     */
+    public void updateOperatorIdentity(String operatorIdentity) {
+        if (advice != null) {
+            advice.setOperatorIdentity(operatorIdentity);
+        }
+    }
+
 
     public FlowAdvice toFlowAdvice(Workflow workflow, IFlowAction flowAction) {
         FlowAdvice flowAdvice = new FlowAdvice();
@@ -54,8 +65,9 @@ public class FlowActionRequest {
             flowAdvice.setManualNode(workflow.getFlowNode(advice.getManualNodeId()));
         }
 
-        // 传递操作人手动选择映射
+        // 传递操作人手动选择映射（含身份，issue #288 衍生 / #292）
         flowAdvice.setOperatorSelectMap(advice.getOperatorSelectMap());
+        flowAdvice.setOperatorSelectOperators(advice.getOperatorSelectOperators());
 
         return flowAdvice;
     }
